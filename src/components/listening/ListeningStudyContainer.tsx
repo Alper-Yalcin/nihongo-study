@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { KanaSection, WordItem, RunStats } from '../../types';
+import React, { useEffect, useMemo, useState } from 'react';
+import { KanaSection, WordItem, RunStats, Character } from '../../types';
 import { CharacterListeningTable } from './CharacterListeningTable';
 import { ListeningStudyPanel } from './ListeningStudyPanel';
 import { SectionCard } from '../SectionCard';
 import { StudyResultPanel } from '../StudyResultPanel';
-import { Play, Headphones, BookOpen } from 'lucide-react';
+import { StudyNavigator } from '../StudyNavigator';
+import { Play, Headphones } from 'lucide-react';
 
 interface Props {
   title: string;
@@ -13,8 +14,9 @@ interface Props {
   script: 'hiragana' | 'katakana';
 }
 
-type View = 'table' | 'practice-setup' | 'test-setup' | 'practice-run' | 'test-run' | 'result';
+type View = 'table' | 'practice-run' | 'test-run' | 'result';
 type DatasetType = 'character' | 'word';
+type RunMode = 'practice' | 'test';
 
 export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, words, script }) => {
   const [view, setView] = useState<View>('table');
@@ -22,140 +24,136 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
   const [questionCount, setQuestionCount] = useState(10);
   const [quizItems, setQuizItems] = useState<{ id: string; symbol: string; label: string; audioSrc: string }[]>([]);
   const [runStats, setRunStats] = useState<RunStats | null>(null);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [lastRunMode, setLastRunMode] = useState<RunMode>('practice');
 
-  const allCharacters = sections.flatMap(s => s.groups.flatMap(g => g.characters));
-  
-  const handleStart = (mode: 'practice' | 'test') => {
+  const allCharacters = useMemo(
+    () =>
+      sections.flatMap(section =>
+        section.matrix.flatMap(row => row.filter((char): char is Character => char !== null))
+      ),
+    [sections]
+  );
+
+  const currentSection = sections[currentSectionIndex];
+  const maxCount = datasetType === 'character' ? allCharacters.length : words.length;
+  const safeMaxCount = Math.max(maxCount, 1);
+
+  useEffect(() => {
+    setQuestionCount(prev => Math.min(Math.max(prev, 1), safeMaxCount));
+  }, [safeMaxCount]);
+
+  const handleStart = (mode: RunMode) => {
     let pool: { id: string; symbol: string; label: string; audioSrc: string }[] = [];
-    
+
     if (datasetType === 'character') {
-      pool = allCharacters.map(c => ({
-        id: c.id,
-        symbol: c.symbol,
-        label: c.label,
-        audioSrc: `/audio/${script}/${c.id}.mp3`
+      pool = allCharacters.map(char => ({
+        id: char.id,
+        symbol: char.symbol,
+        label: char.label,
+        audioSrc: `/audio/${script}/${char.id}.mp3`
       }));
     } else {
-      pool = words.map(w => ({
-        id: w.id,
-        symbol: w.kana,
-        label: w.romaji,
-        audioSrc: `/audio/words/${w.id}.mp3`
+      pool = words.map(word => ({
+        id: word.id,
+        symbol: word.kana,
+        label: word.romaji,
+        audioSrc: `/audio/words/${word.id}.mp3`
       }));
     }
 
     const shuffled = [...pool].sort(() => 0.5 - Math.random());
     setQuizItems(shuffled.slice(0, Math.min(questionCount, pool.length)));
+    setLastRunMode(mode);
     setView(mode === 'practice' ? 'practice-run' : 'test-run');
   };
 
-  const renderSetup = (mode: 'practice' | 'test') => {
-    const maxCount = datasetType === 'character' ? allCharacters.length : words.length;
-    
-    return (
-      <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
-        <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">
-          {mode === 'practice' ? 'Listening Practice' : 'Listening Test'} Setup
-        </h3>
-        
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Dataset</label>
-            <div className="grid grid-cols-2 gap-3">
+  if (!currentSection) {
+    return null;
+  }
+
+  return (
+    <SectionCard title={`${title} Listening`} description={`Improve your listening skills for ${title}.`}>
+      {view === 'table' && (
+        <>
+          <StudyNavigator
+            title={currentSection.title}
+            currentIndex={currentSectionIndex}
+            totalItems={sections.length}
+            onNext={() => setCurrentSectionIndex(prev => Math.min(prev + 1, sections.length - 1))}
+            onPrev={() => setCurrentSectionIndex(prev => Math.max(prev - 1, 0))}
+          />
+
+          <div className="mb-2 text-center text-sm text-slate-500">
+            Click on any character to open its listening card.
+          </div>
+
+          <CharacterListeningTable section={currentSection} script={script} />
+
+          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setDatasetType('character')}
-                className={`py-3 px-4 rounded-xl border-2 font-medium transition-all ${
+                className={`flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   datasetType === 'character'
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                    : 'border-slate-200 text-slate-600 hover:border-indigo-200'
+                    ? 'border border-indigo-200 bg-indigo-100 text-indigo-700'
+                    : 'border border-transparent text-slate-600 hover:bg-slate-200/50'
                 }`}
               >
                 Characters
               </button>
               <button
                 onClick={() => setDatasetType('word')}
-                className={`py-3 px-4 rounded-xl border-2 font-medium transition-all ${
+                className={`flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   datasetType === 'word'
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                    : 'border-slate-200 text-slate-600 hover:border-indigo-200'
+                    ? 'border border-indigo-200 bg-indigo-100 text-indigo-700'
+                    : 'border border-transparent text-slate-600 hover:bg-slate-200/50'
                 }`}
               >
                 Words
               </button>
             </div>
+
+            <div className="flex flex-wrap items-center gap-3 xl:justify-end">
+              <label className="text-sm font-medium text-slate-500" htmlFor={`${script}-listening-count`}>
+                Questions
+              </label>
+              <input
+                id={`${script}-listening-count`}
+                type="number"
+                min="1"
+                max={safeMaxCount}
+                value={questionCount}
+                onChange={(e) => setQuestionCount(Math.min(safeMaxCount, Math.max(1, parseInt(e.target.value, 10) || 1)))}
+                className="w-20 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none transition-colors focus:border-indigo-400"
+              />
+              <div className="text-sm font-medium text-slate-500">
+                <span className="text-slate-700">{questionCount}</span> items / <span className="text-slate-700">{maxCount}</span> total
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleStart('practice')}
+                  disabled={maxCount === 0}
+                  className="flex items-center rounded-lg bg-emerald-600 px-3 py-2 font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Listening Practice"
+                >
+                  <Headphones size={16} className="mr-1.5" />
+                  Practice
+                </button>
+                <button
+                  onClick={() => handleStart('test')}
+                  disabled={maxCount === 0}
+                  className="flex items-center rounded-lg bg-amber-500 px-3 py-2 font-medium text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Listening Test"
+                >
+                  <Play size={16} className="mr-1.5" />
+                  Test
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Question Count (Max: {maxCount})
-            </label>
-            <input
-              type="number"
-              min="1"
-              max={maxCount}
-              value={questionCount}
-              onChange={(e) => setQuestionCount(Math.min(maxCount, Math.max(1, parseInt(e.target.value) || 1)))}
-              className="w-full py-3 px-4 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none text-slate-800 font-medium"
-            />
-          </div>
-
-          <button
-            onClick={() => handleStart(mode)}
-            className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
-          >
-            <Play size={20} className="mr-2" />
-            Start {mode === 'practice' ? 'Practice' : 'Test'}
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <SectionCard title={`${title} Listening`} description={`Improve your listening skills for ${title}.`}>
-      {/* Sub-navigation for Listening */}
-      <div className="flex justify-center mb-8">
-        <div className="inline-flex bg-slate-100 p-1 rounded-xl shadow-sm border border-slate-200">
-          <button
-            onClick={() => setView('table')}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              view === 'table'
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-            }`}
-          >
-            <BookOpen size={16} className="mr-2" />
-            Character Table
-          </button>
-          <button
-            onClick={() => setView('practice-setup')}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              view === 'practice-setup' || view === 'practice-run'
-                ? 'bg-white text-emerald-600 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-            }`}
-          >
-            <Headphones size={16} className="mr-2" />
-            Practice Mode
-          </button>
-          <button
-            onClick={() => setView('test-setup')}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              view === 'test-setup' || view === 'test-run'
-                ? 'bg-white text-amber-600 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-            }`}
-          >
-            <Play size={16} className="mr-2" />
-            Test Mode
-          </button>
-        </div>
-      </div>
-
-      {view === 'table' && <CharacterListeningTable sections={sections} script={script} />}
-      
-      {view === 'practice-setup' && renderSetup('practice')}
-      {view === 'test-setup' && renderSetup('test')}
+        </>
+      )}
 
       {view === 'practice-run' && (
         <ListeningStudyPanel
@@ -165,7 +163,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
             setRunStats(stats);
             setView('result');
           }}
-          onCancel={() => setView('practice-setup')}
+          onCancel={() => setView('table')}
         />
       )}
 
@@ -177,7 +175,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
             setRunStats(stats);
             setView('result');
           }}
-          onCancel={() => setView('test-setup')}
+          onCancel={() => setView('table')}
         />
       )}
 
@@ -185,7 +183,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
         <StudyResultPanel
           section={{ id: `listening-${script}`, title: 'Listening', description: '', matrix: [], groups: [] }}
           stats={runStats}
-          onRestart={() => setView('table')}
+          onRestart={() => handleStart(lastRunMode)}
           onBack={() => setView('table')}
           isDrawing={false}
         />

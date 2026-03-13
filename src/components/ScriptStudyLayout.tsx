@@ -5,7 +5,7 @@ import { WordStudyContainer } from './WordStudyContainer';
 import { ListeningStudyContainer } from './listening/ListeningStudyContainer';
 import { Keyboard, PenTool, BookA, Headphones } from 'lucide-react';
 
-export type StudyView = 'typing' | 'drawing' | 'dictionary' | 'listening';
+export type StudyView = 'typing' | 'drawing' | 'listening' | 'dictionary';
 
 interface Props {
   title: string;
@@ -18,7 +18,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
   title,
   kanaSections,
   dictionaryWords,
-  availableViews = ['typing', 'drawing', 'dictionary', 'listening']
+  availableViews = ['typing', 'drawing', 'listening', 'dictionary']
 }) => {
   const [activeView, setActiveView] = useState<StudyView>(availableViews[0]);
 
@@ -53,19 +53,6 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               Drawing
             </button>
           )}
-          {availableViews.includes('dictionary') && (
-            <button
-              onClick={() => setActiveView('dictionary')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeView === 'dictionary'
-                  ? 'bg-white text-amber-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              <BookA size={16} className="mr-2" />
-              Dictionary
-            </button>
-          )}
           {availableViews.includes('listening') && (
             <button
               onClick={() => setActiveView('listening')}
@@ -77,6 +64,19 @@ export const ScriptStudyLayout: React.FC<Props> = ({
             >
               <Headphones size={16} className="mr-2" />
               Listening
+            </button>
+          )}
+          {availableViews.includes('dictionary') && (
+            <button
+              onClick={() => setActiveView('dictionary')}
+              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeView === 'dictionary'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+              }`}
+            >
+              <BookA size={16} className="mr-2" />
+              Dictionary
             </button>
           )}
         </div>
@@ -94,11 +94,6 @@ export const ScriptStudyLayout: React.FC<Props> = ({
             <StudyContainer title={`${title} Drawing`} sections={kanaSections} mode="drawing" />
           )}
         </div>
-        <div style={{ display: activeView === 'dictionary' ? 'block' : 'none' }}>
-          {availableViews.includes('dictionary') && (
-            <WordStudyContainer title={title} words={dictionaryWords} />
-          )}
-        </div>
         <div style={{ display: activeView === 'listening' ? 'block' : 'none' }}>
           {availableViews.includes('listening') && (
             <ListeningStudyContainer 
@@ -107,6 +102,11 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               words={dictionaryWords} 
               script={title.toLowerCase() as 'hiragana' | 'katakana'} 
             />
+          )}
+        </div>
+        <div style={{ display: activeView === 'dictionary' ? 'block' : 'none' }}>
+          {availableViews.includes('dictionary') && (
+            <WordStudyContainer title={title} words={dictionaryWords} />
           )}
         </div>
       </div>
