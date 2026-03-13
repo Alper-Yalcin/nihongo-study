@@ -1,76 +1,132 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
+import {
+  kanaFontStyles,
+  KanaFontStyleId
+} from '../data/kanaFontStyles';
 
-export const Settings: React.FC = () => {
+interface SettingsProps {
+  kanaFontStyle: KanaFontStyleId;
+  onKanaFontStyleChange: (fontStyle: KanaFontStyleId) => void;
+}
+
+export const Settings: React.FC<SettingsProps> = ({
+  kanaFontStyle,
+  onKanaFontStyleChange
+}) => {
+  const selectedFont = kanaFontStyles.find(option => option.id === kanaFontStyle) ?? kanaFontStyles[0];
+
   return (
     <PageContainer title="Settings">
-      <SectionCard title="Application Settings" description="Customize your learning experience.">
-        <div className="space-y-6 max-w-2xl">
-          
-          {/* Theme Setting */}
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
-            <div>
-              <h4 className="text-sm font-medium text-slate-800">Theme</h4>
-              <p className="text-sm text-slate-500">Choose your preferred color theme.</p>
-            </div>
-            <select className="block w-32 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-slate-50 px-3 py-2 border">
-              <option>Light</option>
-              <option>Dark</option>
-              <option>System</option>
-            </select>
-          </div>
+      <div className="space-y-6">
+        <SectionCard
+          title="Kana Writing Style"
+          description="Switch between different Japanese type styles to compare glyph shapes, similar to the design selector on RealKana."
+        >
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-800">Live Preview</h3>
+                  <p className="text-sm text-slate-500">
+                    Current style: {selectedFont.name}
+                  </p>
+                </div>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-500 shadow-sm border border-slate-200">
+                  Applied globally
+                </span>
+              </div>
 
-          {/* Font Size Setting */}
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
-            <div>
-              <h4 className="text-sm font-medium text-slate-800">Font Size</h4>
-              <p className="text-sm text-slate-500">Adjust the size of Japanese characters.</p>
+              <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                <div
+                  className="mb-3 text-center text-4xl text-slate-800 md:text-5xl"
+                  style={{ fontFamily: selectedFont.fontFamily }}
+                >
+                  ひ さ そ り ふ め
+                </div>
+                <div
+                  className="text-center text-2xl text-slate-700 md:text-3xl"
+                  style={{ fontFamily: selectedFont.fontFamily }}
+                >
+                  ヒ サ ソ リ フ メ
+                </div>
+              </div>
             </div>
-            <select className="block w-32 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-slate-50 px-3 py-2 border">
-              <option>Small</option>
-              <option>Medium</option>
-              <option>Large</option>
-            </select>
-          </div>
 
-          {/* Show Romaji Toggle */}
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
-            <div>
-              <h4 className="text-sm font-medium text-slate-800">Show Romaji</h4>
-              <p className="text-sm text-slate-500">Display romaji readings below characters.</p>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {kanaFontStyles.map(option => {
+                const isSelected = option.id === kanaFontStyle;
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => onKanaFontStyleChange(option.id)}
+                    className={`rounded-2xl border p-4 text-left transition-all ${
+                      isSelected
+                        ? 'border-indigo-300 bg-indigo-50 shadow-sm'
+                        : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">{option.name}</div>
+                        <div className="mt-1 text-sm text-slate-500">{option.description}</div>
+                      </div>
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+                          isSelected
+                            ? 'border-indigo-500 bg-indigo-500 text-white'
+                            : 'border-slate-300 bg-white text-transparent'
+                        }`}
+                      >
+                        <Check size={14} />
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                      <div
+                        className="text-center text-3xl text-slate-800"
+                        style={{ fontFamily: option.fontFamily }}
+                      >
+                        {option.preview}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-            <button type="button" className="bg-indigo-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2" role="switch" aria-checked="true">
-              <span aria-hidden="true" className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-            </button>
           </div>
+        </SectionCard>
 
-          {/* Study Mode */}
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
-            <div>
-              <h4 className="text-sm font-medium text-slate-800">Study Mode</h4>
-              <p className="text-sm text-slate-500">Select how you want to practice.</p>
+        <SectionCard
+          title="How It Works"
+          description="The selected kana font updates every place that uses Japanese text in the app."
+        >
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <div className="mb-1 text-sm font-semibold text-slate-800">Typing & Drawing</div>
+              <p className="text-sm text-slate-500">
+                Study tables and prompts use the selected kana style.
+              </p>
             </div>
-            <select className="block w-32 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-slate-50 px-3 py-2 border">
-              <option>Read</option>
-              <option>Write</option>
-              <option>Quiz</option>
-            </select>
-          </div>
-
-          {/* Sound Effects Toggle */}
-          <div className="flex items-center justify-between py-3">
-            <div>
-              <h4 className="text-sm font-medium text-slate-800">Sound Effects</h4>
-              <p className="text-sm text-slate-500">Play audio pronunciation when clicking characters.</p>
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <div className="mb-1 text-sm font-semibold text-slate-800">Listening</div>
+              <p className="text-sm text-slate-500">
+                Listening cards and character modal previews follow the same style.
+              </p>
             </div>
-            <button type="button" className="bg-slate-200 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2" role="switch" aria-checked="false">
-              <span aria-hidden="true" className="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-            </button>
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <div className="mb-1 text-sm font-semibold text-slate-800">Dictionary</div>
+              <p className="text-sm text-slate-500">
+                Kana words in dictionary tables switch instantly when you change the style.
+              </p>
+            </div>
           </div>
-
-        </div>
-      </SectionCard>
+        </SectionCard>
+      </div>
     </PageContainer>
   );
 };
