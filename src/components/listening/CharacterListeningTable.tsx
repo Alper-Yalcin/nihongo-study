@@ -11,9 +11,8 @@ export const CharacterListeningTable: React.FC<Props> = ({ sections, script }) =
   const [modalOpen, setModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Flatten all characters to allow easy navigation
-  const allCharacters = sections.flatMap(section => 
-    section.groups.flatMap(group => group.characters)
+  const allCharacters = sections.flatMap(section =>
+    section.matrix.flatMap(row => row.filter((char): char is Character => char !== null))
   );
 
   const handleCharacterClick = (char: Character) => {
@@ -34,31 +33,49 @@ export const CharacterListeningTable: React.FC<Props> = ({ sections, script }) =
 
   return (
     <div className="space-y-8">
-      {sections.map(section => (
-        <div key={section.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-          <h3 className="text-xl font-bold text-slate-800 mb-4">{section.title}</h3>
-          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
-            {section.groups.map(group => (
-              group.characters.map(char => (
-                <button
-                  key={char.id}
-                  onClick={() => handleCharacterClick(char)}
-                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 transition-colors group"
-                >
-                  <span className="text-2xl font-jp text-slate-800 group-hover:text-indigo-700 mb-1">
-                    {char.symbol}
-                  </span>
-                  <span className="text-xs font-medium text-slate-500 group-hover:text-indigo-500">
-                    {char.label}
-                  </span>
-                </button>
-              ))
-            ))}
+      {sections.map(section => {
+        const columnCount = Math.max(...section.matrix.map(row => row.length), 1);
+
+        return (
+          <div key={section.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">{section.title}</h3>
+          <div className="w-full overflow-x-auto pb-2">
+            <div
+              className="inline-grid gap-2"
+              style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(64px, 64px))` }}
+            >
+              {section.matrix.flatMap((row, rowIndex) =>
+                row.map((char, colIndex) =>
+                  char ? (
+                    <button
+                      key={char.id}
+                      type="button"
+                      onClick={() => handleCharacterClick(char)}
+                      className="group flex min-h-16 flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 p-3 transition-colors hover:border-indigo-200 hover:bg-indigo-50"
+                    >
+                      <span className="mb-1 text-2xl font-jp text-slate-800 group-hover:text-indigo-700">
+                        {char.symbol}
+                      </span>
+                      <span className="text-xs font-medium text-slate-500 group-hover:text-indigo-500">
+                        {char.label}
+                      </span>
+                    </button>
+                  ) : (
+                    <div
+                      key={`${section.id}-${rowIndex}-${colIndex}`}
+                      aria-hidden="true"
+                      className="min-h-16 rounded-xl"
+                    />
+                  )
+                )
+              )}
+            </div>
           </div>
         </div>
-      ))}
+        );
+      })}
 
-      {modalOpen && (
+      {modalOpen && allCharacters.length > 0 && (
         <CharacterModal
           characters={allCharacters}
           currentIndex={currentIndex}

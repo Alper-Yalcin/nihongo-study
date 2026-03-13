@@ -16,53 +16,78 @@ export const StudyTable: React.FC<StudyTableProps> = ({
   onToggleGroup,
   interactive 
 }) => {
+  const columnCount = Math.max(...matrix.map(row => row.length), 1);
+
   return (
     <div className="w-full overflow-x-auto pb-2">
-      <table className="border-collapse w-max bg-white text-center text-slate-800 shadow-sm rounded-sm">
-        <tbody>
-          {matrix.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((char, colIndex) => {
-                const groupId = columnGroupIds ? columnGroupIds[colIndex] : null;
-                const isSelected = selectedGroupIds && groupId ? selectedGroupIds.has(groupId) : false;
-                const hasSelection = selectedGroupIds && selectedGroupIds.size > 0;
-                const isClickable = interactive && char && groupId;
+      <div
+        className="inline-grid gap-2"
+        style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(64px, 64px))` }}
+      >
+        {matrix.flatMap((row, rowIndex) =>
+          row.map((char, colIndex) => {
+            const groupId = columnGroupIds ? columnGroupIds[colIndex] : null;
+            const isSelected = selectedGroupIds && groupId ? selectedGroupIds.has(groupId) : false;
+            const hasSelection = Boolean(selectedGroupIds && selectedGroupIds.size > 0);
+            const isClickable = Boolean(interactive && char && groupId);
 
-                return (
-                  <td
-                    key={`${rowIndex}-${colIndex}`}
-                    onClick={() => {
-                      if (isClickable && onToggleGroup && groupId) {
-                        onToggleGroup(groupId);
-                      }
-                    }}
-                    className={`border border-slate-200 p-1 w-14 h-14 align-middle transition-all ${
-                      char ? 'bg-white' : 'bg-slate-50/30'
-                    } ${
-                      isClickable ? 'cursor-pointer hover:bg-indigo-50/50' : ''
-                    } ${
-                      isSelected ? 'bg-indigo-50 border-indigo-200' : ''
-                    } ${
-                      hasSelection && !isSelected && char ? 'opacity-40 hover:opacity-80' : ''
-                    }`}
-                  >
-                    {char ? (
-                      <div className={`flex flex-col items-center justify-center ${isSelected ? 'text-indigo-900' : ''}`}>
-                        <span className={`text-xl font-medium font-jp leading-none mb-1 transition-colors ${isSelected ? 'text-indigo-700' : 'text-slate-800'}`}>
-                          {char.symbol}
-                        </span>
-                        <span className={`text-[10px] font-mono tracking-wide leading-none ${isSelected ? 'text-indigo-500 font-semibold' : 'text-slate-400'}`}>
-                          {char.label}
-                        </span>
-                      </div>
-                    ) : null}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            if (!char) {
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  aria-hidden="true"
+                  className={`min-h-16 rounded-xl border transition-all ${
+                    isSelected
+                      ? 'border-indigo-200 bg-indigo-50/50'
+                      : 'border-transparent bg-transparent'
+                  }`}
+                />
+              );
+            }
+
+            return (
+              <button
+                key={char.id}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => {
+                  if (isClickable && onToggleGroup && groupId) {
+                    onToggleGroup(groupId);
+                  }
+                }}
+                className={`group flex min-h-16 flex-col items-center justify-center rounded-xl border p-3 transition-all ${
+                  isSelected
+                    ? 'border-indigo-200 bg-indigo-50'
+                    : 'border-slate-100 bg-slate-50'
+                } ${
+                  isClickable
+                    ? 'cursor-pointer hover:border-indigo-200 hover:bg-indigo-50'
+                    : 'cursor-default'
+                } ${
+                  hasSelection && !isSelected ? 'opacity-40 hover:opacity-80' : ''
+                }`}
+              >
+                <span
+                  className={`mb-1 text-2xl font-jp transition-colors ${
+                    isSelected ? 'text-indigo-700' : 'text-slate-800 group-hover:text-indigo-700'
+                  }`}
+                >
+                  {char.symbol}
+                </span>
+                <span
+                  className={`text-xs font-medium transition-colors ${
+                    isSelected
+                      ? 'font-semibold text-indigo-500'
+                      : 'text-slate-500 group-hover:text-indigo-500'
+                  }`}
+                >
+                  {char.label}
+                </span>
+              </button>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };
