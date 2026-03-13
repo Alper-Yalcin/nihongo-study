@@ -1,12 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { WordItem } from '../types';
 import { WordTable } from './WordTable';
 import { Search, ChevronLeft, ChevronRight, Keyboard, ListChecks } from 'lucide-react';
 
+type LevelFilter = 'all' | NonNullable<WordItem['jlptLevel']>;
+
+const jlptFilters: NonNullable<WordItem['jlptLevel']>[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
+
 interface Props {
   words: WordItem[];
-  onStartTyping: (questionCount: number) => void;
-  onStartTest: (questionCount: number) => void;
+  onStartTyping: (questionCount: number, sourceWords: WordItem[]) => void;
+  onStartTest: (questionCount: number, sourceWords: WordItem[]) => void;
 }
 
 export const WordDictionaryPanel: React.FC<Props> = ({
@@ -15,98 +19,169 @@ export const WordDictionaryPanel: React.FC<Props> = ({
   onStartTest
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeLevel, setActiveLevel] = useState<LevelFilter>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [questionCount, setQuestionCount] = useState(10);
   const pageSize = 10;
 
   const filteredWords = useMemo(() => {
-    if (!searchTerm.trim()) return words;
-    const lowerSearch = searchTerm.toLowerCase().trim();
-    return words.filter(w => 
-      w.kana.toLowerCase().includes(lowerSearch) ||
-      w.romaji.toLowerCase().includes(lowerSearch) ||
-      (w.meaning && w.meaning.toLowerCase().includes(lowerSearch))
-    );
-  }, [words, searchTerm]);
+    const normalizedSearch = searchTerm.toLowerCase().trim();
 
-  const totalPages = Math.max(1, Math.ceil(filteredWords.length / pageSize));
-  
-  // Reset to page 1 when search changes
+    return words.filter((word) => {
+      const matchesLevel = activeLevel === 'all' || word.jlptLevel === activeLevel;
+
+      if (!matchesLevel) {
+        return false;
+      }
+
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      return (
+        word.kana.toLowerCase().includes(normalizedSearch) ||
+        word.romaji.toLowerCase().includes(normalizedSearch) ||
+        (word.meaning && word.meaning.toLowerCase().includes(normalizedSearch)) ||
+        (word.jlptLevel && word.jlptLevel.toLowerCase().includes(normalizedSearch))
+      );
+    });
+  }, [activeLevel, searchTerm, words]);
+
+  const availableWordCount = filteredWords.length;
+  const maxQuestionCount = Math.max(availableWordCount, 1);
+  const totalPages = Math.max(1, Math.ceil(availableWordCount / pageSize));
+
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, activeLevel]);
+
+  React.useEffect(() => {
+    setQuestionCount((previousCount) => {
+      if (availableWordCount === 0) {
+        return 1;
+      }
+
+      return Math.min(Math.max(previousCount, 1), availableWordCount);
+    });
+  }, [availableWordCount]);
 
   const paginatedWords = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filteredWords.slice(start, start + pageSize);
   }, [filteredWords, currentPage, pageSize]);
 
-  const handlePrevPage = () => setCurrentPage(p => Math.max(1, p - 1));
-  const handleNextPage = () => setCurrentPage(p => Math.min(totalPages, p + 1));
+  const handlePrevPage = () => setCurrentPage((page) => Math.max(1, page - 1));
+  const handleNextPage = () => setCurrentPage((page) => Math.min(totalPages, page + 1));
 
   const handleQuestionCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = parseInt(e.target.value, 10);
-    if (isNaN(val)) val = 1;
-    setQuestionCount(val);
+    const parsedValue = parseInt(e.target.value, 10);
+
+    if (Number.isNaN(parsedValue)) {
+      setQuestionCount(1);
+      return;
+    }
+
+    setQuestionCount(parsedValue);
   };
 
   const handleQuestionCountBlur = () => {
-    let val = questionCount;
-    if (val < 1) val = 1;
-    if (val > words.length) val = words.length;
-    setQuestionCount(val);
+    if (availableWordCount === 0) {
+      setQuestionCount(1);
+      return;
+    }
+
+    let nextValue = questionCount;
+    if (nextValue < 1) nextValue = 1;
+    if (nextValue > availableWordCount) nextValue = availableWordCount;
+    setQuestionCount(nextValue);
   };
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">JLPT Levels</div>
+            <div className="text-sm text-slate-500">Filter the dictionary and study modes by level.</div>
+          </div>
+          <div className="rounded-full bg-white px-3 py-1 text-sm font-medium text-slate-600 shadow-sm">
+            {availableWordCount} words
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveLevel('all')}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              activeLevel === 'all'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-white text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            All
+          </button>
+          {jlptFilters.map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() => setActiveLevel(level)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                activeLevel === level
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'bg-white text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {level}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <Search size={18} className="text-slate-400" />
         </div>
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search kana, romaji, or meaning..."
-          className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+          placeholder="Search kana, romaji, meaning, or level..."
+          className="w-full rounded-xl border border-slate-200 py-2 pr-4 pl-10 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
-      
-      {/* Dictionary Table */}
-      <WordTable 
+
+      <WordTable
         words={paginatedWords}
         startIndex={(currentPage - 1) * pageSize}
       />
-      
-      {/* Pagination */}
-      <div className="flex items-center justify-between bg-slate-50 rounded-xl p-2 border border-slate-200">
-        <div className="text-sm text-slate-500 px-2">
-          Showing {filteredWords.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredWords.length)} of {filteredWords.length} words
+
+      <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2">
+        <div className="px-2 text-sm text-slate-500">
+          Showing {availableWordCount === 0 ? 0 : (currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, availableWordCount)} of {availableWordCount} words
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
-            className="p-1.5 rounded-md text-slate-500 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ChevronLeft size={18} />
           </button>
-          <span className="text-sm font-medium text-slate-700 px-2">
+          <span className="px-2 text-sm font-medium text-slate-700">
             Page {currentPage} / {totalPages}
           </span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="p-1.5 rounded-md text-slate-500 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ChevronRight size={18} />
           </button>
         </div>
       </div>
 
-      {/* Quiz Controls */}
-      <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-slate-200 shadow-sm mt-6">
+      <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center space-x-3">
           <label htmlFor="questionCount" className="text-sm font-medium text-slate-700">
             Questions:
@@ -115,29 +190,29 @@ export const WordDictionaryPanel: React.FC<Props> = ({
             id="questionCount"
             type="number"
             min={1}
-            max={words.length}
+            max={maxQuestionCount}
             value={questionCount}
             onChange={handleQuestionCountChange}
             onBlur={handleQuestionCountBlur}
-            className="w-20 px-3 py-1.5 border border-slate-200 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            className="w-20 rounded-lg border border-slate-200 px-3 py-1.5 text-center focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           />
-          <span className="text-xs text-slate-400">/ {words.length} max</span>
+          <span className="text-xs text-slate-400">/ {availableWordCount} max</span>
         </div>
-        
+
         <div className="flex space-x-3">
           <button
-            onClick={() => onStartTyping(questionCount)}
-            disabled={words.length === 0}
-            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => onStartTyping(questionCount, filteredWords)}
+            disabled={availableWordCount === 0}
+            className="flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Keyboard size={18} className="mr-2" />
             Start Typing
           </button>
           <button
-            onClick={() => onStartTest(questionCount)}
-            disabled={words.length < 4}
-            className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title={words.length < 4 ? "Need at least 4 words" : ""}
+            onClick={() => onStartTest(questionCount, filteredWords)}
+            disabled={availableWordCount < 4}
+            className="flex items-center rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+            title={availableWordCount < 4 ? 'Need at least 4 words' : ''}
           >
             <ListChecks size={18} className="mr-2" />
             Start Test

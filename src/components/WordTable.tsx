@@ -13,6 +13,7 @@ export const WordTable: React.FC<Props> = ({ words, startIndex }) => {
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-sm font-medium uppercase tracking-wider">
             <th className="p-3 w-12 text-center">#</th>
+            <th className="p-3">Level</th>
             <th className="p-3">Kana</th>
             <th className="p-3">Romaji</th>
             <th className="p-3">Meaning</th>
@@ -23,6 +24,11 @@ export const WordTable: React.FC<Props> = ({ words, startIndex }) => {
             words.map((word, index) => (
               <tr key={word.id} className="transition-colors hover:bg-slate-50">
                 <td className="p-3 text-center text-slate-400 text-sm">{startIndex + index + 1}</td>
+                <td className="p-3">
+                  <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
+                    {word.jlptLevel || '-'}
+                  </span>
+                </td>
                 <td className="p-3 font-jp text-lg font-medium text-slate-800">{word.kana}</td>
                 <td className="p-3 text-slate-600 font-mono">{word.romaji}</td>
                 <td className="p-3 text-slate-500">{word.meaning || '-'}</td>
@@ -30,7 +36,7 @@ export const WordTable: React.FC<Props> = ({ words, startIndex }) => {
             ))
           ) : (
             <tr>
-              <td colSpan={4} className="p-8 text-center text-slate-500">
+              <td colSpan={5} className="p-8 text-center text-slate-500">
                 No words found.
               </td>
             </tr>
