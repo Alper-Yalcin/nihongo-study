@@ -1,7 +1,7 @@
 import React from 'react';
 import { KanaSection } from '../types';
 import { StudyTable } from './StudyTable';
-import { Play, CheckSquare, Square, Keyboard, PenTool } from 'lucide-react';
+import { CheckSquare, Square, Keyboard, PenTool } from 'lucide-react';
 
 interface Props {
   section: KanaSection;
@@ -57,24 +57,28 @@ export const StudySelectionPanel: React.FC<Props> = ({
       <div className="flex items-center justify-between bg-slate-50 rounded-xl p-3 border border-slate-200">
         <div className="flex space-x-3">
           <button 
+            type="button"
             onClick={onSelectAll} 
-            className={`text-sm flex items-center px-3 py-1.5 rounded-md font-medium transition-colors ${
+            aria-pressed={isAllSelected}
+            className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-colors ${
               isAllSelected 
                 ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' 
                 : 'text-slate-600 hover:bg-slate-200/50 border border-transparent'
             }`}
           >
-            <CheckSquare size={16} className="mr-1.5" /> All
+            <CheckSquare size={17} strokeWidth={2.1} className="shrink-0" /> <span>All</span>
           </button>
           <button 
+            type="button"
             onClick={onDeselectAll} 
-            className={`text-sm flex items-center px-3 py-1.5 rounded-md font-medium transition-colors ${
+            aria-pressed={isNoneSelected}
+            className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-colors ${
               isNoneSelected 
                 ? 'bg-slate-200 text-slate-700 border border-slate-300' 
                 : 'text-slate-600 hover:bg-slate-200/50 border border-transparent'
             }`}
           >
-            <Square size={16} className="mr-1.5" /> None
+            <Square size={17} strokeWidth={2.1} className="shrink-0" /> <span>None</span>
           </button>
         </div>
         

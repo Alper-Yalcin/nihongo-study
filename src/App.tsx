@@ -5,6 +5,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 import { Overview } from './pages/Overview';
 import { Hiragana } from './pages/Hiragana';
 import { Katakana } from './pages/Katakana';
@@ -87,7 +88,7 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen bg-slate-50 font-sans text-slate-900 ${themeMode === 'dark' ? 'theme-dark' : 'theme-light'}`}
+      className={`min-h-screen bg-slate-50 font-sans text-slate-900 ${themeMode === 'dark' ? 'theme-dark' : 'theme-light'} flex flex-col`}
       style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
     >
       <Navbar
@@ -98,9 +99,10 @@ export default function App() {
         themeMode={themeMode}
         onThemeModeChange={setThemeMode}
       />
-      <main>
+      <main className="flex-1">
         {renderContent()}
       </main>
+      <Footer language={language} themeMode={themeMode} />
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { FeatureCards } from '../components/overview/FeatureCards';
 import { TypingFeatureSection } from '../components/overview/TypingFeatureSection';
 import { DrawingFeatureSection } from '../components/overview/DrawingFeatureSection';
 import { DictionaryFeatureSection } from '../components/overview/DictionaryFeatureSection';
-import { ProjectInfoSection } from '../components/overview/ProjectInfoSection';
 import { TabType } from '../types';
 
 interface Props {
@@ -24,8 +23,6 @@ export const Overview: React.FC<Props> = ({ onNavigate = () => {} }) => {
           <DrawingFeatureSection />
           <DictionaryFeatureSection />
         </div>
-        
-        <ProjectInfoSection />
       </div>
     </PageContainer>
   );
