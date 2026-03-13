@@ -3,7 +3,7 @@ export type ThemeMode = 'light' | 'dark';
 
 export const navbarLabels: Record<AppLanguage, Record<'overview' | 'hiragana' | 'katakana' | 'kanji' | 'settings', string>> = {
   tr: {
-    overview: 'Genel Bakış',
+    overview: 'Genel Bak\u0131\u015f',
     hiragana: 'Hiragana',
     katakana: 'Katakana',
     kanji: 'Kanji',
@@ -20,7 +20,7 @@ export const navbarLabels: Record<AppLanguage, Record<'overview' | 'hiragana' | 
 
 export const languageMeta: Record<AppLanguage, { label: string; shortLabel: string }> = {
   tr: {
-    label: 'Türkçe',
+    label: 'T\u00fcrk\u00e7e',
     shortLabel: 'TR'
   },
   en: {
@@ -31,7 +31,7 @@ export const languageMeta: Record<AppLanguage, { label: string; shortLabel: stri
 
 export const themeLabels: Record<AppLanguage, Record<ThemeMode, string>> = {
   tr: {
-    light: 'Gündüz',
+    light: 'G\u00fcnd\u00fcz',
     dark: 'Gece'
   },
   en: {

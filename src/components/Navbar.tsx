@@ -1,5 +1,5 @@
-import React from 'react';
-import { Moon, Sun } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDown, Moon, Sun } from 'lucide-react';
 import { TabType } from '../types';
 import {
   AppLanguage,
@@ -35,9 +35,28 @@ export const Navbar: React.FC<NavbarProps> = ({
   themeMode,
   onThemeModeChange
 }) => {
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
+
   const labels = navbarLabels[language];
   const themeText = themeLabels[language];
   const isDark = themeMode === 'dark';
+
+  const selectedLanguage = useMemo(
+    () => languageOptions.find(option => option.id === language) ?? languageOptions[0],
+    [language]
+  );
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!languageMenuRef.current?.contains(event.target as Node)) {
+        setIsLanguageMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('mousedown', handlePointerDown);
+    return () => window.removeEventListener('mousedown', handlePointerDown);
+  }, []);
 
   const panelClass = isDark
     ? 'border border-slate-700 bg-slate-900/80'
@@ -46,6 +65,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navClass = isDark
     ? 'bg-slate-950 border-b border-slate-800 shadow-[0_8px_24px_rgba(2,6,23,0.28)]'
     : 'bg-white border-b border-gray-200 shadow-sm';
+
+  const dropdownItemBase = isDark
+    ? 'text-slate-200 hover:bg-slate-800'
+    : 'text-slate-700 hover:bg-slate-50';
+
+  const toggleTheme = () => {
+    onThemeModeChange(isDark ? 'light' : 'dark');
+  };
 
   return (
     <nav className={`sticky top-0 z-20 backdrop-blur ${navClass}`}>
@@ -78,114 +105,73 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className={`hidden rounded-xl p-1 sm:flex ${panelClass}`}>
-              {languageOptions.map((option) => {
-                const isActive = option.id === language;
-
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => onLanguageChange(option.id)}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                        : isDark
-                          ? 'text-slate-300 hover:bg-slate-800 hover:text-slate-100'
-                          : 'text-slate-600 hover:bg-white hover:text-slate-900'
-                    }`}
-                    aria-label={languageMeta[option.id].label}
-                  >
-                    <img src={option.flag} alt="" className="h-4 w-4 rounded-full object-cover" />
-                    <span>{languageMeta[option.id].shortLabel}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className={`hidden rounded-xl p-1 sm:flex ${panelClass}`}>
+            <div ref={languageMenuRef} className="relative">
               <button
                 type="button"
-                onClick={() => onThemeModeChange('light')}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  themeMode === 'light'
-                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                    : isDark
-                      ? 'text-slate-300 hover:bg-slate-800 hover:text-slate-100'
-                      : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                onClick={() => setIsLanguageMenuOpen(prev => !prev)}
+                className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${panelClass} ${
+                  isDark ? 'text-slate-100 hover:bg-slate-800' : 'text-slate-700 hover:bg-white'
                 }`}
-                aria-label={themeText.light}
+                aria-haspopup="menu"
+                aria-expanded={isLanguageMenuOpen}
               >
-                <Sun size={16} />
-                <span>{themeText.light}</span>
+                <img src={selectedLanguage.flag} alt="" className="h-4 w-4 rounded-full object-cover" />
+                <span className="hidden sm:inline">{languageMeta[language].label}</span>
+                <span className="sm:hidden">{languageMeta[language].shortLabel}</span>
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${isLanguageMenuOpen ? 'rotate-180' : ''}`}
+                />
               </button>
-              <button
-                type="button"
-                onClick={() => onThemeModeChange('dark')}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  themeMode === 'dark'
-                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                    : isDark
-                      ? 'text-slate-300 hover:bg-slate-800 hover:text-slate-100'
-                      : 'text-slate-600 hover:bg-white hover:text-slate-900'
-                }`}
-                aria-label={themeText.dark}
-              >
-                <Moon size={16} />
-                <span>{themeText.dark}</span>
-              </button>
-            </div>
 
-            <div className={`flex rounded-xl p-1 sm:hidden ${panelClass}`}>
-              {languageOptions.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => onLanguageChange(option.id)}
-                  className={`rounded-lg p-2 transition-colors ${
-                    option.id === language
-                      ? 'bg-white shadow-sm ring-1 ring-slate-200'
-                      : isDark
-                        ? 'hover:bg-slate-800'
-                        : 'hover:bg-white'
+              {isLanguageMenuOpen && (
+                <div
+                  className={`absolute right-0 top-[calc(100%+8px)] min-w-44 overflow-hidden rounded-xl shadow-lg ${
+                    isDark ? 'border border-slate-700 bg-slate-900' : 'border border-slate-200 bg-white'
                   }`}
-                  aria-label={languageMeta[option.id].label}
+                  role="menu"
                 >
-                  <img src={option.flag} alt="" className="h-4 w-4 rounded-full object-cover" />
-                </button>
-              ))}
+                  {languageOptions.map((option) => {
+                    const isActive = option.id === language;
+
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => {
+                          onLanguageChange(option.id);
+                          setIsLanguageMenuOpen(false);
+                        }}
+                        className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm font-medium transition-colors ${
+                          isActive
+                            ? isDark
+                              ? 'bg-slate-800 text-white'
+                              : 'bg-indigo-50 text-indigo-700'
+                            : dropdownItemBase
+                        }`}
+                        role="menuitem"
+                      >
+                        <img src={option.flag} alt="" className="h-4 w-4 rounded-full object-cover" />
+                        <span>{languageMeta[option.id].label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            <div className={`flex rounded-xl p-1 sm:hidden ${panelClass}`}>
-              <button
-                type="button"
-                onClick={() => onThemeModeChange('light')}
-                className={`rounded-lg p-2 transition-colors ${
-                  themeMode === 'light'
-                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                    : isDark
-                      ? 'text-slate-300 hover:bg-slate-800'
-                      : 'text-slate-600 hover:bg-white'
-                }`}
-                aria-label={themeText.light}
-              >
-                <Sun size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => onThemeModeChange('dark')}
-                className={`rounded-lg p-2 transition-colors ${
-                  themeMode === 'dark'
-                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                    : isDark
-                      ? 'text-slate-300 hover:bg-slate-800'
-                      : 'text-slate-600 hover:bg-white'
-                }`}
-                aria-label={themeText.dark}
-              >
-                <Moon size={16} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${panelClass} ${
+                isDark ? 'text-slate-100 hover:bg-slate-800' : 'text-slate-700 hover:bg-white'
+              }`}
+              aria-label={isDark ? themeText.dark : themeText.light}
+              title={isDark ? themeText.dark : themeText.light}
+            >
+              {isDark ? <Moon size={16} /> : <Sun size={16} />}
+              <span className="hidden sm:inline">{isDark ? themeText.dark : themeText.light}</span>
+            </button>
           </div>
         </div>
       </div>

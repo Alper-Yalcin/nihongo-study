@@ -8,14 +8,14 @@ interface Props {
 
 export const OverviewHero: React.FC<Props> = ({ onNavigate }) => {
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-white rounded-3xl p-8 md:p-12 border border-indigo-100 mb-12 text-center">
-      <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+    <div className="overview-hero bg-gradient-to-br from-indigo-50 to-white rounded-3xl p-8 md:p-12 border border-indigo-100 mb-12 text-center">
+      <h1 className="overview-hero-title text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
         Japanese Kana Study App
       </h1>
-      <p className="text-xl text-indigo-900 mb-6 font-medium">
+      <p className="overview-hero-lead text-xl text-indigo-900 mb-6 font-medium">
         Practice Hiragana and Katakana with typing, drawing, and dictionary exercises.
       </p>
-      <p className="text-slate-600 max-w-2xl mx-auto mb-10 text-lg">
+      <p className="overview-hero-copy text-slate-600 max-w-2xl mx-auto mb-10 text-lg">
         This application helps you learn Japanese kana through multiple interactive study methods including typing exercises, handwriting practice, and vocabulary quizzes.
       </p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
