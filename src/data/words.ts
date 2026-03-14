@@ -1,24 +1,21 @@
 import { WordItem } from '../types';
 
 type JlptLevel = NonNullable<WordItem['jlptLevel']>;
+type ScriptType = NonNullable<WordItem['script']>;
 
 const jlptLevelOrder: JlptLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 
-const createWord = (
-  id: string,
-  kana: string,
-  romaji: string,
-  meaning: string,
-  script: WordItem['script'],
-  jlptLevel: JlptLevel
-): WordItem => ({
-  id,
-  kana,
-  romaji,
-  meaning,
-  script,
-  jlptLevel
-});
+const hiraganaCsvModules = import.meta.glob('../../csv/hiragana/*.csv', {
+  eager: true,
+  import: 'default',
+  query: '?raw'
+}) as Record<string, string>;
+
+const katakanaCsvModules = import.meta.glob('../../csv/katakana/*.csv', {
+  eager: true,
+  import: 'default',
+  query: '?raw'
+}) as Record<string, string>;
 
 const sortDictionaryWords = (words: WordItem[]) =>
   [...words].sort((a, b) => {
@@ -33,52 +30,146 @@ const sortDictionaryWords = (words: WordItem[]) =>
     return a.romaji.localeCompare(b.romaji);
   });
 
-const hiraganaWords: WordItem[] = [
-  createWord('hiragana-n5-asoko', 'あそこ', 'asoko', 'there, over there', 'hiragana', 'N5'),
-  createWord('hiragana-n5-achira', 'あちら', 'achira', 'this way; that way', 'hiragana', 'N5'),
-  createWord('hiragana-n5-ikutsu', 'いくつ', 'ikutsu', 'how many; how old', 'hiragana', 'N5'),
-  createWord('hiragana-n5-itsu', 'いつ', 'itsu', 'when', 'hiragana', 'N5'),
-  createWord('hiragana-n4-gomi', 'ごみ', 'gomi', 'trash; garbage', 'hiragana', 'N4'),
-  createWord('hiragana-n4-shikkari', 'しっかり', 'shikkari', 'firmly; steadily', 'hiragana', 'N4'),
-  createWord('hiragana-n4-tsumori', 'つもり', 'tsumori', 'intention; plan', 'hiragana', 'N4'),
-  createWord('hiragana-n4-dame', 'だめ', 'dame', 'no good; useless', 'hiragana', 'N4'),
-  createWord('hiragana-n3-shaberu', 'しゃべる', 'shaberu', 'to chat; to talk', 'hiragana', 'N3'),
-  createWord('hiragana-n3-shibashiba', 'しばしば', 'shibashiba', 'often; frequently', 'hiragana', 'N3'),
-  createWord('hiragana-n3-suteki', 'すてき', 'suteki', 'lovely; wonderful', 'hiragana', 'N3'),
-  createWord('hiragana-n3-zutto', 'ずっと', 'zutto', 'all the time; by far', 'hiragana', 'N3'),
-  createWord('hiragana-n2-aimai', 'あいまい', 'aimai', 'vague; ambiguous', 'hiragana', 'N2'),
-  createWord('hiragana-n2-akubi', 'あくび', 'akubi', 'yawn', 'hiragana', 'N2'),
-  createWord('hiragana-n2-afureru', 'あふれる', 'afureru', 'to overflow', 'hiragana', 'N2'),
-  createWord('hiragana-n2-ikinari', 'いきなり', 'ikinari', 'all of a sudden', 'hiragana', 'N2'),
-  createWord('hiragana-n1-kojireru', 'こじれる', 'kojireru', 'to grow complicated', 'hiragana', 'N1'),
-  createWord('hiragana-n1-kodawaru', 'こだわる', 'kodawaru', 'to be particular about', 'hiragana', 'N1'),
-  createWord('hiragana-n1-gomakasu', 'ごまかす', 'gomakasu', 'to deceive; to falsify', 'hiragana', 'N1'),
-  createWord('hiragana-n1-shikitari', 'しきたり', 'shikitari', 'custom; convention', 'hiragana', 'N1')
-];
+// Minimal CSV parser that keeps quoted commas and line breaks intact.
+const parseCsv = (text: string): string[][] => {
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentCell = '';
+  let inQuotes = false;
 
-const katakanaWords: WordItem[] = [
-  createWord('katakana-n5-apaato', 'アパート', 'apaato', 'apartment', 'katakana', 'N5'),
-  createWord('katakana-n5-kamera', 'カメラ', 'kamera', 'camera', 'katakana', 'N5'),
-  createWord('katakana-n5-gitaa', 'ギター', 'gitaa', 'guitar', 'katakana', 'N5'),
-  createWord('katakana-n5-koohii', 'コーヒー', 'koohii', 'coffee', 'katakana', 'N5'),
-  createWord('katakana-n4-gasorin', 'ガソリン', 'gasorin', 'gasoline; petrol', 'katakana', 'N4'),
-  createWord('katakana-n4-sandoicchi', 'サンドイッチ', 'sandoicchi', 'sandwich', 'katakana', 'N4'),
-  createWord('katakana-n4-sutereo', 'ステレオ', 'sutereo', 'stereo', 'katakana', 'N4'),
-  createWord('katakana-n4-tekisuto', 'テキスト', 'tekisuto', 'textbook; text', 'katakana', 'N4'),
-  createWord('katakana-n3-juusu', 'ジュース', 'juusu', 'juice; soft drink', 'katakana', 'N3'),
-  createWord('katakana-n3-suicchi', 'スイッチ', 'suicchi', 'switch', 'katakana', 'N3'),
-  createWord('katakana-n3-sukejuuru', 'スケジュール', 'sukejuuru', 'schedule', 'katakana', 'N3'),
-  createWord('katakana-n3-supiichi', 'スピーチ', 'supiichi', 'speech', 'katakana', 'N3'),
-  createWord('katakana-n2-akusento', 'アクセント', 'akusento', 'accent', 'katakana', 'N2'),
-  createWord('katakana-n2-antena', 'アンテナ', 'antena', 'antenna', 'katakana', 'N2'),
-  createWord('katakana-n2-epuron', 'エプロン', 'epuron', 'apron', 'katakana', 'N2'),
-  createWord('katakana-n2-ookesutora', 'オーケストラ', 'ookesutora', 'orchestra', 'katakana', 'N2'),
-  createWord('katakana-n1-koonaa', 'コーナー', 'koonaa', 'corner', 'katakana', 'N1'),
-  createWord('katakana-n1-komento', 'コメント', 'komento', 'comment', 'katakana', 'N1'),
-  createWord('katakana-n1-kontorooru', 'コントロール', 'kontorooru', 'control', 'katakana', 'N1'),
-  createWord('katakana-n1-saikuru', 'サイクル', 'saikuru', 'cycle', 'katakana', 'N1')
-];
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
 
-export const hiraganaDictionaryWords: WordItem[] = sortDictionaryWords(hiraganaWords);
+    if (inQuotes) {
+      if (character === '"') {
+        if (text[index + 1] === '"') {
+          currentCell += '"';
+          index += 1;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        currentCell += character;
+      }
 
-export const katakanaDictionaryWords: WordItem[] = sortDictionaryWords(katakanaWords);
+      continue;
+    }
+
+    if (character === '"') {
+      inQuotes = true;
+      continue;
+    }
+
+    if (character === ',') {
+      currentRow.push(currentCell);
+      currentCell = '';
+      continue;
+    }
+
+    if (character === '\n') {
+      currentRow.push(currentCell.replace(/\r$/, ''));
+      rows.push(currentRow);
+      currentRow = [];
+      currentCell = '';
+      continue;
+    }
+
+    currentCell += character;
+  }
+
+  if (currentCell.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentCell.replace(/\r$/, ''));
+    rows.push(currentRow);
+  }
+
+  return rows;
+};
+
+const getJlptLevelFromPath = (path: string): JlptLevel | null => {
+  const match = path.match(/n([1-5])_(hiragana|katakana)\.csv$/i);
+
+  if (!match) {
+    return null;
+  }
+
+  return `N${match[1]}` as JlptLevel;
+};
+
+const createWordId = (
+  script: ScriptType,
+  jlptLevel: JlptLevel,
+  kana: string,
+  romaji: string,
+  meaning: string
+) => {
+  let hash = 5381;
+
+  for (const character of `${kana}|${romaji}|${meaning}`) {
+    hash = ((hash << 5) + hash + character.codePointAt(0)!) >>> 0;
+  }
+
+  return `${script}-${jlptLevel.toLowerCase()}-${hash.toString(36)}`;
+};
+
+const buildDictionaryWords = (
+  csvModules: Record<string, string>,
+  script: ScriptType
+): WordItem[] => {
+  const uniqueWords = new Map<string, WordItem>();
+
+  const files = Object.entries(csvModules)
+    .map(([path, content]) => ({
+      path,
+      content,
+      jlptLevel: getJlptLevelFromPath(path)
+    }))
+    .filter(
+      (entry): entry is { path: string; content: string; jlptLevel: JlptLevel } =>
+        entry.jlptLevel !== null
+    )
+    .sort((a, b) => {
+      const levelDiff = jlptLevelOrder.indexOf(a.jlptLevel) - jlptLevelOrder.indexOf(b.jlptLevel);
+
+      if (levelDiff !== 0) {
+        return levelDiff;
+      }
+
+      return a.path.localeCompare(b.path);
+    });
+
+  for (const file of files) {
+    const rows = parseCsv(file.content.replace(/^\uFEFF/, ''));
+
+    for (const row of rows.slice(1)) {
+      const [rawKana = '', rawRomaji = '', rawMeaning = ''] = row;
+      const kana = rawKana.trim();
+      const romaji = rawRomaji.trim();
+      const meaning = rawMeaning.trim();
+
+      if (!kana || !romaji) {
+        continue;
+      }
+
+      const dedupeKey = `${kana}\u0000${romaji}\u0000${meaning}`;
+
+      if (uniqueWords.has(dedupeKey)) {
+        continue;
+      }
+
+      uniqueWords.set(dedupeKey, {
+        id: createWordId(script, file.jlptLevel, kana, romaji, meaning),
+        kana,
+        romaji,
+        meaning: meaning || undefined,
+        script,
+        jlptLevel: file.jlptLevel
+      });
+    }
+  }
+
+  return sortDictionaryWords([...uniqueWords.values()]);
+};
+
+export const hiraganaDictionaryWords: WordItem[] = buildDictionaryWords(hiraganaCsvModules, 'hiragana');
+
+export const katakanaDictionaryWords: WordItem[] = buildDictionaryWords(katakanaCsvModules, 'katakana');
