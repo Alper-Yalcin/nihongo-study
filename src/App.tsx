@@ -67,7 +67,7 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview onNavigate={setActiveTab} />;
+        return <Overview language={language} onNavigate={setActiveTab} />;
       case 'hiragana':
         return <Hiragana />;
       case 'katakana':
@@ -82,7 +82,7 @@ export default function App() {
           />
         );
       default:
-        return <Overview onNavigate={setActiveTab} />;
+        return <Overview language={language} onNavigate={setActiveTab} />;
     }
   };
 

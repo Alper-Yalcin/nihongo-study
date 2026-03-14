@@ -14,7 +14,7 @@ const footerCopy: Record<AppLanguage, {
 }> = {
   tr: {
     description: 'Hiragana, katakana ve kelime pratiğini typing, drawing, listening ve dictionary modlarıyla tek yerde sürdür.',
-    features: ['Typing', 'Drawing', 'Listening', 'Dictionary'],
+    features: ['Typing', 'Çizim', 'Dinleme', 'Sözlük'],
     bottomLine: `© ${new Date().getFullYear()} Nihongo Study`,
     roadmap: 'Sıradaki hedef: Kanji çalışma modülü'
   },
