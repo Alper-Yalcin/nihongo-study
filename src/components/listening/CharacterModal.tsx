@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Character } from '../../types';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { AudioButton } from './AudioButton';
+import { AppLanguage } from '../../data/appPreferences';
+import { studyContent } from '../../data/studyContent';
 
 interface Props {
   characters: Character[];
@@ -10,6 +12,7 @@ interface Props {
   onPrev: () => void;
   onClose: () => void;
   script: 'hiragana' | 'katakana';
+  language: AppLanguage;
 }
 
 export const CharacterModal: React.FC<Props> = ({
@@ -18,8 +21,10 @@ export const CharacterModal: React.FC<Props> = ({
   onNext,
   onPrev,
   onClose,
-  script
+  script,
+  language
 }) => {
+  const copy = studyContent[language];
   const character = characters[currentIndex];
 
   useEffect(() => {
@@ -43,6 +48,8 @@ export const CharacterModal: React.FC<Props> = ({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
+          aria-label={copy.common.close}
+          title={copy.common.close}
         >
           <X size={24} />
         </button>
@@ -57,7 +64,8 @@ export const CharacterModal: React.FC<Props> = ({
           </div>
 
           <AudioButton 
-            src={audioSrc} 
+            src={audioSrc}
+            language={language}
             autoPlay={true}
             size={32}
             className="w-16 h-16 mb-8"
@@ -67,6 +75,8 @@ export const CharacterModal: React.FC<Props> = ({
             <button
               onClick={onPrev}
               className="p-3 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors"
+              aria-label={copy.common.previous}
+              title={copy.common.previous}
             >
               <ChevronLeft size={28} />
             </button>
@@ -76,6 +86,8 @@ export const CharacterModal: React.FC<Props> = ({
             <button
               onClick={onNext}
               className="p-3 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors"
+              aria-label={copy.common.next}
+              title={copy.common.next}
             >
               <ChevronRight size={28} />
             </button>

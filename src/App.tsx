@@ -69,11 +69,11 @@ export default function App() {
       case 'overview':
         return <Overview language={language} onNavigate={setActiveTab} />;
       case 'hiragana':
-        return <Hiragana />;
+        return <Hiragana language={language} />;
       case 'katakana':
-        return <Katakana />;
+        return <Katakana language={language} />;
       case 'kanji':
-        return <Kanji />;
+        return <Kanji language={language} />;
       case 'settings':
         return (
           <Settings

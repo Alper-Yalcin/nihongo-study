@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { KanaSection, Character } from '../../types';
 import { CharacterModal } from './CharacterModal';
+import { AppLanguage } from '../../data/appPreferences';
 
 interface Props {
   section: KanaSection;
   script: 'hiragana' | 'katakana';
+  language: AppLanguage;
 }
 
-export const CharacterListeningTable: React.FC<Props> = ({ section, script }) => {
+export const CharacterListeningTable: React.FC<Props> = ({ section, script, language }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -75,6 +77,7 @@ export const CharacterListeningTable: React.FC<Props> = ({ section, script }) =>
           onPrev={handlePrev}
           onClose={() => setModalOpen(false)}
           script={script}
+          language={language}
         />
       )}
     </>

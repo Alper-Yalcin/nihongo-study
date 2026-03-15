@@ -6,14 +6,16 @@ import { StudySelectionPanel } from './StudySelectionPanel';
 import { StudyRunPanel } from './StudyRunPanel';
 import { StudyResultPanel } from './StudyResultPanel';
 import { DrawingStudyPanel } from './DrawingStudyPanel';
+import { AppLanguage } from '../data/appPreferences';
 
 interface StudyContainerProps {
   title: string;
+  language: AppLanguage;
   sections: KanaSection[];
   mode: 'typing' | 'drawing';
 }
 
-export const StudyContainer: React.FC<StudyContainerProps> = ({ title, sections, mode }) => {
+export const StudyContainer: React.FC<StudyContainerProps> = ({ title, language, sections, mode }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [view, setView] = useState<'selection' | 'run' | 'result'>('selection');
   const [selectedGroupsBySection, setSelectedGroupsBySection] = useState<Record<string, Set<string>>>({});
@@ -50,7 +52,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, sections,
       });
     });
 
-    const baseId = title.replace(/ (Typing|Drawing)$/, '').toLowerCase().replace(/\s+/g, '-');
+    const baseId = `${sections[0]?.id.split('-')[0] ?? 'study'}-${mode}`;
     const mergedSec: KanaSection = {
       id: baseId,
       title: `${title} All`,
@@ -110,9 +112,11 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, sections,
             totalItems={sections.length}
             onNext={handleNext}
             onPrev={handlePrev}
+            language={language}
           />
           <StudySelectionPanel
             section={currentSection}
+            language={language}
             selectedGroupIds={selectedGroupIds}
             onChangeSelection={handleSelectionChange}
             onStart={() => setView('run')}
@@ -129,6 +133,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, sections,
       {view === 'run' && mode === 'typing' && (
         <StudyRunPanel
           section={mergedSection}
+          language={language}
           selectedGroupIds={mergedSelectedGroupIds}
           onFinish={(stats) => {
             setRunStats(stats);
@@ -140,6 +145,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, sections,
       {view === 'run' && mode === 'drawing' && (
         <DrawingStudyPanel
           section={mergedSection}
+          language={language}
           selectedGroupIds={mergedSelectedGroupIds}
           onFinish={(stats) => {
             setRunStats(stats);
@@ -151,10 +157,11 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, sections,
       {view === 'result' && runStats && (
         <StudyResultPanel
           section={mergedSection}
+          language={language}
           stats={runStats}
           onRestart={() => setView('run')}
           onBack={() => setView('selection')}
-          isDrawing={mode === 'drawing'}
+          variant={mode}
         />
       )}
     </SectionCard>

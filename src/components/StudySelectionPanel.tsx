@@ -2,9 +2,12 @@ import React from 'react';
 import { KanaSection } from '../types';
 import { StudyTable } from './StudyTable';
 import { CheckSquare, Square, Keyboard, PenTool } from 'lucide-react';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface Props {
   section: KanaSection;
+  language: AppLanguage;
   selectedGroupIds: Set<string>;
   onChangeSelection: (newSelection: Set<string>) => void;
   onStart: () => void;
@@ -19,6 +22,7 @@ interface Props {
 
 export const StudySelectionPanel: React.FC<Props> = ({
   section,
+  language,
   selectedGroupIds,
   onChangeSelection,
   onStart,
@@ -30,6 +34,8 @@ export const StudySelectionPanel: React.FC<Props> = ({
   totalSelectedChars,
   mode
 }) => {
+  const copy = studyContent[language];
+
   const toggleGroup = (groupId: string) => {
     const next = new Set(selectedGroupIds);
     if (next.has(groupId)) {
@@ -43,7 +49,7 @@ export const StudySelectionPanel: React.FC<Props> = ({
   return (
     <div className="space-y-4">
       <div className="text-sm text-slate-500 mb-2 text-center">
-        Click on any character in a column to select/deselect it for study.
+        {copy.selection.instruction}
       </div>
       
       <StudyTable 
@@ -66,7 +72,7 @@ export const StudySelectionPanel: React.FC<Props> = ({
                 : 'text-slate-600 hover:bg-slate-200/50 border border-transparent'
             }`}
           >
-            <CheckSquare size={17} strokeWidth={2.1} className="shrink-0" /> <span>All</span>
+            <CheckSquare size={17} strokeWidth={2.1} className="shrink-0" /> <span>{copy.selection.all}</span>
           </button>
           <button 
             type="button"
@@ -78,13 +84,13 @@ export const StudySelectionPanel: React.FC<Props> = ({
                 : 'text-slate-600 hover:bg-slate-200/50 border border-transparent'
             }`}
           >
-            <Square size={17} strokeWidth={2.1} className="shrink-0" /> <span>None</span>
+            <Square size={17} strokeWidth={2.1} className="shrink-0" /> <span>{copy.selection.none}</span>
           </button>
         </div>
         
         <div className="flex items-center space-x-4">
           <div className="text-sm text-slate-500 font-medium">
-            <span className="text-slate-700">{totalSelectedGroups}</span> cols / <span className="text-slate-700">{totalSelectedChars}</span> chars
+            {copy.selection.summary(totalSelectedGroups, totalSelectedChars)}
           </div>
           <div className="flex space-x-2">
             {mode === 'typing' ? (
@@ -92,20 +98,20 @@ export const StudySelectionPanel: React.FC<Props> = ({
                 onClick={onStart}
                 disabled={totalSelectedGroups === 0}
                 className="flex items-center px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Typing Study"
+                title={copy.selection.typingStudyTitle}
               >
                 <Keyboard size={16} className="mr-1.5" />
-                Typing
+                {copy.selection.startTyping}
               </button>
             ) : (
               <button
                 onClick={onStart}
                 disabled={totalSelectedGroups === 0}
                 className="flex items-center px-3 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Drawing Study"
+                title={copy.selection.drawingStudyTitle}
               >
                 <PenTool size={16} className="mr-1.5" />
-                Drawing
+                {copy.selection.startDrawing}
               </button>
             )}
           </div>

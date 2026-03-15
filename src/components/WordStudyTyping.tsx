@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { WordItem, RunStats } from '../types';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface Props {
+  language: AppLanguage;
   words: WordItem[];
   onFinish: (stats: RunStats) => void;
   onCancel: () => void;
 }
 
-export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) => {
+export const WordStudyTyping: React.FC<Props> = ({ language, words, onFinish, onCancel }) => {
+  const copy = studyContent[language];
   const [pool, setPool] = useState<WordItem[]>(words);
   const [currentWord, setCurrentWord] = useState<WordItem | null>(null);
   const [inputValue, setInputValue] = useState('');
@@ -95,8 +99,8 @@ export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) 
         {/* Header / Stats */}
         <div className="flex items-center justify-between mb-8 text-sm font-medium text-slate-500">
           <div className="flex space-x-4">
-            <span className="text-emerald-600">Correct: {correctCount}</span>
-            <span className="text-rose-600">Wrong: {wrongCount}</span>
+            <span className="text-emerald-600">{copy.common.correct}: {correctCount}</span>
+            <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
           </div>
           <div className="flex space-x-4">
             <span>{formatTime(timeSeconds)}</span>
@@ -106,7 +110,7 @@ export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) 
 
         {/* Target Info */}
         <div className="text-center mb-12">
-          <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-2">Type the Romaji</div>
+          <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-2">{copy.wordTyping.prompt}</div>
           <div className="text-6xl font-bold text-slate-800 font-jp tracking-wider">{currentWord?.kana}</div>
           {currentWord?.meaning && (
             <div className="text-slate-400 mt-4 text-sm">{currentWord.meaning}</div>
@@ -128,7 +132,7 @@ export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) 
                   ? 'bg-rose-50 border-rose-400 text-rose-700'
                   : 'bg-white border-slate-200 text-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10'
             }`}
-            placeholder="romaji"
+            placeholder={copy.wordTyping.placeholder}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
@@ -136,7 +140,7 @@ export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) 
           />
           {feedback === 'wrong' && (
             <div className="absolute -bottom-8 left-0 right-0 text-center text-rose-500 font-medium animate-pulse">
-              Try again!
+              {copy.wordTyping.tryAgain}
             </div>
           )}
         </form>
@@ -147,7 +151,7 @@ export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) 
             onClick={onCancel}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <ArrowLeft size={16} className="mr-1" /> Back to Dictionary
+            <ArrowLeft size={16} className="mr-1" /> {copy.wordTyping.backToDictionary}
           </button>
           <button
             onClick={() => {
@@ -162,7 +166,7 @@ export const WordStudyTyping: React.FC<Props> = ({ words, onFinish, onCancel }) 
             }}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <RotateCcw size={16} className="mr-1" /> Restart Run
+            <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
           </button>
         </div>
 

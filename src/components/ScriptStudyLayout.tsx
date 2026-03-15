@@ -4,11 +4,15 @@ import { StudyContainer } from './StudyContainer';
 import { WordStudyContainer } from './WordStudyContainer';
 import { ListeningStudyContainer } from './listening/ListeningStudyContainer';
 import { Keyboard, PenTool, BookA, Headphones } from 'lucide-react';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 export type StudyView = 'typing' | 'drawing' | 'listening' | 'dictionary';
 
 interface Props {
   title: string;
+  language: AppLanguage;
+  script: 'hiragana' | 'katakana';
   kanaSections: KanaSection[];
   dictionaryWords: WordItem[];
   availableViews?: StudyView[];
@@ -16,11 +20,14 @@ interface Props {
 
 export const ScriptStudyLayout: React.FC<Props> = ({
   title,
+  language,
+  script,
   kanaSections,
   dictionaryWords,
   availableViews = ['typing', 'drawing', 'listening', 'dictionary']
 }) => {
   const [activeView, setActiveView] = useState<StudyView>(availableViews[0]);
+  const copy = studyContent[language];
 
   return (
     <div className="space-y-6">
@@ -37,7 +44,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               }`}
             >
               <Keyboard size={16} className="mr-2" />
-              Typing
+              {copy.views.typing}
             </button>
           )}
           {availableViews.includes('drawing') && (
@@ -50,7 +57,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               }`}
             >
               <PenTool size={16} className="mr-2" />
-              Drawing
+              {copy.views.drawing}
             </button>
           )}
           {availableViews.includes('listening') && (
@@ -63,7 +70,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               }`}
             >
               <Headphones size={16} className="mr-2" />
-              Listening
+              {copy.views.listening}
             </button>
           )}
           {availableViews.includes('dictionary') && (
@@ -76,7 +83,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               }`}
             >
               <BookA size={16} className="mr-2" />
-              Dictionary
+              {copy.views.dictionary}
             </button>
           )}
         </div>
@@ -86,27 +93,28 @@ export const ScriptStudyLayout: React.FC<Props> = ({
       <div className="mt-6">
         <div style={{ display: activeView === 'typing' ? 'block' : 'none' }}>
           {availableViews.includes('typing') && (
-            <StudyContainer title={`${title} Typing`} sections={kanaSections} mode="typing" />
+            <StudyContainer title={`${title} ${copy.views.typing}`} language={language} sections={kanaSections} mode="typing" />
           )}
         </div>
         <div style={{ display: activeView === 'drawing' ? 'block' : 'none' }}>
           {availableViews.includes('drawing') && (
-            <StudyContainer title={`${title} Drawing`} sections={kanaSections} mode="drawing" />
+            <StudyContainer title={`${title} ${copy.views.drawing}`} language={language} sections={kanaSections} mode="drawing" />
           )}
         </div>
         <div style={{ display: activeView === 'listening' ? 'block' : 'none' }}>
           {availableViews.includes('listening') && (
-            <ListeningStudyContainer 
-              title={title} 
-              sections={kanaSections} 
-              words={dictionaryWords} 
-              script={title.toLowerCase() as 'hiragana' | 'katakana'} 
+            <ListeningStudyContainer
+              title={title}
+              language={language}
+              sections={kanaSections}
+              words={dictionaryWords}
+              script={script}
             />
           )}
         </div>
         <div style={{ display: activeView === 'dictionary' ? 'block' : 'none' }}>
           {availableViews.includes('dictionary') && (
-            <WordStudyContainer title={title} words={dictionaryWords} />
+            <WordStudyContainer title={title} language={language} words={dictionaryWords} />
           )}
         </div>
       </div>

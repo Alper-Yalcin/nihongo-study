@@ -5,13 +5,17 @@ import { WordDictionaryPanel } from './WordDictionaryPanel';
 import { WordStudyTyping } from './WordStudyTyping';
 import { WordStudyTest } from './WordStudyTest';
 import { WordResultPanel } from './WordResultPanel';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface WordStudyContainerProps {
   title: string;
+  language: AppLanguage;
   words: WordItem[];
 }
 
-export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, words }) => {
+export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, language, words }) => {
+  const copy = studyContent[language];
   const [view, setView] = useState<'dictionary' | 'typing' | 'test' | 'typing-result' | 'test-result'>('dictionary');
   const [runStats, setRunStats] = useState<RunStats | null>(null);
   const [quizWords, setQuizWords] = useState<WordItem[]>([]);
@@ -37,9 +41,10 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, w
   };
 
   return (
-    <SectionCard title={`${title} Dictionary`} description={`Browse and study ${title} vocabulary by JLPT level.`}>
+    <SectionCard title={`${title} ${copy.views.dictionary}`} description={copy.dictionary.sectionDescription(title)}>
       {view === 'dictionary' && (
         <WordDictionaryPanel
+          language={language}
           words={words}
           onStartTyping={handleStartTyping}
           onStartTest={handleStartTest}
@@ -47,6 +52,7 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, w
       )}
       {view === 'typing' && (
         <WordStudyTyping
+          language={language}
           words={quizWords}
           onFinish={(stats) => {
             setRunStats(stats);
@@ -57,6 +63,7 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, w
       )}
       {view === 'test' && (
         <WordStudyTest
+          language={language}
           words={quizWords}
           allDictionaryWords={quizSourceWords}
           onFinish={(stats) => {
@@ -69,6 +76,7 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, w
       {view === 'typing-result' && runStats && (
         <WordResultPanel
           title={title}
+          language={language}
           stats={runStats}
           onRestart={() => handleStartTyping(quizWords.length, quizSourceWords)}
           onBack={() => setView('dictionary')}
@@ -78,6 +86,7 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, w
       {view === 'test-result' && runStats && (
         <WordResultPanel
           title={title}
+          language={language}
           stats={runStats}
           onRestart={() => handleStartTest(quizWords.length, quizSourceWords)}
           onBack={() => setView('dictionary')}

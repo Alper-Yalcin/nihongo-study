@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { KanaSection, Character, RunStats } from '../types';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface Props {
   section: KanaSection;
+  language: AppLanguage;
   selectedGroupIds: Set<string>;
   onFinish: (stats: RunStats) => void;
   onCancel: () => void;
 }
 
-export const StudyRunPanel: React.FC<Props> = ({ section, selectedGroupIds, onFinish, onCancel }) => {
+export const StudyRunPanel: React.FC<Props> = ({ section, language, selectedGroupIds, onFinish, onCancel }) => {
+  const copy = studyContent[language];
   const initialPool = useMemo(() => {
     const chars: Character[] = [];
     section.groups.forEach(g => {
@@ -120,8 +124,8 @@ export const StudyRunPanel: React.FC<Props> = ({ section, selectedGroupIds, onFi
         {/* Header / Stats */}
         <div className="flex items-center justify-between mb-8 text-sm font-medium text-slate-500">
           <div className="flex space-x-4">
-            <span className="text-emerald-600">Correct: {correctCount}</span>
-            <span className="text-rose-600">Wrong: {wrongCount}</span>
+            <span className="text-emerald-600">{copy.common.correct}: {correctCount}</span>
+            <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
           </div>
           <div className="flex space-x-4">
             <span>{formatTime(timeSeconds)}</span>
@@ -148,7 +152,7 @@ export const StudyRunPanel: React.FC<Props> = ({ section, selectedGroupIds, onFi
             value={input}
             onChange={e => setInput(e.target.value)}
             disabled={feedback !== 'idle'}
-            placeholder="Type romaji..."
+            placeholder={copy.studyRun.placeholder}
             className={`w-full text-center text-xl py-3 px-4 rounded-xl border-2 outline-none transition-colors ${
               feedback === 'correct' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' :
               feedback === 'wrong' ? 'border-rose-400 bg-rose-50 text-rose-700' :
@@ -167,7 +171,7 @@ export const StudyRunPanel: React.FC<Props> = ({ section, selectedGroupIds, onFi
             onClick={onCancel}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <ArrowLeft size={16} className="mr-1" /> Back to Selection
+            <ArrowLeft size={16} className="mr-1" /> {copy.studyRun.backToSelection}
           </button>
           <button
             onClick={() => {
@@ -182,7 +186,7 @@ export const StudyRunPanel: React.FC<Props> = ({ section, selectedGroupIds, onFi
             }}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <RotateCcw size={16} className="mr-1" /> Restart Run
+            <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
           </button>
         </div>
       </div>

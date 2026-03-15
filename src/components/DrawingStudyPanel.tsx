@@ -3,15 +3,19 @@ import { KanaSection, Character, RunStats } from '../types';
 import { ArrowLeft, RotateCcw, Eraser, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { DrawingCanvas, DrawingCanvasRef } from './DrawingCanvas';
 import { evaluateDrawing } from '../utils/DrawingEvaluator';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface Props {
   section: KanaSection;
+  language: AppLanguage;
   selectedGroupIds: Set<string>;
   onFinish: (stats: RunStats) => void;
   onCancel: () => void;
 }
 
-export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, onFinish, onCancel }) => {
+export const DrawingStudyPanel: React.FC<Props> = ({ section, language, selectedGroupIds, onFinish, onCancel }) => {
+  const copy = studyContent[language];
   const [mode, setMode] = useState<'practice' | 'test'>('practice');
   
   const initialPool = useMemo(() => {
@@ -140,13 +144,13 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
             onClick={() => { setMode('practice'); handleClear(); setCurrentIndex(0); setCurrentChar(initialPool[0]); setPool(initialPool); }}
             className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${mode === 'practice' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            Practice Mode
+            {copy.drawing.practiceMode}
           </button>
           <button
             onClick={() => { setMode('test'); handleClear(); setPool(initialPool); setCorrectCount(0); setWrongCount(0); setAttempts(0); setTimeSeconds(0); pickRandomChar(initialPool); }}
             className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${mode === 'test' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            Test Mode
+            {copy.drawing.testMode}
           </button>
         </div>
 
@@ -154,8 +158,8 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
         {mode === 'test' ? (
           <div className="flex items-center justify-between mb-4 text-sm font-medium text-slate-500">
             <div className="flex space-x-4">
-              <span className="text-emerald-600">Correct: {correctCount}</span>
-              <span className="text-rose-600">Wrong: {wrongCount}</span>
+              <span className="text-emerald-600">{copy.common.correct}: {correctCount}</span>
+              <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
             </div>
             <div className="flex space-x-4">
               <span>{formatTime(timeSeconds)}</span>
@@ -165,7 +169,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
         ) : (
           <div className="flex items-center justify-between mb-4 text-sm font-medium text-slate-500">
             <div className="flex space-x-4">
-              <span>Practice</span>
+              <span>{copy.drawing.practice}</span>
             </div>
             <div className="flex space-x-4">
               <span>{currentIndex + 1} / {initialPool.length}</span>
@@ -175,7 +179,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
 
         {/* Target Info */}
         <div className="text-center mb-4">
-          <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-1">Draw</div>
+          <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-1">{copy.drawing.draw}</div>
           <div className="text-4xl font-bold text-slate-800">{currentChar?.label}</div>
         </div>
 
@@ -198,7 +202,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
             <div className={`absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm z-10 transition-all ${feedback === 'correct' ? 'text-emerald-500' : 'text-rose-500'}`}>
               <div className="flex flex-col items-center">
                 {feedback === 'correct' ? <Check size={48} /> : <RotateCcw size={48} />}
-                <span className="text-xl font-bold mt-2">{feedback === 'correct' ? 'Correct!' : 'Try Again'}</span>
+                <span className="text-xl font-bold mt-2">{feedback === 'correct' ? copy.drawing.correctFeedback : copy.drawing.wrongFeedback}</span>
               </div>
             </div>
           )}
@@ -210,7 +214,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
             onClick={handleClear}
             className="flex items-center px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
           >
-            <Eraser size={18} className="mr-2" /> Clear
+            <Eraser size={18} className="mr-2" /> {copy.drawing.clear}
           </button>
 
           {mode === 'practice' ? (
@@ -234,7 +238,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
               disabled={feedback !== 'idle'}
               className="flex items-center px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
             >
-              <Check size={18} className="mr-2" /> Check
+              <Check size={18} className="mr-2" /> {copy.drawing.check}
             </button>
           )}
         </div>
@@ -249,7 +253,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
                 onChange={() => setShowStrokeOrder(!showStrokeOrder)}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
-              <span>Numbers</span>
+              <span>{copy.drawing.numbers}</span>
             </label>
             <label className="flex items-center space-x-2 text-sm text-slate-600 cursor-pointer">
               <input 
@@ -258,7 +262,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
                 onChange={() => setShowDirectionArrows(!showDirectionArrows)}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
-              <span>Arrows</span>
+              <span>{copy.drawing.arrows}</span>
             </label>
             <label className="flex items-center space-x-2 text-sm text-slate-600 cursor-pointer">
               <input 
@@ -267,7 +271,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
                 onChange={() => setShowTemplate(!showTemplate)}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
-              <span>Template</span>
+              <span>{copy.drawing.template}</span>
             </label>
           </div>
         )}
@@ -278,7 +282,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
             onClick={onCancel}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <ArrowLeft size={16} className="mr-1" /> Back to Selection
+            <ArrowLeft size={16} className="mr-1" /> {copy.drawing.backToSelection}
           </button>
           {mode === 'test' && (
             <button
@@ -294,7 +298,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, selectedGroupIds, 
               }}
               className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
             >
-              <RotateCcw size={16} className="mr-1" /> Restart Run
+              <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
             </button>
           )}
         </div>

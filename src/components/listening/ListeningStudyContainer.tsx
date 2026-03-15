@@ -6,9 +6,12 @@ import { SectionCard } from '../SectionCard';
 import { StudyResultPanel } from '../StudyResultPanel';
 import { StudyNavigator } from '../StudyNavigator';
 import { Play, Headphones } from 'lucide-react';
+import { AppLanguage } from '../../data/appPreferences';
+import { studyContent } from '../../data/studyContent';
 
 interface Props {
   title: string;
+  language: AppLanguage;
   sections: KanaSection[];
   words: WordItem[];
   script: 'hiragana' | 'katakana';
@@ -18,7 +21,8 @@ type View = 'table' | 'practice-run' | 'test-run' | 'result';
 type DatasetType = 'character' | 'word';
 type RunMode = 'practice' | 'test';
 
-export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, words, script }) => {
+export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sections, words, script }) => {
+  const copy = studyContent[language];
   const [view, setView] = useState<View>('table');
   const [datasetType, setDatasetType] = useState<DatasetType>('character');
   const [questionCount, setQuestionCount] = useState(10);
@@ -73,7 +77,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
   }
 
   return (
-    <SectionCard title={`${title} Listening`} description={`Improve your listening skills for ${title}.`}>
+    <SectionCard title={`${title} ${copy.views.listening}`} description={copy.listening.sectionDescription(title)}>
       {view === 'table' && (
         <>
           <StudyNavigator
@@ -82,13 +86,14 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
             totalItems={sections.length}
             onNext={() => setCurrentSectionIndex(prev => Math.min(prev + 1, sections.length - 1))}
             onPrev={() => setCurrentSectionIndex(prev => Math.max(prev - 1, 0))}
+            language={language}
           />
 
           <div className="mb-2 text-center text-sm text-slate-500">
-            Click on any character to open its listening card.
+            {copy.listening.clickHint}
           </div>
 
-          <CharacterListeningTable section={currentSection} script={script} />
+          <CharacterListeningTable section={currentSection} script={script} language={language} />
 
           <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-wrap gap-3">
@@ -100,7 +105,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
                     : 'border border-transparent text-slate-600 hover:bg-slate-200/50'
                 }`}
               >
-                Characters
+                {copy.listening.characters}
               </button>
               <button
                 onClick={() => setDatasetType('word')}
@@ -110,13 +115,13 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
                     : 'border border-transparent text-slate-600 hover:bg-slate-200/50'
                 }`}
               >
-                Words
+                {copy.listening.words}
               </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 xl:justify-end">
               <label className="text-sm font-medium text-slate-500" htmlFor={`${script}-listening-count`}>
-                Questions
+                {copy.listening.questions}
               </label>
               <input
                 id={`${script}-listening-count`}
@@ -128,26 +133,26 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
                 className="w-20 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none transition-colors focus:border-indigo-400"
               />
               <div className="text-sm font-medium text-slate-500">
-                <span className="text-slate-700">{questionCount}</span> items / <span className="text-slate-700">{maxCount}</span> total
+                {copy.listening.itemsSummary(questionCount, maxCount)}
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleStart('practice')}
                   disabled={maxCount === 0}
                   className="flex items-center rounded-lg bg-emerald-600 px-3 py-2 font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  title="Listening Practice"
+                  title={copy.listening.practiceTitle}
                 >
                   <Headphones size={16} className="mr-1.5" />
-                  Practice
+                  {copy.listening.practice}
                 </button>
                 <button
                   onClick={() => handleStart('test')}
                   disabled={maxCount === 0}
                   className="flex items-center rounded-lg bg-amber-500 px-3 py-2 font-medium text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
-                  title="Listening Test"
+                  title={copy.listening.testTitle}
                 >
                   <Play size={16} className="mr-1.5" />
-                  Test
+                  {copy.listening.test}
                 </button>
               </div>
             </div>
@@ -157,6 +162,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
 
       {view === 'practice-run' && (
         <ListeningStudyPanel
+          language={language}
           items={quizItems}
           mode="practice"
           onFinish={(stats) => {
@@ -169,6 +175,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
 
       {view === 'test-run' && (
         <ListeningStudyPanel
+          language={language}
           items={quizItems}
           mode="test"
           onFinish={(stats) => {
@@ -181,11 +188,12 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, sections, word
 
       {view === 'result' && runStats && (
         <StudyResultPanel
-          section={{ id: `listening-${script}`, title: 'Listening', description: '', matrix: [], groups: [] }}
+          section={{ id: `listening-${script}`, title: copy.views.listening, description: '', matrix: [], groups: [] }}
+          language={language}
           stats={runStats}
           onRestart={() => handleStart(lastRunMode)}
           onBack={() => setView('table')}
-          isDrawing={false}
+          variant="listening"
         />
       )}
     </SectionCard>

@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { WordItem, RunStats } from '../types';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface Props {
+  language: AppLanguage;
   words: WordItem[];
   allDictionaryWords: WordItem[];
   onFinish: (stats: RunStats) => void;
   onCancel: () => void;
 }
 
-export const WordStudyTest: React.FC<Props> = ({ words, allDictionaryWords, onFinish, onCancel }) => {
+export const WordStudyTest: React.FC<Props> = ({ language, words, allDictionaryWords, onFinish, onCancel }) => {
+  const copy = studyContent[language];
   const [pool, setPool] = useState<WordItem[]>(words);
   const [currentWord, setCurrentWord] = useState<WordItem | null>(null);
   const [questionType, setQuestionType] = useState<'kanaToRomaji' | 'romajiToKana'>('kanaToRomaji');
@@ -113,8 +117,8 @@ export const WordStudyTest: React.FC<Props> = ({ words, allDictionaryWords, onFi
         {/* Header / Stats */}
         <div className="flex items-center justify-between mb-8 text-sm font-medium text-slate-500">
           <div className="flex space-x-4">
-            <span className="text-emerald-600">Correct: {correctCount}</span>
-            <span className="text-rose-600">Wrong: {wrongCount}</span>
+            <span className="text-emerald-600">{copy.common.correct}: {correctCount}</span>
+            <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
           </div>
           <div className="flex space-x-4">
             <span>{formatTime(timeSeconds)}</span>
@@ -125,7 +129,7 @@ export const WordStudyTest: React.FC<Props> = ({ words, allDictionaryWords, onFi
         {/* Target Info */}
         <div className="text-center mb-10">
           <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-2">
-            {questionType === 'kanaToRomaji' ? 'Select Romaji' : 'Select Kana'}
+            {questionType === 'kanaToRomaji' ? copy.wordTest.selectRomaji : copy.wordTest.selectKana}
           </div>
           <div className={`text-6xl font-bold text-slate-800 tracking-wider ${questionType === 'romajiToKana' ? 'font-mono' : 'font-jp'}`}>
             {questionType === 'kanaToRomaji' ? currentWord?.kana : currentWord?.romaji}
@@ -182,7 +186,7 @@ export const WordStudyTest: React.FC<Props> = ({ words, allDictionaryWords, onFi
             onClick={onCancel}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <ArrowLeft size={16} className="mr-1" /> Back to Dictionary
+            <ArrowLeft size={16} className="mr-1" /> {copy.wordTest.backToDictionary}
           </button>
           <button
             onClick={() => {
@@ -197,7 +201,7 @@ export const WordStudyTest: React.FC<Props> = ({ words, allDictionaryWords, onFi
             }}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <RotateCcw size={16} className="mr-1" /> Restart Run
+            <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
           </button>
         </div>
 

@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Character, WordItem, RunStats } from '../../types';
+import { RunStats } from '../../types';
 import { AudioButton } from './AudioButton';
-import { CheckCircle2, XCircle, ArrowRight, RotateCcw, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { AppLanguage } from '../../data/appPreferences';
+import { studyContent } from '../../data/studyContent';
 
 interface Props {
+  language: AppLanguage;
   items: { id: string; symbol: string; label: string; audioSrc: string }[];
   mode: 'practice' | 'test';
   onFinish: (stats: RunStats) => void;
   onCancel: () => void;
 }
 
-export const ListeningStudyPanel: React.FC<Props> = ({ items, mode, onFinish, onCancel }) => {
+export const ListeningStudyPanel: React.FC<Props> = ({ language, items, mode, onFinish, onCancel }) => {
+  const copy = studyContent[language];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'idle' | 'correct' | 'wrong'>('idle');
@@ -80,6 +84,8 @@ export const ListeningStudyPanel: React.FC<Props> = ({ items, mode, onFinish, on
           <button
             onClick={onCancel}
             className="text-slate-400 hover:text-slate-600 transition-colors"
+            aria-label={copy.listening.back}
+            title={copy.listening.back}
           >
             <ArrowLeft size={24} />
           </button>
@@ -91,7 +97,8 @@ export const ListeningStudyPanel: React.FC<Props> = ({ items, mode, onFinish, on
 
         <div className="flex flex-col items-center mb-10">
           <AudioButton 
-            src={currentItem.audioSrc} 
+            src={currentItem.audioSrc}
+            language={language}
             autoPlay={true}
             size={48}
             className="w-24 h-24 mb-8"
@@ -117,7 +124,7 @@ export const ListeningStudyPanel: React.FC<Props> = ({ items, mode, onFinish, on
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={status === 'correct'}
-            placeholder="Type romaji..."
+            placeholder={copy.listening.placeholder}
             className={`w-full text-center text-2xl py-4 px-6 rounded-2xl border-2 outline-none transition-all ${
               status === 'correct' 
                 ? 'bg-emerald-50 border-emerald-400 text-emerald-700' 
@@ -147,26 +154,26 @@ export const ListeningStudyPanel: React.FC<Props> = ({ items, mode, onFinish, on
               }}
               className="text-slate-500 hover:text-slate-700 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
-              Try Again
+              {copy.listening.tryAgain}
             </button>
             <button
               onClick={handleReveal}
               className="text-indigo-600 hover:text-indigo-800 font-medium px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
             >
-              Show Answer
+              {copy.listening.showAnswer}
             </button>
           </div>
         )}
 
         {showAnswer && (
           <div className="mt-6 text-center animate-fade-in">
-            <div className="text-sm text-slate-500 mb-1">Correct Answer</div>
+            <div className="text-sm text-slate-500 mb-1">{copy.listening.correctAnswer}</div>
             <div className="text-2xl font-bold text-indigo-600">{currentItem.label}</div>
             <button
               onClick={handleNext}
               className="mt-4 w-full flex items-center justify-center py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
             >
-              Next <ArrowRight size={18} className="ml-2" />
+              {copy.common.next} <ArrowRight size={18} className="ml-2" />
             </button>
           </div>
         )}

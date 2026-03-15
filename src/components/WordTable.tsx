@@ -1,22 +1,27 @@
 import React from 'react';
 import { WordItem } from '../types';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 interface Props {
+  language: AppLanguage;
   words: WordItem[];
   startIndex: number;
 }
 
-export const WordTable: React.FC<Props> = ({ words, startIndex }) => {
+export const WordTable: React.FC<Props> = ({ language, words, startIndex }) => {
+  const copy = studyContent[language];
+
   return (
     <div className="w-full overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-sm font-medium uppercase tracking-wider">
             <th className="p-3 w-12 text-center">#</th>
-            <th className="p-3">Level</th>
-            <th className="p-3">Kana</th>
-            <th className="p-3">Romaji</th>
-            <th className="p-3">Meaning</th>
+            <th className="p-3">{copy.wordTable.level}</th>
+            <th className="p-3">{copy.wordTable.kana}</th>
+            <th className="p-3">{copy.wordTable.romaji}</th>
+            <th className="p-3">{copy.wordTable.meaning}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -37,7 +42,7 @@ export const WordTable: React.FC<Props> = ({ words, startIndex }) => {
           ) : (
             <tr>
               <td colSpan={5} className="p-8 text-center text-slate-500">
-                No words found.
+                {copy.wordTable.empty}
               </td>
             </tr>
           )}

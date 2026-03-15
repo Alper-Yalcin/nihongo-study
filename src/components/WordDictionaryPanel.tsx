@@ -2,22 +2,27 @@ import React, { useMemo, useState } from 'react';
 import { WordItem } from '../types';
 import { WordTable } from './WordTable';
 import { Search, ChevronLeft, ChevronRight, Keyboard, ListChecks } from 'lucide-react';
+import { AppLanguage } from '../data/appPreferences';
+import { studyContent } from '../data/studyContent';
 
 type LevelFilter = 'all' | NonNullable<WordItem['jlptLevel']>;
 
 const jlptFilters: NonNullable<WordItem['jlptLevel']>[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 
 interface Props {
+  language: AppLanguage;
   words: WordItem[];
   onStartTyping: (questionCount: number, sourceWords: WordItem[]) => void;
   onStartTest: (questionCount: number, sourceWords: WordItem[]) => void;
 }
 
 export const WordDictionaryPanel: React.FC<Props> = ({
+  language,
   words,
   onStartTyping,
   onStartTest
 }) => {
+  const copy = studyContent[language];
   const [searchTerm, setSearchTerm] = useState('');
   const [activeLevel, setActiveLevel] = useState<LevelFilter>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,11 +106,11 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">JLPT Levels</div>
-            <div className="text-sm text-slate-500">Filter the dictionary and study modes by level.</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{copy.dictionary.jlptLevels}</div>
+            <div className="text-sm text-slate-500">{copy.dictionary.filterDescription}</div>
           </div>
           <div className="rounded-full bg-white px-3 py-1 text-sm font-medium text-slate-600 shadow-sm">
-            {availableWordCount} words
+            {copy.dictionary.wordCount(availableWordCount)}
           </div>
         </div>
 
@@ -119,7 +124,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
                 : 'bg-white text-slate-600 hover:bg-slate-100'
             }`}
           >
-            All
+            {copy.dictionary.all}
           </button>
           {jlptFilters.map((level) => (
             <button
@@ -146,35 +151,44 @@ export const WordDictionaryPanel: React.FC<Props> = ({
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search kana, romaji, meaning, or level..."
+          placeholder={copy.dictionary.searchPlaceholder}
           className="w-full rounded-xl border border-slate-200 py-2 pr-4 pl-10 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
 
       <WordTable
+        language={language}
         words={paginatedWords}
         startIndex={(currentPage - 1) * pageSize}
       />
 
       <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2">
         <div className="px-2 text-sm text-slate-500">
-          Showing {availableWordCount === 0 ? 0 : (currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, availableWordCount)} of {availableWordCount} words
+          {copy.dictionary.showingResults(
+            availableWordCount === 0 ? 0 : (currentPage - 1) * pageSize + 1,
+            Math.min(currentPage * pageSize, availableWordCount),
+            availableWordCount
+          )}
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
             className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={copy.common.previous}
+            title={copy.common.previous}
           >
             <ChevronLeft size={18} />
           </button>
           <span className="px-2 text-sm font-medium text-slate-700">
-            Page {currentPage} / {totalPages}
+            {copy.dictionary.pageLabel(currentPage, totalPages)}
           </span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
             className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={copy.common.next}
+            title={copy.common.next}
           >
             <ChevronRight size={18} />
           </button>
@@ -184,7 +198,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center space-x-3">
           <label htmlFor="questionCount" className="text-sm font-medium text-slate-700">
-            Questions:
+            {copy.dictionary.questions}:
           </label>
           <input
             id="questionCount"
@@ -196,7 +210,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
             onBlur={handleQuestionCountBlur}
             className="w-20 rounded-lg border border-slate-200 px-3 py-1.5 text-center focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           />
-          <span className="text-xs text-slate-400">/ {availableWordCount} max</span>
+          <span className="text-xs text-slate-400">{copy.dictionary.maxLabel(availableWordCount)}</span>
         </div>
 
         <div className="flex space-x-3">
@@ -206,16 +220,16 @@ export const WordDictionaryPanel: React.FC<Props> = ({
             className="flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Keyboard size={18} className="mr-2" />
-            Start Typing
+            {copy.dictionary.startTyping}
           </button>
           <button
             onClick={() => onStartTest(questionCount, filteredWords)}
             disabled={availableWordCount < 4}
             className="flex items-center rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-            title={availableWordCount < 4 ? 'Need at least 4 words' : ''}
+            title={availableWordCount < 4 ? copy.dictionary.needAtLeastWords(4) : ''}
           >
             <ListChecks size={18} className="mr-2" />
-            Start Test
+            {copy.dictionary.startTest}
           </button>
         </div>
       </div>
