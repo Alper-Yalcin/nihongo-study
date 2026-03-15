@@ -2,40 +2,45 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
+import { AppLanguage } from '../data/appPreferences';
 import {
   kanaFontStyles,
   KanaFontStyleId
 } from '../data/kanaFontStyles';
+import { settingsContent } from '../data/settingsContent';
 
 interface SettingsProps {
+  language: AppLanguage;
   kanaFontStyle: KanaFontStyleId;
   onKanaFontStyleChange: (fontStyle: KanaFontStyleId) => void;
 }
 
 export const Settings: React.FC<SettingsProps> = ({
+  language,
   kanaFontStyle,
   onKanaFontStyleChange
 }) => {
   const selectedFont = kanaFontStyles.find(option => option.id === kanaFontStyle) ?? kanaFontStyles[0];
+  const copy = settingsContent[language];
 
   return (
-    <PageContainer title="Settings">
+    <PageContainer title={copy.pageTitle}>
       <div className="space-y-6">
         <SectionCard
-          title="Kana Writing Style"
-          description="Switch between different Japanese type styles to compare glyph shapes, similar to the design selector on RealKana."
+          title={copy.fontSectionTitle}
+          description={copy.fontSectionDescription}
         >
           <div className="space-y-6">
             <div className="settings-preview-shell rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-800">Live Preview</h3>
+                  <h3 className="text-sm font-semibold text-slate-800">{copy.livePreviewTitle}</h3>
                   <p className="text-sm text-slate-500">
-                    Current style: {selectedFont.name}
+                    {copy.currentStyleLabel}: {selectedFont.name}
                   </p>
                 </div>
                 <span className="settings-preview-badge rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-500 shadow-sm border border-slate-200">
-                  Applied globally
+                  {copy.appliedGloballyLabel}
                 </span>
               </div>
 
@@ -73,7 +78,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div>
                         <div className="text-sm font-semibold text-slate-800">{option.name}</div>
-                        <div className="mt-1 text-sm text-slate-500">{option.description}</div>
+                        <div className="mt-1 text-sm text-slate-500">{option.description[language]}</div>
                       </div>
                       <div
                         className={`flex h-6 w-6 items-center justify-center rounded-full border ${
@@ -102,28 +107,16 @@ export const Settings: React.FC<SettingsProps> = ({
         </SectionCard>
 
         <SectionCard
-          title="How It Works"
-          description="The selected kana font updates every place that uses Japanese text in the app."
+          title={copy.howItWorksTitle}
+          description={copy.howItWorksDescription}
         >
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="settings-info-card rounded-xl border border-slate-200 bg-white p-4">
-              <div className="mb-1 text-sm font-semibold text-slate-800">Typing & Drawing</div>
-              <p className="text-sm text-slate-500">
-                Study tables and prompts use the selected kana style.
-              </p>
-            </div>
-            <div className="settings-info-card rounded-xl border border-slate-200 bg-white p-4">
-              <div className="mb-1 text-sm font-semibold text-slate-800">Listening</div>
-              <p className="text-sm text-slate-500">
-                Listening cards and character modal previews follow the same style.
-              </p>
-            </div>
-            <div className="settings-info-card rounded-xl border border-slate-200 bg-white p-4">
-              <div className="mb-1 text-sm font-semibold text-slate-800">Dictionary</div>
-              <p className="text-sm text-slate-500">
-                Kana words in dictionary tables switch instantly when you change the style.
-              </p>
-            </div>
+            {copy.infoCards.map((item) => (
+              <div key={item.title} className="settings-info-card rounded-xl border border-slate-200 bg-white p-4">
+                <div className="mb-1 text-sm font-semibold text-slate-800">{item.title}</div>
+                <p className="text-sm text-slate-500">{item.description}</p>
+              </div>
+            ))}
           </div>
         </SectionCard>
       </div>

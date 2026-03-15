@@ -163,14 +163,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={toggleTheme}
-              className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${panelClass} ${
+              className={`flex items-center justify-center rounded-xl p-2.5 text-sm font-medium transition-colors ${panelClass} ${
                 isDark ? 'text-slate-100 hover:bg-slate-800' : 'text-slate-700 hover:bg-white'
               }`}
               aria-label={isDark ? themeText.dark : themeText.light}
               title={isDark ? themeText.dark : themeText.light}
             >
               {isDark ? <Moon size={16} /> : <Sun size={16} />}
-              <span className="hidden sm:inline">{isDark ? themeText.dark : themeText.light}</span>
             </button>
           </div>
         </div>

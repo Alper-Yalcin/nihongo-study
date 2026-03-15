@@ -77,6 +77,7 @@ export default function App() {
       case 'settings':
         return (
           <Settings
+            language={language}
             kanaFontStyle={kanaFontStyle}
             onKanaFontStyleChange={setKanaFontStyle}
           />
