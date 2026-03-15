@@ -64,6 +64,13 @@ export interface RunStats {
   wrong: number;
   accuracy: number;
   timeSeconds: number;
+  mode?: TypingMode;
+  speed?: number;
+  bestStreak?: number;
+  averageAnswerMs?: number;
+  timeLimitSeconds?: number;
 }
+
+export type TypingMode = 'current' | 'reverse' | 'timed';
 
 export type TabType = 'overview' | 'hiragana' | 'katakana' | 'kanji' | 'settings';

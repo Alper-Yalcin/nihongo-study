@@ -1,5 +1,5 @@
 import React from 'react';
-import { KanaSection } from '../types';
+import { KanaSection, TypingMode } from '../types';
 import { StudyTable } from './StudyTable';
 import { CheckSquare, Square, Keyboard, PenTool } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
@@ -11,6 +11,8 @@ interface Props {
   selectedGroupIds: Set<string>;
   onChangeSelection: (newSelection: Set<string>) => void;
   onStart: () => void;
+  typingMode: TypingMode;
+  onTypingModeChange: (mode: TypingMode) => void;
   isAllSelected: boolean;
   isNoneSelected: boolean;
   onSelectAll: () => void;
@@ -26,6 +28,8 @@ export const StudySelectionPanel: React.FC<Props> = ({
   selectedGroupIds,
   onChangeSelection,
   onStart,
+  typingMode,
+  onTypingModeChange,
   isAllSelected,
   isNoneSelected,
   onSelectAll,
@@ -35,6 +39,23 @@ export const StudySelectionPanel: React.FC<Props> = ({
   mode
 }) => {
   const copy = studyContent[language];
+  const typingModeCards: { id: TypingMode; title: string; description: string }[] = [
+    {
+      id: 'current',
+      title: copy.studyRun.currentMode,
+      description: copy.studyRun.currentModeDescription
+    },
+    {
+      id: 'reverse',
+      title: copy.studyRun.reverseMode,
+      description: copy.studyRun.reverseModeDescription
+    },
+    {
+      id: 'timed',
+      title: copy.studyRun.timedMode,
+      description: copy.studyRun.timedModeDescription
+    }
+  ];
 
   const toggleGroup = (groupId: string) => {
     const next = new Set(selectedGroupIds);
@@ -59,6 +80,39 @@ export const StudySelectionPanel: React.FC<Props> = ({
         onToggleGroup={toggleGroup}
         interactive={true}
       />
+
+      {mode === 'typing' && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            {copy.studyRun.modeLabel}
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {typingModeCards.map((card) => {
+              const isActive = typingMode === card.id;
+
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  onClick={() => onTypingModeChange(card.id)}
+                  className={`rounded-2xl border px-4 py-4 text-left transition-all ${
+                    isActive
+                      ? 'border-indigo-300 bg-indigo-50 shadow-sm'
+                      : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white'
+                  }`}
+                >
+                  <div className={`text-sm font-semibold ${isActive ? 'text-indigo-700' : 'text-slate-700'}`}>
+                    {card.title}
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-slate-500">
+                    {card.description}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
       
       <div className="flex items-center justify-between bg-slate-50 rounded-xl p-3 border border-slate-200">
         <div className="flex space-x-3">
@@ -72,7 +126,12 @@ export const StudySelectionPanel: React.FC<Props> = ({
                 : 'text-slate-600 hover:bg-slate-200/50 border border-transparent'
             }`}
           >
-            <CheckSquare size={17} strokeWidth={2.1} className="shrink-0" /> <span>{copy.selection.all}</span>
+            {isAllSelected ? (
+              <CheckSquare size={17} strokeWidth={2.1} className="shrink-0" />
+            ) : (
+              <Square size={17} strokeWidth={2.1} className="shrink-0" />
+            )}{' '}
+            <span>{copy.selection.all}</span>
           </button>
           <button 
             type="button"
@@ -84,7 +143,12 @@ export const StudySelectionPanel: React.FC<Props> = ({
                 : 'text-slate-600 hover:bg-slate-200/50 border border-transparent'
             }`}
           >
-            <Square size={17} strokeWidth={2.1} className="shrink-0" /> <span>{copy.selection.none}</span>
+            {isNoneSelected ? (
+              <CheckSquare size={17} strokeWidth={2.1} className="shrink-0" />
+            ) : (
+              <Square size={17} strokeWidth={2.1} className="shrink-0" />
+            )}{' '}
+            <span>{copy.selection.none}</span>
           </button>
         </div>
         

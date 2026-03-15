@@ -14,6 +14,8 @@ interface StudyContent {
     correct: string;
     wrong: string;
     accuracy: string;
+    speed: string;
+    streak: string;
     time: string;
     best: string;
     playAgain: string;
@@ -33,7 +35,18 @@ interface StudyContent {
     backToSelection: string;
   };
   studyRun: {
+    modeLabel: string;
+    currentMode: string;
+    reverseMode: string;
+    timedMode: string;
+    currentModeDescription: string;
+    reverseModeDescription: string;
+    timedModeDescription: string;
+    typeRomaji: string;
+    typeKana: string;
     placeholder: string;
+    reversePlaceholder: string;
+    timedRemaining: string;
     backToSelection: string;
   };
   drawing: {
@@ -227,6 +240,8 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       correct: 'Doğru',
       wrong: 'Yanlış',
       accuracy: 'Doğruluk',
+      speed: 'Hız',
+      streak: 'Seri',
       time: 'Süre',
       best: 'En iyi',
       playAgain: 'Tekrar Oyna',
@@ -246,7 +261,18 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       backToSelection: 'Seçime Dön'
     },
     studyRun: {
+      modeLabel: 'Mod',
+      currentMode: 'Standart',
+      reverseMode: 'Romajiden Kana',
+      timedMode: 'Zamana Karşı',
+      currentModeDescription: 'Karakteri gör, romajiyi yaz.',
+      reverseModeDescription: 'Romajiyi gör, kana karakterini yaz.',
+      timedModeDescription: '60 saniyede olabildiğince fazla karakter bil.',
+      typeRomaji: 'Romajiyi Yaz',
+      typeKana: 'Kana Karakterini Yaz',
       placeholder: 'Romaji yaz...',
+      reversePlaceholder: 'Kana yaz...',
+      timedRemaining: 'Kalan Süre',
       backToSelection: 'Seçime Dön'
     },
     drawing: {
@@ -344,6 +370,8 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       correct: 'Correct',
       wrong: 'Wrong',
       accuracy: 'Accuracy',
+      speed: 'Speed',
+      streak: 'Streak',
       time: 'Time',
       best: 'Best',
       playAgain: 'Play Again',
@@ -363,7 +391,18 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       backToSelection: 'Back to Selection'
     },
     studyRun: {
+      modeLabel: 'Mode',
+      currentMode: 'Standard',
+      reverseMode: 'Romaji to Kana',
+      timedMode: 'Beat the Clock',
+      currentModeDescription: 'See the kana and type its romaji.',
+      reverseModeDescription: 'See the romaji and type the matching kana.',
+      timedModeDescription: 'Answer as many kana as you can in 60 seconds.',
+      typeRomaji: 'Type the Romaji',
+      typeKana: 'Type the Kana',
       placeholder: 'Type romaji...',
+      reversePlaceholder: 'Type kana...',
+      timedRemaining: 'Time Left',
       backToSelection: 'Back to Selection'
     },
     drawing: {
