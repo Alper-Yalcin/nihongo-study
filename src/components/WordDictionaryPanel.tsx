@@ -4,6 +4,7 @@ import { WordTable } from './WordTable';
 import { Search, ChevronLeft, ChevronRight, Keyboard, ListChecks } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
+import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
 
 type LevelFilter = 'all' | NonNullable<WordItem['jlptLevel']>;
 
@@ -23,6 +24,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
   onStartTest
 }) => {
   const copy = studyContent[language];
+  const meaningTranslations = useMeaningTranslations(language);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeLevel, setActiveLevel] = useState<LevelFilter>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,11 +48,12 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       return (
         word.kana.toLowerCase().includes(normalizedSearch) ||
         word.romaji.toLowerCase().includes(normalizedSearch) ||
+        (getLocalizedWordMeaning(word.meaning, language, meaningTranslations)?.toLowerCase().includes(normalizedSearch) ?? false) ||
         (word.meaning && word.meaning.toLowerCase().includes(normalizedSearch)) ||
         (word.jlptLevel && word.jlptLevel.toLowerCase().includes(normalizedSearch))
       );
     });
-  }, [activeLevel, searchTerm, words]);
+  }, [activeLevel, language, meaningTranslations, searchTerm, words]);
 
   const availableWordCount = filteredWords.length;
   const maxQuestionCount = Math.max(availableWordCount, 1);
@@ -158,6 +161,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
 
       <WordTable
         language={language}
+        meaningTranslations={meaningTranslations}
         words={paginatedWords}
         startIndex={(currentPage - 1) * pageSize}
       />

@@ -277,7 +277,7 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       filterDescription: 'Sözlüğü ve çalışma modlarını seviyeye göre filtrele.',
       wordCount: (count) => `${count} kelime`,
       all: 'Tümü',
-      searchPlaceholder: 'Kana, romaji, anlam veya seviye ara...',
+      searchPlaceholder: 'Kana, romaji, Turkce anlam veya seviye ara...',
       showingResults: (from, to, total) => `${from} - ${to} / ${total} kelime gösteriliyor`,
       pageLabel: (current, total) => `Sayfa ${current} / ${total}`,
       questions: 'Soru Sayısı',

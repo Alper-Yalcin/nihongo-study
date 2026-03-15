@@ -3,6 +3,7 @@ import { WordItem, RunStats } from '../types';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
+import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
 
 interface Props {
   language: AppLanguage;
@@ -13,6 +14,7 @@ interface Props {
 
 export const WordStudyTyping: React.FC<Props> = ({ language, words, onFinish, onCancel }) => {
   const copy = studyContent[language];
+  const meaningTranslations = useMeaningTranslations(language);
   const [pool, setPool] = useState<WordItem[]>(words);
   const [currentWord, setCurrentWord] = useState<WordItem | null>(null);
   const [inputValue, setInputValue] = useState('');
@@ -112,8 +114,8 @@ export const WordStudyTyping: React.FC<Props> = ({ language, words, onFinish, on
         <div className="text-center mb-12">
           <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-2">{copy.wordTyping.prompt}</div>
           <div className="text-6xl font-bold text-slate-800 font-jp tracking-wider">{currentWord?.kana}</div>
-          {currentWord?.meaning && (
-            <div className="text-slate-400 mt-4 text-sm">{currentWord.meaning}</div>
+          {currentWord && getLocalizedWordMeaning(currentWord.meaning, language, meaningTranslations) && (
+            <div className="text-slate-400 mt-4 text-sm">{getLocalizedWordMeaning(currentWord.meaning, language, meaningTranslations)}</div>
           )}
         </div>
 

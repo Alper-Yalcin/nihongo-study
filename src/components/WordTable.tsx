@@ -2,14 +2,16 @@ import React from 'react';
 import { WordItem } from '../types';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
+import { getLocalizedWordMeaning, MeaningTranslations } from '../utils/wordMeaning';
 
 interface Props {
   language: AppLanguage;
+  meaningTranslations?: MeaningTranslations | null;
   words: WordItem[];
   startIndex: number;
 }
 
-export const WordTable: React.FC<Props> = ({ language, words, startIndex }) => {
+export const WordTable: React.FC<Props> = ({ language, meaningTranslations, words, startIndex }) => {
   const copy = studyContent[language];
 
   return (
@@ -36,7 +38,7 @@ export const WordTable: React.FC<Props> = ({ language, words, startIndex }) => {
                 </td>
                 <td className="p-3 font-jp text-lg font-medium text-slate-800">{word.kana}</td>
                 <td className="p-3 text-slate-600 font-mono">{word.romaji}</td>
-                <td className="p-3 text-slate-500">{word.meaning || '-'}</td>
+                <td className="p-3 text-slate-500">{getLocalizedWordMeaning(word.meaning, language, meaningTranslations) || '-'}</td>
               </tr>
             ))
           ) : (
