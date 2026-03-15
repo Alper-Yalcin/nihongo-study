@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { KanaSection, RunStats, TypingMode } from '../types';
+import { KanaSection, RunStats, TypingMode, DrawingMode } from '../types';
 import { StudyNavigator } from './StudyNavigator';
 import { SectionCard } from './SectionCard';
 import { StudySelectionPanel } from './StudySelectionPanel';
@@ -21,6 +21,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, language,
   const [selectedGroupsBySection, setSelectedGroupsBySection] = useState<Record<string, Set<string>>>({});
   const [runStats, setRunStats] = useState<RunStats | null>(null);
   const [typingMode, setTypingMode] = useState<TypingMode>('current');
+  const [drawingMode, setDrawingMode] = useState<DrawingMode>('practice');
 
   const currentSection = sections[currentIndex];
   const selectedGroupIds = selectedGroupsBySection[currentSection.id] || new Set<string>();
@@ -123,6 +124,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, language,
             onStart={() => setView('run')}
             typingMode={typingMode}
             onTypingModeChange={setTypingMode}
+            drawingMode={drawingMode}
+            onDrawingModeChange={setDrawingMode}
             isAllSelected={isAllSelected}
             isNoneSelected={isNoneSelected}
             onSelectAll={handleSelectAll}
@@ -151,6 +154,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({ title, language,
           section={mergedSection}
           language={language}
           selectedGroupIds={mergedSelectedGroupIds}
+          drawingMode={drawingMode}
           onFinish={(stats) => {
             setRunStats(stats);
             setView('result');

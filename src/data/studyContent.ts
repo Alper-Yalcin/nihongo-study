@@ -50,10 +50,16 @@ interface StudyContent {
     backToSelection: string;
   };
   drawing: {
+    modeLabel: string;
     practiceMode: string;
     testMode: string;
+    speedMode: string;
+    memoryMode: string;
     practice: string;
     draw: string;
+    timeLeft: string;
+    memorize: string;
+    drawFromMemory: string;
     correctFeedback: string;
     wrongFeedback: string;
     clear: string;
@@ -106,18 +112,25 @@ interface StudyContent {
   listening: {
     sectionDescription: (title: string) => string;
     clickHint: string;
+    modeLabel: string;
+    recognitionMode: string;
+    typingMode: string;
+    writingMode: string;
     characters: string;
     words: string;
     questions: string;
     itemsSummary: (selected: number, total: number) => string;
-    practice: string;
-    test: string;
-    practiceTitle: string;
-    testTitle: string;
+    start: string;
+    chooseKana: string;
+    typeRomaji: string;
+    drawKana: string;
+    submit: string;
+    skip: string;
+    score: string;
     placeholder: string;
-    tryAgain: string;
-    showAnswer: string;
     correctAnswer: string;
+    replayHint: string;
+    writingOnlyCharacters: string;
     back: string;
   };
   audio: {
@@ -276,10 +289,16 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       backToSelection: 'Seçime Dön'
     },
     drawing: {
+      modeLabel: 'Mod',
       practiceMode: 'Pratik Modu',
       testMode: 'Test Modu',
+      speedMode: 'Hızlı Tur',
+      memoryMode: 'Hafızadan Çizim',
       practice: 'Pratik',
       draw: 'Çiz',
+      timeLeft: 'Kalan Süre',
+      memorize: 'Aklında Tut',
+      drawFromMemory: 'Hafızadan Çiz',
       correctFeedback: 'Doğru!',
       wrongFeedback: 'Tekrar Dene',
       clear: 'Temizle',
@@ -337,18 +356,25 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
     listening: {
       sectionDescription: (title) => `${title} için dinleme pratiğini geliştir.`,
       clickHint: 'Dinleme kartını açmak için herhangi bir karaktere tıkla.',
+      modeLabel: 'Mod',
+      recognitionMode: 'Tanıma',
+      typingMode: 'Yazma',
+      writingMode: 'Kana Çizimi',
       characters: 'Karakterler',
       words: 'Kelimeler',
       questions: 'Sorular',
       itemsSummary: (selected, total) => `${selected} öğe / ${total} toplam`,
-      practice: 'Pratik',
-      test: 'Test',
-      practiceTitle: 'Dinleme Pratiği',
-      testTitle: 'Dinleme Testi',
+      start: 'Dinlemeyi Başlat',
+      chooseKana: 'Doğru Kana Seç',
+      typeRomaji: 'Romajiyi Yaz',
+      drawKana: 'Kana Çiz',
+      submit: 'Gönder',
+      skip: 'Atla',
+      score: 'Skor',
       placeholder: 'Romaji yaz...',
-      tryAgain: 'Tekrar Dene',
-      showAnswer: 'Cevabı Göster',
       correctAnswer: 'Doğru Cevap',
+      replayHint: 'Sesi tekrar oynat',
+      writingOnlyCharacters: 'Kana çizimi modu yalnızca karakter veri setinde kullanılabilir.',
       back: 'Dinleme listesine dön'
     },
     audio: {
@@ -406,10 +432,16 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       backToSelection: 'Back to Selection'
     },
     drawing: {
+      modeLabel: 'Mode',
       practiceMode: 'Practice Mode',
       testMode: 'Test Mode',
+      speedMode: 'Speed Run',
+      memoryMode: 'Memory Draw',
       practice: 'Practice',
       draw: 'Draw',
+      timeLeft: 'Time Left',
+      memorize: 'Memorize',
+      drawFromMemory: 'Draw from Memory',
       correctFeedback: 'Correct!',
       wrongFeedback: 'Try Again',
       clear: 'Clear',
@@ -466,18 +498,25 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
     listening: {
       sectionDescription: (title) => `Improve your listening skills for ${title}.`,
       clickHint: 'Click on any character to open its listening card.',
+      modeLabel: 'Mode',
+      recognitionMode: 'Recognition',
+      typingMode: 'Typing',
+      writingMode: 'Kana Writing',
       characters: 'Characters',
       words: 'Words',
       questions: 'Questions',
       itemsSummary: (selected, total) => `${selected} items / ${total} total`,
-      practice: 'Practice',
-      test: 'Test',
-      practiceTitle: 'Listening Practice',
-      testTitle: 'Listening Test',
+      start: 'Start Listening',
+      chooseKana: 'Choose the Kana',
+      typeRomaji: 'Type the Romaji',
+      drawKana: 'Draw the Kana',
+      submit: 'Submit',
+      skip: 'Skip',
+      score: 'Score',
       placeholder: 'Type romaji...',
-      tryAgain: 'Try Again',
-      showAnswer: 'Show Answer',
       correctAnswer: 'Correct Answer',
+      replayHint: 'Replay audio',
+      writingOnlyCharacters: 'Kana writing mode is available only for the character dataset.',
       back: 'Back to listening list'
     },
     audio: {

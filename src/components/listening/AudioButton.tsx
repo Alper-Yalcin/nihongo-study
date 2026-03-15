@@ -7,11 +7,19 @@ interface Props {
   src: string;
   language: AppLanguage;
   autoPlay?: boolean;
+  autoPlayToken?: string | number;
   className?: string;
   size?: number;
 }
 
-export const AudioButton: React.FC<Props> = ({ src, language, autoPlay = false, className = '', size = 24 }) => {
+export const AudioButton: React.FC<Props> = ({
+  src,
+  language,
+  autoPlay = false,
+  autoPlayToken,
+  className = '',
+  size = 24
+}) => {
   const copy = studyContent[language];
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(false);
@@ -45,7 +53,7 @@ export const AudioButton: React.FC<Props> = ({ src, language, autoPlay = false, 
         audioRef.current.pause();
       }
     };
-  }, [src, autoPlay]);
+  }, [src, autoPlay, autoPlayToken]);
 
   return (
     <button

@@ -1,13 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { KanaSection, WordItem, RunStats, Character } from '../../types';
+import {
+  Character,
+  KanaSection,
+  ListeningItem,
+  ListeningMode,
+  RunStats,
+  WordItem
+} from '../../types';
 import { CharacterListeningTable } from './CharacterListeningTable';
 import { ListeningStudyPanel } from './ListeningStudyPanel';
 import { SectionCard } from '../SectionCard';
 import { StudyResultPanel } from '../StudyResultPanel';
 import { StudyNavigator } from '../StudyNavigator';
-import { Play, Headphones } from 'lucide-react';
+import { StudyModeSelector } from '../StudyModeSelector';
+import { Play } from 'lucide-react';
 import { AppLanguage } from '../../data/appPreferences';
 import { studyContent } from '../../data/studyContent';
+import { getAcceptedRomajiAnswers } from '../../utils/typing';
+import { shuffleArray } from '../../utils/listening';
 
 interface Props {
   title: string;
@@ -17,64 +27,130 @@ interface Props {
   script: 'hiragana' | 'katakana';
 }
 
-type View = 'table' | 'practice-run' | 'test-run' | 'result';
+type View = 'table' | 'run' | 'result';
 type DatasetType = 'character' | 'word';
-type RunMode = 'practice' | 'test';
 
-export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sections, words, script }) => {
+export const ListeningStudyContainer: React.FC<Props> = ({
+  title,
+  language,
+  sections,
+  words,
+  script
+}) => {
   const copy = studyContent[language];
   const [view, setView] = useState<View>('table');
   const [datasetType, setDatasetType] = useState<DatasetType>('character');
+  const [listeningMode, setListeningMode] = useState<ListeningMode>('recognition');
   const [questionCount, setQuestionCount] = useState(10);
-  const [quizItems, setQuizItems] = useState<{ id: string; symbol: string; label: string; audioSrc: string }[]>([]);
+  const [quizItems, setQuizItems] = useState<ListeningItem[]>([]);
+  const [sourceItems, setSourceItems] = useState<ListeningItem[]>([]);
   const [runStats, setRunStats] = useState<RunStats | null>(null);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
-  const [lastRunMode, setLastRunMode] = useState<RunMode>('practice');
+  const [lastRunMode, setLastRunMode] = useState<ListeningMode>('recognition');
+  const [lastRunDatasetType, setLastRunDatasetType] = useState<DatasetType>('character');
 
   const allCharacters = useMemo(
     () =>
-      sections.flatMap(section =>
-        section.matrix.flatMap(row => row.filter((char): char is Character => char !== null))
+      sections.flatMap((section) =>
+        section.matrix.flatMap((row) => row.filter((char): char is Character => char !== null))
       ),
     [sections]
   );
 
+  const characterItems = useMemo<ListeningItem[]>(
+    () =>
+      allCharacters.map((character) => ({
+        id: character.id,
+        script,
+        kana: character.symbol,
+        romaji: character.label,
+        acceptedRomaji: getAcceptedRomajiAnswers(character.label),
+        audioSrc: `/audio/${script}/${character.id}.mp3`,
+        datasetType: 'character',
+        character
+      })),
+    [allCharacters, script]
+  );
+
+  const wordItems = useMemo<ListeningItem[]>(
+    () =>
+      words.map((word) => ({
+        id: word.id,
+        script: word.script ?? script,
+        kana: word.kana,
+        romaji: word.romaji,
+        acceptedRomaji: [word.romaji],
+        audioSrc: `/audio/words/${word.id}.mp3`,
+        datasetType: 'word'
+      })),
+    [script, words]
+  );
+
   const currentSection = sections[currentSectionIndex];
-  const maxCount = datasetType === 'character' ? allCharacters.length : words.length;
+  const activePool = datasetType === 'character' ? characterItems : wordItems;
+  const maxCount = activePool.length;
   const safeMaxCount = Math.max(maxCount, 1);
+  const isWritingDisabled = datasetType === 'word';
 
   useEffect(() => {
-    setQuestionCount(prev => Math.min(Math.max(prev, 1), safeMaxCount));
+    setQuestionCount((previousCount) => Math.min(Math.max(previousCount, 1), safeMaxCount));
   }, [safeMaxCount]);
 
-  const handleStart = (mode: RunMode) => {
-    let pool: { id: string; symbol: string; label: string; audioSrc: string }[] = [];
-
-    if (datasetType === 'character') {
-      pool = allCharacters.map(char => ({
-        id: char.id,
-        symbol: char.symbol,
-        label: char.label,
-        audioSrc: `/audio/${script}/${char.id}.mp3`
-      }));
-    } else {
-      pool = words.map(word => ({
-        id: word.id,
-        symbol: word.kana,
-        label: word.romaji,
-        audioSrc: `/audio/words/${word.id}.mp3`
-      }));
+  useEffect(() => {
+    if (datasetType === 'word' && listeningMode === 'writing') {
+      setListeningMode('recognition');
     }
+  }, [datasetType, listeningMode]);
 
-    const shuffled = [...pool].sort(() => 0.5 - Math.random());
-    setQuizItems(shuffled.slice(0, Math.min(questionCount, pool.length)));
-    setLastRunMode(mode);
-    setView(mode === 'practice' ? 'practice-run' : 'test-run');
+  const getModeLabel = (mode: ListeningMode) => {
+    switch (mode) {
+      case 'recognition':
+        return copy.listening.recognitionMode;
+      case 'typing':
+        return copy.listening.typingMode;
+      case 'writing':
+        return copy.listening.writingMode;
+      default:
+        return copy.listening.recognitionMode;
+    }
+  };
+
+  const handleStart = (targetMode = listeningMode) => {
+    const resolvedMode = datasetType === 'word' && targetMode === 'writing' ? 'recognition' : targetMode;
+    const nextSourceItems = datasetType === 'character' ? characterItems : wordItems;
+    const nextQuizItems = shuffleArray(nextSourceItems).slice(0, Math.min(questionCount, nextSourceItems.length));
+
+    setSourceItems(nextSourceItems);
+    setQuizItems(nextQuizItems);
+    setRunStats(null);
+    setLastRunMode(resolvedMode);
+    setLastRunDatasetType(datasetType);
+    setView('run');
   };
 
   if (!currentSection) {
     return null;
   }
+
+  const modeOptions: {
+    id: ListeningMode;
+    label: string;
+    disabled?: boolean;
+  }[] = [
+    {
+      id: 'recognition',
+      label: copy.listening.recognitionMode
+    },
+    {
+      id: 'typing',
+      label: copy.listening.typingMode
+    },
+    {
+      id: 'writing',
+      label: copy.listening.writingMode,
+      disabled: isWritingDisabled
+    }
+  ];
 
   return (
     <SectionCard title={`${title} ${copy.views.listening}`} description={copy.listening.sectionDescription(title)}>
@@ -84,8 +160,8 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sect
             title={currentSection.title}
             currentIndex={currentSectionIndex}
             totalItems={sections.length}
-            onNext={() => setCurrentSectionIndex(prev => Math.min(prev + 1, sections.length - 1))}
-            onPrev={() => setCurrentSectionIndex(prev => Math.max(prev - 1, 0))}
+            onNext={() => setCurrentSectionIndex((previousIndex) => Math.min(previousIndex + 1, sections.length - 1))}
+            onPrev={() => setCurrentSectionIndex((previousIndex) => Math.max(previousIndex - 1, 0))}
             language={language}
           />
 
@@ -95,13 +171,13 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sect
 
           <CharacterListeningTable section={currentSection} script={script} language={language} />
 
-          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="mt-4 space-y-4">
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setDatasetType('character')}
-                className={`flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   datasetType === 'character'
-                    ? 'border border-indigo-200 bg-indigo-100 text-indigo-700'
+                    ? 'border border-rose-200 bg-rose-100 text-rose-700'
                     : 'border border-transparent text-slate-600 hover:bg-slate-200/50'
                 }`}
               >
@@ -109,9 +185,9 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sect
               </button>
               <button
                 onClick={() => setDatasetType('word')}
-                className={`flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   datasetType === 'word'
-                    ? 'border border-indigo-200 bg-indigo-100 text-indigo-700'
+                    ? 'border border-rose-200 bg-rose-100 text-rose-700'
                     : 'border border-transparent text-slate-600 hover:bg-slate-200/50'
                 }`}
               >
@@ -119,65 +195,66 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sect
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 xl:justify-end">
-              <label className="text-sm font-medium text-slate-500" htmlFor={`${script}-listening-count`}>
-                {copy.listening.questions}
-              </label>
-              <input
-                id={`${script}-listening-count`}
-                type="number"
-                min="1"
-                max={safeMaxCount}
-                value={questionCount}
-                onChange={(e) => setQuestionCount(Math.min(safeMaxCount, Math.max(1, parseInt(e.target.value, 10) || 1)))}
-                className="w-20 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none transition-colors focus:border-indigo-400"
-              />
-              <div className="text-sm font-medium text-slate-500">
-                {copy.listening.itemsSummary(questionCount, maxCount)}
+            <StudyModeSelector
+              label={copy.listening.modeLabel}
+              value={listeningMode}
+              options={modeOptions}
+              onChange={setListeningMode}
+              gridClassName="grid-cols-3"
+            />
+
+            {isWritingDisabled && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                {copy.listening.writingOnlyCharacters}
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleStart('practice')}
-                  disabled={maxCount === 0}
-                  className="flex items-center rounded-lg bg-emerald-600 px-3 py-2 font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  title={copy.listening.practiceTitle}
-                >
-                  <Headphones size={16} className="mr-1.5" />
-                  {copy.listening.practice}
-                </button>
-                <button
-                  onClick={() => handleStart('test')}
-                  disabled={maxCount === 0}
-                  className="flex items-center rounded-lg bg-amber-500 px-3 py-2 font-medium text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
-                  title={copy.listening.testTitle}
-                >
-                  <Play size={16} className="mr-1.5" />
-                  {copy.listening.test}
-                </button>
+            )}
+
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium text-slate-500" htmlFor={`${script}-listening-count`}>
+                  {copy.listening.questions}
+                </label>
+                <input
+                  id={`${script}-listening-count`}
+                  type="number"
+                  min="1"
+                  max={safeMaxCount}
+                  value={questionCount}
+                  onChange={(event) =>
+                    setQuestionCount(
+                      Math.min(safeMaxCount, Math.max(1, parseInt(event.target.value, 10) || 1))
+                    )
+                  }
+                  className="w-20 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none transition-colors focus:border-rose-400"
+                />
               </div>
+
+              <div className="flex items-center gap-4">
+                <div className="text-sm font-medium text-slate-500">
+                  {copy.listening.itemsSummary(questionCount, maxCount)}
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleStart()}
+                disabled={maxCount === 0}
+                className="inline-flex items-center justify-center rounded-lg bg-rose-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                title={getModeLabel(listeningMode)}
+              >
+                <Play size={16} className="mr-2" />
+                {copy.listening.start}: {getModeLabel(listeningMode)}
+              </button>
             </div>
           </div>
         </>
       )}
 
-      {view === 'practice-run' && (
+      {view === 'run' && (
         <ListeningStudyPanel
           language={language}
           items={quizItems}
-          mode="practice"
-          onFinish={(stats) => {
-            setRunStats(stats);
-            setView('result');
-          }}
-          onCancel={() => setView('table')}
-        />
-      )}
-
-      {view === 'test-run' && (
-        <ListeningStudyPanel
-          language={language}
-          items={quizItems}
-          mode="test"
+          sourceItems={sourceItems}
+          mode={lastRunMode}
           onFinish={(stats) => {
             setRunStats(stats);
             setView('result');
@@ -188,7 +265,13 @@ export const ListeningStudyContainer: React.FC<Props> = ({ title, language, sect
 
       {view === 'result' && runStats && (
         <StudyResultPanel
-          section={{ id: `listening-${script}`, title: copy.views.listening, description: '', matrix: [], groups: [] }}
+          section={{
+            id: `listening-${script}-${lastRunDatasetType}`,
+            title: copy.views.listening,
+            description: '',
+            matrix: [],
+            groups: []
+          }}
           language={language}
           stats={runStats}
           onRestart={() => handleStart(lastRunMode)}

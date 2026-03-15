@@ -20,6 +20,11 @@ const ROMAJI_ALIASES: Record<string, string[]> = {
   jo: ['zyo', 'jyo']
 };
 
+export const getAcceptedRomajiAnswers = (expected: string) => {
+  const normalizedExpected = normalizeRomajiInput(expected);
+  return [normalizedExpected, ...(ROMAJI_ALIASES[normalizedExpected] ?? [])];
+};
+
 export const TIMED_MODE_DURATION_SECONDS = 60;
 
 export const normalizeKanaInput = (value: string) =>
@@ -40,7 +45,7 @@ export const isAcceptedRomajiAnswer = (value: string, expected: string) => {
     return true;
   }
 
-  const aliases = ROMAJI_ALIASES[normalizedExpected] ?? [];
+  const aliases = getAcceptedRomajiAnswers(normalizedExpected);
   return aliases.includes(normalizedInput);
 };
 

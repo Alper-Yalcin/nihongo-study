@@ -57,6 +57,17 @@ export interface WordItem {
   jlptLevel?: 'N5' | 'N4' | 'N3' | 'N2' | 'N1';
 }
 
+export interface ListeningItem {
+  id: string;
+  script: 'hiragana' | 'katakana';
+  kana: string;
+  romaji: string;
+  acceptedRomaji?: string[];
+  audioSrc: string;
+  datasetType: 'character' | 'word';
+  character?: Character;
+}
+
 export interface RunStats {
   completed: number;
   totalAttempts: number;
@@ -64,13 +75,17 @@ export interface RunStats {
   wrong: number;
   accuracy: number;
   timeSeconds: number;
-  mode?: TypingMode;
+  mode?: TypingMode | DrawingMode | ListeningMode;
+  modeLabel?: string;
   speed?: number;
   bestStreak?: number;
   averageAnswerMs?: number;
   timeLimitSeconds?: number;
+  averageScore?: number;
 }
 
 export type TypingMode = 'current' | 'reverse' | 'timed';
+export type DrawingMode = 'practice' | 'test' | 'speed' | 'memory';
+export type ListeningMode = 'recognition' | 'typing' | 'writing';
 
 export type TabType = 'overview' | 'hiragana' | 'katakana' | 'kanji' | 'settings';

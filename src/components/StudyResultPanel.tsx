@@ -4,6 +4,7 @@ import { Trophy, Clock, Target, RotateCcw, ArrowLeft, Zap, Flame } from 'lucide-
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
 import { getTypingModeStorageKey, isBetterTypingRun } from '../utils/typing';
+import { isBetterListeningRun } from '../utils/listening';
 
 interface Props {
   section: KanaSection;
@@ -13,6 +14,43 @@ interface Props {
   onBack: () => void;
   variant: 'typing' | 'drawing' | 'listening';
 }
+
+const isBetterDrawingRun = (candidate: RunStats, incumbent: RunStats) => {
+  const mode = candidate.mode ?? 'test';
+
+  if (mode === 'speed') {
+    if (candidate.correct !== incumbent.correct) {
+      return candidate.correct > incumbent.correct;
+    }
+
+    if ((candidate.speed ?? 0) !== (incumbent.speed ?? 0)) {
+      return (candidate.speed ?? 0) > (incumbent.speed ?? 0);
+    }
+
+    if (candidate.accuracy !== incumbent.accuracy) {
+      return candidate.accuracy > incumbent.accuracy;
+    }
+
+    return candidate.timeSeconds < incumbent.timeSeconds;
+  }
+
+  if (mode === 'memory') {
+    if (candidate.correct !== incumbent.correct) {
+      return candidate.correct > incumbent.correct;
+    }
+
+    if ((candidate.bestStreak ?? 0) !== (incumbent.bestStreak ?? 0)) {
+      return (candidate.bestStreak ?? 0) > (incumbent.bestStreak ?? 0);
+    }
+
+    return candidate.timeSeconds < incumbent.timeSeconds;
+  }
+
+  return (
+    candidate.timeSeconds < incumbent.timeSeconds ||
+    (candidate.timeSeconds === incumbent.timeSeconds && candidate.accuracy > incumbent.accuracy)
+  );
+};
 
 export const StudyResultPanel: React.FC<Props> = ({
   section,
@@ -29,10 +67,10 @@ export const StudyResultPanel: React.FC<Props> = ({
   useEffect(() => {
     const storageKey =
       variant === 'drawing'
-        ? `best-score-drawing-${section.id}`
+        ? `best-score-drawing-${section.id}-${stats.mode ?? 'test'}`
         : variant === 'listening'
-          ? `best-score-listening-${section.id}`
-          : getTypingModeStorageKey(section.id, stats.mode ?? 'current');
+          ? `best-score-listening-${section.id}-${stats.mode ?? 'recognition'}`
+          : getTypingModeStorageKey(section.id, (stats.mode as 'current' | 'reverse' | 'timed') ?? 'current');
 
     const saved = localStorage.getItem(storageKey);
     let nextBestScore: RunStats | null = stats;
@@ -43,8 +81,9 @@ export const StudyResultPanel: React.FC<Props> = ({
       const candidateIsBetter =
         variant === 'typing'
           ? isBetterTypingRun(stats, parsed)
-          : stats.timeSeconds < parsed.timeSeconds ||
-            (stats.timeSeconds === parsed.timeSeconds && stats.accuracy > parsed.accuracy);
+          : variant === 'drawing'
+            ? isBetterDrawingRun(stats, parsed)
+            : isBetterListeningRun(stats, parsed);
 
       if (candidateIsBetter) {
         localStorage.setItem(storageKey, JSON.stringify(stats));
@@ -80,15 +119,15 @@ export const StudyResultPanel: React.FC<Props> = ({
       label: copy.common.time,
       value: formatTime(stats.timeSeconds),
       detail:
-        bestScore && !isNewBest
-          ? `${copy.common.best}: ${formatTime(bestScore.timeSeconds)}`
-          : stats.timeLimitSeconds
-            ? `${copy.common.time}: ${formatTime(stats.timeLimitSeconds)}`
+        stats.timeLimitSeconds
+          ? `${copy.common.time}: ${formatTime(stats.timeLimitSeconds)}`
+          : bestScore && !isNewBest
+            ? `${copy.common.best}: ${formatTime(bestScore.timeSeconds)}`
             : undefined
     }
   ];
 
-  if (variant === 'typing' && typeof stats.speed === 'number') {
+  if ((variant === 'typing' || variant === 'drawing' || variant === 'listening') && typeof stats.speed === 'number') {
     resultCards.push({
       key: 'speed',
       icon: <Zap size={16} className="mr-1" />,
@@ -101,12 +140,22 @@ export const StudyResultPanel: React.FC<Props> = ({
     });
   }
 
-  if (variant === 'typing' && typeof stats.bestStreak === 'number') {
+  if ((variant === 'typing' || variant === 'drawing' || variant === 'listening') && typeof stats.bestStreak === 'number') {
     resultCards.push({
       key: 'streak',
       icon: <Flame size={16} className="mr-1" />,
       label: copy.common.streak,
       value: `${stats.bestStreak}`,
+      detail: undefined
+    });
+  }
+
+  if (variant === 'listening' && typeof stats.averageScore === 'number') {
+    resultCards.push({
+      key: 'score',
+      icon: <Target size={16} className="mr-1" />,
+      label: copy.listening.score,
+      value: `${stats.averageScore}%`,
       detail: undefined
     });
   }
@@ -121,14 +170,14 @@ export const StudyResultPanel: React.FC<Props> = ({
         <h2 className="mb-2 text-2xl font-bold text-slate-800">{copy.result.runCompleted}</h2>
         <p className="mb-4 text-slate-500">{copy.result.completedSummary(variant, stats.completed)}</p>
 
-        {variant === 'typing' && stats.mode && (
+        {(variant === 'typing' || variant === 'drawing' || variant === 'listening') && stats.modeLabel && (
           <div className="mb-8 inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
-            {copy.studyRun.modeLabel}:{' '}
-            {stats.mode === 'current'
-              ? copy.studyRun.currentMode
-              : stats.mode === 'reverse'
-                ? copy.studyRun.reverseMode
-                : copy.studyRun.timedMode}
+            {variant === 'typing'
+              ? copy.studyRun.modeLabel
+              : variant === 'drawing'
+                ? copy.drawing.modeLabel
+                : copy.listening.modeLabel}
+            {`: ${stats.modeLabel}`}
           </div>
         )}
 

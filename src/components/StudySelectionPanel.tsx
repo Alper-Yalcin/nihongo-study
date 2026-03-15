@@ -1,9 +1,10 @@
 import React from 'react';
-import { KanaSection, TypingMode } from '../types';
+import { KanaSection, TypingMode, DrawingMode } from '../types';
 import { StudyTable } from './StudyTable';
 import { CheckSquare, Square, Keyboard, PenTool } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
+import { StudyModeSelector } from './StudyModeSelector';
 
 interface Props {
   section: KanaSection;
@@ -13,6 +14,8 @@ interface Props {
   onStart: () => void;
   typingMode: TypingMode;
   onTypingModeChange: (mode: TypingMode) => void;
+  drawingMode: DrawingMode;
+  onDrawingModeChange: (mode: DrawingMode) => void;
   isAllSelected: boolean;
   isNoneSelected: boolean;
   onSelectAll: () => void;
@@ -30,6 +33,8 @@ export const StudySelectionPanel: React.FC<Props> = ({
   onStart,
   typingMode,
   onTypingModeChange,
+  drawingMode,
+  onDrawingModeChange,
   isAllSelected,
   isNoneSelected,
   onSelectAll,
@@ -39,22 +44,16 @@ export const StudySelectionPanel: React.FC<Props> = ({
   mode
 }) => {
   const copy = studyContent[language];
-  const typingModeCards: { id: TypingMode; title: string; description: string }[] = [
-    {
-      id: 'current',
-      title: copy.studyRun.currentMode,
-      description: copy.studyRun.currentModeDescription
-    },
-    {
-      id: 'reverse',
-      title: copy.studyRun.reverseMode,
-      description: copy.studyRun.reverseModeDescription
-    },
-    {
-      id: 'timed',
-      title: copy.studyRun.timedMode,
-      description: copy.studyRun.timedModeDescription
-    }
+  const typingModeButtons: { id: TypingMode; label: string }[] = [
+    { id: 'current', label: copy.studyRun.currentMode },
+    { id: 'reverse', label: copy.studyRun.reverseMode },
+    { id: 'timed', label: copy.studyRun.timedMode }
+  ];
+  const drawingModeButtons: { id: DrawingMode; label: string }[] = [
+    { id: 'practice', label: copy.drawing.practiceMode },
+    { id: 'test', label: copy.drawing.testMode },
+    { id: 'speed', label: copy.drawing.speedMode },
+    { id: 'memory', label: copy.drawing.memoryMode }
   ];
 
   const toggleGroup = (groupId: string) => {
@@ -82,36 +81,23 @@ export const StudySelectionPanel: React.FC<Props> = ({
       />
 
       {mode === 'typing' && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            {copy.studyRun.modeLabel}
-          </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            {typingModeCards.map((card) => {
-              const isActive = typingMode === card.id;
+        <StudyModeSelector
+          label={copy.studyRun.modeLabel}
+          value={typingMode}
+          options={typingModeButtons}
+          onChange={onTypingModeChange}
+          gridClassName="grid-cols-3"
+        />
+      )}
 
-              return (
-                <button
-                  key={card.id}
-                  type="button"
-                  onClick={() => onTypingModeChange(card.id)}
-                  className={`rounded-2xl border px-4 py-4 text-left transition-all ${
-                    isActive
-                      ? 'border-indigo-300 bg-indigo-50 shadow-sm'
-                      : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white'
-                  }`}
-                >
-                  <div className={`text-sm font-semibold ${isActive ? 'text-indigo-700' : 'text-slate-700'}`}>
-                    {card.title}
-                  </div>
-                  <div className="mt-2 text-sm leading-6 text-slate-500">
-                    {card.description}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {mode === 'drawing' && (
+        <StudyModeSelector
+          label={copy.drawing.modeLabel}
+          value={drawingMode}
+          options={drawingModeButtons}
+          onChange={onDrawingModeChange}
+          gridClassName="grid-cols-2 md:grid-cols-4"
+        />
       )}
       
       <div className="flex items-center justify-between bg-slate-50 rounded-xl p-3 border border-slate-200">

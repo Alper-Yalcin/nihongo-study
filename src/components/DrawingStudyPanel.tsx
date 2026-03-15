@@ -1,28 +1,54 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { KanaSection, Character, RunStats } from '../types';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { KanaSection, Character, RunStats, DrawingMode } from '../types';
 import { ArrowLeft, RotateCcw, Eraser, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { DrawingCanvas, DrawingCanvasRef } from './DrawingCanvas';
 import { evaluateDrawing } from '../utils/DrawingEvaluator';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
+import { calculateAccuracy, calculateSpeed } from '../utils/typing';
 
 interface Props {
   section: KanaSection;
   language: AppLanguage;
   selectedGroupIds: Set<string>;
+  drawingMode: DrawingMode;
   onFinish: (stats: RunStats) => void;
   onCancel: () => void;
 }
 
-export const DrawingStudyPanel: React.FC<Props> = ({ section, language, selectedGroupIds, onFinish, onCancel }) => {
+interface SessionStats {
+  correctCount: number;
+  wrongCount: number;
+  attempts: number;
+  currentStreak: number;
+  bestStreak: number;
+}
+
+const SPEED_MODE_DURATION_SECONDS = 60;
+const MEMORY_PREVIEW_MS = 1800;
+
+const initialSessionStats: SessionStats = {
+  correctCount: 0,
+  wrongCount: 0,
+  attempts: 0,
+  currentStreak: 0,
+  bestStreak: 0
+};
+
+export const DrawingStudyPanel: React.FC<Props> = ({
+  section,
+  language,
+  selectedGroupIds,
+  drawingMode,
+  onFinish,
+  onCancel
+}) => {
   const copy = studyContent[language];
-  const [mode, setMode] = useState<'practice' | 'test'>('practice');
-  
   const initialPool = useMemo(() => {
     const chars: Character[] = [];
-    section.groups.forEach(g => {
-      if (selectedGroupIds.has(g.id)) {
-        chars.push(...g.characters);
+    section.groups.forEach((group) => {
+      if (selectedGroupIds.has(group.id)) {
+        chars.push(...group.characters);
       }
     });
     return chars;
@@ -30,244 +56,483 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, language, selected
 
   const [pool, setPool] = useState<Character[]>(initialPool);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentChar, setCurrentChar] = useState<Character | null>(null);
-  
+  const [currentChar, setCurrentChar] = useState<Character | null>(initialPool[0] ?? null);
   const [feedback, setFeedback] = useState<'idle' | 'correct' | 'wrong'>('idle');
-  
-  const [correctCount, setCorrectCount] = useState(0);
-  const [wrongCount, setWrongCount] = useState(0);
-  const [attempts, setAttempts] = useState(0);
+  const [sessionStats, setSessionStats] = useState<SessionStats>(initialSessionStats);
   const [timeSeconds, setTimeSeconds] = useState(0);
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [isMemoryPreviewVisible, setIsMemoryPreviewVisible] = useState(false);
 
-  // Toggles for Practice Mode
   const [showStrokeOrder, setShowStrokeOrder] = useState(true);
   const [showDirectionArrows, setShowDirectionArrows] = useState(true);
   const [showTemplate, setShowTemplate] = useState(true);
 
   const canvasRef = useRef<DrawingCanvasRef>(null);
+  const sessionStatsRef = useRef(sessionStats);
+  const sessionActiveRef = useRef(isSessionActive);
+  const timeSecondsRef = useRef(timeSeconds);
+  const transitionTimeoutRef = useRef<number | null>(null);
+  const previewTimeoutRef = useRef<number | null>(null);
+
+  const isPracticeMode = drawingMode === 'practice';
+  const isTestMode = drawingMode === 'test';
+  const isSpeedMode = drawingMode === 'speed';
+  const isMemoryMode = drawingMode === 'memory';
 
   useEffect(() => {
-    if (pool.length > 0 && !currentChar) {
-      if (mode === 'practice') {
-        setCurrentChar(pool[0]);
-      } else {
-        pickRandomChar(pool);
-      }
-    }
-  }, [pool, mode]);
+    sessionStatsRef.current = sessionStats;
+  }, [sessionStats]);
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeSeconds(t => t + 1), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    sessionActiveRef.current = isSessionActive;
+  }, [isSessionActive]);
 
-  const pickRandomChar = (currentPool: Character[]) => {
-    const randomIndex = Math.floor(Math.random() * currentPool.length);
-    setCurrentChar(currentPool[randomIndex]);
-  };
+  useEffect(() => {
+    timeSecondsRef.current = timeSeconds;
+  }, [timeSeconds]);
 
-  const handleClear = () => {
+  const clearCanvas = () => {
     canvasRef.current?.clear();
-    setFeedback('idle');
   };
 
-  const handleNextPractice = () => {
-    handleClear();
-    setCurrentIndex(prev => {
-      const next = (prev + 1) % pool.length;
-      setCurrentChar(pool[next]);
-      return next;
-    });
+  const clearScheduledWork = () => {
+    if (transitionTimeoutRef.current !== null) {
+      window.clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
+    }
+
+    if (previewTimeoutRef.current !== null) {
+      window.clearTimeout(previewTimeoutRef.current);
+      previewTimeoutRef.current = null;
+    }
   };
 
-  const handlePrevPractice = () => {
-    handleClear();
-    setCurrentIndex(prev => {
-      const next = (prev - 1 + pool.length) % pool.length;
-      setCurrentChar(pool[next]);
-      return next;
-    });
+  const pickRandomChar = (source: Character[]) => {
+    if (source.length === 0) {
+      return null;
+    }
+
+    const randomIndex = Math.floor(Math.random() * source.length);
+    return source[randomIndex];
   };
 
-  const handleCheckTest = () => {
-    if (!currentChar || feedback !== 'idle') return;
-    const strokes = canvasRef.current?.getStrokes() || [];
-    if (strokes.length === 0) return;
-
-    setAttempts(a => a + 1);
-    const isCorrect = evaluateDrawing(strokes, currentChar);
-
-    if (isCorrect) {
-      setFeedback('correct');
-      setCorrectCount(c => c + 1);
-      
-      setTimeout(() => {
-        const newPool = pool.filter(c => c.id !== currentChar.id);
-        if (newPool.length === 0) {
-          onFinish({
-            completed: initialPool.length,
-            totalAttempts: attempts + 1,
-            correct: correctCount + 1,
-            wrong: wrongCount,
-            accuracy: Math.round(((correctCount + 1) / (attempts + 1)) * 100),
-            timeSeconds: timeSeconds
-          });
-        } else {
-          setPool(newPool);
-          pickRandomChar(newPool);
-          handleClear();
-        }
-      }, 1000);
-    } else {
-      setFeedback('wrong');
-      setWrongCount(w => w + 1);
-      setTimeout(() => {
-        setFeedback('idle');
-        handleClear();
-      }, 1000);
+  const getModeLabel = (targetMode: DrawingMode) => {
+    switch (targetMode) {
+      case 'practice':
+        return copy.drawing.practiceMode;
+      case 'test':
+        return copy.drawing.testMode;
+      case 'speed':
+        return copy.drawing.speedMode;
+      case 'memory':
+        return copy.drawing.memoryMode;
+      default:
+        return copy.drawing.testMode;
     }
   };
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+    const safeSeconds = Math.max(seconds, 0);
+    const minutes = Math.floor(safeSeconds / 60);
+    const remainingSeconds = safeSeconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  const startMemoryPreview = (nextChar: Character | null) => {
+    clearScheduledWork();
+    clearCanvas();
+    setFeedback('idle');
+    setCurrentChar(nextChar);
+
+    if (!nextChar) {
+      setIsMemoryPreviewVisible(false);
+      return;
+    }
+
+    setIsMemoryPreviewVisible(true);
+    previewTimeoutRef.current = window.setTimeout(() => {
+      setIsMemoryPreviewVisible(false);
+    }, MEMORY_PREVIEW_MS);
+  };
+
+  const finalizeRun = (finalMode: DrawingMode, resolvedTime = timeSecondsRef.current) => {
+    if (!sessionActiveRef.current) {
+      return;
+    }
+
+    clearScheduledWork();
+    sessionActiveRef.current = false;
+    setIsSessionActive(false);
+    setIsMemoryPreviewVisible(false);
+
+    const snapshot = sessionStatsRef.current;
+
+    onFinish({
+      completed: finalMode === 'test' ? initialPool.length : snapshot.correctCount,
+      totalAttempts: snapshot.attempts,
+      correct: snapshot.correctCount,
+      wrong: snapshot.wrongCount,
+      accuracy: calculateAccuracy(snapshot.correctCount, snapshot.attempts),
+      timeSeconds: resolvedTime,
+      mode: finalMode,
+      modeLabel: getModeLabel(finalMode),
+      speed: finalMode === 'speed' ? calculateSpeed(snapshot.correctCount, resolvedTime) : undefined,
+      bestStreak: finalMode === 'memory' ? snapshot.bestStreak : undefined,
+      timeLimitSeconds: finalMode === 'speed' ? SPEED_MODE_DURATION_SECONDS : undefined
+    });
+  };
+
+  const initializeMode = (nextMode: DrawingMode) => {
+    clearScheduledWork();
+    clearCanvas();
+
+    setPool(initialPool);
+    setCurrentIndex(0);
+    setFeedback('idle');
+    setSessionStats(initialSessionStats);
+    sessionStatsRef.current = initialSessionStats;
+    setTimeSeconds(0);
+    timeSecondsRef.current = 0;
+    setIsMemoryPreviewVisible(false);
+
+    if (nextMode === 'practice') {
+      sessionActiveRef.current = false;
+      setIsSessionActive(false);
+      setCurrentChar(initialPool[0] ?? null);
+      return;
+    }
+
+    sessionActiveRef.current = true;
+    setIsSessionActive(true);
+
+    const nextChar = pickRandomChar(initialPool);
+
+    if (nextMode === 'memory') {
+      startMemoryPreview(nextChar);
+      return;
+    }
+
+    setCurrentChar(nextChar);
+  };
+
+  useEffect(() => {
+    initializeMode(drawingMode);
+
+    return () => {
+      clearScheduledWork();
+    };
+  }, [initialPool, drawingMode]);
+
+  useEffect(() => {
+    if (!isSessionActive) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setTimeSeconds((previousSeconds) => previousSeconds + 1);
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [isSessionActive]);
+
+  useEffect(() => {
+    if (isSpeedMode && isSessionActive && timeSeconds >= SPEED_MODE_DURATION_SECONDS) {
+      finalizeRun('speed', SPEED_MODE_DURATION_SECONDS);
+    }
+  }, [isSpeedMode, isSessionActive, timeSeconds]);
+
+  const handleClear = () => {
+    if (feedback !== 'idle' || isMemoryPreviewVisible) {
+      return;
+    }
+
+    clearCanvas();
+  };
+
+  const handleNextPractice = () => {
+    if (initialPool.length === 0) {
+      return;
+    }
+
+    clearCanvas();
+    setFeedback('idle');
+    setCurrentIndex((previousIndex) => {
+      const nextIndex = (previousIndex + 1) % initialPool.length;
+      setCurrentChar(initialPool[nextIndex]);
+      return nextIndex;
+    });
+  };
+
+  const handlePrevPractice = () => {
+    if (initialPool.length === 0) {
+      return;
+    }
+
+    clearCanvas();
+    setFeedback('idle');
+    setCurrentIndex((previousIndex) => {
+      const nextIndex = (previousIndex - 1 + initialPool.length) % initialPool.length;
+      setCurrentChar(initialPool[nextIndex]);
+      return nextIndex;
+    });
+  };
+
+  const handleCheck = () => {
+    if (!currentChar || feedback !== 'idle' || isMemoryPreviewVisible) {
+      return;
+    }
+
+    const strokes = canvasRef.current?.getStrokes() || [];
+
+    if (strokes.length === 0) {
+      return;
+    }
+
+    const isCorrect = evaluateDrawing(strokes, currentChar);
+    setFeedback(isCorrect ? 'correct' : 'wrong');
+
+    setSessionStats((previousStats) => {
+      const nextAttempts = previousStats.attempts + 1;
+      const nextCorrectCount = previousStats.correctCount + (isCorrect ? 1 : 0);
+      const nextWrongCount = previousStats.wrongCount + (isCorrect ? 0 : 1);
+      const nextCurrentStreak = isMemoryMode
+        ? isCorrect
+          ? previousStats.currentStreak + 1
+          : 0
+        : previousStats.currentStreak;
+
+      return {
+        attempts: nextAttempts,
+        correctCount: nextCorrectCount,
+        wrongCount: nextWrongCount,
+        currentStreak: nextCurrentStreak,
+        bestStreak:
+          isMemoryMode && isCorrect
+            ? Math.max(previousStats.bestStreak, nextCurrentStreak)
+            : previousStats.bestStreak
+      };
+    });
+
+    clearScheduledWork();
+
+    if (isCorrect) {
+      if (isTestMode) {
+        const nextPool = pool.filter((character) => character.id !== currentChar.id);
+        transitionTimeoutRef.current = window.setTimeout(() => {
+          if (!sessionActiveRef.current) {
+            return;
+          }
+
+          if (nextPool.length === 0) {
+            finalizeRun('test');
+            return;
+          }
+
+          setPool(nextPool);
+          setFeedback('idle');
+          clearCanvas();
+          setCurrentChar(pickRandomChar(nextPool));
+        }, 900);
+        return;
+      }
+
+      if (isSpeedMode) {
+        transitionTimeoutRef.current = window.setTimeout(() => {
+          if (!sessionActiveRef.current) {
+            return;
+          }
+
+          setFeedback('idle');
+          clearCanvas();
+          setCurrentChar(pickRandomChar(initialPool));
+        }, 320);
+        return;
+      }
+
+      if (isMemoryMode) {
+        transitionTimeoutRef.current = window.setTimeout(() => {
+          if (!sessionActiveRef.current) {
+            return;
+          }
+
+          setFeedback('idle');
+          startMemoryPreview(pickRandomChar(initialPool));
+        }, 700);
+      }
+
+      return;
+    }
+
+    if (isMemoryMode) {
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        finalizeRun('memory');
+      }, 900);
+      return;
+    }
+
+    if (isSpeedMode) {
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        if (!sessionActiveRef.current) {
+          return;
+        }
+
+        setFeedback('idle');
+        clearCanvas();
+        setCurrentChar(pickRandomChar(initialPool));
+      }, 550);
+      return;
+    }
+
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      if (!sessionActiveRef.current) {
+        return;
+      }
+
+      setFeedback('idle');
+      clearCanvas();
+    }, 900);
+  };
+
+  const headerPrompt = isMemoryMode
+    ? isMemoryPreviewVisible
+      ? copy.drawing.memorize
+      : copy.drawing.drawFromMemory
+    : copy.drawing.draw;
+  const headerDisplay = isMemoryMode
+    ? isMemoryPreviewVisible
+      ? currentChar?.symbol
+      : '...'
+    : currentChar?.label;
+  const liveSpeed = calculateSpeed(sessionStats.correctCount, timeSeconds);
 
   return (
     <div className="flex flex-col items-center py-6">
-      <div className="w-full max-w-md">
-        
-        {/* Mode Tabs */}
-        <div className="flex bg-slate-100 p-1 rounded-lg mb-6">
-          <button
-            onClick={() => { setMode('practice'); handleClear(); setCurrentIndex(0); setCurrentChar(initialPool[0]); setPool(initialPool); }}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${mode === 'practice' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            {copy.drawing.practiceMode}
-          </button>
-          <button
-            onClick={() => { setMode('test'); handleClear(); setPool(initialPool); setCorrectCount(0); setWrongCount(0); setAttempts(0); setTimeSeconds(0); pickRandomChar(initialPool); }}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${mode === 'test' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            {copy.drawing.testMode}
-          </button>
-        </div>
-
-        {/* Header / Stats */}
-        {mode === 'test' ? (
-          <div className="flex items-center justify-between mb-4 text-sm font-medium text-slate-500">
-            <div className="flex space-x-4">
-              <span className="text-emerald-600">{copy.common.correct}: {correctCount}</span>
-              <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
-            </div>
-            <div className="flex space-x-4">
-              <span>{formatTime(timeSeconds)}</span>
-              <span>{initialPool.length - pool.length} / {initialPool.length}</span>
-            </div>
+      <div className="w-full max-w-2xl">
+        {isPracticeMode ? (
+          <div className="mb-4 flex items-center justify-between text-sm font-medium text-slate-500">
+            <span>{copy.drawing.practice}</span>
+            <span>{currentIndex + 1} / {initialPool.length}</span>
           </div>
         ) : (
-          <div className="flex items-center justify-between mb-4 text-sm font-medium text-slate-500">
-            <div className="flex space-x-4">
-              <span>{copy.drawing.practice}</span>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm font-medium text-slate-500">
+            <div className="flex flex-wrap gap-4">
+              <span className="text-emerald-600">{copy.common.correct}: {sessionStats.correctCount}</span>
+              <span className="text-rose-600">{copy.common.wrong}: {sessionStats.wrongCount}</span>
             </div>
-            <div className="flex space-x-4">
-              <span>{currentIndex + 1} / {initialPool.length}</span>
+            <div className="flex flex-wrap gap-4">
+              <span>
+                {isSpeedMode ? `${copy.drawing.timeLeft}: ${formatTime(SPEED_MODE_DURATION_SECONDS - timeSeconds)}` : formatTime(timeSeconds)}
+              </span>
+              {isTestMode && <span>{initialPool.length - pool.length} / {initialPool.length}</span>}
+              {isSpeedMode && <span>{copy.common.speed}: {liveSpeed}/min</span>}
+              {isMemoryMode && <span>{copy.common.streak}: {sessionStats.correctCount}</span>}
             </div>
           </div>
         )}
 
-        {/* Target Info */}
-        <div className="text-center mb-4">
-          <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-1">{copy.drawing.draw}</div>
-          <div className="text-4xl font-bold text-slate-800">{currentChar?.label}</div>
+        <div className="mb-4 text-center">
+          <div className="mb-1 text-sm font-semibold uppercase tracking-widest text-slate-500">{headerPrompt}</div>
+          <div
+            className={`font-bold ${
+              isMemoryMode && isMemoryPreviewVisible
+                ? 'font-jp text-6xl text-slate-800'
+                : isMemoryMode
+                  ? 'text-4xl text-slate-300'
+                  : 'text-4xl text-slate-800'
+            }`}
+          >
+            {headerDisplay}
+          </div>
         </div>
 
-        {/* Canvas Area */}
-        <div className="flex justify-center mb-6 relative">
-          <DrawingCanvas 
-            ref={canvasRef} 
-            guideSymbol={mode === 'practice' ? currentChar?.symbol : undefined} 
-            drawingData={mode === 'practice' ? currentChar?.drawingData : undefined}
-            showStrokeOrder={mode === 'practice' ? showStrokeOrder : false}
-            showDirectionArrows={mode === 'practice' ? showDirectionArrows : false}
-            showTemplate={mode === 'practice' ? showTemplate : false}
-            width={280} 
+        <div className="relative mb-6 flex justify-center">
+          <DrawingCanvas
+            ref={canvasRef}
+            guideSymbol={isPracticeMode ? currentChar?.symbol : undefined}
+            drawingData={isPracticeMode ? currentChar?.drawingData : undefined}
+            showStrokeOrder={isPracticeMode ? showStrokeOrder : false}
+            showDirectionArrows={isPracticeMode ? showDirectionArrows : false}
+            showTemplate={isPracticeMode ? showTemplate : false}
+            width={280}
             height={280}
-            disabled={feedback !== 'idle'}
+            disabled={feedback !== 'idle' || isMemoryPreviewVisible}
           />
-          
-          {/* Feedback Overlay for Test Mode */}
-          {mode === 'test' && feedback !== 'idle' && (
-            <div className={`absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm z-10 transition-all ${feedback === 'correct' ? 'text-emerald-500' : 'text-rose-500'}`}>
+
+          {!isPracticeMode && feedback !== 'idle' && (
+            <div
+              className={`absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm transition-all ${
+                feedback === 'correct' ? 'text-emerald-500' : 'text-rose-500'
+              }`}
+            >
               <div className="flex flex-col items-center">
                 {feedback === 'correct' ? <Check size={48} /> : <RotateCcw size={48} />}
-                <span className="text-xl font-bold mt-2">{feedback === 'correct' ? copy.drawing.correctFeedback : copy.drawing.wrongFeedback}</span>
+                <span className="mt-2 text-xl font-bold">
+                  {feedback === 'correct' ? copy.drawing.correctFeedback : copy.drawing.wrongFeedback}
+                </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Controls */}
-        <div className="flex justify-center space-x-3 mb-6">
+        <div className="mb-6 flex justify-center space-x-3">
           <button
             onClick={handleClear}
-            className="flex items-center px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+            disabled={feedback !== 'idle' || isMemoryPreviewVisible}
+            className="flex items-center rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Eraser size={18} className="mr-2" /> {copy.drawing.clear}
           </button>
 
-          {mode === 'practice' ? (
+          {isPracticeMode ? (
             <>
               <button
                 onClick={handlePrevPractice}
-                className="flex items-center px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+                className="flex items-center rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={handleNextPractice}
-                className="flex items-center px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+                className="flex items-center rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200"
               >
                 <ChevronRight size={18} />
               </button>
             </>
           ) : (
             <button
-              onClick={handleCheckTest}
-              disabled={feedback !== 'idle'}
-              className="flex items-center px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              onClick={handleCheck}
+              disabled={feedback !== 'idle' || isMemoryPreviewVisible}
+              className="flex items-center rounded-lg bg-indigo-600 px-6 py-2 font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Check size={18} className="mr-2" /> {copy.drawing.check}
             </button>
           )}
         </div>
 
-        {/* Practice Mode Toggles */}
-        {mode === 'practice' && (
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <label className="flex items-center space-x-2 text-sm text-slate-600 cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={showStrokeOrder} 
+        {isPracticeMode && (
+          <div className="mb-8 flex flex-wrap justify-center gap-3">
+            <label className="flex cursor-pointer items-center space-x-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={showStrokeOrder}
                 onChange={() => setShowStrokeOrder(!showStrokeOrder)}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
               <span>{copy.drawing.numbers}</span>
             </label>
-            <label className="flex items-center space-x-2 text-sm text-slate-600 cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={showDirectionArrows} 
+            <label className="flex cursor-pointer items-center space-x-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={showDirectionArrows}
                 onChange={() => setShowDirectionArrows(!showDirectionArrows)}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
               <span>{copy.drawing.arrows}</span>
             </label>
-            <label className="flex items-center space-x-2 text-sm text-slate-600 cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={showTemplate} 
+            <label className="flex cursor-pointer items-center space-x-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={showTemplate}
                 onChange={() => setShowTemplate(!showTemplate)}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
@@ -276,33 +541,22 @@ export const DrawingStudyPanel: React.FC<Props> = ({ section, language, selected
           </div>
         )}
 
-        {/* Footer */}
-        <div className="flex justify-between items-center border-t border-slate-100 pt-6">
+        <div className="flex items-center justify-between border-t border-slate-100 pt-6">
           <button
             onClick={onCancel}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
             <ArrowLeft size={16} className="mr-1" /> {copy.drawing.backToSelection}
           </button>
-          {mode === 'test' && (
+          {!isPracticeMode && (
             <button
-              onClick={() => {
-                setPool(initialPool);
-                setCorrectCount(0);
-                setWrongCount(0);
-                setAttempts(0);
-                setTimeSeconds(0);
-                setFeedback('idle');
-                handleClear();
-                pickRandomChar(initialPool);
-              }}
+              onClick={() => initializeMode(drawingMode)}
               className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
             >
               <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
             </button>
           )}
         </div>
-
       </div>
     </div>
   );

@@ -141,6 +141,7 @@ export const StudyRunPanel: React.FC<Props> = ({
       accuracy,
       timeSeconds,
       mode: typingMode,
+      modeLabel,
       speed: calculateSpeed(snapshot.correctCount, timeSeconds),
       bestStreak: snapshot.bestStreak,
       averageAnswerMs,
@@ -288,17 +289,6 @@ export const StudyRunPanel: React.FC<Props> = ({
   return (
     <div className="flex flex-col items-center py-6" onClick={focusInput}>
       <div className="w-full max-w-2xl">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
-            {copy.studyRun.modeLabel}: {modeLabel}
-          </div>
-          {isTimedMode && (
-            <div className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-              {copy.studyRun.timedRemaining}: {liveTime}
-            </div>
-          )}
-        </div>
-
         <div className="mb-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
