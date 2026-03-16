@@ -5,18 +5,24 @@ interface Props {
   alt: string;
   fallbackTitle: string;
   fallbackPath: string;
+  className?: string;
+  imageClassName?: string;
 }
 
 export const OverviewDemoFrame: React.FC<Props> = ({
   src,
   alt,
   fallbackTitle,
-  fallbackPath
+  fallbackPath,
+  className = '',
+  imageClassName = ''
 }) => {
   const [hasError, setHasError] = useState(false);
 
   return (
-    <div className="group flex-1 w-full max-w-[600px] min-h-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 p-4 shadow-sm transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-xl flex items-center justify-center">
+    <div
+      className={`group flex-1 w-full max-w-[600px] min-h-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 p-4 shadow-sm transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-xl flex items-center justify-center ${className}`.trim()}
+    >
       {hasError ? (
         <div className="text-slate-400 text-center p-8">
           <p className="mb-2 font-medium">{fallbackTitle}</p>
@@ -26,7 +32,7 @@ export const OverviewDemoFrame: React.FC<Props> = ({
         <img
           src={src}
           alt={alt}
-          className="w-full h-auto rounded-xl border border-slate-200 shadow-sm transition-transform duration-500 ease-out will-change-transform group-hover:scale-110"
+          className={`w-full h-auto rounded-xl border border-slate-200 shadow-sm transition-transform duration-500 ease-out will-change-transform group-hover:scale-110 ${imageClassName}`.trim()}
           loading="lazy"
           onError={() => setHasError(true)}
         />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PageContainer } from '../components/PageContainer';
 import { OverviewHero } from '../components/overview/OverviewHero';
 import { FeatureCards } from '../components/overview/FeatureCards';
@@ -9,6 +9,8 @@ import { DictionaryFeatureSection } from '../components/overview/DictionaryFeatu
 import { TabType } from '../types';
 import { AppLanguage } from '../data/appPreferences';
 import { overviewContent } from '../data/overviewContent';
+import { OverviewStudyAreaId } from '../data/overviewModalContent';
+import { OverviewStudyDetailModal } from '../components/overview/OverviewStudyDetailModal';
 
 interface Props {
   language: AppLanguage;
@@ -17,6 +19,7 @@ interface Props {
 
 export const Overview: React.FC<Props> = ({ language, onNavigate = () => {} }) => {
   const copy = overviewContent[language];
+  const [activeStudyArea, setActiveStudyArea] = useState<OverviewStudyAreaId | null>(null);
 
   return (
     <PageContainer title={copy.pageTitle}>
@@ -25,12 +28,20 @@ export const Overview: React.FC<Props> = ({ language, onNavigate = () => {} }) =
         <FeatureCards language={language} />
         
         <div className="mt-32 space-y-32">
-          <TypingFeatureSection language={language} />
-          <DrawingFeatureSection language={language} />
-          <ListeningFeatureSection language={language} />
-          <DictionaryFeatureSection language={language} />
+          <TypingFeatureSection language={language} onOpenDetails={() => setActiveStudyArea('typing')} />
+          <DrawingFeatureSection language={language} onOpenDetails={() => setActiveStudyArea('drawing')} />
+          <ListeningFeatureSection language={language} onOpenDetails={() => setActiveStudyArea('listening')} />
+          <DictionaryFeatureSection language={language} onOpenDetails={() => setActiveStudyArea('dictionary')} />
         </div>
       </div>
+
+      {activeStudyArea && (
+        <OverviewStudyDetailModal
+          language={language}
+          studyArea={activeStudyArea}
+          onClose={() => setActiveStudyArea(null)}
+        />
+      )}
     </PageContainer>
   );
 };

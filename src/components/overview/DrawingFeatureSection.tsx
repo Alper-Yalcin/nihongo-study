@@ -6,13 +6,34 @@ import { OverviewDemoFrame } from './OverviewDemoFrame';
 
 interface Props {
   language: AppLanguage;
+  onOpenDetails?: () => void;
 }
 
-export const DrawingFeatureSection: React.FC<Props> = ({ language }) => {
+export const DrawingFeatureSection: React.FC<Props> = ({ language, onOpenDetails }) => {
   const copy = overviewContent[language].drawingSection;
+  const isInteractive = Boolean(onOpenDetails);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!onOpenDetails) {
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onOpenDetails();
+    }
+  };
 
   return (
-    <div className="flex flex-col lg:flex-row-reverse items-center gap-12 mb-24">
+    <div
+      className={`mb-24 flex flex-col items-center gap-12 lg:flex-row-reverse ${
+        isInteractive ? 'cursor-pointer rounded-3xl transition-transform duration-300 hover:-translate-y-1' : ''
+      }`}
+      onClick={onOpenDetails}
+      onKeyDown={handleKeyDown}
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+    >
       <div className="flex-1 space-y-6">
         <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold tracking-wide uppercase mb-2">
           {copy.badge}
