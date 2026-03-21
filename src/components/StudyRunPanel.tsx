@@ -189,17 +189,18 @@ export const StudyRunPanel: React.FC<Props> = ({
     }
   }, [currentChar, feedback, isSessionComplete]);
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const isCorrectAnswer = (value: string, character: Character) =>
+    isReverseMode
+      ? isAcceptedKanaAnswer(value, character.symbol)
+      : isAcceptedRomajiAnswer(value, character.label);
 
-    if (!currentChar || !input.trim() || feedback !== 'idle' || isSessionComplete) {
+  const evaluateAnswer = (rawValue: string) => {
+    if (!currentChar || !rawValue.trim() || feedback !== 'idle' || isSessionComplete) {
       return;
     }
 
     const answerDuration = Date.now() - roundStartedAt;
-    const isCorrect = isReverseMode
-      ? isAcceptedKanaAnswer(input, currentChar.symbol)
-      : isAcceptedRomajiAnswer(input, currentChar.label);
+    const isCorrect = isCorrectAnswer(rawValue, currentChar);
 
     setFeedback(isCorrect ? 'correct' : 'wrong');
 
@@ -265,6 +266,24 @@ export const StudyRunPanel: React.FC<Props> = ({
       setInput('');
       setRoundStartedAt(Date.now());
     }, isTimedMode ? 260 : 480);
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    evaluateAnswer(input);
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextValue = event.target.value;
+    setInput(nextValue);
+
+    if (!currentChar || feedback !== 'idle' || isSessionComplete || !nextValue.trim()) {
+      return;
+    }
+
+    if (isCorrectAnswer(nextValue, currentChar)) {
+      evaluateAnswer(nextValue);
+    }
   };
 
   const liveAccuracy = calculateAccuracy(sessionStats.correctCount, sessionStats.attempts);
@@ -358,7 +377,7 @@ export const StudyRunPanel: React.FC<Props> = ({
               ref={inputRef}
               type="text"
               value={input}
-              onChange={(event) => setInput(event.target.value)}
+              onChange={handleInputChange}
               disabled={feedback !== 'idle' || isSessionComplete}
               placeholder={isReverseMode ? copy.studyRun.reversePlaceholder : copy.studyRun.placeholder}
               className={`w-full rounded-2xl border-2 px-5 py-4 text-center text-2xl outline-none transition-all ${
