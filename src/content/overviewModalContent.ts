@@ -1,4 +1,4 @@
-import { AppLanguage } from './appPreferences';
+import { AppLanguage } from '../data/appPreferences';
 
 export type OverviewStudyAreaId = 'typing' | 'drawing' | 'listening' | 'dictionary';
 

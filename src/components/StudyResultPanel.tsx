@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { KanaSection, RunStats } from '../types';
 import { Trophy, Clock, Target, RotateCcw, ArrowLeft, Zap, Flame } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
 import { getTypingModeStorageKey, isBetterTypingRun } from '../utils/typing';
 import { isBetterListeningRun } from '../utils/listening';
+import { useBestScore } from '../hooks/useBestScore';
+import { formatDuration } from '../utils/formatDuration';
 
 interface Props {
   section: KanaSection;
@@ -61,49 +63,23 @@ export const StudyResultPanel: React.FC<Props> = ({
   variant
 }) => {
   const copy = studyContent[language];
-  const [bestScore, setBestScore] = useState<RunStats | null>(null);
-  const [isNewBest, setIsNewBest] = useState(false);
-
-  useEffect(() => {
-    const storageKey =
-      variant === 'drawing'
-        ? `best-score-drawing-${section.id}-${stats.mode ?? 'test'}`
-        : variant === 'listening'
-          ? `best-score-listening-${section.id}-${stats.mode ?? 'recognition'}`
-          : getTypingModeStorageKey(section.id, (stats.mode as 'current' | 'reverse' | 'timed') ?? 'current');
-
-    const saved = localStorage.getItem(storageKey);
-    let nextBestScore: RunStats | null = stats;
-    let nextIsNewBest = true;
-
-    if (saved) {
-      const parsed = JSON.parse(saved) as RunStats;
-      const candidateIsBetter =
-        variant === 'typing'
-          ? isBetterTypingRun(stats, parsed)
-          : variant === 'drawing'
-            ? isBetterDrawingRun(stats, parsed)
-            : isBetterListeningRun(stats, parsed);
-
-      if (candidateIsBetter) {
-        localStorage.setItem(storageKey, JSON.stringify(stats));
-      } else {
-        nextBestScore = parsed;
-        nextIsNewBest = false;
-      }
-    } else {
-      localStorage.setItem(storageKey, JSON.stringify(stats));
-    }
-
-    setBestScore(nextBestScore);
-    setIsNewBest(nextIsNewBest);
-  }, [stats, section.id, variant]);
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
+  const storageKey =
+    variant === 'drawing'
+      ? `best-score-drawing-${section.id}-${stats.mode ?? 'test'}`
+      : variant === 'listening'
+        ? `best-score-listening-${section.id}-${stats.mode ?? 'recognition'}`
+        : getTypingModeStorageKey(section.id, (stats.mode as 'current' | 'reverse' | 'timed') ?? 'current');
+  const bestScoreComparator =
+    variant === 'typing'
+      ? isBetterTypingRun
+      : variant === 'drawing'
+        ? isBetterDrawingRun
+        : isBetterListeningRun;
+  const { bestScore, isNewBest } = useBestScore<RunStats>({
+    storageKey,
+    candidate: stats,
+    isBetter: bestScoreComparator
+  });
 
   const resultCards = [
     {
@@ -117,12 +93,12 @@ export const StudyResultPanel: React.FC<Props> = ({
       key: 'time',
       icon: <Clock size={16} className="mr-1" />,
       label: copy.common.time,
-      value: formatTime(stats.timeSeconds),
+      value: formatDuration(stats.timeSeconds),
       detail:
         stats.timeLimitSeconds
-          ? `${copy.common.time}: ${formatTime(stats.timeLimitSeconds)}`
+          ? `${copy.common.time}: ${formatDuration(stats.timeLimitSeconds)}`
           : bestScore && !isNewBest
-            ? `${copy.common.best}: ${formatTime(bestScore.timeSeconds)}`
+            ? `${copy.common.best}: ${formatDuration(bestScore.timeSeconds)}`
             : undefined
     }
   ];

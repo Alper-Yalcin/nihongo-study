@@ -14,36 +14,46 @@ import { Settings } from './pages/Settings';
 import { TabType } from './types';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
 import { AppLanguage, ThemeMode } from './data/appPreferences';
+import { usePersistentState } from './hooks/usePersistentState';
 
 const KANA_FONT_STORAGE_KEY = 'nihongo-study.kana-font-style';
 const APP_LANGUAGE_STORAGE_KEY = 'nihongo-study.app-language';
 const THEME_MODE_STORAGE_KEY = 'nihongo-study.theme-mode';
 
+const serializeString = <T extends string>(value: T) => value;
+const deserializeLanguage = (value: string): AppLanguage => (value === 'en' ? 'en' : 'tr');
+const deserializeThemeMode = (value: string): ThemeMode => (value === 'dark' ? 'dark' : 'light');
+const deserializeKanaFontStyle = (value: string): KanaFontStyleId =>
+  kanaFontStyles.some((option) => option.id === value)
+    ? (value as KanaFontStyleId)
+    : defaultKanaFontStyleId;
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [language, setLanguage] = useState<AppLanguage>(() => {
-    if (typeof window === 'undefined') {
-      return 'tr';
+  const [language, setLanguage] = usePersistentState<AppLanguage>(
+    APP_LANGUAGE_STORAGE_KEY,
+    'tr',
+    {
+      serialize: serializeString,
+      deserialize: deserializeLanguage
     }
-
-    const saved = window.localStorage.getItem(APP_LANGUAGE_STORAGE_KEY);
-    return saved === 'en' ? 'en' : 'tr';
-  });
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    if (typeof window === 'undefined') {
-      return 'light';
+  );
+  const [themeMode, setThemeMode] = usePersistentState<ThemeMode>(
+    THEME_MODE_STORAGE_KEY,
+    'light',
+    {
+      serialize: serializeString,
+      deserialize: deserializeThemeMode
     }
-
-    return window.localStorage.getItem(THEME_MODE_STORAGE_KEY) === 'dark' ? 'dark' : 'light';
-  });
-  const [kanaFontStyle, setKanaFontStyle] = useState<KanaFontStyleId>(() => {
-    if (typeof window === 'undefined') {
-      return defaultKanaFontStyleId;
+  );
+  const [kanaFontStyle, setKanaFontStyle] = usePersistentState<KanaFontStyleId>(
+    KANA_FONT_STORAGE_KEY,
+    defaultKanaFontStyleId,
+    {
+      serialize: serializeString,
+      deserialize: deserializeKanaFontStyle
     }
-
-    const saved = window.localStorage.getItem(KANA_FONT_STORAGE_KEY) as KanaFontStyleId | null;
-    return kanaFontStyles.some(option => option.id === saved) ? saved! : defaultKanaFontStyleId;
-  });
+  );
 
   const selectedKanaFont = useMemo(
     () => kanaFontStyles.find(option => option.id === kanaFontStyle) ?? kanaFontStyles[0],
@@ -51,17 +61,8 @@ export default function App() {
   );
 
   useEffect(() => {
-    window.localStorage.setItem(KANA_FONT_STORAGE_KEY, kanaFontStyle);
-  }, [kanaFontStyle]);
-
-  useEffect(() => {
-    window.localStorage.setItem(APP_LANGUAGE_STORAGE_KEY, language);
     document.documentElement.lang = language;
   }, [language]);
-
-  useEffect(() => {
-    window.localStorage.setItem(THEME_MODE_STORAGE_KEY, themeMode);
-  }, [themeMode]);
 
   // Simple router based on state
   const renderContent = () => {

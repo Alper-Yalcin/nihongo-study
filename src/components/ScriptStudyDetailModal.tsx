@@ -5,7 +5,7 @@ import {
   ScriptAccentTone,
   ScriptOverviewDetailSection,
   scriptLandingContent
-} from '../data/scriptLandingContent';
+} from '../content/scriptLandingContent';
 import { OverviewDemoFrame } from './overview/OverviewDemoFrame';
 
 interface Props {

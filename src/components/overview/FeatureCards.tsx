@@ -1,7 +1,7 @@
 import React from 'react';
 import { Keyboard, PenTool, BookA, Headphones } from 'lucide-react';
 import { AppLanguage } from '../../data/appPreferences';
-import { overviewContent } from '../../data/overviewContent';
+import { overviewContent } from '../../content/overviewContent';
 
 interface Props {
   language: AppLanguage;

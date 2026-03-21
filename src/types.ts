@@ -14,6 +14,30 @@ export interface SafeZone {
   height: number;
 }
 
+export interface DrawingTemplatePoint {
+  x: number;
+  y: number;
+}
+
+export interface DrawingTemplateStroke {
+  points: DrawingTemplatePoint[];
+}
+
+export interface DrawingTestTemplate {
+  strokes?: DrawingTemplateStroke[];
+  width?: number;
+  height?: number;
+}
+
+export interface DrawingBoundingHints {
+  minX?: number;
+  minY?: number;
+  maxX?: number;
+  maxY?: number;
+  width?: number;
+  height?: number;
+}
+
 export interface DrawingData {
   viewBoxWidth?: number;
   viewBoxHeight?: number;
@@ -21,8 +45,8 @@ export interface DrawingData {
   guidePaths?: string[];
   strokeGuides?: StrokeGuide[];
   safeZone?: SafeZone;
-  testTemplate?: any;
-  boundingHints?: any;
+  testTemplate?: DrawingTestTemplate;
+  boundingHints?: DrawingBoundingHints;
 }
 
 export interface Character {

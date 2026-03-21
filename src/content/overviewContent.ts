@@ -1,4 +1,4 @@
-import { AppLanguage } from './appPreferences';
+import { AppLanguage } from '../data/appPreferences';
 
 interface OverviewFeatureCardCopy {
   title: string;

@@ -1,5 +1,5 @@
 ﻿import { ScriptStudyView } from '../types';
-import { AppLanguage } from './appPreferences';
+import { AppLanguage } from '../data/appPreferences';
 
 export type ScriptAccentTone = 'indigo' | 'emerald' | 'rose' | 'amber' | 'slate';
 

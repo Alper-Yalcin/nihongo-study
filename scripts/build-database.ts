@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
-import { turkishMeaningTranslations } from '../src/data/meaningTranslations';
+import { turkishMeaningTranslations } from './data/meaningTranslations';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -181,12 +181,27 @@ const ensureDatabaseDirectory = () => {
   fs.mkdirSync(DATABASE_DIR, { recursive: true });
 };
 
+const removeExistingDatabase = () => {
+  if (!fs.existsSync(DATABASE_PATH)) {
+    return;
+  }
+
+  try {
+    fs.rmSync(DATABASE_PATH, { force: true });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'EPERM') {
+      throw new Error(
+        `Database file is locked at ${DATABASE_PATH}. Stop the running backend or dev server, then run "npm run db:build" again.`
+      );
+    }
+
+    throw error;
+  }
+};
+
 const rebuildDatabase = () => {
   ensureDatabaseDirectory();
-
-  if (fs.existsSync(DATABASE_PATH)) {
-    fs.rmSync(DATABASE_PATH, { force: true });
-  }
+  removeExistingDatabase();
 
   const database = new Database(DATABASE_PATH);
   database.pragma('foreign_keys = ON');

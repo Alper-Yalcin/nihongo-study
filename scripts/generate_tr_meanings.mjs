@@ -6,7 +6,7 @@ const SEP = '\n@@__SEP__@@\n';
 const BATCH_SIZE = 50;
 const CONCURRENCY = 4;
 const RETRY_LIMIT = 3;
-const OUTPUT_PATH = path.join(ROOT, 'src', 'data', 'meaningTranslations.ts');
+const OUTPUT_PATH = path.join(ROOT, 'scripts', 'data', 'meaningTranslations.ts');
 const CSV_DIRS = [
   path.join(ROOT, 'csv', 'hiragana'),
   path.join(ROOT, 'csv', 'katakana')
@@ -151,6 +151,7 @@ async function writeMap(map) {
   const sortedEntries = Object.entries(map).sort(([left], [right]) => left.localeCompare(right));
   const jsonBody = JSON.stringify(Object.fromEntries(sortedEntries), null, 2);
   const source = `export const turkishMeaningTranslations: Record<string, string> = ${jsonBody};\n`;
+  await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await fs.writeFile(OUTPUT_PATH, source, 'utf8');
 }
 

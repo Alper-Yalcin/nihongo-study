@@ -6,6 +6,7 @@ import { evaluateDrawing } from '../utils/DrawingEvaluator';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
 import { calculateAccuracy, calculateSpeed } from '../utils/typing';
+import { formatDuration } from '../utils/formatDuration';
 
 interface Props {
   section: KanaSection;
@@ -129,13 +130,6 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       default:
         return copy.drawing.testMode;
     }
-  };
-
-  const formatTime = (seconds: number) => {
-    const safeSeconds = Math.max(seconds, 0);
-    const minutes = Math.floor(safeSeconds / 60);
-    const remainingSeconds = safeSeconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const startMemoryPreview = (nextChar: Character | null) => {
@@ -421,7 +415,9 @@ export const DrawingStudyPanel: React.FC<Props> = ({
             </div>
             <div className="flex flex-wrap gap-4">
               <span>
-                {isSpeedMode ? `${copy.drawing.timeLeft}: ${formatTime(SPEED_MODE_DURATION_SECONDS - timeSeconds)}` : formatTime(timeSeconds)}
+                {isSpeedMode
+                  ? `${copy.drawing.timeLeft}: ${formatDuration(SPEED_MODE_DURATION_SECONDS - timeSeconds)}`
+                  : formatDuration(timeSeconds)}
               </span>
               {isTestMode && <span>{initialPool.length - pool.length} / {initialPool.length}</span>}
               {isSpeedMode && <span>{copy.common.speed}: {liveSpeed}/min</span>}

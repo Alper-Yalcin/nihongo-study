@@ -4,7 +4,7 @@ import { AppLanguage } from '../../data/appPreferences';
 import {
   overviewModalContent,
   OverviewStudyAreaId
-} from '../../data/overviewModalContent';
+} from '../../content/overviewModalContent';
 import { OverviewDemoFrame } from './OverviewDemoFrame';
 
 interface Props {

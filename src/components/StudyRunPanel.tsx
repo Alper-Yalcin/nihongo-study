@@ -10,6 +10,7 @@ import {
   isAcceptedRomajiAnswer,
   TIMED_MODE_DURATION_SECONDS
 } from '../utils/typing';
+import { formatDuration } from '../utils/formatDuration';
 
 interface Props {
   section: KanaSection;
@@ -81,13 +82,6 @@ export const StudyRunPanel: React.FC<Props> = ({
   useEffect(() => {
     sessionCompleteRef.current = isSessionComplete;
   }, [isSessionComplete]);
-
-  const formatTime = (seconds: number) => {
-    const safeSeconds = Math.max(seconds, 0);
-    const minutes = Math.floor(safeSeconds / 60);
-    const remainingSeconds = safeSeconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
   const focusInput = () => {
     window.setTimeout(() => {
@@ -276,8 +270,8 @@ export const StudyRunPanel: React.FC<Props> = ({
   const liveAccuracy = calculateAccuracy(sessionStats.correctCount, sessionStats.attempts);
   const liveSpeed = calculateSpeed(sessionStats.correctCount, elapsedSeconds);
   const liveTime = isTimedMode
-    ? formatTime(TIMED_MODE_DURATION_SECONDS - elapsedSeconds)
-    : formatTime(elapsedSeconds);
+    ? formatDuration(TIMED_MODE_DURATION_SECONDS - elapsedSeconds)
+    : formatDuration(elapsedSeconds);
   const promptTitle = isReverseMode ? copy.studyRun.typeKana : copy.studyRun.typeRomaji;
   const modeLabel =
     typingMode === 'current'

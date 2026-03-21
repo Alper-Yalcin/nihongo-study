@@ -6,8 +6,9 @@ import { ListeningStudyContainer } from './listening/ListeningStudyContainer';
 import { ArrowLeft } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
-import { scriptLandingContent } from '../data/scriptLandingContent';
+import { scriptLandingContent } from '../content/scriptLandingContent';
 import { ScriptOverviewPanel } from './ScriptOverviewPanel';
+import { getBackToOverviewLabel } from './landing/landingUtils';
 
 interface Props {
   title: string;
@@ -37,7 +38,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
         : activeView === 'listening'
           ? copy.views.listening
           : copy.views.dictionary;
-  const backToOverviewLabel = language === 'tr' ? "Overview'a don" : 'Back to overview';
+  const backToOverviewLabel = getBackToOverviewLabel(language);
 
   return (
     <div className="space-y-6">

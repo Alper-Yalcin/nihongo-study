@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Trophy, Clock, Target, RotateCcw, ArrowLeft } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { wordStudyContent } from '../data/wordStudyContent';
 import { studyContent } from '../data/studyContent';
 import { RunStats, WordStudyMode } from '../types';
+import { useBestScore } from '../hooks/useBestScore';
+import { formatDuration } from '../utils/formatDuration';
 
 interface Props {
   title: string;
@@ -13,6 +15,10 @@ interface Props {
   onBack: () => void;
   mode: WordStudyMode;
 }
+
+const isBetterWordRun = (candidate: RunStats, incumbent: RunStats) =>
+  candidate.timeSeconds < incumbent.timeSeconds ||
+  (candidate.timeSeconds === incumbent.timeSeconds && candidate.accuracy > incumbent.accuracy);
 
 export const WordResultPanel: React.FC<Props> = ({
   title,
@@ -24,38 +30,11 @@ export const WordResultPanel: React.FC<Props> = ({
 }) => {
   const copy = studyContent[language];
   const wordCopy = wordStudyContent[language];
-  const [bestScore, setBestScore] = useState<RunStats | null>(null);
-  const [isNewBest, setIsNewBest] = useState(false);
-
-  useEffect(() => {
-    const key = `best-score-word-${title.toLowerCase()}-${mode}`;
-    const saved = localStorage.getItem(key);
-    let newBest = false;
-
-    if (saved) {
-      const parsed = JSON.parse(saved) as RunStats;
-      if (stats.timeSeconds < parsed.timeSeconds || (stats.timeSeconds === parsed.timeSeconds && stats.accuracy > parsed.accuracy)) {
-        newBest = true;
-        localStorage.setItem(key, JSON.stringify(stats));
-      } else {
-        setBestScore(parsed);
-      }
-    } else {
-      newBest = true;
-      localStorage.setItem(key, JSON.stringify(stats));
-    }
-
-    if (newBest) {
-      setBestScore(stats);
-      setIsNewBest(true);
-    }
-  }, [stats, title, mode]);
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
+  const { bestScore, isNewBest } = useBestScore<RunStats>({
+    storageKey: `best-score-word-${title.toLowerCase()}-${mode}`,
+    candidate: stats,
+    isBetter: isBetterWordRun
+  });
 
   return (
     <div className="flex flex-col items-center py-8">
@@ -92,9 +71,9 @@ export const WordResultPanel: React.FC<Props> = ({
               <Clock size={16} className="mr-1" />
               <span className="text-xs font-medium uppercase tracking-wider">{copy.common.time}</span>
             </div>
-            <div className="text-2xl font-bold text-slate-700">{formatTime(stats.timeSeconds)}</div>
+            <div className="text-2xl font-bold text-slate-700">{formatDuration(stats.timeSeconds)}</div>
             {bestScore && !isNewBest && (
-              <div className="mt-1 text-xs text-slate-500">{copy.common.best}: {formatTime(bestScore.timeSeconds)}</div>
+              <div className="mt-1 text-xs text-slate-500">{copy.common.best}: {formatDuration(bestScore.timeSeconds)}</div>
             )}
           </div>
         </div>

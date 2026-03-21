@@ -7,6 +7,7 @@ import { WordItem, RunStats, WordQuizMode } from '../types';
 import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
 import { calculateAccuracy, isAcceptedRomajiAnswer } from '../utils/typing';
 import { isAcceptedMeaningAnswer, isAcceptedWordAnswer } from '../utils/wordStudy';
+import { formatDuration } from '../utils/formatDuration';
 
 interface Props {
   language: AppLanguage;
@@ -137,12 +138,6 @@ export const WordStudyTyping: React.FC<Props> = ({ language, mode, words, onFini
     }, 800);
   };
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   const promptTitle = wordCopy.prompts[mode];
   const promptValue =
     mode === 'meaningToWord'
@@ -163,7 +158,7 @@ export const WordStudyTyping: React.FC<Props> = ({ language, mode, words, onFini
             <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
           </div>
           <div className="flex space-x-4">
-            <span>{formatTime(timeSeconds)}</span>
+            <span>{formatDuration(timeSeconds)}</span>
             <span>{words.length - pool.length} / {words.length}</span>
           </div>
         </div>

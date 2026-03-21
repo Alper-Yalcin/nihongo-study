@@ -2,7 +2,7 @@ import React from 'react';
 import { TabType } from '../../types';
 import { ArrowRight } from 'lucide-react';
 import { AppLanguage } from '../../data/appPreferences';
-import { overviewContent } from '../../data/overviewContent';
+import { overviewContent } from '../../content/overviewContent';
 
 interface Props {
   language: AppLanguage;
