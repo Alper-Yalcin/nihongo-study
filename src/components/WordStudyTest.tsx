@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { WordItem, RunStats } from '../types';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
+import { wordStudyContent } from '../data/wordStudyContent';
 import { studyContent } from '../data/studyContent';
+import { WordItem, RunStats, WordQuizMode } from '../types';
 import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
+import { calculateAccuracy } from '../utils/typing';
 
 interface Props {
   language: AppLanguage;
@@ -13,111 +15,173 @@ interface Props {
   onCancel: () => void;
 }
 
+const testQuestionTypes: WordQuizMode[] = ['wordToRomaji', 'wordToMeaning', 'meaningToWord'];
+
 export const WordStudyTest: React.FC<Props> = ({ language, words, allDictionaryWords, onFinish, onCancel }) => {
   const copy = studyContent[language];
+  const wordCopy = wordStudyContent[language];
   const meaningTranslations = useMeaningTranslations(language);
   const [pool, setPool] = useState<WordItem[]>(words);
   const [currentWord, setCurrentWord] = useState<WordItem | null>(null);
-  const [questionType, setQuestionType] = useState<'kanaToRomaji' | 'romajiToKana'>('kanaToRomaji');
+  const [questionType, setQuestionType] = useState<WordQuizMode>('wordToRomaji');
   const [options, setOptions] = useState<WordItem[]>([]);
-  
   const [feedback, setFeedback] = useState<'idle' | 'correct' | 'wrong'>('idle');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [timeSeconds, setTimeSeconds] = useState(0);
 
-  useEffect(() => {
-    if (pool.length > 0 && !currentWord) {
-      generateQuestion(pool);
+  const transitionTimeoutRef = useRef<number | null>(null);
+
+  const clearTransitionTimeout = () => {
+    if (transitionTimeoutRef.current !== null) {
+      window.clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
     }
-  }, [pool]);
-
-  useEffect(() => {
-    const timer = setInterval(() => setTimeSeconds(t => t + 1), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const generateQuestion = (currentPool: WordItem[]) => {
-    const randomIndex = Math.floor(Math.random() * currentPool.length);
-    const targetWord = currentPool[randomIndex];
-    setCurrentWord(targetWord);
-    
-    const type = Math.random() > 0.5 ? 'kanaToRomaji' : 'romajiToKana';
-    setQuestionType(type);
-
-    // Generate 3 wrong options
-    const wrongOptions: WordItem[] = [];
-    const availableWrong = allDictionaryWords.filter(w => w.id !== targetWord.id);
-    
-    // Shuffle available wrong options
-    const shuffledWrong = [...availableWrong].sort(() => 0.5 - Math.random());
-    
-    for (let i = 0; i < Math.min(3, shuffledWrong.length); i++) {
-      wrongOptions.push(shuffledWrong[i]);
-    }
-
-    // Combine and shuffle options
-    const allOptions = [targetWord, ...wrongOptions].sort(() => 0.5 - Math.random());
-    setOptions(allOptions);
-    setSelectedOptionId(null);
-    setFeedback('idle');
   };
 
+  const getOptionDisplayKey = (word: WordItem, type: WordQuizMode) => {
+    if (type === 'wordToMeaning') {
+      return (getLocalizedWordMeaning(word.meaning, language, meaningTranslations) || word.meaning || '').toLowerCase();
+    }
+
+    if (type === 'meaningToWord') {
+      return word.kana;
+    }
+
+    return word.romaji.toLowerCase();
+  };
+
+  const generateQuestion = (currentPool: WordItem[]) => {
+    if (currentPool.length === 0) {
+      setCurrentWord(null);
+      setOptions([]);
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * currentPool.length);
+    const targetWord = currentPool[randomIndex];
+    const nextQuestionType = testQuestionTypes[Math.floor(Math.random() * testQuestionTypes.length)];
+    const wrongOptions: WordItem[] = [];
+    const shuffledWrong = [...allDictionaryWords.filter((word) => word.id !== targetWord.id)].sort(() => 0.5 - Math.random());
+    const usedDisplayKeys = new Set<string>([getOptionDisplayKey(targetWord, nextQuestionType)]);
+
+    for (const candidate of shuffledWrong) {
+      const candidateKey = getOptionDisplayKey(candidate, nextQuestionType);
+
+      if (!candidateKey || usedDisplayKeys.has(candidateKey)) {
+        continue;
+      }
+
+      usedDisplayKeys.add(candidateKey);
+      wrongOptions.push(candidate);
+
+      if (wrongOptions.length === 3) {
+        break;
+      }
+    }
+
+    setCurrentWord(targetWord);
+    setQuestionType(nextQuestionType);
+    setOptions([targetWord, ...wrongOptions].sort(() => 0.5 - Math.random()));
+    setFeedback('idle');
+    setSelectedOptionId(null);
+  };
+
+  const resetSession = () => {
+    clearTransitionTimeout();
+    setPool(words);
+    setCorrectCount(0);
+    setWrongCount(0);
+    setAttempts(0);
+    setTimeSeconds(0);
+    setFeedback('idle');
+    setSelectedOptionId(null);
+    generateQuestion(words);
+  };
+
+  useEffect(() => {
+    resetSession();
+
+    return () => {
+      clearTransitionTimeout();
+    };
+  }, [words, language]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setTimeSeconds((current) => current + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   const handleOptionClick = (option: WordItem) => {
-    if (feedback !== 'idle' || !currentWord) return;
+    if (feedback !== 'idle' || !currentWord) {
+      return;
+    }
 
     setSelectedOptionId(option.id);
-    setAttempts(a => a + 1);
-    
+    setAttempts((current) => current + 1);
+
     const isCorrect = option.id === currentWord.id;
 
     if (isCorrect) {
       setFeedback('correct');
-      setCorrectCount(c => c + 1);
-      
-      setTimeout(() => {
-        const newPool = pool.filter(w => w.id !== currentWord.id);
+      setCorrectCount((current) => current + 1);
+      clearTransitionTimeout();
+
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        const newPool = pool.filter((word) => word.id !== currentWord.id);
+
         if (newPool.length === 0) {
           onFinish({
             completed: words.length,
             totalAttempts: attempts + 1,
             correct: correctCount + 1,
             wrong: wrongCount,
-            accuracy: Math.round(((correctCount + 1) / (attempts + 1)) * 100),
-            timeSeconds: timeSeconds
+            accuracy: calculateAccuracy(correctCount + 1, attempts + 1),
+            timeSeconds,
+            mode: 'test',
+            modeLabel: wordCopy.modes.test
           });
-        } else {
-          setPool(newPool);
-          generateQuestion(newPool);
+          return;
         }
+
+        setPool(newPool);
+        generateQuestion(newPool);
       }, 800);
-    } else {
-      setFeedback('wrong');
-      setWrongCount(w => w + 1);
-      // Wait for user to click continue or auto-continue after a delay
-      // Let's use a slightly longer delay to let them see the correct answer
-      setTimeout(() => {
-        setFeedback('idle');
-        setSelectedOptionId(null);
-      }, 2000);
+
+      return;
     }
+
+    setFeedback('wrong');
+    setWrongCount((current) => current + 1);
+    clearTransitionTimeout();
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      setFeedback('idle');
+      setSelectedOptionId(null);
+    }, 2000);
   };
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  const promptTitle = wordCopy.testPrompts[questionType];
+  const promptValue =
+    questionType === 'meaningToWord'
+      ? getLocalizedWordMeaning(currentWord?.meaning, language, meaningTranslations) || currentWord?.meaning || ''
+      : currentWord?.kana || '';
+  const promptClass =
+    questionType === 'meaningToWord'
+      ? 'text-3xl font-semibold leading-tight text-slate-800 sm:text-4xl'
+      : 'text-6xl font-bold tracking-wider text-slate-800 font-jp';
 
   return (
     <div className="flex flex-col items-center py-6">
       <div className="w-full max-w-md">
-        
-        {/* Header / Stats */}
-        <div className="flex items-center justify-between mb-8 text-sm font-medium text-slate-500">
+        <div className="mb-8 flex items-center justify-between text-sm font-medium text-slate-500">
           <div className="flex space-x-4">
             <span className="text-emerald-600">{copy.common.correct}: {correctCount}</span>
             <span className="text-rose-600">{copy.common.wrong}: {wrongCount}</span>
@@ -128,42 +192,33 @@ export const WordStudyTest: React.FC<Props> = ({ language, words, allDictionaryW
           </div>
         </div>
 
-        {/* Target Info */}
-        <div className="text-center mb-10">
-          <div className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-2">
-            {questionType === 'kanaToRomaji' ? copy.wordTest.selectRomaji : copy.wordTest.selectKana}
-          </div>
-          <div className={`text-6xl font-bold text-slate-800 tracking-wider ${questionType === 'romajiToKana' ? 'font-mono' : 'font-jp'}`}>
-            {questionType === 'kanaToRomaji' ? currentWord?.kana : currentWord?.romaji}
-          </div>
-          {currentWord && getLocalizedWordMeaning(currentWord.meaning, language, meaningTranslations) && (
-            <div className="text-slate-400 mt-4 text-sm">{getLocalizedWordMeaning(currentWord.meaning, language, meaningTranslations)}</div>
-          )}
+        <div className="mb-10 text-center">
+          <div className="mb-2 text-sm font-semibold uppercase tracking-widest text-slate-500">{promptTitle}</div>
+          <div className={promptClass}>{promptValue}</div>
         </div>
 
-        {/* Options Area */}
-        <div className="grid grid-cols-1 gap-3 mb-10">
+        <div className="mb-10 grid grid-cols-1 gap-3">
           {options.map((option) => {
             const isSelected = selectedOptionId === option.id;
             const isCorrectAnswer = option.id === currentWord?.id;
-            
-            let buttonClass = "w-full py-4 px-6 rounded-xl border-2 text-xl font-medium transition-all shadow-sm outline-none ";
-            
+
+            let buttonClass = 'w-full rounded-xl border-2 px-6 py-4 text-xl font-medium transition-all shadow-sm outline-none ';
+
             if (feedback === 'idle') {
-              buttonClass += "bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-slate-50";
+              buttonClass += 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-slate-50';
             } else if (feedback === 'correct') {
               if (isCorrectAnswer) {
-                buttonClass += "bg-emerald-50 border-emerald-400 text-emerald-700";
+                buttonClass += 'bg-emerald-50 border-emerald-400 text-emerald-700';
               } else {
-                buttonClass += "bg-white border-slate-200 text-slate-400 opacity-50";
+                buttonClass += 'bg-white border-slate-200 text-slate-400 opacity-50';
               }
             } else if (feedback === 'wrong') {
               if (isCorrectAnswer) {
-                buttonClass += "bg-emerald-50 border-emerald-400 text-emerald-700 animate-pulse";
+                buttonClass += 'bg-emerald-50 border-emerald-400 text-emerald-700 animate-pulse';
               } else if (isSelected) {
-                buttonClass += "bg-rose-50 border-rose-400 text-rose-700";
+                buttonClass += 'bg-rose-50 border-rose-400 text-rose-700';
               } else {
-                buttonClass += "bg-white border-slate-200 text-slate-400 opacity-50";
+                buttonClass += 'bg-white border-slate-200 text-slate-400 opacity-50';
               }
             }
 
@@ -174,39 +229,35 @@ export const WordStudyTest: React.FC<Props> = ({ language, words, allDictionaryW
                 disabled={feedback !== 'idle'}
                 className={buttonClass}
               >
-                <span className={questionType === 'kanaToRomaji' ? 'font-mono' : 'font-jp'}>
-                  {questionType === 'kanaToRomaji' ? option.romaji : option.kana}
-                </span>
+                {questionType === 'wordToRomaji' && <span className="font-mono">{option.romaji}</span>}
+                {questionType === 'wordToMeaning' && (
+                  <span>{getLocalizedWordMeaning(option.meaning, language, meaningTranslations) || option.meaning}</span>
+                )}
+                {questionType === 'meaningToWord' && (
+                  <span className="flex flex-col items-center">
+                    <span className="text-2xl font-jp">{option.kana}</span>
+                    <span className="mt-1 text-xs font-mono text-slate-400">{option.romaji}</span>
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center border-t border-slate-100 pt-6">
+        <div className="flex items-center justify-between border-t border-slate-100 pt-6">
           <button
             onClick={onCancel}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            <ArrowLeft size={16} className="mr-1" /> {copy.wordTest.backToDictionary}
+            <ArrowLeft size={16} className="mr-1" /> {wordCopy.backToDictionary}
           </button>
           <button
-            onClick={() => {
-              setPool(words);
-              setCorrectCount(0);
-              setWrongCount(0);
-              setAttempts(0);
-              setTimeSeconds(0);
-              setFeedback('idle');
-              setSelectedOptionId(null);
-              generateQuestion(words);
-            }}
+            onClick={resetSession}
             className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
           >
             <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
           </button>
         </div>
-
       </div>
     </div>
   );

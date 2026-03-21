@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { KanaSection, WordItem } from '../types';
+import { KanaSection, ScriptLayoutView, ScriptStudyView, WordItem } from '../types';
 import { StudyContainer } from './StudyContainer';
 import { WordStudyContainer } from './WordStudyContainer';
 import { ListeningStudyContainer } from './listening/ListeningStudyContainer';
-import { Keyboard, PenTool, BookA, Headphones } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
-
-export type StudyView = 'typing' | 'drawing' | 'listening' | 'dictionary';
+import { scriptLandingContent } from '../data/scriptLandingContent';
+import { ScriptOverviewPanel } from './ScriptOverviewPanel';
 
 interface Props {
   title: string;
@@ -15,7 +15,7 @@ interface Props {
   script: 'hiragana' | 'katakana';
   kanaSections: KanaSection[];
   dictionaryWords: WordItem[];
-  availableViews?: StudyView[];
+  availableViews?: ScriptStudyView[];
 }
 
 export const ScriptStudyLayout: React.FC<Props> = ({
@@ -26,71 +26,51 @@ export const ScriptStudyLayout: React.FC<Props> = ({
   dictionaryWords,
   availableViews = ['typing', 'drawing', 'listening', 'dictionary']
 }) => {
-  const [activeView, setActiveView] = useState<StudyView>(availableViews[0]);
+  const [activeView, setActiveView] = useState<ScriptLayoutView>('overview');
   const copy = studyContent[language];
+  const overviewCopy = scriptLandingContent[language][script];
+  const activeViewLabel =
+    activeView === 'typing'
+      ? copy.views.typing
+      : activeView === 'drawing'
+        ? copy.views.drawing
+        : activeView === 'listening'
+          ? copy.views.listening
+          : copy.views.dictionary;
+  const backToOverviewLabel = language === 'tr' ? "Overview'a don" : 'Back to overview';
 
   return (
     <div className="space-y-6">
-      {/* Sub-navigation */}
-      <div className="flex justify-center">
-        <div className="inline-flex bg-slate-100 p-1 rounded-xl shadow-sm border border-slate-200">
-          {availableViews.includes('typing') && (
-            <button
-              onClick={() => setActiveView('typing')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeView === 'typing'
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              <Keyboard size={16} className="mr-2" />
-              {copy.views.typing}
-            </button>
-          )}
-          {availableViews.includes('drawing') && (
-            <button
-              onClick={() => setActiveView('drawing')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeView === 'drawing'
-                  ? 'bg-white text-emerald-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              <PenTool size={16} className="mr-2" />
-              {copy.views.drawing}
-            </button>
-          )}
-          {availableViews.includes('listening') && (
-            <button
-              onClick={() => setActiveView('listening')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeView === 'listening'
-                  ? 'bg-white text-rose-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              <Headphones size={16} className="mr-2" />
-              {copy.views.listening}
-            </button>
-          )}
-          {availableViews.includes('dictionary') && (
-            <button
-              onClick={() => setActiveView('dictionary')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeView === 'dictionary'
-                  ? 'bg-white text-amber-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              <BookA size={16} className="mr-2" />
-              {copy.views.dictionary}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Content Area */}
       <div className="mt-6">
+        {activeView !== 'overview' && (
+          <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                {overviewCopy.overviewTab}
+              </div>
+              <h2 className="mt-2 text-2xl font-bold text-slate-900">{`${title} ${activeViewLabel}`}</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveView('overview')}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              <ArrowLeft size={16} className="mr-2" />
+              {backToOverviewLabel}
+            </button>
+          </div>
+        )}
+        <div style={{ display: activeView === 'overview' ? 'block' : 'none' }}>
+          <ScriptOverviewPanel
+            title={title}
+            language={language}
+            script={script}
+            sections={kanaSections}
+            words={dictionaryWords}
+            availableViews={availableViews}
+            onSelectView={setActiveView}
+          />
+        </div>
         <div style={{ display: activeView === 'typing' ? 'block' : 'none' }}>
           {availableViews.includes('typing') && (
             <StudyContainer title={`${title} ${copy.views.typing}`} language={language} sections={kanaSections} mode="typing" />

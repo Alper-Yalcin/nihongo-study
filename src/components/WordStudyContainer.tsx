@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { WordItem, RunStats } from '../types';
+import { WordItem, RunStats, WordStudyMode } from '../types';
 import { SectionCard } from './SectionCard';
 import { WordDictionaryPanel } from './WordDictionaryPanel';
 import { WordStudyTyping } from './WordStudyTyping';
@@ -16,28 +16,24 @@ interface WordStudyContainerProps {
 
 export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, language, words }) => {
   const copy = studyContent[language];
-  const [view, setView] = useState<'dictionary' | 'typing' | 'test' | 'typing-result' | 'test-result'>('dictionary');
+  const [view, setView] = useState<'dictionary' | 'practice' | 'test' | 'result'>('dictionary');
   const [runStats, setRunStats] = useState<RunStats | null>(null);
   const [quizWords, setQuizWords] = useState<WordItem[]>([]);
   const [quizSourceWords, setQuizSourceWords] = useState<WordItem[]>(words);
+  const [activeMode, setActiveMode] = useState<WordStudyMode>('wordToRomaji');
 
   const buildRandomQuizWords = (sourceWords: WordItem[], count: number) => {
     const shuffled = [...sourceWords].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, Math.min(count, sourceWords.length));
   };
 
-  const handleStartTyping = (count: number, sourceWords: WordItem[]) => {
+  const handleStartMode = (mode: WordStudyMode, count: number, sourceWords: WordItem[]) => {
     if (sourceWords.length === 0) return;
-    setQuizSourceWords(sourceWords);
-    setQuizWords(buildRandomQuizWords(sourceWords, count));
-    setView('typing');
-  };
 
-  const handleStartTest = (count: number, sourceWords: WordItem[]) => {
-    if (sourceWords.length === 0) return;
+    setActiveMode(mode);
     setQuizSourceWords(sourceWords);
     setQuizWords(buildRandomQuizWords(sourceWords, count));
-    setView('test');
+    setView(mode === 'test' ? 'test' : 'practice');
   };
 
   return (
@@ -46,51 +42,41 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, l
         <WordDictionaryPanel
           language={language}
           words={words}
-          onStartTyping={handleStartTyping}
-          onStartTest={handleStartTest}
+          onStartMode={handleStartMode}
         />
       )}
-      {view === 'typing' && (
+      {view === 'practice' && activeMode !== 'test' && (
         <WordStudyTyping
           language={language}
+          mode={activeMode}
           words={quizWords}
           onFinish={(stats) => {
             setRunStats(stats);
-            setView('typing-result');
+            setView('result');
           }}
           onCancel={() => setView('dictionary')}
         />
       )}
-      {view === 'test' && (
+      {view === 'test' && activeMode === 'test' && (
         <WordStudyTest
           language={language}
           words={quizWords}
           allDictionaryWords={quizSourceWords}
           onFinish={(stats) => {
             setRunStats(stats);
-            setView('test-result');
+            setView('result');
           }}
           onCancel={() => setView('dictionary')}
         />
       )}
-      {view === 'typing-result' && runStats && (
+      {view === 'result' && runStats && (
         <WordResultPanel
           title={title}
           language={language}
           stats={runStats}
-          onRestart={() => handleStartTyping(quizWords.length, quizSourceWords)}
+          mode={activeMode}
+          onRestart={() => handleStartMode(activeMode, quizWords.length, quizSourceWords)}
           onBack={() => setView('dictionary')}
-          mode="typing"
-        />
-      )}
-      {view === 'test-result' && runStats && (
-        <WordResultPanel
-          title={title}
-          language={language}
-          stats={runStats}
-          onRestart={() => handleStartTest(quizWords.length, quizSourceWords)}
-          onBack={() => setView('dictionary')}
-          mode="test"
         />
       )}
     </SectionCard>

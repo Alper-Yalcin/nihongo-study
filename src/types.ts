@@ -75,7 +75,7 @@ export interface RunStats {
   wrong: number;
   accuracy: number;
   timeSeconds: number;
-  mode?: TypingMode | DrawingMode | ListeningMode;
+  mode?: TypingMode | DrawingMode | ListeningMode | WordStudyMode;
   modeLabel?: string;
   speed?: number;
   bestStreak?: number;
@@ -87,5 +87,9 @@ export interface RunStats {
 export type TypingMode = 'current' | 'reverse' | 'timed';
 export type DrawingMode = 'practice' | 'test' | 'speed' | 'memory';
 export type ListeningMode = 'recognition' | 'typing' | 'writing';
+export type WordQuizMode = 'wordToRomaji' | 'wordToMeaning' | 'meaningToWord';
+export type WordStudyMode = WordQuizMode | 'test';
+export type ScriptStudyView = 'typing' | 'drawing' | 'listening' | 'dictionary';
+export type ScriptLayoutView = 'overview' | ScriptStudyView;
 
 export type TabType = 'overview' | 'hiragana' | 'katakana' | 'kanji' | 'settings';

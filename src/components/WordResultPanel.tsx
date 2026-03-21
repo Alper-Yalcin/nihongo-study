@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { RunStats } from '../types';
 import { Trophy, Clock, Target, RotateCcw, ArrowLeft } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
+import { wordStudyContent } from '../data/wordStudyContent';
 import { studyContent } from '../data/studyContent';
+import { RunStats, WordStudyMode } from '../types';
 
 interface Props {
   title: string;
@@ -10,7 +11,7 @@ interface Props {
   stats: RunStats;
   onRestart: () => void;
   onBack: () => void;
-  mode: 'typing' | 'test';
+  mode: WordStudyMode;
 }
 
 export const WordResultPanel: React.FC<Props> = ({
@@ -22,6 +23,7 @@ export const WordResultPanel: React.FC<Props> = ({
   mode
 }) => {
   const copy = studyContent[language];
+  const wordCopy = wordStudyContent[language];
   const [bestScore, setBestScore] = useState<RunStats | null>(null);
   const [isNewBest, setIsNewBest] = useState(false);
 
@@ -50,9 +52,9 @@ export const WordResultPanel: React.FC<Props> = ({
   }, [stats, title, mode]);
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -63,7 +65,9 @@ export const WordResultPanel: React.FC<Props> = ({
         </div>
 
         <h2 className="mb-2 text-2xl font-bold text-slate-800">{copy.result.runCompleted}</h2>
-        <p className="mb-8 text-slate-500">{copy.wordResult.completedSummary(stats.completed, mode)}</p>
+        <p className="mb-8 text-slate-500">
+          {wordCopy.completedSummary(stats.completed, stats.modeLabel || wordCopy.modes[mode])}
+        </p>
 
         {isNewBest && (
           <div className="mb-6 inline-block rounded-lg bg-amber-100 px-4 py-2 text-sm font-bold text-amber-800 animate-pulse">
@@ -95,10 +99,10 @@ export const WordResultPanel: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="flex justify-between items-center border-t border-slate-100 pt-6">
+        <div className="grid gap-3 border-t border-slate-100 pt-6 sm:grid-cols-2">
           <button
             onClick={onRestart}
-            className="mb-3 flex w-full items-center justify-center rounded-xl bg-indigo-600 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
+            className="flex w-full items-center justify-center rounded-xl bg-indigo-600 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
           >
             <RotateCcw size={18} className="mr-2" /> {copy.common.playAgain}
           </button>
@@ -106,7 +110,7 @@ export const WordResultPanel: React.FC<Props> = ({
             onClick={onBack}
             className="flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white py-3 font-medium text-slate-600 transition-colors hover:bg-slate-50"
           >
-            <ArrowLeft size={18} className="mr-2" /> {copy.wordTyping.backToDictionary}
+            <ArrowLeft size={18} className="mr-2" /> {wordCopy.backToDictionary}
           </button>
         </div>
       </div>
