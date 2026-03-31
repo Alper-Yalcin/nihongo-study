@@ -4,7 +4,7 @@ import { ArrowLeft, RotateCcw, Eraser, Check, ChevronRight, ChevronLeft } from '
 import { DrawingCanvas, DrawingCanvasRef } from './DrawingCanvas';
 import { evaluateDrawing } from '../utils/DrawingEvaluator';
 import { AppLanguage } from '../data/appPreferences';
-import { getNhkHiraganaGuideImageSrc } from '../data/nhkKanaGuideImages';
+import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { studyContent } from '../data/studyContent';
 import { calculateAccuracy, calculateSpeed } from '../utils/typing';
 import { formatDuration } from '../utils/formatDuration';
@@ -393,7 +393,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       ? copy.drawing.memorize
       : copy.drawing.drawFromMemory
     : copy.drawing.draw;
-  const guideImageSrc = isPracticeMode ? getNhkHiraganaGuideImageSrc(currentChar?.id) : undefined;
+  const guideImageSrc = isPracticeMode ? getNhkKanaGuideImageSrc(currentChar?.id) : undefined;
   const isNhkTemplateVisible = Boolean(guideImageSrc && showTemplate);
   const headerDisplay = isMemoryMode
     ? isMemoryPreviewVisible
