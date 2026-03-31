@@ -3,6 +3,7 @@ import { DrawingData, StrokeGuide } from '../types';
 
 interface Props {
   drawingData?: DrawingData;
+  showGuidePaths?: boolean;
   showStrokeOrder: boolean;
   showDirectionArrows: boolean;
   width: number;
@@ -62,16 +63,26 @@ const getRenderedArrow = (
 
 export const StrokeGuideOverlay: React.FC<Props> = ({
   drawingData,
+  showGuidePaths = false,
   showStrokeOrder,
   showDirectionArrows,
   width,
   height
 }) => {
-  if (!drawingData || !drawingData.strokeGuides || drawingData.strokeGuides.length === 0) {
+  if (
+    !drawingData ||
+    ((!drawingData.strokeGuides || drawingData.strokeGuides.length === 0) &&
+      (!drawingData.guidePaths || drawingData.guidePaths.length === 0))
+  ) {
     return null;
   }
 
-  const { viewBoxWidth = 300, viewBoxHeight = 300, strokeGuides } = drawingData;
+  const {
+    viewBoxWidth = 300,
+    viewBoxHeight = 300,
+    strokeGuides = [],
+    guidePaths = [],
+  } = drawingData;
 
   // Calculate scaling factors
   const scaleX = width / viewBoxWidth;
@@ -84,6 +95,26 @@ export const StrokeGuideOverlay: React.FC<Props> = ({
       className="absolute inset-0 pointer-events-none z-10"
       style={{ overflow: 'visible' }}
     >
+      {showGuidePaths && guidePaths.length > 0 && (
+        <g
+          transform={`scale(${scaleX} ${scaleY})`}
+          fill="none"
+          stroke="#475569"
+          strokeWidth={Math.round(Math.min(viewBoxWidth, viewBoxHeight) * 0.08)}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={0.18}
+        >
+          {guidePaths.map((guidePath, index) => (
+            <path
+              key={`guide-path-${index}`}
+              d={guidePath.d}
+              transform={guidePath.transform}
+            />
+          ))}
+        </g>
+      )}
+
       <defs>
         {/* Define arrowheads for different colors */}
         {strokeGuides.map((guide) => {

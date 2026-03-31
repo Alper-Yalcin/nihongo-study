@@ -23,6 +23,11 @@ export interface DrawingTemplateStroke {
   points: DrawingTemplatePoint[];
 }
 
+export interface GuidePath {
+  d: string;
+  transform?: string;
+}
+
 export interface DrawingTestTemplate {
   strokes?: DrawingTemplateStroke[];
   width?: number;
@@ -42,7 +47,7 @@ export interface DrawingData {
   viewBoxWidth?: number;
   viewBoxHeight?: number;
   strokeCount?: number;
-  guidePaths?: string[];
+  guidePaths?: GuidePath[];
   strokeGuides?: StrokeGuide[];
   safeZone?: SafeZone;
   testTemplate?: DrawingTestTemplate;

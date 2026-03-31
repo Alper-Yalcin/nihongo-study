@@ -4,6 +4,7 @@ import { ArrowLeft, RotateCcw, Eraser, Check, ChevronRight, ChevronLeft } from '
 import { DrawingCanvas, DrawingCanvasRef } from './DrawingCanvas';
 import { evaluateDrawing } from '../utils/DrawingEvaluator';
 import { AppLanguage } from '../data/appPreferences';
+import { getNhkHiraganaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { studyContent } from '../data/studyContent';
 import { calculateAccuracy, calculateSpeed } from '../utils/typing';
 import { formatDuration } from '../utils/formatDuration';
@@ -392,6 +393,8 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       ? copy.drawing.memorize
       : copy.drawing.drawFromMemory
     : copy.drawing.draw;
+  const guideImageSrc = isPracticeMode ? getNhkHiraganaGuideImageSrc(currentChar?.id) : undefined;
+  const isNhkTemplateVisible = Boolean(guideImageSrc && showTemplate);
   const headerDisplay = isMemoryMode
     ? isMemoryPreviewVisible
       ? currentChar?.symbol
@@ -445,6 +448,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
           <DrawingCanvas
             ref={canvasRef}
             guideSymbol={isPracticeMode ? currentChar?.symbol : undefined}
+            guideImageSrc={guideImageSrc}
             drawingData={isPracticeMode ? currentChar?.drawingData : undefined}
             showStrokeOrder={isPracticeMode ? showStrokeOrder : false}
             showDirectionArrows={isPracticeMode ? showDirectionArrows : false}
@@ -507,20 +511,30 @@ export const DrawingStudyPanel: React.FC<Props> = ({
 
         {isPracticeMode && (
           <div className="mb-8 flex flex-wrap justify-center gap-3">
-            <label className="flex cursor-pointer items-center space-x-2 text-sm text-slate-600">
+            <label
+              className={`flex items-center space-x-2 text-sm text-slate-600 ${
+                isNhkTemplateVisible ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={showStrokeOrder}
                 onChange={() => setShowStrokeOrder(!showStrokeOrder)}
+                disabled={isNhkTemplateVisible}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
               <span>{copy.drawing.numbers}</span>
             </label>
-            <label className="flex cursor-pointer items-center space-x-2 text-sm text-slate-600">
+            <label
+              className={`flex items-center space-x-2 text-sm text-slate-600 ${
+                isNhkTemplateVisible ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={showDirectionArrows}
                 onChange={() => setShowDirectionArrows(!showDirectionArrows)}
+                disabled={isNhkTemplateVisible}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
               <span>{copy.drawing.arrows}</span>
