@@ -3,10 +3,12 @@ import { DictionaryWordRow, findWordsByScript } from '../repositories/wordReposi
 export interface DictionaryWord {
   id: string;
   script: string;
+  kanji?: string;
   kana: string;
   romaji: string;
   meaning?: string;
-  jlptLevel: string;
+  meanings: string[];
+  jlptLevel?: string;
 }
 
 export interface DictionaryWordsResponse {

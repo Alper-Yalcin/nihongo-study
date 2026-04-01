@@ -12,7 +12,12 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "db:build": "tsx scripts/build-database.ts",
-    "start:server": "tsx server/index.ts"
+    "start:server": "tsx server/index.ts",
+    "data:import-db": "tsx scripts/import-normalized-dataset.ts",
+    "data:download": "python scripts/data/download_sources.py",
+    "data:normalize": "python scripts/data/build_normalized_dictionary.py",
+    "data:validate": "python scripts/data/validate_normalized.py",
+    "data:fixture": "python scripts/data/run_fixture_pipeline.py"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",

@@ -79,10 +79,12 @@ export interface KanaSection {
 
 export interface WordItem {
   id: string;
+  kanji?: string;
   kana: string;
   romaji: string;
   meaning?: string;
-  script?: 'hiragana' | 'katakana';
+  meanings?: string[];
+  script?: 'hiragana' | 'katakana' | 'kanji';
   jlptLevel?: 'N5' | 'N4' | 'N3' | 'N2' | 'N1';
 }
 

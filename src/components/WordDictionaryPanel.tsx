@@ -47,8 +47,10 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       }
 
       return (
+        (word.kanji?.toLowerCase().includes(normalizedSearch) ?? false) ||
         word.kana.toLowerCase().includes(normalizedSearch) ||
         word.romaji.toLowerCase().includes(normalizedSearch) ||
+        (word.meanings?.some((meaning) => meaning.toLowerCase().includes(normalizedSearch)) ?? false) ||
         (getLocalizedWordMeaning(word.meaning, language, meaningTranslations)?.toLowerCase().includes(normalizedSearch) ?? false) ||
         (word.meaning && word.meaning.toLowerCase().includes(normalizedSearch)) ||
         (word.jlptLevel && word.jlptLevel.toLowerCase().includes(normalizedSearch))

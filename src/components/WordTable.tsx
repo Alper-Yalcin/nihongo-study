@@ -36,7 +36,16 @@ export const WordTable: React.FC<Props> = ({ language, meaningTranslations, word
                     {word.jlptLevel || '-'}
                   </span>
                 </td>
-                <td className="p-3 font-jp text-lg font-medium text-slate-800">{word.kana}</td>
+                <td className="p-3 font-jp text-lg font-medium text-slate-800">
+                  {word.kanji ? (
+                    <div className="space-y-1">
+                      <div>{word.kanji}</div>
+                      <div className="text-sm font-normal text-slate-500">{word.kana}</div>
+                    </div>
+                  ) : (
+                    word.kana
+                  )}
+                </td>
                 <td className="p-3 text-slate-600 font-mono">{word.romaji}</td>
                 <td className="p-3 text-slate-500">{getLocalizedWordMeaning(word.meaning, language, meaningTranslations) || '-'}</td>
               </tr>
