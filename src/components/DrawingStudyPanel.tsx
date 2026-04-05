@@ -284,7 +284,8 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     }
 
     const isCorrect = evaluateDrawing(strokes, currentChar, {
-      tolerance: isPracticeMode ? 'practice' : 'standard'
+      tolerance: isPracticeMode ? 'practice' : 'standard',
+      guideImageLayout: isPracticeMode ? canvasRef.current?.getGuideImageLayout() : null,
     });
     setFeedback(isCorrect ? 'correct' : 'wrong');
 
@@ -411,7 +412,8 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       : copy.drawing.drawFromMemory
     : copy.drawing.draw;
   const guideImageSrc = isPracticeMode ? getNhkKanaGuideImageSrc(currentChar?.id) : undefined;
-  const isNhkTemplateVisible = Boolean(guideImageSrc && showTemplate);
+  const isPinnedGuideTemplate = Boolean(guideImageSrc);
+  const isNhkTemplateVisible = Boolean(guideImageSrc);
   const headerDisplay = isMemoryMode
     ? isMemoryPreviewVisible
       ? currentChar?.symbol
@@ -469,7 +471,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
             drawingData={isPracticeMode ? currentChar?.drawingData : undefined}
             showStrokeOrder={isPracticeMode ? showStrokeOrder : false}
             showDirectionArrows={isPracticeMode ? showDirectionArrows : false}
-            showTemplate={isPracticeMode ? showTemplate : false}
+            showTemplate={isPracticeMode ? (isPinnedGuideTemplate || showTemplate) : false}
             width={280}
             height={280}
             disabled={feedback !== 'idle' || isMemoryPreviewVisible}
@@ -563,11 +565,16 @@ export const DrawingStudyPanel: React.FC<Props> = ({
               />
               <span>{copy.drawing.arrows}</span>
             </label>
-            <label className="flex cursor-pointer items-center space-x-2 text-sm text-slate-600">
+            <label
+              className={`flex items-center space-x-2 text-sm text-slate-600 ${
+                isPinnedGuideTemplate ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              }`}
+            >
               <input
                 type="checkbox"
-                checked={showTemplate}
+                checked={isPinnedGuideTemplate || showTemplate}
                 onChange={() => setShowTemplate(!showTemplate)}
+                disabled={isPinnedGuideTemplate}
                 className="rounded text-indigo-600 focus:ring-indigo-500"
               />
               <span>{copy.drawing.template}</span>

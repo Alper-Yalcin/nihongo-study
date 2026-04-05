@@ -4,9 +4,19 @@ import { Character, DrawingData, GuidePath } from '../types';
 export type Point = { x: number; y: number };
 export type Stroke = Point[];
 export type DrawingEvaluationTolerance = 'standard' | 'practice';
+export type GuideImageLayout = {
+  image: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  canvasWidth: number;
+  canvasHeight: number;
+};
 
 interface DrawingEvaluationOptions {
   tolerance?: DrawingEvaluationTolerance;
+  guideImageLayout?: GuideImageLayout | null;
 }
 
 type Rect = {
@@ -26,6 +36,13 @@ type SampledStroke = {
   centroid: Point;
 };
 
+type RasterMask = {
+  pixels: Uint8Array;
+  dilatedPixels: Uint8Array;
+  count: number;
+  bounds: Rect | null;
+};
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const DEFAULT_VIEWBOX_SIZE = 300;
 const MIN_STROKE_LENGTH_PX = 6;
@@ -33,6 +50,11 @@ const MIN_DRAWING_SIZE_PX = 10;
 const MIN_SAMPLE_COUNT = 18;
 const MAX_SAMPLE_COUNT = 60;
 const VISIBLE_POINT_PADDING_RATIO = 0.08;
+const IMAGE_MASK_MIN_ALPHA = 24;
+const IMAGE_MASK_MAX_RGB = 92;
+const TEMPLATE_DILATION_RADIUS = 12;
+const USER_DILATION_RADIUS = 12;
+const USER_MASK_LINE_WIDTH = 12;
 const SCORE_THRESHOLDS: Record<
   DrawingEvaluationTolerance,
   { maxStrokeScore: number; maxAverageScore: number }
@@ -46,6 +68,20 @@ const SCORE_THRESHOLDS: Record<
     maxAverageScore: 1.02,
   },
 };
+const IMAGE_SCORE_THRESHOLDS: Record<
+  DrawingEvaluationTolerance,
+  { minPrecision: number; minRecall: number }
+> = {
+  standard: {
+    minPrecision: 0.48,
+    minRecall: 0.28,
+  },
+  practice: {
+    minPrecision: 0.4,
+    minRecall: 0.22,
+  },
+};
+const GUIDE_IMAGE_MASK_CACHE = new Map<string, RasterMask>();
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -120,6 +156,227 @@ const createSampledStroke = (points: Point[]): SampledStroke => ({
   length: getStrokeLength(points),
   centroid: getCentroid(points),
 });
+
+const getMaskBounds = (pixels: Uint8Array, width: number, height: number): Rect | null => {
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let index = 0; index < pixels.length; index += 1) {
+    if (!pixels[index]) {
+      continue;
+    }
+
+    const x = index % width;
+    const y = Math.floor(index / width);
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return null;
+  }
+
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+  };
+};
+
+const dilateMask = (pixels: Uint8Array, width: number, height: number, radius: number) => {
+  if (radius <= 0) {
+    return pixels.slice();
+  }
+
+  const dilated = new Uint8Array(pixels.length);
+  const offsets: Array<{ x: number; y: number }> = [];
+
+  for (let y = -radius; y <= radius; y += 1) {
+    for (let x = -radius; x <= radius; x += 1) {
+      if (x * x + y * y <= radius * radius) {
+        offsets.push({ x, y });
+      }
+    }
+  }
+
+  for (let index = 0; index < pixels.length; index += 1) {
+    if (!pixels[index]) {
+      continue;
+    }
+
+    const originX = index % width;
+    const originY = Math.floor(index / width);
+
+    offsets.forEach(({ x, y }) => {
+      const nextX = originX + x;
+      const nextY = originY + y;
+
+      if (nextX < 0 || nextX >= width || nextY < 0 || nextY >= height) {
+        return;
+      }
+
+      dilated[nextY * width + nextX] = 1;
+    });
+  }
+
+  return dilated;
+};
+
+const countMaskPixels = (pixels: Uint8Array) =>
+  pixels.reduce((total, value) => total + (value ? 1 : 0), 0);
+
+const countMaskOverlap = (left: Uint8Array, right: Uint8Array) => {
+  let overlap = 0;
+
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] && right[index]) {
+      overlap += 1;
+    }
+  }
+
+  return overlap;
+};
+
+const createRasterMask = (
+  pixels: Uint8Array,
+  width: number,
+  height: number,
+  dilationRadius: number
+): RasterMask => ({
+  pixels,
+  dilatedPixels: dilateMask(pixels, width, height, dilationRadius),
+  count: countMaskPixels(pixels),
+  bounds: getMaskBounds(pixels, width, height),
+});
+
+const getGuideImageMaskKey = (layout: GuideImageLayout) =>
+  [
+    layout.image.currentSrc || layout.image.src,
+    layout.canvasWidth,
+    layout.canvasHeight,
+    layout.x.toFixed(2),
+    layout.y.toFixed(2),
+    layout.width.toFixed(2),
+    layout.height.toFixed(2),
+  ].join('|');
+
+const getGuideImageMask = (layout: GuideImageLayout): RasterMask | null => {
+  if (typeof document === 'undefined' || !layout.image.complete || layout.image.naturalWidth === 0) {
+    return null;
+  }
+
+  const cacheKey = getGuideImageMaskKey(layout);
+  const cachedMask = GUIDE_IMAGE_MASK_CACHE.get(cacheKey);
+
+  if (cachedMask) {
+    return cachedMask;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = layout.canvasWidth;
+  canvas.height = layout.canvasHeight;
+
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) {
+    return null;
+  }
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(layout.image, layout.x, layout.y, layout.width, layout.height);
+
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = new Uint8Array(canvas.width * canvas.height);
+
+  for (let index = 0; index < pixels.length; index += 1) {
+    const offset = index * 4;
+    const red = imageData.data[offset];
+    const green = imageData.data[offset + 1];
+    const blue = imageData.data[offset + 2];
+    const alpha = imageData.data[offset + 3];
+
+    if (
+      alpha >= IMAGE_MASK_MIN_ALPHA &&
+      red <= IMAGE_MASK_MAX_RGB &&
+      green <= IMAGE_MASK_MAX_RGB &&
+      blue <= IMAGE_MASK_MAX_RGB
+    ) {
+      pixels[index] = 1;
+    }
+  }
+
+  const rasterMask = createRasterMask(
+    pixels,
+    canvas.width,
+    canvas.height,
+    TEMPLATE_DILATION_RADIUS
+  );
+
+  if (rasterMask.count === 0) {
+    return null;
+  }
+
+  GUIDE_IMAGE_MASK_CACHE.set(cacheKey, rasterMask);
+  return rasterMask;
+};
+
+const renderStrokeMask = (
+  strokes: Stroke[],
+  width: number,
+  height: number
+): RasterMask | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) {
+    return null;
+  }
+
+  context.clearRect(0, 0, width, height);
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  context.lineWidth = USER_MASK_LINE_WIDTH;
+  context.strokeStyle = '#000';
+
+  strokes.forEach((stroke) => {
+    if (stroke.length === 0) {
+      return;
+    }
+
+    context.beginPath();
+    context.moveTo(stroke[0].x, stroke[0].y);
+
+    for (let index = 1; index < stroke.length; index += 1) {
+      context.lineTo(stroke[index].x, stroke[index].y);
+    }
+
+    context.stroke();
+  });
+
+  const imageData = context.getImageData(0, 0, width, height);
+  const pixels = new Uint8Array(width * height);
+
+  for (let index = 0; index < pixels.length; index += 1) {
+    if (imageData.data[index * 4 + 3] > 0) {
+      pixels[index] = 1;
+    }
+  }
+
+  const rasterMask = createRasterMask(pixels, width, height, USER_DILATION_RADIUS);
+  return rasterMask.count > 0 ? rasterMask : null;
+};
 
 const resampleStroke = (stroke: Stroke, sampleCount: number): Point[] => {
   if (stroke.length === 0) {
@@ -240,11 +497,32 @@ const applyMatrix = (point: Point, matrix: Matrix): Point => ({
 });
 
 const getCanonicalDrawingData = (expectedChar: Character): DrawingData | null => {
-  if (expectedChar.drawingData?.guidePaths?.length) {
-    return expectedChar.drawingData;
+  const inlineDrawingData = expectedChar.drawingData;
+
+  if (inlineDrawingData?.guidePaths?.length) {
+    return inlineDrawingData;
   }
 
-  return generatedKanaDrawingGuides[expectedChar.id] ?? expectedChar.drawingData ?? null;
+  const generatedDrawingData = generatedKanaDrawingGuides[expectedChar.id];
+
+  if (!generatedDrawingData) {
+    return inlineDrawingData ?? null;
+  }
+
+  const preferredStrokeCount =
+    inlineDrawingData?.strokeCount ??
+    (inlineDrawingData?.strokeGuides?.length
+      ? inlineDrawingData.strokeGuides.length
+      : undefined);
+
+  return {
+    ...generatedDrawingData,
+    strokeCount: preferredStrokeCount ?? generatedDrawingData.strokeCount,
+    guidePaths:
+      preferredStrokeCount && generatedDrawingData.guidePaths?.length
+        ? generatedDrawingData.guidePaths.slice(0, preferredStrokeCount)
+        : generatedDrawingData.guidePaths,
+  };
 };
 
 const sampleGuidePath = (guidePath: GuidePath): SampledStroke | null => {
@@ -406,6 +684,45 @@ const fallbackHeuristic = (strokes: Stroke[], expectedChar: Character) => {
   return totalPoints >= 5;
 };
 
+const evaluateAgainstGuideImage = (
+  strokes: Stroke[],
+  expectedChar: Character,
+  tolerance: DrawingEvaluationTolerance,
+  guideImageLayout: GuideImageLayout
+) => {
+  const thresholds = IMAGE_SCORE_THRESHOLDS[tolerance];
+  const expectedStrokeCount =
+    expectedChar.drawingData?.strokeCount ??
+    expectedChar.drawingData?.strokeGuides?.length ??
+    expectedChar.drawingData?.guidePaths?.length;
+
+  if (expectedStrokeCount && strokes.length !== expectedStrokeCount) {
+    return false;
+  }
+
+  const templateMask = getGuideImageMask(guideImageLayout);
+  if (!templateMask || !templateMask.bounds) {
+    return null;
+  }
+
+  const userMask = renderStrokeMask(
+    strokes,
+    guideImageLayout.canvasWidth,
+    guideImageLayout.canvasHeight
+  );
+
+  if (!userMask || !userMask.bounds || userMask.count === 0) {
+    return false;
+  }
+
+  const overlapPrecision = countMaskOverlap(userMask.pixels, templateMask.dilatedPixels);
+  const overlapRecall = countMaskOverlap(templateMask.pixels, userMask.dilatedPixels);
+  const precision = overlapPrecision / Math.max(userMask.count, 1);
+  const recall = overlapRecall / Math.max(templateMask.count, 1);
+
+  return precision >= thresholds.minPrecision && recall >= thresholds.minRecall;
+};
+
 export const evaluateDrawing = (
   strokes: Stroke[],
   expectedChar: Character,
@@ -427,6 +744,19 @@ export const evaluateDrawing = (
     userBounds.height < MIN_DRAWING_SIZE_PX
   ) {
     return false;
+  }
+
+  if (options.guideImageLayout) {
+    const imageEvaluation = evaluateAgainstGuideImage(
+      filteredStrokes,
+      expectedChar,
+      options.tolerance ?? 'standard',
+      options.guideImageLayout
+    );
+
+    if (typeof imageEvaluation === 'boolean') {
+      return imageEvaluation;
+    }
   }
 
   const drawingData = getCanonicalDrawingData(expectedChar);

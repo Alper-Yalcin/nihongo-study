@@ -1,11 +1,12 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { Point, Stroke } from '../utils/DrawingEvaluator';
+import { GuideImageLayout, Point, Stroke } from '../utils/DrawingEvaluator';
 import { DrawingData } from '../types';
 import { StrokeGuideOverlay } from './StrokeGuideOverlay';
 
 export interface DrawingCanvasRef {
   clear: () => void;
   getStrokes: () => Stroke[];
+  getGuideImageLayout: () => GuideImageLayout | null;
 }
 
 interface Props {
@@ -33,7 +34,9 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
   onDrawEnd, 
   disabled = false 
 }, ref) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const guideImageRef = useRef<HTMLImageElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [currentStroke, setCurrentStroke] = useState<Stroke>([]);
@@ -58,7 +61,28 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
         }
       }
     },
-    getStrokes: () => strokes
+    getStrokes: () => strokes,
+    getGuideImageLayout: () => {
+      const container = containerRef.current;
+      const guideImage = guideImageRef.current;
+
+      if (!container || !guideImage || !guideImage.complete || guideImage.naturalWidth === 0) {
+        return null;
+      }
+
+      const containerRect = container.getBoundingClientRect();
+      const imageRect = guideImage.getBoundingClientRect();
+
+      return {
+        image: guideImage,
+        x: imageRect.left - containerRect.left,
+        y: imageRect.top - containerRect.top,
+        width: imageRect.width,
+        height: imageRect.height,
+        canvasWidth: width,
+        canvasHeight: height,
+      };
+    }
   }));
 
   const startDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -111,10 +135,15 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
   };
 
   return (
-    <div style={{ width, height }} className="relative bg-white rounded-xl border-2 border-slate-200 overflow-hidden touch-none shadow-inner">
+    <div
+      ref={containerRef}
+      style={{ width, height }}
+      className="relative bg-white rounded-xl border-2 border-slate-200 overflow-hidden touch-none shadow-inner"
+    >
       {hasGuideImage && showTemplate && (
         <div className="absolute inset-0 z-10 flex items-center justify-center p-3 pointer-events-none select-none">
           <img
+            ref={guideImageRef}
             src={guideImageSrc}
             alt=""
             className="max-h-full max-w-full object-contain"

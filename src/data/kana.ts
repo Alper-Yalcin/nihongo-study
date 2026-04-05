@@ -879,6 +879,237 @@ const composeDrawingData = (...parts: DrawingData[]): DrawingData => {
   );
 };
 
+const roundScaledValue = (value: number) => Math.round(value * 1000) / 1000;
+
+const scaleStrokeGuides = (
+  strokeGuides: DrawingData['strokeGuides'],
+  scaleX: number,
+  scaleY: number,
+  maxCount?: number
+): DrawingData['strokeGuides'] =>
+  strokeGuides
+    ?.slice(0, maxCount)
+    .map((guide, index) => ({
+      ...guide,
+      index: index + 1,
+      labelX: Math.round(guide.labelX * scaleX),
+      labelY: Math.round(guide.labelY * scaleY),
+      arrowFrom: {
+        x: Math.round(guide.arrowFrom.x * scaleX),
+        y: Math.round(guide.arrowFrom.y * scaleY)
+      },
+      arrowTo: {
+        x: Math.round(guide.arrowTo.x * scaleX),
+        y: Math.round(guide.arrowTo.y * scaleY)
+      }
+    }));
+
+const scaleGuidePaths = (
+  guidePaths: DrawingData['guidePaths'],
+  scaleX: number,
+  scaleY: number,
+  maxCount?: number
+): DrawingData['guidePaths'] => {
+  const trimmedGuidePaths = guidePaths?.slice(0, maxCount);
+
+  if (!trimmedGuidePaths?.length) {
+    return trimmedGuidePaths;
+  }
+
+  if (Math.abs(scaleX - 1) < 0.0001 && Math.abs(scaleY - 1) < 0.0001) {
+    return trimmedGuidePaths;
+  }
+
+  const scaleTransform =
+    Math.abs(scaleX - scaleY) < 0.0001
+      ? `scale(${roundScaledValue(scaleX)})`
+      : `scale(${roundScaledValue(scaleX)} ${roundScaledValue(scaleY)})`;
+
+  return trimmedGuidePaths.map((guidePath) => ({
+    ...guidePath,
+    transform: [scaleTransform, guidePath.transform].filter(Boolean).join(' ') || undefined
+  }));
+};
+
+const scaleSafeZone = (
+  safeZone: DrawingData['safeZone'],
+  scaleX: number,
+  scaleY: number
+): DrawingData['safeZone'] =>
+  safeZone
+    ? {
+        x: Math.round(safeZone.x * scaleX),
+        y: Math.round(safeZone.y * scaleY),
+        width: Math.round(safeZone.width * scaleX),
+        height: Math.round(safeZone.height * scaleY)
+      }
+    : undefined;
+
+const parseGuidePathStart = (d: string) => {
+  const match = d.match(/^[\s,]*([Mm])\s*([+-]?\d*\.?\d+)\s*[ ,]\s*([+-]?\d*\.?\d+)/);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    x: Number(match[2]),
+    y: Number(match[3])
+  };
+};
+
+type Matrix = [number, number, number, number, number, number];
+
+const identityMatrix = (): Matrix => [1, 0, 0, 1, 0, 0];
+
+const multiplyMatrices = (left: Matrix, right: Matrix): Matrix => [
+  left[0] * right[0] + left[2] * right[1],
+  left[1] * right[0] + left[3] * right[1],
+  left[0] * right[2] + left[2] * right[3],
+  left[1] * right[2] + left[3] * right[3],
+  left[0] * right[4] + left[2] * right[5] + left[4],
+  left[1] * right[4] + left[3] * right[5] + left[5]
+];
+
+const applyGuidePathTransform = (
+  point: { x: number; y: number },
+  transform?: string
+) => {
+  if (!transform) {
+    return point;
+  }
+
+  let matrix = identityMatrix();
+  const matcher = /(translate|scale)\(([^)]+)\)/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = matcher.exec(transform)) !== null) {
+    const [, type, rawArgs] = match;
+    const args = rawArgs
+      .trim()
+      .split(/[\s,]+/)
+      .filter(Boolean)
+      .map(Number);
+
+    if (type === 'translate') {
+      matrix = multiplyMatrices(matrix, [1, 0, 0, 1, args[0] ?? 0, args[1] ?? 0]);
+      continue;
+    }
+
+    const scaleX = args[0] ?? 1;
+    const scaleY = args[1] ?? scaleX;
+    matrix = multiplyMatrices(matrix, [scaleX, 0, 0, scaleY, 0, 0]);
+  }
+
+  return {
+    x: point.x * matrix[0] + point.y * matrix[2] + matrix[4],
+    y: point.x * matrix[1] + point.y * matrix[3] + matrix[5]
+  };
+};
+
+const alignGuidePathsToStrokeGuides = (drawingData: DrawingData): DrawingData => {
+  if (!drawingData.guidePaths?.length || !drawingData.strokeGuides?.length) {
+    return drawingData;
+  }
+
+  const alignedGuidePaths = drawingData.guidePaths.map((guidePath, index) => {
+    const strokeGuide = drawingData.strokeGuides?.[index];
+    const startPoint = parseGuidePathStart(guidePath.d);
+
+    if (!strokeGuide || !startPoint) {
+      return guidePath;
+    }
+
+    const transformedStart = applyGuidePathTransform(startPoint, guidePath.transform);
+    const deltaX = strokeGuide.arrowFrom.x - transformedStart.x;
+    const deltaY = strokeGuide.arrowFrom.y - transformedStart.y;
+
+    if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5) {
+      return guidePath;
+    }
+
+    return {
+      ...guidePath,
+      transform: [
+        `translate(${roundScaledValue(deltaX)} ${roundScaledValue(deltaY)})`,
+        guidePath.transform
+      ]
+        .filter(Boolean)
+        .join(' ')
+    };
+  });
+
+  return {
+    ...drawingData,
+    guidePaths: alignedGuidePaths
+  };
+};
+
+const normalizeDrawingDataForDisplay = (drawingData: DrawingData): DrawingData => {
+  const viewBoxWidth = drawingData.viewBoxWidth ?? 300;
+  const viewBoxHeight = drawingData.viewBoxHeight ?? 300;
+  const clampToViewBox = (value: number, max: number) => Math.min(Math.max(value, 0), max);
+
+  return alignGuidePathsToStrokeGuides({
+    ...drawingData,
+    strokeGuides: drawingData.strokeGuides?.map((guide, index) => ({
+      ...guide,
+      index: index + 1,
+      labelX: clampToViewBox(guide.labelX, viewBoxWidth),
+      labelY: clampToViewBox(guide.labelY, viewBoxHeight),
+      arrowFrom: {
+        x: clampToViewBox(guide.arrowFrom.x, viewBoxWidth),
+        y: clampToViewBox(guide.arrowFrom.y, viewBoxHeight)
+      },
+      arrowTo: {
+        x: clampToViewBox(guide.arrowTo.x, viewBoxWidth),
+        y: clampToViewBox(guide.arrowTo.y, viewBoxHeight)
+      }
+    }))
+  });
+};
+
+const mergeCharacterDrawingData = (
+  inlineDrawingData: DrawingData,
+  fallbackDrawingData?: DrawingData
+): DrawingData => {
+  if (!fallbackDrawingData) {
+    return normalizeDrawingDataForDisplay(inlineDrawingData);
+  }
+
+  const targetViewBoxWidth = inlineDrawingData.viewBoxWidth ?? fallbackDrawingData.viewBoxWidth ?? 300;
+  const targetViewBoxHeight = inlineDrawingData.viewBoxHeight ?? fallbackDrawingData.viewBoxHeight ?? 300;
+  const sourceViewBoxWidth = fallbackDrawingData.viewBoxWidth ?? targetViewBoxWidth;
+  const sourceViewBoxHeight = fallbackDrawingData.viewBoxHeight ?? targetViewBoxHeight;
+  const scaleX = targetViewBoxWidth / Math.max(sourceViewBoxWidth, 1);
+  const scaleY = targetViewBoxHeight / Math.max(sourceViewBoxHeight, 1);
+  const preferredStrokeCount =
+    inlineDrawingData.strokeCount ??
+    inlineDrawingData.strokeGuides?.length ??
+    fallbackDrawingData.strokeCount ??
+    fallbackDrawingData.strokeGuides?.length ??
+    fallbackDrawingData.guidePaths?.length;
+
+  return normalizeDrawingDataForDisplay({
+    ...fallbackDrawingData,
+    ...inlineDrawingData,
+    viewBoxWidth: targetViewBoxWidth,
+    viewBoxHeight: targetViewBoxHeight,
+    strokeCount: preferredStrokeCount,
+    guidePaths:
+      inlineDrawingData.guidePaths?.length
+        ? inlineDrawingData.guidePaths
+        : scaleGuidePaths(fallbackDrawingData.guidePaths, scaleX, scaleY, preferredStrokeCount),
+    strokeGuides:
+      inlineDrawingData.strokeGuides?.length
+        ? inlineDrawingData.strokeGuides
+        : scaleStrokeGuides(fallbackDrawingData.strokeGuides, scaleX, scaleY, preferredStrokeCount),
+    safeZone:
+      inlineDrawingData.safeZone ??
+      scaleSafeZone(fallbackDrawingData.safeZone, scaleX, scaleY)
+  });
+};
+
 const createDakutenData = (): DrawingData =>
   createDrawingData(
     [
@@ -1159,14 +1390,19 @@ Object.assign(drawingGuideLibrary, createDerivedDrawingGuides());
 const attachDrawingData = (matrix: (Character | null)[][]) => {
   matrix.forEach((row) => {
     row.forEach((character) => {
-      if (!character || character.drawingData) {
+      if (!character) {
         return;
       }
 
       const drawingData = drawingGuideLibrary[character.id];
 
+      if (character.drawingData) {
+        character.drawingData = mergeCharacterDrawingData(character.drawingData, drawingData);
+        return;
+      }
+
       if (drawingData) {
-        character.drawingData = drawingData;
+        character.drawingData = normalizeDrawingDataForDisplay(drawingData);
       }
     });
   });
