@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
-import { turkishMeaningTranslations } from './data/meaningTranslations';
 import { importNormalizedDatasets, printNormalizedImportReport } from './import-normalized-dataset';
 import { loadAllLegacyDictionaryRecords } from './legacy-dictionary';
+import { loadTurkishMeaningTranslations } from './load-meaning-translations';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +37,7 @@ const removeExistingDatabase = () => {
 const rebuildDatabase = async () => {
   ensureDatabaseDirectory();
   removeExistingDatabase();
+  const turkishMeaningTranslations = loadTurkishMeaningTranslations();
 
   const database = new Database(DATABASE_PATH);
   database.pragma('foreign_keys = ON');

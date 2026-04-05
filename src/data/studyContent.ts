@@ -75,7 +75,6 @@ interface StudyContent {
   };
   dictionary: {
     sectionDescription: (title: string) => string;
-    jlptLevels: string;
     filterDescription: string;
     wordCount: (count: number) => string;
     all: string;
@@ -89,7 +88,6 @@ interface StudyContent {
     needAtLeastWords: (count: number) => string;
   };
   wordTable: {
-    level: string;
     kana: string;
     romaji: string;
     meaning: string;
@@ -317,12 +315,11 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       }
     },
     dictionary: {
-      sectionDescription: (title) => `${title} kelimelerini JLPT seviyesine göre incele ve çalış.`,
-      jlptLevels: 'JLPT Seviyeleri',
-      filterDescription: 'Sözlüğü ve çalışma modlarını seviyeye göre filtrele.',
+      sectionDescription: (title) => `${title} kelimelerini incele ve farklı soru yönleriyle çalış.`,
+      filterDescription: 'Arama ile kelime havuzunu daralt ve çalışma modlarını seç.',
       wordCount: (count) => `${count} kelime`,
       all: 'Tümü',
-      searchPlaceholder: 'Kana, romaji, Turkce anlam veya seviye ara...',
+      searchPlaceholder: 'Kana, romaji veya anlam ara...',
       showingResults: (from, to, total) => `${from} - ${to} / ${total} kelime gösteriliyor`,
       pageLabel: (current, total) => `Sayfa ${current} / ${total}`,
       questions: 'Soru Sayısı',
@@ -332,7 +329,6 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       needAtLeastWords: (count) => `En az ${count} kelime gerekli`
     },
     wordTable: {
-      level: 'Seviye',
       kana: 'Kana',
       romaji: 'Romaji',
       meaning: 'Anlam',
@@ -460,12 +456,11 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       }
     },
     dictionary: {
-      sectionDescription: (title) => `Browse and study ${title} vocabulary by JLPT level.`,
-      jlptLevels: 'JLPT Levels',
-      filterDescription: 'Filter the dictionary and study modes by level.',
+      sectionDescription: (title) => `Browse and study ${title} vocabulary from multiple question directions.`,
+      filterDescription: 'Use search to narrow the vocabulary pool and launch study modes.',
       wordCount: (count) => `${count} words`,
       all: 'All',
-      searchPlaceholder: 'Search kana, romaji, meaning, or level...',
+      searchPlaceholder: 'Search kana, romaji, or meaning...',
       showingResults: (from, to, total) => `Showing ${from} to ${to} of ${total} words`,
       pageLabel: (current, total) => `Page ${current} / ${total}`,
       questions: 'Questions',
@@ -475,7 +470,6 @@ export const studyContent: Record<AppLanguage, StudyContent> = {
       needAtLeastWords: (count) => `Need at least ${count} words`
     },
     wordTable: {
-      level: 'Level',
       kana: 'Kana',
       romaji: 'Romaji',
       meaning: 'Meaning',
@@ -536,17 +530,17 @@ export const kanjiContent: Record<AppLanguage, KanjiPageContent> = {
       {
         id: 'beginner',
         title: 'Başlangıç Kanji',
-        description: 'Günlük kullanım için temel karakterler (JLPT N5-N4).'
+        description: 'Günlük kullanım için temel karakterler.'
       },
       {
         id: 'intermediate',
         title: 'Orta Seviye Kanji',
-        description: 'Okuma ve yazma için daha karmaşık karakterler (JLPT N3-N2).'
+        description: 'Okuma ve yazma için daha karmaşık karakterler.'
       },
       {
         id: 'advanced',
         title: 'İleri Seviye Kanji',
-        description: 'Akıcılık için ileri düzey karakterler (JLPT N1).'
+        description: 'Akıcılık için ileri düzey karakterler.'
       }
     ]
   },
@@ -559,17 +553,17 @@ export const kanjiContent: Record<AppLanguage, KanjiPageContent> = {
       {
         id: 'beginner',
         title: 'Beginner Kanji',
-        description: 'Essential characters for everyday use (JLPT N5-N4).'
+        description: 'Essential characters for everyday use.'
       },
       {
         id: 'intermediate',
         title: 'Intermediate Kanji',
-        description: 'More complex characters for reading and writing (JLPT N3-N2).'
+        description: 'More complex characters for reading and writing.'
       },
       {
         id: 'advanced',
         title: 'Advanced Kanji',
-        description: 'Advanced characters for fluency (JLPT N1).'
+        description: 'Advanced characters for fluency.'
       }
     ]
   }

@@ -8,7 +8,6 @@ export interface DictionaryWord {
   romaji: string;
   meaning?: string;
   meanings: string[];
-  jlptLevel?: string;
 }
 
 export interface DictionaryWordsResponse {

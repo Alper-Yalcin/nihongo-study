@@ -7,9 +7,6 @@ import { studyContent } from '../data/studyContent';
 import { wordStudyContent } from '../data/wordStudyContent';
 import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
 
-type LevelFilter = 'all' | NonNullable<WordItem['jlptLevel']>;
-
-const jlptFilters: NonNullable<WordItem['jlptLevel']>[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 const studyModes: WordStudyMode[] = ['wordToRomaji', 'wordToMeaning', 'meaningToWord', 'test'];
 
 interface Props {
@@ -27,7 +24,6 @@ export const WordDictionaryPanel: React.FC<Props> = ({
   const wordCopy = wordStudyContent[language];
   const meaningTranslations = useMeaningTranslations(language);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeLevel, setActiveLevel] = useState<LevelFilter>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [questionCount, setQuestionCount] = useState(10);
   const pageSize = 10;
@@ -36,12 +32,6 @@ export const WordDictionaryPanel: React.FC<Props> = ({
     const normalizedSearch = searchTerm.toLowerCase().trim();
 
     return words.filter((word) => {
-      const matchesLevel = activeLevel === 'all' || word.jlptLevel === activeLevel;
-
-      if (!matchesLevel) {
-        return false;
-      }
-
       if (!normalizedSearch) {
         return true;
       }
@@ -52,11 +42,10 @@ export const WordDictionaryPanel: React.FC<Props> = ({
         word.romaji.toLowerCase().includes(normalizedSearch) ||
         (word.meanings?.some((meaning) => meaning.toLowerCase().includes(normalizedSearch)) ?? false) ||
         (getLocalizedWordMeaning(word.meaning, language, meaningTranslations)?.toLowerCase().includes(normalizedSearch) ?? false) ||
-        (word.meaning && word.meaning.toLowerCase().includes(normalizedSearch)) ||
-        (word.jlptLevel && word.jlptLevel.toLowerCase().includes(normalizedSearch))
+        (word.meaning && word.meaning.toLowerCase().includes(normalizedSearch))
       );
     });
-  }, [activeLevel, language, meaningTranslations, searchTerm, words]);
+  }, [language, meaningTranslations, searchTerm, words]);
 
   const availableWordCount = filteredWords.length;
   const maxQuestionCount = Math.max(availableWordCount, 1);
@@ -64,7 +53,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
 
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, activeLevel]);
+  }, [searchTerm]);
 
   React.useEffect(() => {
     setQuestionCount((previousCount) => {
@@ -120,40 +109,12 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{copy.dictionary.jlptLevels}</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{copy.views.dictionary}</div>
             <div className="text-sm text-slate-500">{copy.dictionary.filterDescription}</div>
           </div>
           <div className="rounded-full bg-white px-3 py-1 text-sm font-medium text-slate-600 shadow-sm">
             {copy.dictionary.wordCount(availableWordCount)}
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setActiveLevel('all')}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              activeLevel === 'all'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            {copy.dictionary.all}
-          </button>
-          {jlptFilters.map((level) => (
-            <button
-              key={level}
-              type="button"
-              onClick={() => setActiveLevel(level)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                activeLevel === level
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {level}
-            </button>
-          ))}
         </div>
       </div>
 

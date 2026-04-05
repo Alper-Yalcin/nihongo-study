@@ -283,7 +283,9 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       return;
     }
 
-    const isCorrect = evaluateDrawing(strokes, currentChar);
+    const isCorrect = evaluateDrawing(strokes, currentChar, {
+      tolerance: isPracticeMode ? 'practice' : 'standard'
+    });
     setFeedback(isCorrect ? 'correct' : 'wrong');
 
     setSessionStats((previousStats) => {
@@ -311,6 +313,13 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     clearScheduledWork();
 
     if (isCorrect) {
+      if (isPracticeMode) {
+        transitionTimeoutRef.current = window.setTimeout(() => {
+          setFeedback('idle');
+        }, 900);
+        return;
+      }
+
       if (isTestMode) {
         const nextPool = pool.filter((character) => character.id !== currentChar.id);
         transitionTimeoutRef.current = window.setTimeout(() => {
@@ -355,6 +364,14 @@ export const DrawingStudyPanel: React.FC<Props> = ({
         }, 700);
       }
 
+      return;
+    }
+
+    if (isPracticeMode) {
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        setFeedback('idle');
+        clearCanvas();
+      }, 900);
       return;
     }
 
@@ -458,7 +475,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
             disabled={feedback !== 'idle' || isMemoryPreviewVisible}
           />
 
-          {!isPracticeMode && feedback !== 'idle' && (
+          {feedback !== 'idle' && (
             <div
               className={`absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm transition-all ${
                 feedback === 'correct' ? 'text-emerald-500' : 'text-rose-500'
@@ -485,6 +502,13 @@ export const DrawingStudyPanel: React.FC<Props> = ({
 
           {isPracticeMode ? (
             <>
+              <button
+                onClick={handleCheck}
+                disabled={feedback !== 'idle' || isMemoryPreviewVisible}
+                className="flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Check size={18} className="mr-2" /> {copy.drawing.check}
+              </button>
               <button
                 onClick={handlePrevPractice}
                 className="flex items-center rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200"

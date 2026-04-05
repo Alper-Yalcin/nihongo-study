@@ -253,7 +253,7 @@ const trDictionarySection: OverviewModalSection = {
       lead: 'Kelime listesini filtreleyip kana, romaji ve anlam ilişkilerini bağlam içinde incelemeyi sağlar.',
       paragraphs: [
         'Aranabilir sözlük yapısı, kullanıcıya tek tek karakterlerden çıkıp gerçek kelime örneklerine geçme imkanı sunar. Böylece kana bilgisi soyut kalmaz; günlük kullanımdaki karşılıklarıyla birlikte pekişir.',
-        'Arama ve filtreleme akışı özellikle belirli JLPT seviyelerine veya belirli okuma kalıplarına odaklanmak isteyen kullanıcılar için düzenli bir tekrar zemini oluşturur.'
+        'Arama ve filtreleme akışı özellikle belirli okuma kalıplarına veya daha dar kelime havuzlarına odaklanmak isteyen kullanıcılar için düzenli bir tekrar zemini oluşturur.'
       ],
       learningPoints: [
         'Kana bilgisini gerçek kelimelere taşır',
@@ -303,20 +303,20 @@ const trDictionarySection: OverviewModalSection = {
     },
     {
       id: 'dictionary-levels',
-      title: 'JLPT ve Filtre Akışı',
-      lead: 'İçeriği seviyeye göre daraltmak, çalışma yükünü yönetilebilir ve ölçülebilir hale getirir.',
+      title: 'Arama ve Filtre Akışı',
+      lead: 'İçeriği daha dar havuzlara ayırmak, çalışma yükünü yönetilebilir ve ölçülebilir hale getirir.',
       paragraphs: [
-        'JLPT filtresi sayesinde kullanıcı tüm sözlük içinde kaybolmadan kendi seviyesine uygun kelimeleri seçebilir. Bu, tekrar planını daha kontrollü kurmayı ve seviyeye göre istikrarlı ilerlemeyi kolaylaştırır.',
-        'Filtre akışı yalnızca içerik azaltmak için değil, belirli bir sınava veya günlük hedefe göre çalışma seansları hazırlamak için de kullanışlıdır.'
+        'Arama ve filtreleme sayesinde kullanıcı tüm sözlük içinde kaybolmadan daha uygun kelime havuzları seçebilir. Bu, tekrar planını daha kontrollü kurmayı ve çalışmayı daha istikrarlı hale getirmeyi kolaylaştırır.',
+        'Filtre akışı yalnızca içerik azaltmak için değil, belirli bir hedefe veya günlük çalışma planına göre seans hazırlamak için de kullanışlıdır.'
       ],
       learningPoints: [
-        'Seviyeye uygun çalışma havuzu oluşturur',
+        'Daha odaklı çalışma havuzu oluşturur',
         'Büyük kelime listelerini yönetilebilir kılar',
-        'Sınav veya hedef odaklı tekrar planı kurmayı kolaylaştırır'
+        'Hedef odaklı tekrar planı kurmayı kolaylaştırır'
       ],
       demoSrc: '/gifs/dictionary-demo.gif',
-      demoAlt: 'JLPT filtre demosu',
-      fallbackTitle: 'Dictionary JLPT Demo GIF',
+      demoAlt: 'Sözlük filtre demosu',
+      fallbackTitle: 'Dictionary Filter Demo GIF',
       fallbackPath: '/gifs/dictionary-demo.gif'
     }
   ]
@@ -545,7 +545,7 @@ const enDictionarySection: OverviewModalSection = {
       lead: 'A browsing flow built for contextual study rather than isolated symbol review.',
       paragraphs: [
         'The searchable dictionary lets the learner move from kana drills into actual words. This makes kana knowledge less abstract because every item now appears with reading and meaning together.',
-        'Filtering and lookup also support targeted study sessions, especially when the learner wants to focus on a level, a pattern, or a narrow review set.'
+        'Filtering and lookup also support targeted study sessions, especially when the learner wants to focus on a pattern or a narrow review set.'
       ],
       learningPoints: [
         'Connects kana practice to real vocabulary',
@@ -595,20 +595,20 @@ const enDictionarySection: OverviewModalSection = {
     },
     {
       id: 'dictionary-levels',
-      title: 'JLPT and Filter Flow',
+      title: 'Search and Filter Flow',
       lead: 'A control layer that keeps large vocabulary sets manageable and goal-oriented.',
       paragraphs: [
-        'JLPT-based filtering prevents the learner from getting lost inside a very large dictionary. Instead, study sessions can be scoped to the right level and repeated with more intention.',
-        'That makes the dictionary area useful not only for browsing, but also for building deliberate exam-focused or goal-focused review sets.'
+        'Search and filtering prevent the learner from getting lost inside a very large dictionary. Instead, study sessions can be scoped to the right pool and repeated with more intention.',
+        'That makes the dictionary area useful not only for browsing, but also for building deliberate goal-focused review sets.'
       ],
       learningPoints: [
-        'Creates level-appropriate study pools',
+        'Creates focused study pools',
         'Makes large vocabulary lists manageable',
-        'Supports exam-focused or goal-focused review planning'
+        'Supports goal-focused review planning'
       ],
       demoSrc: '/gifs/dictionary-demo.gif',
-      demoAlt: 'Dictionary JLPT filter demo',
-      fallbackTitle: 'Dictionary JLPT Demo GIF',
+      demoAlt: 'Dictionary filter demo',
+      fallbackTitle: 'Dictionary Filter Demo GIF',
       fallbackPath: '/gifs/dictionary-demo.gif'
     }
   ]

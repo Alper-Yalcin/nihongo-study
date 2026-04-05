@@ -1,16 +1,5 @@
 import { getDatabase } from '../db';
 
-const JLPT_SORT_SQL = `
-  CASE jlpt_level
-    WHEN 'N5' THEN 1
-    WHEN 'N4' THEN 2
-    WHEN 'N3' THEN 3
-    WHEN 'N2' THEN 4
-    WHEN 'N1' THEN 5
-    ELSE 99
-  END
-`;
-
 const WORD_TABLE_BY_SCRIPT = {
   hiragana: 'hiragana_words',
   katakana: 'katakana_words',
@@ -26,7 +15,6 @@ interface DictionaryWordDbRow {
   kana: string | null;
   romaji: string | null;
   meanings: string;
-  jlptLevel: string | null;
 }
 
 export interface DictionaryWordRow {
@@ -37,7 +25,6 @@ export interface DictionaryWordRow {
   romaji: string;
   meaning?: string;
   meanings: string[];
-  jlptLevel?: string;
 }
 
 const isDictionaryScript = (script: string): script is DictionaryScript =>
@@ -62,8 +49,7 @@ const normalizeWordRow = (script: DictionaryScript, row: DictionaryWordDbRow): D
     kana: row.kana ?? '',
     romaji: row.romaji ?? '',
     meaning: meanings.length > 0 ? meanings.join('; ') : undefined,
-    meanings,
-    jlptLevel: row.jlptLevel ?? undefined
+    meanings
   };
 };
 
@@ -84,10 +70,9 @@ export const findWordsByScript = (script: string): DictionaryWordRow[] => {
             kanji,
             kana,
             romaji,
-            meanings,
-            jlpt_level AS jlptLevel
+            meanings
           FROM ${tableName}
-          ORDER BY ${JLPT_SORT_SQL}, COALESCE(kanji, kana) COLLATE NOCASE, romaji COLLATE NOCASE
+          ORDER BY COALESCE(kanji, kana) COLLATE NOCASE, romaji COLLATE NOCASE
         `
       )
       .all() as DictionaryWordDbRow[]

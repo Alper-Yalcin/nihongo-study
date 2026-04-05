@@ -14,6 +14,8 @@
     "db:build": "tsx scripts/build-database.ts",
     "start:server": "tsx server/index.ts",
     "data:import-db": "tsx scripts/import-normalized-dataset.ts",
+    "data:enrich-jlpt-web": "python scripts/enrich-jlpt-from-web.py",
+    "data:translate-tr": "node scripts/generate_tr_meanings.mjs",
     "data:download": "python scripts/data/download_sources.py",
     "data:normalize": "python scripts/data/build_normalized_dictionary.py",
     "data:validate": "python scripts/data/validate_normalized.py",

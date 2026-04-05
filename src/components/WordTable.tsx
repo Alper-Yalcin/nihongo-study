@@ -20,7 +20,6 @@ export const WordTable: React.FC<Props> = ({ language, meaningTranslations, word
         <thead>
           <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-sm font-medium uppercase tracking-wider">
             <th className="p-3 w-12 text-center">#</th>
-            <th className="p-3">{copy.wordTable.level}</th>
             <th className="p-3">{copy.wordTable.kana}</th>
             <th className="p-3">{copy.wordTable.romaji}</th>
             <th className="p-3">{copy.wordTable.meaning}</th>
@@ -31,11 +30,6 @@ export const WordTable: React.FC<Props> = ({ language, meaningTranslations, word
             words.map((word, index) => (
               <tr key={word.id} className="transition-colors hover:bg-slate-50">
                 <td className="p-3 text-center text-slate-400 text-sm">{startIndex + index + 1}</td>
-                <td className="p-3">
-                  <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
-                    {word.jlptLevel || '-'}
-                  </span>
-                </td>
                 <td className="p-3 font-jp text-lg font-medium text-slate-800">
                   {word.kanji ? (
                     <div className="space-y-1">
@@ -52,7 +46,7 @@ export const WordTable: React.FC<Props> = ({ language, meaningTranslations, word
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="p-8 text-center text-slate-500">
+              <td colSpan={4} className="p-8 text-center text-slate-500">
                 {copy.wordTable.empty}
               </td>
             </tr>
