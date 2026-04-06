@@ -1,0 +1,879 @@
+{
+  "generatedAt": "2026-04-06T10:46:51.475495+00:00",
+  "source": "google-translate-gtts",
+  "language": "ja",
+  "script": "katakana",
+  "total": 124,
+  "generated": 124,
+  "skipped": 0,
+  "items": [
+    {
+      "id": "k-a",
+      "symbol": "ア",
+      "filename": "a.mp3",
+      "path": "public/sounds/google-translate/katakana/a.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ka",
+      "symbol": "カ",
+      "filename": "ka.mp3",
+      "path": "public/sounds/google-translate/katakana/ka.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-sa",
+      "symbol": "サ",
+      "filename": "sa.mp3",
+      "path": "public/sounds/google-translate/katakana/sa.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ta",
+      "symbol": "タ",
+      "filename": "ta.mp3",
+      "path": "public/sounds/google-translate/katakana/ta.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-na",
+      "symbol": "ナ",
+      "filename": "na.mp3",
+      "path": "public/sounds/google-translate/katakana/na.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ha",
+      "symbol": "ハ",
+      "filename": "ha.mp3",
+      "path": "public/sounds/google-translate/katakana/ha.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ma",
+      "symbol": "マ",
+      "filename": "ma.mp3",
+      "path": "public/sounds/google-translate/katakana/ma.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ya",
+      "symbol": "ヤ",
+      "filename": "ya.mp3",
+      "path": "public/sounds/google-translate/katakana/ya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ra",
+      "symbol": "ラ",
+      "filename": "ra.mp3",
+      "path": "public/sounds/google-translate/katakana/ra.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-wa",
+      "symbol": "ワ",
+      "filename": "wa.mp3",
+      "path": "public/sounds/google-translate/katakana/wa.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ga",
+      "symbol": "ガ",
+      "filename": "ga.mp3",
+      "path": "public/sounds/google-translate/katakana/ga.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-za",
+      "symbol": "ザ",
+      "filename": "za.mp3",
+      "path": "public/sounds/google-translate/katakana/za.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-da",
+      "symbol": "ダ",
+      "filename": "da.mp3",
+      "path": "public/sounds/google-translate/katakana/da.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ba",
+      "symbol": "バ",
+      "filename": "ba.mp3",
+      "path": "public/sounds/google-translate/katakana/ba.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pa",
+      "symbol": "パ",
+      "filename": "pa.mp3",
+      "path": "public/sounds/google-translate/katakana/pa.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-i",
+      "symbol": "イ",
+      "filename": "i.mp3",
+      "path": "public/sounds/google-translate/katakana/i.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ki",
+      "symbol": "キ",
+      "filename": "ki.mp3",
+      "path": "public/sounds/google-translate/katakana/ki.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-shi",
+      "symbol": "シ",
+      "filename": "shi.mp3",
+      "path": "public/sounds/google-translate/katakana/shi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-chi",
+      "symbol": "チ",
+      "filename": "chi.mp3",
+      "path": "public/sounds/google-translate/katakana/chi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ni",
+      "symbol": "ニ",
+      "filename": "ni.mp3",
+      "path": "public/sounds/google-translate/katakana/ni.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-hi",
+      "symbol": "ヒ",
+      "filename": "hi.mp3",
+      "path": "public/sounds/google-translate/katakana/hi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-mi",
+      "symbol": "ミ",
+      "filename": "mi.mp3",
+      "path": "public/sounds/google-translate/katakana/mi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ri",
+      "symbol": "リ",
+      "filename": "ri.mp3",
+      "path": "public/sounds/google-translate/katakana/ri.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-gi",
+      "symbol": "ギ",
+      "filename": "gi.mp3",
+      "path": "public/sounds/google-translate/katakana/gi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ji",
+      "symbol": "ジ",
+      "filename": "ji.mp3",
+      "path": "public/sounds/google-translate/katakana/ji.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-dji",
+      "symbol": "ヂ",
+      "filename": "ji2.mp3",
+      "path": "public/sounds/google-translate/katakana/ji2.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-bi",
+      "symbol": "ビ",
+      "filename": "bi.mp3",
+      "path": "public/sounds/google-translate/katakana/bi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pi",
+      "symbol": "ピ",
+      "filename": "pi.mp3",
+      "path": "public/sounds/google-translate/katakana/pi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-u",
+      "symbol": "ウ",
+      "filename": "u.mp3",
+      "path": "public/sounds/google-translate/katakana/u.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ku",
+      "symbol": "ク",
+      "filename": "ku.mp3",
+      "path": "public/sounds/google-translate/katakana/ku.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-su",
+      "symbol": "ス",
+      "filename": "su.mp3",
+      "path": "public/sounds/google-translate/katakana/su.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-tsu",
+      "symbol": "ツ",
+      "filename": "tsu.mp3",
+      "path": "public/sounds/google-translate/katakana/tsu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-nu",
+      "symbol": "ヌ",
+      "filename": "nu.mp3",
+      "path": "public/sounds/google-translate/katakana/nu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-fu",
+      "symbol": "フ",
+      "filename": "fu.mp3",
+      "path": "public/sounds/google-translate/katakana/fu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-mu",
+      "symbol": "ム",
+      "filename": "mu.mp3",
+      "path": "public/sounds/google-translate/katakana/mu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-yu",
+      "symbol": "ユ",
+      "filename": "yu.mp3",
+      "path": "public/sounds/google-translate/katakana/yu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ru",
+      "symbol": "ル",
+      "filename": "ru.mp3",
+      "path": "public/sounds/google-translate/katakana/ru.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-gu",
+      "symbol": "グ",
+      "filename": "gu.mp3",
+      "path": "public/sounds/google-translate/katakana/gu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-zu",
+      "symbol": "ズ",
+      "filename": "zu.mp3",
+      "path": "public/sounds/google-translate/katakana/zu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-dzu",
+      "symbol": "ヅ",
+      "filename": "zu2.mp3",
+      "path": "public/sounds/google-translate/katakana/zu2.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-bu",
+      "symbol": "ブ",
+      "filename": "bu.mp3",
+      "path": "public/sounds/google-translate/katakana/bu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pu",
+      "symbol": "プ",
+      "filename": "pu.mp3",
+      "path": "public/sounds/google-translate/katakana/pu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-e",
+      "symbol": "エ",
+      "filename": "e.mp3",
+      "path": "public/sounds/google-translate/katakana/e.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ke",
+      "symbol": "ケ",
+      "filename": "ke.mp3",
+      "path": "public/sounds/google-translate/katakana/ke.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-se",
+      "symbol": "セ",
+      "filename": "se.mp3",
+      "path": "public/sounds/google-translate/katakana/se.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-te",
+      "symbol": "テ",
+      "filename": "te.mp3",
+      "path": "public/sounds/google-translate/katakana/te.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ne",
+      "symbol": "ネ",
+      "filename": "ne.mp3",
+      "path": "public/sounds/google-translate/katakana/ne.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-he",
+      "symbol": "ヘ",
+      "filename": "he.mp3",
+      "path": "public/sounds/google-translate/katakana/he.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-me",
+      "symbol": "メ",
+      "filename": "me.mp3",
+      "path": "public/sounds/google-translate/katakana/me.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-re",
+      "symbol": "レ",
+      "filename": "re.mp3",
+      "path": "public/sounds/google-translate/katakana/re.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ge",
+      "symbol": "ゲ",
+      "filename": "ge.mp3",
+      "path": "public/sounds/google-translate/katakana/ge.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ze",
+      "symbol": "ゼ",
+      "filename": "ze.mp3",
+      "path": "public/sounds/google-translate/katakana/ze.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-de",
+      "symbol": "デ",
+      "filename": "de.mp3",
+      "path": "public/sounds/google-translate/katakana/de.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-be",
+      "symbol": "ベ",
+      "filename": "be.mp3",
+      "path": "public/sounds/google-translate/katakana/be.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pe",
+      "symbol": "ペ",
+      "filename": "pe.mp3",
+      "path": "public/sounds/google-translate/katakana/pe.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-o",
+      "symbol": "オ",
+      "filename": "o.mp3",
+      "path": "public/sounds/google-translate/katakana/o.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ko",
+      "symbol": "コ",
+      "filename": "ko.mp3",
+      "path": "public/sounds/google-translate/katakana/ko.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-so",
+      "symbol": "ソ",
+      "filename": "so.mp3",
+      "path": "public/sounds/google-translate/katakana/so.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-to",
+      "symbol": "ト",
+      "filename": "to.mp3",
+      "path": "public/sounds/google-translate/katakana/to.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-no",
+      "symbol": "ノ",
+      "filename": "no.mp3",
+      "path": "public/sounds/google-translate/katakana/no.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ho",
+      "symbol": "ホ",
+      "filename": "ho.mp3",
+      "path": "public/sounds/google-translate/katakana/ho.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-mo",
+      "symbol": "モ",
+      "filename": "mo.mp3",
+      "path": "public/sounds/google-translate/katakana/mo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-yo",
+      "symbol": "ヨ",
+      "filename": "yo.mp3",
+      "path": "public/sounds/google-translate/katakana/yo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ro",
+      "symbol": "ロ",
+      "filename": "ro.mp3",
+      "path": "public/sounds/google-translate/katakana/ro.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-wo",
+      "symbol": "ヲ",
+      "filename": "wo.mp3",
+      "path": "public/sounds/google-translate/katakana/wo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-n",
+      "symbol": "ン",
+      "filename": "n.mp3",
+      "path": "public/sounds/google-translate/katakana/n.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-go",
+      "symbol": "ゴ",
+      "filename": "go.mp3",
+      "path": "public/sounds/google-translate/katakana/go.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-zo",
+      "symbol": "ゾ",
+      "filename": "zo.mp3",
+      "path": "public/sounds/google-translate/katakana/zo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-do",
+      "symbol": "ド",
+      "filename": "do.mp3",
+      "path": "public/sounds/google-translate/katakana/do.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-bo",
+      "symbol": "ボ",
+      "filename": "bo.mp3",
+      "path": "public/sounds/google-translate/katakana/bo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-po",
+      "symbol": "ポ",
+      "filename": "po.mp3",
+      "path": "public/sounds/google-translate/katakana/po.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-kya",
+      "symbol": "キャ",
+      "filename": "kya.mp3",
+      "path": "public/sounds/google-translate/katakana/kya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-sha",
+      "symbol": "シャ",
+      "filename": "sha.mp3",
+      "path": "public/sounds/google-translate/katakana/sha.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-cha",
+      "symbol": "チャ",
+      "filename": "cha.mp3",
+      "path": "public/sounds/google-translate/katakana/cha.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-nya",
+      "symbol": "ニャ",
+      "filename": "nya.mp3",
+      "path": "public/sounds/google-translate/katakana/nya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-hya",
+      "symbol": "ヒャ",
+      "filename": "hya.mp3",
+      "path": "public/sounds/google-translate/katakana/hya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-mya",
+      "symbol": "ミャ",
+      "filename": "mya.mp3",
+      "path": "public/sounds/google-translate/katakana/mya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-rya",
+      "symbol": "リャ",
+      "filename": "rya.mp3",
+      "path": "public/sounds/google-translate/katakana/rya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-gya",
+      "symbol": "ギャ",
+      "filename": "gya.mp3",
+      "path": "public/sounds/google-translate/katakana/gya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ja",
+      "symbol": "ジャ",
+      "filename": "ja.mp3",
+      "path": "public/sounds/google-translate/katakana/ja.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-bya",
+      "symbol": "ビャ",
+      "filename": "bya.mp3",
+      "path": "public/sounds/google-translate/katakana/bya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pya",
+      "symbol": "ピャ",
+      "filename": "pya.mp3",
+      "path": "public/sounds/google-translate/katakana/pya.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-kyu",
+      "symbol": "キュ",
+      "filename": "kyu.mp3",
+      "path": "public/sounds/google-translate/katakana/kyu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-shu",
+      "symbol": "シュ",
+      "filename": "shu.mp3",
+      "path": "public/sounds/google-translate/katakana/shu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-chu",
+      "symbol": "チュ",
+      "filename": "chu.mp3",
+      "path": "public/sounds/google-translate/katakana/chu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-nyu",
+      "symbol": "ニュ",
+      "filename": "nyu.mp3",
+      "path": "public/sounds/google-translate/katakana/nyu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-hyu",
+      "symbol": "ヒュ",
+      "filename": "hyu.mp3",
+      "path": "public/sounds/google-translate/katakana/hyu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-myu",
+      "symbol": "ミュ",
+      "filename": "myu.mp3",
+      "path": "public/sounds/google-translate/katakana/myu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ryu",
+      "symbol": "リュ",
+      "filename": "ryu.mp3",
+      "path": "public/sounds/google-translate/katakana/ryu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-gyu",
+      "symbol": "ギュ",
+      "filename": "gyu.mp3",
+      "path": "public/sounds/google-translate/katakana/gyu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ju",
+      "symbol": "ジュ",
+      "filename": "ju.mp3",
+      "path": "public/sounds/google-translate/katakana/ju.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-byu",
+      "symbol": "ビュ",
+      "filename": "byu.mp3",
+      "path": "public/sounds/google-translate/katakana/byu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pyu",
+      "symbol": "ピュ",
+      "filename": "pyu.mp3",
+      "path": "public/sounds/google-translate/katakana/pyu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-kyo",
+      "symbol": "キョ",
+      "filename": "kyo.mp3",
+      "path": "public/sounds/google-translate/katakana/kyo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-sho",
+      "symbol": "ショ",
+      "filename": "sho.mp3",
+      "path": "public/sounds/google-translate/katakana/sho.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-cho",
+      "symbol": "チョ",
+      "filename": "cho.mp3",
+      "path": "public/sounds/google-translate/katakana/cho.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-nyo",
+      "symbol": "ニョ",
+      "filename": "nyo.mp3",
+      "path": "public/sounds/google-translate/katakana/nyo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-hyo",
+      "symbol": "ヒョ",
+      "filename": "hyo.mp3",
+      "path": "public/sounds/google-translate/katakana/hyo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-myo",
+      "symbol": "ミョ",
+      "filename": "myo.mp3",
+      "path": "public/sounds/google-translate/katakana/myo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ryo",
+      "symbol": "リョ",
+      "filename": "ryo.mp3",
+      "path": "public/sounds/google-translate/katakana/ryo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-gyo",
+      "symbol": "ギョ",
+      "filename": "gyo.mp3",
+      "path": "public/sounds/google-translate/katakana/gyo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-jo",
+      "symbol": "ジョ",
+      "filename": "jo.mp3",
+      "path": "public/sounds/google-translate/katakana/jo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-byo",
+      "symbol": "ビョ",
+      "filename": "byo.mp3",
+      "path": "public/sounds/google-translate/katakana/byo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-pyo",
+      "symbol": "ピョ",
+      "filename": "pyo.mp3",
+      "path": "public/sounds/google-translate/katakana/pyo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-fa",
+      "symbol": "ファ",
+      "filename": "fa.mp3",
+      "path": "public/sounds/google-translate/katakana/fa.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-va",
+      "symbol": "ヴァ",
+      "filename": "va.mp3",
+      "path": "public/sounds/google-translate/katakana/va.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-tsa",
+      "symbol": "ツァ",
+      "filename": "tsa.mp3",
+      "path": "public/sounds/google-translate/katakana/tsa.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-fi",
+      "symbol": "フィ",
+      "filename": "fi.mp3",
+      "path": "public/sounds/google-translate/katakana/fi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-vi",
+      "symbol": "ヴィ",
+      "filename": "vi.mp3",
+      "path": "public/sounds/google-translate/katakana/vi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-tsi",
+      "symbol": "ツィ",
+      "filename": "tsi.mp3",
+      "path": "public/sounds/google-translate/katakana/tsi.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ti",
+      "symbol": "ティ",
+      "filename": "ti.mp3",
+      "path": "public/sounds/google-translate/katakana/ti.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-di",
+      "symbol": "ディ",
+      "filename": "di.mp3",
+      "path": "public/sounds/google-translate/katakana/di.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-vu",
+      "symbol": "ヴ",
+      "filename": "vu.mp3",
+      "path": "public/sounds/google-translate/katakana/vu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-tu",
+      "symbol": "トゥ",
+      "filename": "tu.mp3",
+      "path": "public/sounds/google-translate/katakana/tu.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-du",
+      "symbol": "ドゥ",
+      "filename": "du.mp3",
+      "path": "public/sounds/google-translate/katakana/du.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-fe",
+      "symbol": "フェ",
+      "filename": "fe.mp3",
+      "path": "public/sounds/google-translate/katakana/fe.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-ve",
+      "symbol": "ヴェ",
+      "filename": "ve.mp3",
+      "path": "public/sounds/google-translate/katakana/ve.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-tse",
+      "symbol": "ツェ",
+      "filename": "tse.mp3",
+      "path": "public/sounds/google-translate/katakana/tse.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-che",
+      "symbol": "チェ",
+      "filename": "che.mp3",
+      "path": "public/sounds/google-translate/katakana/che.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-she",
+      "symbol": "シェ",
+      "filename": "she.mp3",
+      "path": "public/sounds/google-translate/katakana/she.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-je",
+      "symbol": "ジェ",
+      "filename": "je.mp3",
+      "path": "public/sounds/google-translate/katakana/je.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-fo",
+      "symbol": "フォ",
+      "filename": "fo.mp3",
+      "path": "public/sounds/google-translate/katakana/fo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-vo",
+      "symbol": "ヴォ",
+      "filename": "vo.mp3",
+      "path": "public/sounds/google-translate/katakana/vo.mp3",
+      "status": "generated"
+    },
+    {
+      "id": "k-tso",
+      "symbol": "ツォ",
+      "filename": "tso.mp3",
+      "path": "public/sounds/google-translate/katakana/tso.mp3",
+      "status": "generated"
+    }
+  ]
+}
