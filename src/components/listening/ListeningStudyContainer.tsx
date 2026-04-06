@@ -18,6 +18,7 @@ import { AppLanguage } from '../../data/appPreferences';
 import { studyContent } from '../../data/studyContent';
 import { getAcceptedRomajiAnswers } from '../../utils/typing';
 import { shuffleArray } from '../../utils/listening';
+import { getGoogleTranslateKanaAudioSrc } from '../../data/kanaAudio';
 
 interface Props {
   title: string;
@@ -57,19 +58,43 @@ export const ListeningStudyContainer: React.FC<Props> = ({
     [sections]
   );
 
+  const equivalentCharactersByRomaji = useMemo(() => {
+    const buckets = new Map<string, Character[]>();
+
+    allCharacters.forEach((character) => {
+      const key = character.label.trim().toLowerCase();
+      const existing = buckets.get(key);
+
+      if (existing) {
+        existing.push(character);
+        return;
+      }
+
+      buckets.set(key, [character]);
+    });
+
+    return buckets;
+  }, [allCharacters]);
+
   const characterItems = useMemo<ListeningItem[]>(
     () =>
-      allCharacters.map((character) => ({
-        id: character.id,
-        script,
-        kana: character.symbol,
-        romaji: character.label,
-        acceptedRomaji: getAcceptedRomajiAnswers(character.label),
-        audioSrc: `/audio/${script}/${character.id}.mp3`,
-        datasetType: 'character',
-        character
-      })),
-    [allCharacters, script]
+      allCharacters.map((character) => {
+        const equivalents = equivalentCharactersByRomaji.get(character.label.trim().toLowerCase()) ?? [character];
+
+        return {
+          id: character.id,
+          script,
+          kana: character.symbol,
+          romaji: character.label,
+          acceptedRomaji: getAcceptedRomajiAnswers(character.label),
+          acceptedCharacterIds: equivalents.map((candidate) => candidate.id),
+          acceptedCharacters: equivalents,
+          audioSrc: getGoogleTranslateKanaAudioSrc(character.id) ?? `/audio/${script}/${character.id}.mp3`,
+          datasetType: 'character',
+          character
+        };
+      }),
+    [allCharacters, equivalentCharactersByRomaji, script]
   );
 
   const wordItems = useMemo<ListeningItem[]>(

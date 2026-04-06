@@ -4,7 +4,9 @@ import { studyContent } from '../../data/studyContent';
 import { ListeningItem, RunStats } from '../../types';
 import {
   buildListeningRunStats,
-  buildRecognitionOptions
+  buildRecognitionOptions,
+  getAcceptedListeningCharacterIds,
+  isCorrectListeningRecognitionAnswer
 } from '../../utils/listening';
 import { ArrowLeft, CheckCircle2, SkipForward, XCircle } from 'lucide-react';
 import { AudioButton } from './AudioButton';
@@ -141,6 +143,12 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
     return null;
   }
 
+  const acceptedCharacterIds = new Set(getAcceptedListeningCharacterIds(currentItem));
+  const acceptedKana = sourceItems
+    .filter((item) => acceptedCharacterIds.has(item.id))
+    .map((item) => item.kana)
+    .join(' / ');
+
   const progressPercent = items.length > 0 ? ((currentIndex + 1) / items.length) * 100 : 0;
 
   return (
@@ -189,7 +197,7 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
         <div className="grid gap-3 sm:grid-cols-2">
           {options.map((option) => {
             const isSelected = selectedId === option.id;
-            const isCorrectOption = option.id === currentItem.id;
+            const isCorrectOption = acceptedCharacterIds.has(option.id);
             const showCorrect = feedback !== 'idle' && isCorrectOption;
             const showWrong = feedback === 'wrong' && isSelected && !isCorrectOption;
 
@@ -197,7 +205,7 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
               <button
                 key={option.id}
                 type="button"
-                onClick={() => recordAnswer(option.id === currentItem.id, option.id)}
+                onClick={() => recordAnswer(isCorrectListeningRecognitionAnswer(currentItem, option.id), option.id)}
                 disabled={feedback !== 'idle'}
                 className={`rounded-2xl border px-4 py-5 text-center transition-all ${
                   showCorrect
@@ -225,7 +233,7 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
             {feedback === 'wrong' && (
               <span className="inline-flex items-center text-rose-600">
                 <XCircle size={18} className="mr-2" />
-                {copy.common.wrong}: {currentItem.kana} ({currentItem.romaji})
+                {copy.common.wrong}: {acceptedKana || currentItem.kana} ({currentItem.romaji})
               </span>
             )}
           </div>

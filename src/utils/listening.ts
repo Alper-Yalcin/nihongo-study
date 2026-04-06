@@ -20,6 +20,17 @@ export const getAcceptedListeningAnswers = (item: ListeningItem) => {
   return getAcceptedRomajiAnswers(item.romaji);
 };
 
+export const getAcceptedListeningCharacterIds = (item: ListeningItem) => {
+  if (item.acceptedCharacterIds && item.acceptedCharacterIds.length > 0) {
+    return Array.from(new Set(item.acceptedCharacterIds));
+  }
+
+  return [item.id];
+};
+
+export const isCorrectListeningRecognitionAnswer = (item: ListeningItem, selectedId: string) =>
+  getAcceptedListeningCharacterIds(item).includes(selectedId);
+
 export const isCorrectListeningTypingAnswer = (item: ListeningItem, value: string) => {
   const normalizedInput = normalizeRomajiInput(value);
 
@@ -35,8 +46,9 @@ export const buildRecognitionOptions = (
   sourceItems: ListeningItem[],
   optionCount = 4
 ) => {
+  const acceptedIds = new Set(getAcceptedListeningCharacterIds(currentItem));
   const distractors = shuffleArray(
-    sourceItems.filter((item) => item.id !== currentItem.id && item.kana !== currentItem.kana)
+    sourceItems.filter((item) => !acceptedIds.has(item.id) && item.kana !== currentItem.kana)
   ).slice(0, Math.max(optionCount - 1, 0));
 
   return shuffleArray([currentItem, ...distractors]);

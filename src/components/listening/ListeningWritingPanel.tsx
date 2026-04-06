@@ -140,7 +140,11 @@ export const ListeningWritingPanel: React.FC<Props> = ({
       return;
     }
 
-    const isCorrect = evaluateDrawing(strokes, currentItem.character);
+    const targetCharacters = currentItem.acceptedCharacters?.length
+      ? currentItem.acceptedCharacters
+      : [currentItem.character];
+
+    const isCorrect = targetCharacters.some((targetCharacter) => evaluateDrawing(strokes, targetCharacter));
     recordAnswer(isCorrect, isCorrect ? 100 : 0);
   };
 
@@ -155,6 +159,8 @@ export const ListeningWritingPanel: React.FC<Props> = ({
   if (!currentItem?.character) {
     return null;
   }
+
+  const acceptedKana = (currentItem.acceptedCharacters?.map((character) => character.symbol) ?? [currentItem.kana]).join(' / ');
 
   const progressPercent = items.length > 0 ? ((currentIndex + 1) / items.length) * 100 : 0;
   const liveAccuracy = sessionStats.attempts > 0 ? Math.round((sessionStats.correct / sessionStats.attempts) * 100) : 0;
@@ -249,7 +255,7 @@ export const ListeningWritingPanel: React.FC<Props> = ({
           {feedback === 'wrong' && (
             <span className="inline-flex items-center text-rose-600">
               <XCircle size={18} className="mr-2" />
-              {copy.common.wrong}: {currentItem.kana} ({currentItem.romaji})
+              {copy.common.wrong}: {acceptedKana} ({currentItem.romaji})
             </span>
           )}
         </div>

@@ -24,21 +24,35 @@ export const AudioButton: React.FC<Props> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentSrcRef = useRef<string | null>(null);
 
-  const playAudio = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(src);
-      audioRef.current.onended = () => setIsPlaying(false);
-      audioRef.current.onerror = () => {
+  const ensureAudio = () => {
+    if (!audioRef.current || currentSrcRef.current !== src) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      const nextAudio = new Audio(src);
+      nextAudio.onended = () => setIsPlaying(false);
+      nextAudio.onerror = () => {
         setIsPlaying(false);
         setError(true);
       };
+
+      audioRef.current = nextAudio;
+      currentSrcRef.current = src;
     }
-    
+
+    return audioRef.current;
+  };
+
+  const playAudio = () => {
+    const audio = ensureAudio();
+
     setIsPlaying(true);
     setError(false);
-    audioRef.current.currentTime = 0;
-    audioRef.current.play().catch(() => {
+    audio.currentTime = 0;
+    audio.play().catch(() => {
       setIsPlaying(false);
       setError(true);
     });

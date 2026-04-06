@@ -93,6 +93,8 @@ export interface ListeningItem {
   kana: string;
   romaji: string;
   acceptedRomaji?: string[];
+  acceptedCharacterIds?: string[];
+  acceptedCharacters?: Character[];
   audioSrc: string;
   datasetType: 'character' | 'word';
   character?: Character;

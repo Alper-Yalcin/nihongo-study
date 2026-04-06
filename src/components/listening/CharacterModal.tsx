@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { AudioButton } from './AudioButton';
 import { AppLanguage } from '../../data/appPreferences';
 import { studyContent } from '../../data/studyContent';
+import { getGoogleTranslateKanaAudioSrc } from '../../data/kanaAudio';
 
 interface Props {
   characters: Character[];
@@ -40,7 +41,7 @@ export const CharacterModal: React.FC<Props> = ({
 
   if (!character) return null;
 
-  const audioSrc = `/audio/${script}/${character.id}.mp3`;
+  const audioSrc = getGoogleTranslateKanaAudioSrc(character.id) ?? `/audio/${script}/${character.id}.mp3`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
