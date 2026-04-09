@@ -79,7 +79,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex min-h-16 items-center justify-between gap-4 py-3">
           <div className="flex min-w-0 items-center gap-6">
-            <div className="flex-shrink-0">
+            <div className="flex flex-shrink-0 items-center gap-3">
+              <img
+                src="/logo/logo.svg"
+                alt="Nihongo Study logo"
+                className="h-10 w-10 rounded-2xl border border-white/20 shadow-sm"
+              />
               <span className={`text-xl font-bold tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                 Nihongo Study
               </span>
