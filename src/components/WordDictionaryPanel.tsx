@@ -1,23 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { WordItem, WordStudyMode } from '../types';
 import { WordTable } from './WordTable';
 import { Search, ChevronLeft, ChevronRight, Keyboard, ListChecks } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
 import { wordStudyContent } from '../data/wordStudyContent';
-import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
+import { useMeaningTranslations } from '../utils/wordMeaning';
+import { searchDictionaryWords, useDictionaryWordSearch } from '../data/words';
 
 const studyModes: WordStudyMode[] = ['wordToRomaji', 'wordToMeaning', 'meaningToWord', 'test'];
 
 interface Props {
   language: AppLanguage;
-  words: WordItem[];
+  script: NonNullable<WordItem['script']>;
   onStartMode: (mode: WordStudyMode, questionCount: number, sourceWords: WordItem[]) => void;
 }
 
 export const WordDictionaryPanel: React.FC<Props> = ({
   language,
-  words,
+  script,
   onStartMode
 }) => {
   const copy = studyContent[language];
@@ -26,29 +27,20 @@ export const WordDictionaryPanel: React.FC<Props> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [questionCount, setQuestionCount] = useState(10);
+  const [isStartingMode, setIsStartingMode] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
   const pageSize = 10;
+  const normalizedSearch = searchTerm.trim();
 
-  const filteredWords = useMemo(() => {
-    const normalizedSearch = searchTerm.toLowerCase().trim();
+  const { words: paginatedWords, page, loading, error } = useDictionaryWordSearch({
+    script,
+    query: normalizedSearch || undefined,
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize
+  });
 
-    return words.filter((word) => {
-      if (!normalizedSearch) {
-        return true;
-      }
-
-      return (
-        (word.kanji?.toLowerCase().includes(normalizedSearch) ?? false) ||
-        word.kana.toLowerCase().includes(normalizedSearch) ||
-        word.romaji.toLowerCase().includes(normalizedSearch) ||
-        (word.meanings?.some((meaning) => meaning.toLowerCase().includes(normalizedSearch)) ?? false) ||
-        (getLocalizedWordMeaning(word.meaning, language, meaningTranslations)?.toLowerCase().includes(normalizedSearch) ?? false) ||
-        (word.meaning && word.meaning.toLowerCase().includes(normalizedSearch))
-      );
-    });
-  }, [language, meaningTranslations, searchTerm, words]);
-
-  const availableWordCount = filteredWords.length;
-  const maxQuestionCount = Math.max(availableWordCount, 1);
+  const availableWordCount = page.total;
+  const maxQuestionCount = Math.max(Math.min(availableWordCount, 100), 1);
   const totalPages = Math.max(1, Math.ceil(availableWordCount / pageSize));
 
   React.useEffect(() => {
@@ -56,19 +48,18 @@ export const WordDictionaryPanel: React.FC<Props> = ({
   }, [searchTerm]);
 
   React.useEffect(() => {
+    setCurrentPage((previousPage) => Math.min(previousPage, totalPages));
+  }, [totalPages]);
+
+  React.useEffect(() => {
     setQuestionCount((previousCount) => {
       if (availableWordCount === 0) {
         return 1;
       }
 
-      return Math.min(Math.max(previousCount, 1), availableWordCount);
+      return Math.min(Math.max(previousCount, 1), maxQuestionCount);
     });
-  }, [availableWordCount]);
-
-  const paginatedWords = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredWords.slice(start, start + pageSize);
-  }, [filteredWords, currentPage, pageSize]);
+  }, [availableWordCount, maxQuestionCount]);
 
   const handlePrevPage = () => setCurrentPage((page) => Math.max(1, page - 1));
   const handleNextPage = () => setCurrentPage((page) => Math.min(totalPages, page + 1));
@@ -92,8 +83,75 @@ export const WordDictionaryPanel: React.FC<Props> = ({
 
     let nextValue = questionCount;
     if (nextValue < 1) nextValue = 1;
-    if (nextValue > availableWordCount) nextValue = availableWordCount;
+    if (nextValue > maxQuestionCount) nextValue = maxQuestionCount;
     setQuestionCount(nextValue);
+  };
+
+  const fetchStudySourceWords = async (mode: WordStudyMode, requestedCount: number) => {
+    const minimumWordCount = mode === 'test' ? 4 : 1;
+    const targetCount = Math.max(minimumWordCount, Math.min(requestedCount, maxQuestionCount));
+
+    if (targetCount <= 0) {
+      return [] as WordItem[];
+    }
+
+    const collectedWords: WordItem[] = [];
+    let nextOffset = 0;
+    const requestLimit = Math.min(Math.max(targetCount, pageSize), 100);
+
+    while (collectedWords.length < targetCount) {
+      const response = await searchDictionaryWords({
+        script,
+        query: normalizedSearch || undefined,
+        limit: requestLimit,
+        offset: nextOffset
+      });
+
+      if (response.items.length === 0) {
+        break;
+      }
+
+      collectedWords.push(...response.items);
+      nextOffset += response.items.length;
+
+      if (!response.page.hasMore) {
+        break;
+      }
+    }
+
+    return collectedWords.slice(0, targetCount);
+  };
+
+  const handleStartMode = async (mode: WordStudyMode) => {
+    const minimumWordCount = mode === 'test' ? 4 : 1;
+
+    if (availableWordCount < minimumWordCount) {
+      return;
+    }
+
+    setIsStartingMode(true);
+    setStartError(null);
+
+    try {
+      const sourceWords = await fetchStudySourceWords(mode, questionCount);
+
+      if (sourceWords.length < minimumWordCount) {
+        setStartError(copy.dictionary.needAtLeastWords(minimumWordCount));
+        return;
+      }
+
+      onStartMode(mode, Math.min(questionCount, sourceWords.length), sourceWords);
+    } catch (requestError) {
+      const message =
+        requestError instanceof Error
+          ? requestError.message
+          : language === 'tr'
+            ? 'Kelime listesi yuklenemedi.'
+            : 'Failed to load dictionary words.';
+      setStartError(message);
+    } finally {
+      setIsStartingMode(false);
+    }
   };
 
   const getModeIcon = (mode: WordStudyMode) => {
@@ -135,21 +193,33 @@ export const WordDictionaryPanel: React.FC<Props> = ({
         language={language}
         meaningTranslations={meaningTranslations}
         words={paginatedWords}
-        startIndex={(currentPage - 1) * pageSize}
+        startIndex={page.offset}
       />
+
+      {loading && (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          {language === 'tr' ? 'Kelime listesi yukleniyor...' : 'Loading dictionary words...'}
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {error}
+        </div>
+      )}
 
       <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2">
         <div className="px-2 text-sm text-slate-500">
           {copy.dictionary.showingResults(
-            availableWordCount === 0 ? 0 : (currentPage - 1) * pageSize + 1,
-            Math.min(currentPage * pageSize, availableWordCount),
+            availableWordCount === 0 ? 0 : page.offset + 1,
+            Math.min(page.offset + paginatedWords.length, availableWordCount),
             availableWordCount
           )}
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={handlePrevPage}
-            disabled={currentPage === 1}
+            disabled={currentPage === 1 || loading}
             className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={copy.common.previous}
             title={copy.common.previous}
@@ -161,7 +231,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
           </span>
           <button
             onClick={handleNextPage}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || loading}
             className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={copy.common.next}
             title={copy.common.next}
@@ -193,9 +263,15 @@ export const WordDictionaryPanel: React.FC<Props> = ({
               onBlur={handleQuestionCountBlur}
               className="w-20 rounded-lg border border-slate-200 px-3 py-1.5 text-center focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
-            <span className="text-xs text-slate-400">{copy.dictionary.maxLabel(availableWordCount)}</span>
+            <span className="text-xs text-slate-400">{copy.dictionary.maxLabel(maxQuestionCount)}</span>
           </div>
         </div>
+
+        {startError && (
+          <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {startError}
+          </div>
+        )}
 
         <div className="grid gap-3 sm:grid-cols-2">
           {studyModes.map((mode) => {
@@ -207,8 +283,10 @@ export const WordDictionaryPanel: React.FC<Props> = ({
               <button
                 key={mode}
                 type="button"
-                onClick={() => onStartMode(mode, questionCount, filteredWords)}
-                disabled={isDisabled}
+                onClick={() => {
+                  void handleStartMode(mode);
+                }}
+                disabled={isDisabled || loading || isStartingMode}
                 title={disabledTitle}
                 className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
                   mode === 'test'

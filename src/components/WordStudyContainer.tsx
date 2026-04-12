@@ -11,10 +11,11 @@ import { studyContent } from '../data/studyContent';
 interface WordStudyContainerProps {
   title: string;
   language: AppLanguage;
+  script: 'hiragana' | 'katakana';
   words: WordItem[];
 }
 
-export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, language, words }) => {
+export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, language, script, words }) => {
   const copy = studyContent[language];
   const [view, setView] = useState<'dictionary' | 'practice' | 'test' | 'result'>('dictionary');
   const [runStats, setRunStats] = useState<RunStats | null>(null);
@@ -41,7 +42,7 @@ export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, l
       {view === 'dictionary' && (
         <WordDictionaryPanel
           language={language}
-          words={words}
+          script={script}
           onStartMode={handleStartMode}
         />
       )}

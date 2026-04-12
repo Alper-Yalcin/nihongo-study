@@ -107,7 +107,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
         </div>
         <div style={{ display: activeView === 'dictionary' ? 'block' : 'none' }}>
           {availableViews.includes('dictionary') && (
-            <WordStudyContainer title={title} language={language} words={dictionaryWords} />
+            <WordStudyContainer title={title} language={language} script={script} words={dictionaryWords} />
           )}
         </div>
       </div>
