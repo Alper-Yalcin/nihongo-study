@@ -15,13 +15,13 @@ const footerCopy: Record<AppLanguage, {
   tr: {
     description: 'Hiragana, katakana ve kelime pratiğini typing, drawing, listening ve dictionary modlarıyla tek yerde sürdür.',
     features: ['Typing', 'Çizim', 'Dinleme', 'Sözlük'],
-    bottomLine: `© ${new Date().getFullYear()} Nihongo Study`,
+    bottomLine: `© ${new Date().getFullYear()} Kotonoha`,
     roadmap: 'Sıradaki hedef: Kanji çalışma modülü'
   },
   en: {
     description: 'Practice hiragana, katakana, and vocabulary in one place with typing, drawing, listening, and dictionary modes.',
     features: ['Typing', 'Drawing', 'Listening', 'Dictionary'],
-    bottomLine: `© ${new Date().getFullYear()} Nihongo Study`,
+    bottomLine: `© ${new Date().getFullYear()} Kotonoha`,
     roadmap: 'Next milestone: Kanji study module'
   }
 };
@@ -38,7 +38,7 @@ export const Footer: React.FC<FooterProps> = ({ language, themeMode }) => {
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="space-y-2">
             <p className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Nihongo Study
+              Kotonoha
             </p>
             <p
               className={`max-w-2xl text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}

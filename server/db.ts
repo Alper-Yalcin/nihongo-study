@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 
-export const DATABASE_PATH = path.join(ROOT, 'database', 'nihongo-study.sqlite');
+export const DATABASE_PATH = path.join(ROOT, 'database', 'kotonoha.sqlite');
 
 let database: Database.Database | null = null;
 

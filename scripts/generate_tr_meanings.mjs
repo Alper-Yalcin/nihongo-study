@@ -3,11 +3,11 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 
 const ROOT = process.cwd();
-const DATABASE_PATH = path.join(ROOT, 'database', 'nihongo-study.sqlite');
+const DATABASE_PATH = path.join(ROOT, 'database', 'kotonoha.sqlite');
 const BASE_TRANSLATIONS_PATH = path.join(ROOT, 'scripts', 'data', 'meaningTranslations.ts');
 const GENERATED_TRANSLATIONS_PATH = path.join(ROOT, 'scripts', 'data', 'meaningTranslations.generated.json');
 const TARGET_LANGUAGE = 'tr';
-const SEP = '\n[[[NIHONGO_STUDY_SEP_3D9D1D]]]\n';
+const SEP = '\n[[[KOTONOHA_SEP_3D9D1D]]]\n';
 const TABLES = ['hiragana_words', 'katakana_words', 'kanji_words', 'kanji_characters'];
 
 const DEFAULT_BATCH_ITEM_LIMIT = 20;

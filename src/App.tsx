@@ -16,9 +16,9 @@ import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/
 import { AppLanguage, ThemeMode } from './data/appPreferences';
 import { usePersistentState } from './hooks/usePersistentState';
 
-const KANA_FONT_STORAGE_KEY = 'nihongo-study.kana-font-style';
-const APP_LANGUAGE_STORAGE_KEY = 'nihongo-study.app-language';
-const THEME_MODE_STORAGE_KEY = 'nihongo-study.theme-mode';
+const KANA_FONT_STORAGE_KEY = 'kotonoha.kana-font-style';
+const APP_LANGUAGE_STORAGE_KEY = 'kotonoha.app-language';
+const THEME_MODE_STORAGE_KEY = 'kotonoha.theme-mode';
 
 const serializeString = <T extends string>(value: T) => value;
 const deserializeLanguage = (value: string): AppLanguage => (value === 'en' ? 'en' : 'tr');

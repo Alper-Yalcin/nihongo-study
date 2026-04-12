@@ -32,7 +32,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 688,
           "y": 246
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -46,7 +46,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 439,
           "y": 795
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -60,7 +60,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 469,
           "y": 951
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -74,7 +74,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 469,
           "y": 951
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -109,7 +109,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 307,
           "y": 684
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -123,7 +123,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 835,
           "y": 358
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -137,7 +137,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 837
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -151,7 +151,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 837
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -183,7 +183,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 889,
           "y": 741
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -197,7 +197,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 710,
           "y": 377
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -211,7 +211,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 780,
           "y": 322
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -243,7 +243,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 834,
           "y": 647
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -257,7 +257,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 867,
           "y": 292
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -271,7 +271,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 940,
           "y": 236
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -309,7 +309,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 292,
           "y": 688
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -323,7 +323,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 756,
           "y": 244
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -337,7 +337,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 808,
           "y": 430
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -351,7 +351,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 825,
           "y": 854
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -406,7 +406,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 562,
           "y": 386
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -420,7 +420,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 378,
           "y": 849
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -434,7 +434,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 291,
           "y": 799
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -448,7 +448,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 879,
           "y": 768
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -505,7 +505,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 605,
           "y": 343
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -519,7 +519,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 469,
           "y": 926
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -560,7 +560,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 556,
           "y": 314
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -574,7 +574,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 215,
           "y": 864
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -588,7 +588,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 798,
           "y": 443
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -602,7 +602,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 806,
           "y": 871
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -662,7 +662,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 723,
           "y": 886
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -676,7 +676,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 864,
           "y": 218
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -690,7 +690,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 949,
           "y": 170
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -725,7 +725,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 605,
           "y": 343
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -739,7 +739,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 469,
           "y": 926
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -753,7 +753,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 784,
           "y": 277
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -767,7 +767,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 859,
           "y": 216
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -802,7 +802,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 483,
           "y": 454
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -816,7 +816,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 760,
           "y": 864
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -830,7 +830,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 859,
           "y": 343
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -844,7 +844,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 940,
           "y": 293
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -876,7 +876,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 432,
           "y": 830
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -890,7 +890,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 866,
           "y": 284
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -904,7 +904,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 940,
           "y": 223
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -933,7 +933,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 590,
           "y": 246
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -947,7 +947,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 819,
           "y": 892
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -982,7 +982,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 562,
           "y": 386
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -996,7 +996,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 378,
           "y": 849
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1010,7 +1010,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 291,
           "y": 799
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1024,7 +1024,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 879,
           "y": 768
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -1062,7 +1062,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 292,
           "y": 806
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1076,7 +1076,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 225,
           "y": 697
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1090,7 +1090,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 904,
           "y": 626
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1104,7 +1104,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 854,
           "y": 325
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -1156,7 +1156,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 330,
           "y": 667
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1170,7 +1170,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 854,
           "y": 350
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1184,7 +1184,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 557,
           "y": 931
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1198,7 +1198,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 867,
           "y": 236
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -1253,7 +1253,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 680,
           "y": 273
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1267,7 +1267,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 725,
           "y": 442
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1281,7 +1281,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 604,
           "y": 660
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1295,7 +1295,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 581,
           "y": 909
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -1358,7 +1358,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 553,
           "y": 390
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1372,7 +1372,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 765,
           "y": 848
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1386,7 +1386,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 816,
           "y": 283
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1400,7 +1400,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 894,
           "y": 228
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -1432,7 +1432,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 651,
           "y": 900
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1446,7 +1446,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 750,
           "y": 362
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1460,7 +1460,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 823,
           "y": 301
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -1495,7 +1495,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 307,
           "y": 684
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1509,7 +1509,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 835,
           "y": 358
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1523,7 +1523,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 837
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1537,7 +1537,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 837
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -1563,7 +1563,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 889,
           "y": 741
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -1589,7 +1589,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 834,
           "y": 647
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -1627,7 +1627,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 292,
           "y": 688
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1641,7 +1641,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 793,
           "y": 229
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1655,7 +1655,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 808,
           "y": 430
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1669,7 +1669,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 825,
           "y": 854
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -1712,7 +1712,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 432,
           "y": 615
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1726,7 +1726,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 874,
           "y": 623
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -1758,7 +1758,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 830,
           "y": 762
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1772,7 +1772,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 666,
           "y": 381
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1786,7 +1786,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 761,
           "y": 323
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -1818,7 +1818,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 292,
           "y": 806
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1832,7 +1832,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 225,
           "y": 697
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1846,7 +1846,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 904,
           "y": 626
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -1878,7 +1878,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 330,
           "y": 667
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1892,7 +1892,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 854,
           "y": 350
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1906,7 +1906,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 557,
           "y": 931
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -1941,7 +1941,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 680,
           "y": 273
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -1955,7 +1955,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 725,
           "y": 442
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -1969,7 +1969,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 604,
           "y": 660
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -1983,7 +1983,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 581,
           "y": 909
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -2012,7 +2012,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 553,
           "y": 390
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2026,7 +2026,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 765,
           "y": 848
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -2052,7 +2052,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 651,
           "y": 900
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -2087,7 +2087,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 727,
           "y": 310
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2101,7 +2101,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 728,
           "y": 495
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2115,7 +2115,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 744,
           "y": 874
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -2129,7 +2129,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 744,
           "y": 874
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -2161,7 +2161,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 425,
           "y": 753
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2175,7 +2175,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 549,
           "y": 903
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2189,7 +2189,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 549,
           "y": 903
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -2218,7 +2218,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 881,
           "y": 721
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2232,7 +2232,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 881,
           "y": 721
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -2264,7 +2264,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 654,
           "y": 512
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2278,7 +2278,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 506,
           "y": 407
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2292,7 +2292,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 517,
           "y": 606
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -2324,7 +2324,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 519,
           "y": 359
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2338,7 +2338,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 768,
           "y": 596
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2352,7 +2352,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 768,
           "y": 596
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -2378,7 +2378,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 909,
           "y": 569
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -2416,7 +2416,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 553,
           "y": 293
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2430,7 +2430,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 242,
           "y": 667
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2444,7 +2444,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 799,
           "y": 428
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -2458,7 +2458,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 792,
           "y": 862
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -2504,7 +2504,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 331,
           "y": 880
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2518,7 +2518,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 898,
           "y": 852
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2532,7 +2532,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 898,
           "y": 852
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -2564,7 +2564,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 318,
           "y": 675
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2578,7 +2578,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 759,
           "y": 298
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2592,7 +2592,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 811,
           "y": 818
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -2621,7 +2621,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 539,
           "y": 886
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2635,7 +2635,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 539,
           "y": 886
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -2670,7 +2670,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 425,
           "y": 777
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2684,7 +2684,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 870,
           "y": 853
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2698,7 +2698,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 870,
           "y": 853
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -2712,7 +2712,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 870,
           "y": 853
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -2744,7 +2744,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 541,
           "y": 347
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2758,7 +2758,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 512,
           "y": 840
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2772,7 +2772,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 512,
           "y": 840
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -2807,7 +2807,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 307,
           "y": 684
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2821,7 +2821,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 835,
           "y": 358
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -2835,7 +2835,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 837
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -2849,7 +2849,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 837
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -2878,7 +2878,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 889,
           "y": 741
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2892,7 +2892,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 775,
           "y": 273
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -2921,7 +2921,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 834,
           "y": 647
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2935,7 +2935,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 919,
           "y": 222
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -2973,7 +2973,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 292,
           "y": 688
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -2987,7 +2987,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 740,
           "y": 240
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3001,7 +3001,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 808,
           "y": 430
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -3015,7 +3015,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 825,
           "y": 854
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -3067,7 +3067,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 562,
           "y": 386
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3081,7 +3081,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 378,
           "y": 849
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3095,7 +3095,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 291,
           "y": 799
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -3109,7 +3109,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 879,
           "y": 768
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -3152,7 +3152,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 475,
           "y": 286
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3166,7 +3166,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 418,
           "y": 927
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3195,7 +3195,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 343,
           "y": 897
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3209,7 +3209,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 940,
           "y": 767
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3238,7 +3238,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 423,
           "y": 494
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3252,7 +3252,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 434,
           "y": 916
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3278,7 +3278,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 406,
           "y": 915
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -3307,7 +3307,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 518,
           "y": 817
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3321,7 +3321,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 518,
           "y": 817
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3353,7 +3353,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 776,
           "y": 310
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3367,7 +3367,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 582,
           "y": 572
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3381,7 +3381,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 618,
           "y": 907
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -3413,7 +3413,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 885,
           "y": 385
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3427,7 +3427,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 537,
           "y": 584
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3441,7 +3441,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 737,
           "y": 843
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -3467,7 +3467,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 830,
           "y": 762
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -3499,7 +3499,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 551,
           "y": 695
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3513,7 +3513,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 516,
           "y": 480
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3527,7 +3527,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 508,
           "y": 910
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -3559,7 +3559,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 687,
           "y": 537
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3573,7 +3573,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 688,
           "y": 904
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3587,7 +3587,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 688,
           "y": 904
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -3616,7 +3616,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 505,
           "y": 801
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3630,7 +3630,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 525,
           "y": 932
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3656,7 +3656,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 649,
           "y": 895
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -3688,7 +3688,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 869,
           "y": 284
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3702,7 +3702,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 404,
           "y": 937
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3716,7 +3716,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 404,
           "y": 937
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -3751,7 +3751,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 556,
           "y": 314
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3765,7 +3765,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 215,
           "y": 864
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -3779,7 +3779,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 798,
           "y": 443
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -3793,7 +3793,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 806,
           "y": 871
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -3819,7 +3819,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 723,
           "y": 886
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -3848,7 +3848,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 483,
           "y": 454
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3862,7 +3862,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 760,
           "y": 864
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3888,7 +3888,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 432,
           "y": 830
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -3917,7 +3917,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 604,
           "y": 219
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3931,7 +3931,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 385,
           "y": 938
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -3960,7 +3960,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 339,
           "y": 901
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -3974,7 +3974,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 568,
           "y": 903
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -4006,7 +4006,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 595,
           "y": 266
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4020,7 +4020,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 550,
           "y": 739
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4034,7 +4034,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 721,
           "y": 892
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4066,7 +4066,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 552,
           "y": 566
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4080,7 +4080,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 511,
           "y": 275
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4094,7 +4094,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 539,
           "y": 881
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4126,7 +4126,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 755,
           "y": 381
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4140,7 +4140,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 761,
           "y": 870
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4154,7 +4154,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 761,
           "y": 870
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4183,7 +4183,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 493,
           "y": 711
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4197,7 +4197,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 530,
           "y": 932
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -4235,7 +4235,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 776,
           "y": 310
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4249,7 +4249,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 582,
           "y": 572
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4263,7 +4263,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 618,
           "y": 907
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -4277,7 +4277,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 864,
           "y": 230
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -4329,7 +4329,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 885,
           "y": 385
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4343,7 +4343,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 537,
           "y": 584
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4357,7 +4357,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 737,
           "y": 843
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -4371,7 +4371,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 862,
           "y": 270
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -4417,7 +4417,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 649,
           "y": 895
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4431,7 +4431,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 778,
           "y": 303
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4445,7 +4445,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 859,
           "y": 252
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4477,7 +4477,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 869,
           "y": 284
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4491,7 +4491,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 404,
           "y": 937
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4505,7 +4505,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 404,
           "y": 937
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4534,7 +4534,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 539,
           "y": 464
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4548,7 +4548,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 241,
           "y": 905
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -4583,7 +4583,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 144,
           "y": 801
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4597,7 +4597,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 856,
           "y": 739
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4611,7 +4611,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 831,
           "y": 377
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -4625,7 +4625,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 907,
           "y": 314
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -4657,7 +4657,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 883,
           "y": 745
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4671,7 +4671,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 709,
           "y": 378
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4685,7 +4685,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 783,
           "y": 316
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4720,7 +4720,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 701,
           "y": 387
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4734,7 +4734,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 756,
           "y": 862
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4748,7 +4748,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 815,
           "y": 337
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -4762,7 +4762,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 890,
           "y": 282
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -4803,7 +4803,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 782,
           "y": 394
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4817,7 +4817,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 387,
           "y": 801
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4831,7 +4831,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 188,
           "y": 769
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -4845,7 +4845,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 825,
           "y": 746
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -4905,7 +4905,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 286,
           "y": 896
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4919,7 +4919,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 866,
           "y": 237
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4933,7 +4933,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 944,
           "y": 186
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -4965,7 +4965,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 296,
           "y": 352
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -4979,7 +4979,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 861,
           "y": 498
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -4993,7 +4993,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 299,
           "y": 935
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -5031,7 +5031,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 227,
           "y": 574
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5045,7 +5045,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 215,
           "y": 918
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5059,7 +5059,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 535,
           "y": 547
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5073,7 +5073,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 871,
           "y": 214
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -5125,7 +5125,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 689,
           "y": 238
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5139,7 +5139,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 429
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5153,7 +5153,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 277,
           "y": 917
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5167,7 +5167,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 853,
           "y": 259
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -5219,7 +5219,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 296,
           "y": 352
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5233,7 +5233,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 861,
           "y": 498
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5247,7 +5247,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 299,
           "y": 935
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5261,7 +5261,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 826,
           "y": 322
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -5310,7 +5310,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 426,
           "y": 905
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5324,7 +5324,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 722,
           "y": 585
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5338,7 +5338,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 678,
           "y": 326
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5352,7 +5352,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 756,
           "y": 262
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -5390,7 +5390,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 311,
           "y": 501
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5404,7 +5404,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 513,
           "y": 443
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5418,7 +5418,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 327,
           "y": 899
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5432,7 +5432,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 886,
           "y": 239
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -5478,7 +5478,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 725,
           "y": 341
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5492,7 +5492,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 513,
           "y": 685
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5506,7 +5506,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 856,
           "y": 744
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -5532,7 +5532,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 286,
           "y": 896
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -5567,7 +5567,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 457,
           "y": 825
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5581,7 +5581,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 181,
           "y": 918
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5595,7 +5595,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 865,
           "y": 328
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5609,7 +5609,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 942,
           "y": 272
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -5647,7 +5647,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 169,
           "y": 542
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5661,7 +5661,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 831,
           "y": 348
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5675,7 +5675,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 329,
           "y": 910
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5689,7 +5689,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 842,
           "y": 231
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -5741,7 +5741,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 717,
           "y": 367
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5755,7 +5755,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 838,
           "y": 556
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5769,7 +5769,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 635,
           "y": 910
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5783,7 +5783,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 307
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -5832,7 +5832,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 727,
           "y": 701
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5846,7 +5846,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 716,
           "y": 775
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5860,7 +5860,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 861,
           "y": 310
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5874,7 +5874,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 939,
           "y": 252
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -5909,7 +5909,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 251,
           "y": 493
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5923,7 +5923,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 264,
           "y": 866
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -5937,7 +5937,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 879,
           "y": 207
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -5951,7 +5951,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 953,
           "y": 157
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -5980,7 +5980,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 144,
           "y": 801
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -5994,7 +5994,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 856,
           "y": 739
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6020,7 +6020,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 883,
           "y": 745
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -6049,7 +6049,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 701,
           "y": 387
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6063,7 +6063,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 756,
           "y": 862
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6098,7 +6098,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 782,
           "y": 394
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6112,7 +6112,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 387,
           "y": 801
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6126,7 +6126,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 188,
           "y": 769
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -6140,7 +6140,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 825,
           "y": 746
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -6169,7 +6169,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 173,
           "y": 656
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6183,7 +6183,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 572,
           "y": 905
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6221,7 +6221,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 450,
           "y": 332
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6235,7 +6235,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 357,
           "y": 516
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6249,7 +6249,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 923,
           "y": 412
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -6263,7 +6263,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 848,
           "y": 266
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -6306,7 +6306,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 457,
           "y": 825
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6320,7 +6320,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 181,
           "y": 918
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6352,7 +6352,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 169,
           "y": 542
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6366,7 +6366,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 831,
           "y": 348
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6380,7 +6380,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 329,
           "y": 910
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -6412,7 +6412,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 717,
           "y": 367
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6426,7 +6426,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 838,
           "y": 556
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6440,7 +6440,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 635,
           "y": 910
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -6469,7 +6469,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 727,
           "y": 701
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6483,7 +6483,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 716,
           "y": 775
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6512,7 +6512,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 251,
           "y": 493
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6526,7 +6526,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 264,
           "y": 866
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6555,7 +6555,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 543,
           "y": 608
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6569,7 +6569,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 618,
           "y": 800
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6598,7 +6598,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 209,
           "y": 879
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6612,7 +6612,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 692,
           "y": 646
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6644,7 +6644,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 663,
           "y": 338
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6658,7 +6658,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 614,
           "y": 549
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6672,7 +6672,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 704,
           "y": 858
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -6704,7 +6704,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 660,
           "y": 269
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6718,7 +6718,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 794,
           "y": 512
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6732,7 +6732,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 803,
           "y": 852
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -6761,7 +6761,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 668,
           "y": 736
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6775,7 +6775,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 810,
           "y": 826
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6804,7 +6804,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 404,
           "y": 396
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6818,7 +6818,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 871,
           "y": 407
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6847,7 +6847,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 853,
           "y": 440
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6861,7 +6861,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 271,
           "y": 907
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -6896,7 +6896,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 580,
           "y": 239
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6910,7 +6910,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 179,
           "y": 809
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -6924,7 +6924,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 538,
           "y": 910
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -6938,7 +6938,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 798,
           "y": 719
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -6967,7 +6967,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 694,
           "y": 378
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -6981,7 +6981,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 834,
           "y": 714
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7007,7 +7007,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 240,
           "y": 914
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -7036,7 +7036,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 224,
           "y": 887
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7050,7 +7050,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 692,
           "y": 630
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7082,7 +7082,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 830,
           "y": 386
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7096,7 +7096,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 498,
           "y": 826
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7110,7 +7110,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 209,
           "y": 825
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7142,7 +7142,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 144,
           "y": 801
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7156,7 +7156,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 856,
           "y": 739
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7170,7 +7170,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 837,
           "y": 260
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7199,7 +7199,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 883,
           "y": 745
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7213,7 +7213,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 756,
           "y": 260
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7245,7 +7245,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 701,
           "y": 387
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7259,7 +7259,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 756,
           "y": 862
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7273,7 +7273,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 844,
           "y": 199
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7311,7 +7311,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 782,
           "y": 394
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7325,7 +7325,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 387,
           "y": 801
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7339,7 +7339,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 188,
           "y": 769
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -7353,7 +7353,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 825,
           "y": 746
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -7396,7 +7396,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 286,
           "y": 896
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7410,7 +7410,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 930,
           "y": 108
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7439,7 +7439,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 668,
           "y": 218
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7453,7 +7453,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 296,
           "y": 916
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7479,7 +7479,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 795,
           "y": 499
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       }
     ]
   },
@@ -7508,7 +7508,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 370,
           "y": 579
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7522,7 +7522,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 392,
           "y": 949
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7554,7 +7554,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 312,
           "y": 784
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7568,7 +7568,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 699,
           "y": 684
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7582,7 +7582,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 689,
           "y": 762
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7611,7 +7611,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 190,
           "y": 834
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7625,7 +7625,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 847,
           "y": 539
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7657,7 +7657,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 881,
           "y": 412
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7671,7 +7671,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 425,
           "y": 648
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7685,7 +7685,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 379,
           "y": 947
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7714,7 +7714,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 654,
           "y": 601
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7728,7 +7728,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 784,
           "y": 850
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7760,7 +7760,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 450,
           "y": 332
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7774,7 +7774,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 357,
           "y": 516
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7788,7 +7788,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 923,
           "y": 412
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7817,7 +7817,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 550,
           "y": 580
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7831,7 +7831,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 313,
           "y": 915
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7863,7 +7863,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 661,
           "y": 528
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7877,7 +7877,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 513,
           "y": 777
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7891,7 +7891,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 764,
           "y": 834
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -7920,7 +7920,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 262,
           "y": 715
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7934,7 +7934,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 542,
           "y": 896
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -7966,7 +7966,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 749,
           "y": 508
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -7980,7 +7980,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 515,
           "y": 851
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -7994,7 +7994,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 294,
           "y": 834
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8026,7 +8026,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 522,
           "y": 438
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8040,7 +8040,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 348,
           "y": 643
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8054,7 +8054,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 407,
           "y": 918
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8083,7 +8083,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 616,
           "y": 646
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8097,7 +8097,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 537,
           "y": 907
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8129,7 +8129,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 650,
           "y": 795
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8143,7 +8143,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 615,
           "y": 665
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8157,7 +8157,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 645,
           "y": 860
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8186,7 +8186,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 606,
           "y": 772
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8200,7 +8200,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 749,
           "y": 834
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8229,7 +8229,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 377,
           "y": 448
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8243,7 +8243,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 328,
           "y": 915
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8272,7 +8272,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 167,
           "y": 867
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8286,7 +8286,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 814,
           "y": 838
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8318,7 +8318,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 227,
           "y": 574
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8332,7 +8332,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 215,
           "y": 918
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8346,7 +8346,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 535,
           "y": 547
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8378,7 +8378,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 689,
           "y": 238
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8392,7 +8392,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 843,
           "y": 429
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8406,7 +8406,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 277,
           "y": 917
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8435,7 +8435,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 426,
           "y": 905
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8449,7 +8449,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 722,
           "y": 585
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8481,7 +8481,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 311,
           "y": 501
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8495,7 +8495,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 513,
           "y": 443
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8509,7 +8509,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 327,
           "y": 899
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8541,7 +8541,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 517,
           "y": 299
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8555,7 +8555,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 296,
           "y": 562
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8569,7 +8569,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 356,
           "y": 937
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8607,7 +8607,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 517,
           "y": 299
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8621,7 +8621,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 296,
           "y": 562
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8635,7 +8635,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 356,
           "y": 937
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -8649,7 +8649,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 862,
           "y": 267
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -8692,7 +8692,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 287,
           "y": 495
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8706,7 +8706,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 347,
           "y": 888
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8738,7 +8738,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 707,
           "y": 242
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8752,7 +8752,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 649,
           "y": 428
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8766,7 +8766,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 321,
           "y": 873
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8795,7 +8795,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 646,
           "y": 562
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8809,7 +8809,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 558,
           "y": 907
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8841,7 +8841,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 688,
           "y": 709
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8855,7 +8855,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 649,
           "y": 507
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8869,7 +8869,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 670,
           "y": 773
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       }
     ]
   },
@@ -8898,7 +8898,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 636,
           "y": 682
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8912,7 +8912,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 839,
           "y": 739
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       }
     ]
   },
@@ -8950,7 +8950,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 881,
           "y": 412
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -8964,7 +8964,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 425,
           "y": 648
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -8978,7 +8978,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 379,
           "y": 947
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -8992,7 +8992,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 838,
           "y": 285
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       },
       {
         "index": 5,
@@ -9041,7 +9041,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 654,
           "y": 601
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -9055,7 +9055,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 784,
           "y": 850
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -9069,7 +9069,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 857,
           "y": 282
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -9083,7 +9083,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 932,
           "y": 220
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -9118,7 +9118,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 377,
           "y": 448
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -9132,7 +9132,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 328,
           "y": 915
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -9146,7 +9146,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 872,
           "y": 205
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -9160,7 +9160,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 946,
           "y": 145
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   },
@@ -9195,7 +9195,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 167,
           "y": 867
         },
-        "color": "#ef4444"
+        "color": "#D06070"
       },
       {
         "index": 2,
@@ -9209,7 +9209,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 814,
           "y": 838
         },
-        "color": "#3b82f6"
+        "color": "#C05060"
       },
       {
         "index": 3,
@@ -9223,7 +9223,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 845,
           "y": 318
         },
-        "color": "#10b981"
+        "color": "#A8616F"
       },
       {
         "index": 4,
@@ -9237,7 +9237,7 @@ export const generatedKanaDrawingGuides: Record<string, DrawingData> = {
           "x": 922,
           "y": 262
         },
-        "color": "#f59e0b"
+        "color": "#E08B97"
       }
     ]
   }

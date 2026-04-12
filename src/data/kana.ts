@@ -7,9 +7,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 72, labelY: 70, arrowFrom: { x: 84, y: 82 }, arrowTo: { x: 90, y: 154 }, color: '#ef4444' },
-      { index: 2, labelX: 114, labelY: 96, arrowFrom: { x: 128, y: 100 }, arrowTo: { x: 190, y: 100 }, color: '#3b82f6' },
-      { index: 3, labelX: 222, labelY: 108, arrowFrom: { x: 238, y: 118 }, arrowTo: { x: 212, y: 158 }, color: '#10b981' }
+      { index: 1, labelX: 72, labelY: 70, arrowFrom: { x: 84, y: 82 }, arrowTo: { x: 90, y: 154 }, color: '#D06070' },
+      { index: 2, labelX: 114, labelY: 96, arrowFrom: { x: 128, y: 100 }, arrowTo: { x: 190, y: 100 }, color: '#C05060' },
+      { index: 3, labelX: 222, labelY: 108, arrowFrom: { x: 238, y: 118 }, arrowTo: { x: 212, y: 158 }, color: '#A8616F' }
     ]
   },
   'h-ki': {
@@ -17,10 +17,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 66, labelY: 70, arrowFrom: { x: 82, y: 70 }, arrowTo: { x: 180, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 86, labelY: 118, arrowFrom: { x: 102, y: 118 }, arrowTo: { x: 216, y: 118 }, color: '#3b82f6' },
-      { index: 3, labelX: 150, labelY: 94, arrowFrom: { x: 160, y: 102 }, arrowTo: { x: 162, y: 188 }, color: '#10b981' },
-      { index: 4, labelX: 208, labelY: 168, arrowFrom: { x: 224, y: 174 }, arrowTo: { x: 188, y: 208 }, color: '#f59e0b' }
+      { index: 1, labelX: 66, labelY: 70, arrowFrom: { x: 82, y: 70 }, arrowTo: { x: 180, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 86, labelY: 118, arrowFrom: { x: 102, y: 118 }, arrowTo: { x: 216, y: 118 }, color: '#C05060' },
+      { index: 3, labelX: 150, labelY: 94, arrowFrom: { x: 160, y: 102 }, arrowTo: { x: 162, y: 188 }, color: '#A8616F' },
+      { index: 4, labelX: 208, labelY: 168, arrowFrom: { x: 224, y: 174 }, arrowTo: { x: 188, y: 208 }, color: '#E08B97' }
     ]
   },
   'h-ku': {
@@ -28,7 +28,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 204, labelY: 84, arrowFrom: { x: 220, y: 92 }, arrowTo: { x: 134, y: 170 }, color: '#ef4444' }
+      { index: 1, labelX: 204, labelY: 84, arrowFrom: { x: 220, y: 92 }, arrowTo: { x: 134, y: 170 }, color: '#D06070' }
     ]
   },
   'h-ke': {
@@ -36,9 +36,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 72, labelY: 70, arrowFrom: { x: 84, y: 82 }, arrowTo: { x: 90, y: 152 }, color: '#ef4444' },
-      { index: 2, labelX: 130, labelY: 96, arrowFrom: { x: 142, y: 100 }, arrowTo: { x: 182, y: 108 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 78, arrowFrom: { x: 214, y: 90 }, arrowTo: { x: 214, y: 202 }, color: '#10b981' }
+      { index: 1, labelX: 72, labelY: 70, arrowFrom: { x: 84, y: 82 }, arrowTo: { x: 90, y: 152 }, color: '#D06070' },
+      { index: 2, labelX: 130, labelY: 96, arrowFrom: { x: 142, y: 100 }, arrowTo: { x: 182, y: 108 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 78, arrowFrom: { x: 214, y: 90 }, arrowTo: { x: 214, y: 202 }, color: '#A8616F' }
     ]
   },
   'h-ko': {
@@ -46,8 +46,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 74, labelY: 84, arrowFrom: { x: 90, y: 84 }, arrowTo: { x: 198, y: 84 }, color: '#ef4444' },
-      { index: 2, labelX: 68, labelY: 176, arrowFrom: { x: 88, y: 182 }, arrowTo: { x: 206, y: 182 }, color: '#3b82f6' }
+      { index: 1, labelX: 74, labelY: 84, arrowFrom: { x: 90, y: 84 }, arrowTo: { x: 198, y: 84 }, color: '#D06070' },
+      { index: 2, labelX: 68, labelY: 176, arrowFrom: { x: 88, y: 182 }, arrowTo: { x: 206, y: 182 }, color: '#C05060' }
     ]
   },
   'h-sa': {
@@ -55,9 +55,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 78, labelY: 74, arrowFrom: { x: 94, y: 74 }, arrowTo: { x: 168, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 118, labelY: 44, arrowFrom: { x: 128, y: 56 }, arrowTo: { x: 128, y: 138 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 110, arrowFrom: { x: 222, y: 118 }, arrowTo: { x: 196, y: 190 }, color: '#10b981' }
+      { index: 1, labelX: 78, labelY: 74, arrowFrom: { x: 94, y: 74 }, arrowTo: { x: 168, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 118, labelY: 44, arrowFrom: { x: 128, y: 56 }, arrowTo: { x: 128, y: 138 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 110, arrowFrom: { x: 222, y: 118 }, arrowTo: { x: 196, y: 190 }, color: '#A8616F' }
     ]
   },
   'h-shi': {
@@ -65,7 +65,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 198, labelY: 66, arrowFrom: { x: 214, y: 74 }, arrowTo: { x: 150, y: 212 }, color: '#ef4444' }
+      { index: 1, labelX: 198, labelY: 66, arrowFrom: { x: 214, y: 74 }, arrowTo: { x: 150, y: 212 }, color: '#D06070' }
     ]
   },
   'h-su': {
@@ -73,8 +73,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 110, labelY: 42, arrowFrom: { x: 124, y: 52 }, arrowTo: { x: 154, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 80, labelY: 108, arrowFrom: { x: 98, y: 114 }, arrowTo: { x: 196, y: 124 }, color: '#3b82f6' }
+      { index: 1, labelX: 110, labelY: 42, arrowFrom: { x: 124, y: 52 }, arrowTo: { x: 154, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 80, labelY: 108, arrowFrom: { x: 98, y: 114 }, arrowTo: { x: 196, y: 124 }, color: '#C05060' }
     ]
   },
   'h-se': {
@@ -82,9 +82,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 64, labelY: 82, arrowFrom: { x: 82, y: 82 }, arrowTo: { x: 204, y: 82 }, color: '#ef4444' },
-      { index: 2, labelX: 136, labelY: 40, arrowFrom: { x: 146, y: 52 }, arrowTo: { x: 146, y: 204 }, color: '#3b82f6' },
-      { index: 3, labelX: 78, labelY: 178, arrowFrom: { x: 94, y: 182 }, arrowTo: { x: 214, y: 182 }, color: '#10b981' }
+      { index: 1, labelX: 64, labelY: 82, arrowFrom: { x: 82, y: 82 }, arrowTo: { x: 204, y: 82 }, color: '#D06070' },
+      { index: 2, labelX: 136, labelY: 40, arrowFrom: { x: 146, y: 52 }, arrowTo: { x: 146, y: 204 }, color: '#C05060' },
+      { index: 3, labelX: 78, labelY: 178, arrowFrom: { x: 94, y: 182 }, arrowTo: { x: 214, y: 182 }, color: '#A8616F' }
     ]
   },
   'h-so': {
@@ -92,7 +92,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 202, labelY: 74, arrowFrom: { x: 218, y: 84 }, arrowTo: { x: 148, y: 202 }, color: '#ef4444' }
+      { index: 1, labelX: 202, labelY: 74, arrowFrom: { x: 218, y: 84 }, arrowTo: { x: 148, y: 202 }, color: '#D06070' }
     ]
   },
   'h-ta': {
@@ -100,10 +100,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 74, labelY: 70, arrowFrom: { x: 90, y: 70 }, arrowTo: { x: 170, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 132, labelY: 42, arrowFrom: { x: 142, y: 54 }, arrowTo: { x: 142, y: 138 }, color: '#3b82f6' },
-      { index: 3, labelX: 92, labelY: 150, arrowFrom: { x: 106, y: 154 }, arrowTo: { x: 178, y: 154 }, color: '#10b981' },
-      { index: 4, labelX: 222, labelY: 104, arrowFrom: { x: 236, y: 114 }, arrowTo: { x: 196, y: 196 }, color: '#f59e0b' }
+      { index: 1, labelX: 74, labelY: 70, arrowFrom: { x: 90, y: 70 }, arrowTo: { x: 170, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 132, labelY: 42, arrowFrom: { x: 142, y: 54 }, arrowTo: { x: 142, y: 138 }, color: '#C05060' },
+      { index: 3, labelX: 92, labelY: 150, arrowFrom: { x: 106, y: 154 }, arrowTo: { x: 178, y: 154 }, color: '#A8616F' },
+      { index: 4, labelX: 222, labelY: 104, arrowFrom: { x: 236, y: 114 }, arrowTo: { x: 196, y: 196 }, color: '#E08B97' }
     ]
   },
   'h-chi': {
@@ -111,8 +111,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 140, labelY: 40, arrowFrom: { x: 150, y: 52 }, arrowTo: { x: 150, y: 122 }, color: '#ef4444' },
-      { index: 2, labelX: 90, labelY: 126, arrowFrom: { x: 106, y: 134 }, arrowTo: { x: 208, y: 150 }, color: '#3b82f6' }
+      { index: 1, labelX: 140, labelY: 40, arrowFrom: { x: 150, y: 52 }, arrowTo: { x: 150, y: 122 }, color: '#D06070' },
+      { index: 2, labelX: 90, labelY: 126, arrowFrom: { x: 106, y: 134 }, arrowTo: { x: 208, y: 150 }, color: '#C05060' }
     ]
   },
   'h-tsu': {
@@ -120,7 +120,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 196, labelY: 86, arrowFrom: { x: 212, y: 96 }, arrowTo: { x: 122, y: 182 }, color: '#ef4444' }
+      { index: 1, labelX: 196, labelY: 86, arrowFrom: { x: 212, y: 96 }, arrowTo: { x: 122, y: 182 }, color: '#D06070' }
     ]
   },
   'h-te': {
@@ -128,7 +128,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 82, labelY: 72, arrowFrom: { x: 98, y: 74 }, arrowTo: { x: 212, y: 132 }, color: '#ef4444' }
+      { index: 1, labelX: 82, labelY: 72, arrowFrom: { x: 98, y: 74 }, arrowTo: { x: 212, y: 132 }, color: '#D06070' }
     ]
   },
   'h-to': {
@@ -136,8 +136,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 112, labelY: 42, arrowFrom: { x: 122, y: 54 }, arrowTo: { x: 122, y: 116 }, color: '#ef4444' },
-      { index: 2, labelX: 166, labelY: 104, arrowFrom: { x: 176, y: 116 }, arrowTo: { x: 154, y: 208 }, color: '#3b82f6' }
+      { index: 1, labelX: 112, labelY: 42, arrowFrom: { x: 122, y: 54 }, arrowTo: { x: 122, y: 116 }, color: '#D06070' },
+      { index: 2, labelX: 166, labelY: 104, arrowFrom: { x: 176, y: 116 }, arrowTo: { x: 154, y: 208 }, color: '#C05060' }
     ]
   },
   'h-na': {
@@ -145,10 +145,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 78, labelY: 70, arrowFrom: { x: 94, y: 70 }, arrowTo: { x: 176, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 136, labelY: 44, arrowFrom: { x: 146, y: 56 }, arrowTo: { x: 146, y: 136 }, color: '#3b82f6' },
-      { index: 3, labelX: 86, labelY: 146, arrowFrom: { x: 102, y: 150 }, arrowTo: { x: 188, y: 150 }, color: '#10b981' },
-      { index: 4, labelX: 220, labelY: 112, arrowFrom: { x: 236, y: 122 }, arrowTo: { x: 202, y: 200 }, color: '#f59e0b' }
+      { index: 1, labelX: 78, labelY: 70, arrowFrom: { x: 94, y: 70 }, arrowTo: { x: 176, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 136, labelY: 44, arrowFrom: { x: 146, y: 56 }, arrowTo: { x: 146, y: 136 }, color: '#C05060' },
+      { index: 3, labelX: 86, labelY: 146, arrowFrom: { x: 102, y: 150 }, arrowTo: { x: 188, y: 150 }, color: '#A8616F' },
+      { index: 4, labelX: 220, labelY: 112, arrowFrom: { x: 236, y: 122 }, arrowTo: { x: 202, y: 200 }, color: '#E08B97' }
     ]
   },
   'h-ni': {
@@ -156,9 +156,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 86, labelY: 84, arrowFrom: { x: 104, y: 84 }, arrowTo: { x: 220, y: 84 }, color: '#ef4444' },
-      { index: 2, labelX: 88, labelY: 146, arrowFrom: { x: 106, y: 146 }, arrowTo: { x: 222, y: 146 }, color: '#3b82f6' },
-      { index: 3, labelX: 86, labelY: 206, arrowFrom: { x: 106, y: 206 }, arrowTo: { x: 214, y: 206 }, color: '#10b981' }
+      { index: 1, labelX: 86, labelY: 84, arrowFrom: { x: 104, y: 84 }, arrowTo: { x: 220, y: 84 }, color: '#D06070' },
+      { index: 2, labelX: 88, labelY: 146, arrowFrom: { x: 106, y: 146 }, arrowTo: { x: 222, y: 146 }, color: '#C05060' },
+      { index: 3, labelX: 86, labelY: 206, arrowFrom: { x: 106, y: 206 }, arrowTo: { x: 214, y: 206 }, color: '#A8616F' }
     ]
   },
   'h-nu': {
@@ -166,8 +166,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 100, labelY: 48, arrowFrom: { x: 114, y: 60 }, arrowTo: { x: 144, y: 94 }, color: '#ef4444' },
-      { index: 2, labelX: 78, labelY: 118, arrowFrom: { x: 94, y: 124 }, arrowTo: { x: 208, y: 142 }, color: '#3b82f6' }
+      { index: 1, labelX: 100, labelY: 48, arrowFrom: { x: 114, y: 60 }, arrowTo: { x: 144, y: 94 }, color: '#D06070' },
+      { index: 2, labelX: 78, labelY: 118, arrowFrom: { x: 94, y: 124 }, arrowTo: { x: 208, y: 142 }, color: '#C05060' }
     ]
   },
   'h-ne': {
@@ -175,10 +175,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 74, labelY: 74, arrowFrom: { x: 90, y: 74 }, arrowTo: { x: 170, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 134, labelY: 44, arrowFrom: { x: 144, y: 56 }, arrowTo: { x: 144, y: 136 }, color: '#3b82f6' },
-      { index: 3, labelX: 92, labelY: 150, arrowFrom: { x: 108, y: 154 }, arrowTo: { x: 192, y: 154 }, color: '#10b981' },
-      { index: 4, labelX: 214, labelY: 110, arrowFrom: { x: 228, y: 120 }, arrowTo: { x: 202, y: 202 }, color: '#f59e0b' }
+      { index: 1, labelX: 74, labelY: 74, arrowFrom: { x: 90, y: 74 }, arrowTo: { x: 170, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 134, labelY: 44, arrowFrom: { x: 144, y: 56 }, arrowTo: { x: 144, y: 136 }, color: '#C05060' },
+      { index: 3, labelX: 92, labelY: 150, arrowFrom: { x: 108, y: 154 }, arrowTo: { x: 192, y: 154 }, color: '#A8616F' },
+      { index: 4, labelX: 214, labelY: 110, arrowFrom: { x: 228, y: 120 }, arrowTo: { x: 202, y: 202 }, color: '#E08B97' }
     ]
   },
   'h-no': {
@@ -186,7 +186,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 204, labelY: 74, arrowFrom: { x: 220, y: 84 }, arrowTo: { x: 146, y: 212 }, color: '#ef4444' }
+      { index: 1, labelX: 204, labelY: 74, arrowFrom: { x: 220, y: 84 }, arrowTo: { x: 146, y: 212 }, color: '#D06070' }
     ]
   },
   'h-ha': {
@@ -194,9 +194,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 70, arrowFrom: { x: 102, y: 82 }, arrowTo: { x: 106, y: 202 }, color: '#ef4444' },
-      { index: 2, labelX: 188, labelY: 70, arrowFrom: { x: 198, y: 82 }, arrowTo: { x: 202, y: 202 }, color: '#3b82f6' },
-      { index: 3, labelX: 72, labelY: 122, arrowFrom: { x: 88, y: 124 }, arrowTo: { x: 218, y: 124 }, color: '#10b981' }
+      { index: 1, labelX: 90, labelY: 70, arrowFrom: { x: 102, y: 82 }, arrowTo: { x: 106, y: 202 }, color: '#D06070' },
+      { index: 2, labelX: 188, labelY: 70, arrowFrom: { x: 198, y: 82 }, arrowTo: { x: 202, y: 202 }, color: '#C05060' },
+      { index: 3, labelX: 72, labelY: 122, arrowFrom: { x: 88, y: 124 }, arrowTo: { x: 218, y: 124 }, color: '#A8616F' }
     ]
   },
   'h-hi': {
@@ -204,7 +204,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 196, labelY: 72, arrowFrom: { x: 212, y: 80 }, arrowTo: { x: 138, y: 214 }, color: '#ef4444' }
+      { index: 1, labelX: 196, labelY: 72, arrowFrom: { x: 212, y: 80 }, arrowTo: { x: 138, y: 214 }, color: '#D06070' }
     ]
   },
   'h-fu': {
@@ -212,10 +212,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 116, labelY: 34, arrowFrom: { x: 128, y: 44 }, arrowTo: { x: 154, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 78, labelY: 98, arrowFrom: { x: 94, y: 104 }, arrowTo: { x: 130, y: 138 }, color: '#3b82f6' },
-      { index: 3, labelX: 204, labelY: 96, arrowFrom: { x: 220, y: 102 }, arrowTo: { x: 178, y: 142 }, color: '#10b981' },
-      { index: 4, labelX: 144, labelY: 150, arrowFrom: { x: 154, y: 162 }, arrowTo: { x: 154, y: 216 }, color: '#f59e0b' }
+      { index: 1, labelX: 116, labelY: 34, arrowFrom: { x: 128, y: 44 }, arrowTo: { x: 154, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 78, labelY: 98, arrowFrom: { x: 94, y: 104 }, arrowTo: { x: 130, y: 138 }, color: '#C05060' },
+      { index: 3, labelX: 204, labelY: 96, arrowFrom: { x: 220, y: 102 }, arrowTo: { x: 178, y: 142 }, color: '#A8616F' },
+      { index: 4, labelX: 144, labelY: 150, arrowFrom: { x: 154, y: 162 }, arrowTo: { x: 154, y: 216 }, color: '#E08B97' }
     ]
   },
   'h-he': {
@@ -223,7 +223,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 78, arrowFrom: { x: 106, y: 82 }, arrowTo: { x: 214, y: 194 }, color: '#ef4444' }
+      { index: 1, labelX: 90, labelY: 78, arrowFrom: { x: 106, y: 82 }, arrowTo: { x: 214, y: 194 }, color: '#D06070' }
     ]
   },
   'h-ho': {
@@ -231,10 +231,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 68, arrowFrom: { x: 100, y: 80 }, arrowTo: { x: 104, y: 208 }, color: '#ef4444' },
-      { index: 2, labelX: 192, labelY: 68, arrowFrom: { x: 202, y: 80 }, arrowTo: { x: 206, y: 208 }, color: '#3b82f6' },
-      { index: 3, labelX: 74, labelY: 122, arrowFrom: { x: 90, y: 124 }, arrowTo: { x: 220, y: 124 }, color: '#10b981' },
-      { index: 4, labelX: 74, labelY: 186, arrowFrom: { x: 90, y: 188 }, arrowTo: { x: 220, y: 188 }, color: '#f59e0b' }
+      { index: 1, labelX: 88, labelY: 68, arrowFrom: { x: 100, y: 80 }, arrowTo: { x: 104, y: 208 }, color: '#D06070' },
+      { index: 2, labelX: 192, labelY: 68, arrowFrom: { x: 202, y: 80 }, arrowTo: { x: 206, y: 208 }, color: '#C05060' },
+      { index: 3, labelX: 74, labelY: 122, arrowFrom: { x: 90, y: 124 }, arrowTo: { x: 220, y: 124 }, color: '#A8616F' },
+      { index: 4, labelX: 74, labelY: 186, arrowFrom: { x: 90, y: 188 }, arrowTo: { x: 220, y: 188 }, color: '#E08B97' }
     ]
   },
   'h-ma': {
@@ -242,9 +242,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 86, labelY: 72, arrowFrom: { x: 100, y: 72 }, arrowTo: { x: 184, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 142, labelY: 46, arrowFrom: { x: 152, y: 58 }, arrowTo: { x: 152, y: 144 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 108, arrowFrom: { x: 220, y: 118 }, arrowTo: { x: 188, y: 206 }, color: '#10b981' }
+      { index: 1, labelX: 86, labelY: 72, arrowFrom: { x: 100, y: 72 }, arrowTo: { x: 184, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 142, labelY: 46, arrowFrom: { x: 152, y: 58 }, arrowTo: { x: 152, y: 144 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 108, arrowFrom: { x: 220, y: 118 }, arrowTo: { x: 188, y: 206 }, color: '#A8616F' }
     ]
   },
   'h-mi': {
@@ -252,8 +252,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 104, labelY: 48, arrowFrom: { x: 118, y: 60 }, arrowTo: { x: 150, y: 92 }, color: '#ef4444' },
-      { index: 2, labelX: 80, labelY: 118, arrowFrom: { x: 96, y: 124 }, arrowTo: { x: 214, y: 146 }, color: '#3b82f6' }
+      { index: 1, labelX: 104, labelY: 48, arrowFrom: { x: 118, y: 60 }, arrowTo: { x: 150, y: 92 }, color: '#D06070' },
+      { index: 2, labelX: 80, labelY: 118, arrowFrom: { x: 96, y: 124 }, arrowTo: { x: 214, y: 146 }, color: '#C05060' }
     ]
   },
   'h-mu': {
@@ -261,9 +261,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 72, arrowFrom: { x: 104, y: 72 }, arrowTo: { x: 186, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 148, labelY: 48, arrowFrom: { x: 158, y: 60 }, arrowTo: { x: 158, y: 148 }, color: '#3b82f6' },
-      { index: 3, labelX: 214, labelY: 112, arrowFrom: { x: 228, y: 122 }, arrowTo: { x: 196, y: 212 }, color: '#10b981' }
+      { index: 1, labelX: 90, labelY: 72, arrowFrom: { x: 104, y: 72 }, arrowTo: { x: 186, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 148, labelY: 48, arrowFrom: { x: 158, y: 60 }, arrowTo: { x: 158, y: 148 }, color: '#C05060' },
+      { index: 3, labelX: 214, labelY: 112, arrowFrom: { x: 228, y: 122 }, arrowTo: { x: 196, y: 212 }, color: '#A8616F' }
     ]
   },
   'h-me': {
@@ -271,8 +271,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 94, labelY: 72, arrowFrom: { x: 110, y: 74 }, arrowTo: { x: 206, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 194, labelY: 108, arrowFrom: { x: 208, y: 120 }, arrowTo: { x: 154, y: 212 }, color: '#3b82f6' }
+      { index: 1, labelX: 94, labelY: 72, arrowFrom: { x: 110, y: 74 }, arrowTo: { x: 206, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 194, labelY: 108, arrowFrom: { x: 208, y: 120 }, arrowTo: { x: 154, y: 212 }, color: '#C05060' }
     ]
   },
   'h-mo': {
@@ -280,9 +280,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 74, arrowFrom: { x: 102, y: 74 }, arrowTo: { x: 182, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 144, labelY: 48, arrowFrom: { x: 154, y: 60 }, arrowTo: { x: 154, y: 144 }, color: '#3b82f6' },
-      { index: 3, labelX: 86, labelY: 176, arrowFrom: { x: 102, y: 178 }, arrowTo: { x: 214, y: 178 }, color: '#10b981' }
+      { index: 1, labelX: 88, labelY: 74, arrowFrom: { x: 102, y: 74 }, arrowTo: { x: 182, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 144, labelY: 48, arrowFrom: { x: 154, y: 60 }, arrowTo: { x: 154, y: 144 }, color: '#C05060' },
+      { index: 3, labelX: 86, labelY: 176, arrowFrom: { x: 102, y: 178 }, arrowTo: { x: 214, y: 178 }, color: '#A8616F' }
     ]
   },
   'h-ya': {
@@ -290,9 +290,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 102, y: 72 }, arrowTo: { x: 180, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 146, labelY: 48, arrowFrom: { x: 156, y: 60 }, arrowTo: { x: 156, y: 134 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 106, arrowFrom: { x: 220, y: 116 }, arrowTo: { x: 186, y: 206 }, color: '#10b981' }
+      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 102, y: 72 }, arrowTo: { x: 180, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 146, labelY: 48, arrowFrom: { x: 156, y: 60 }, arrowTo: { x: 156, y: 134 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 106, arrowFrom: { x: 220, y: 116 }, arrowTo: { x: 186, y: 206 }, color: '#A8616F' }
     ]
   },
   'h-yu': {
@@ -300,8 +300,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 104, labelY: 44, arrowFrom: { x: 118, y: 56 }, arrowTo: { x: 150, y: 94 }, color: '#ef4444' },
-      { index: 2, labelX: 82, labelY: 116, arrowFrom: { x: 98, y: 122 }, arrowTo: { x: 212, y: 146 }, color: '#3b82f6' }
+      { index: 1, labelX: 104, labelY: 44, arrowFrom: { x: 118, y: 56 }, arrowTo: { x: 150, y: 94 }, color: '#D06070' },
+      { index: 2, labelX: 82, labelY: 116, arrowFrom: { x: 98, y: 122 }, arrowTo: { x: 212, y: 146 }, color: '#C05060' }
     ]
   },
   'h-yo': {
@@ -309,8 +309,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 74, arrowFrom: { x: 102, y: 74 }, arrowTo: { x: 188, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 146, labelY: 48, arrowFrom: { x: 156, y: 60 }, arrowTo: { x: 156, y: 210 }, color: '#3b82f6' }
+      { index: 1, labelX: 88, labelY: 74, arrowFrom: { x: 102, y: 74 }, arrowTo: { x: 188, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 146, labelY: 48, arrowFrom: { x: 156, y: 60 }, arrowTo: { x: 156, y: 210 }, color: '#C05060' }
     ]
   },
   'h-wa': {
@@ -318,8 +318,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 98, labelY: 48, arrowFrom: { x: 112, y: 60 }, arrowTo: { x: 146, y: 96 }, color: '#ef4444' },
-      { index: 2, labelX: 82, labelY: 118, arrowFrom: { x: 98, y: 124 }, arrowTo: { x: 214, y: 146 }, color: '#3b82f6' }
+      { index: 1, labelX: 98, labelY: 48, arrowFrom: { x: 112, y: 60 }, arrowTo: { x: 146, y: 96 }, color: '#D06070' },
+      { index: 2, labelX: 82, labelY: 118, arrowFrom: { x: 98, y: 124 }, arrowTo: { x: 214, y: 146 }, color: '#C05060' }
     ]
   },
   'h-wo': {
@@ -327,9 +327,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 82, labelY: 72, arrowFrom: { x: 96, y: 72 }, arrowTo: { x: 174, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 140, labelY: 46, arrowFrom: { x: 150, y: 58 }, arrowTo: { x: 150, y: 136 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 108, arrowFrom: { x: 220, y: 118 }, arrowTo: { x: 188, y: 206 }, color: '#10b981' }
+      { index: 1, labelX: 82, labelY: 72, arrowFrom: { x: 96, y: 72 }, arrowTo: { x: 174, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 140, labelY: 46, arrowFrom: { x: 150, y: 58 }, arrowTo: { x: 150, y: 136 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 108, arrowFrom: { x: 220, y: 118 }, arrowTo: { x: 188, y: 206 }, color: '#A8616F' }
     ]
   },
   'h-ra': {
@@ -337,8 +337,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 104, labelY: 44, arrowFrom: { x: 118, y: 56 }, arrowTo: { x: 150, y: 88 }, color: '#ef4444' },
-      { index: 2, labelX: 82, labelY: 116, arrowFrom: { x: 98, y: 122 }, arrowTo: { x: 210, y: 144 }, color: '#3b82f6' }
+      { index: 1, labelX: 104, labelY: 44, arrowFrom: { x: 118, y: 56 }, arrowTo: { x: 150, y: 88 }, color: '#D06070' },
+      { index: 2, labelX: 82, labelY: 116, arrowFrom: { x: 98, y: 122 }, arrowTo: { x: 210, y: 144 }, color: '#C05060' }
     ]
   },
   'h-ri': {
@@ -346,8 +346,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 96, labelY: 72, arrowFrom: { x: 108, y: 84 }, arrowTo: { x: 114, y: 202 }, color: '#ef4444' },
-      { index: 2, labelX: 192, labelY: 72, arrowFrom: { x: 204, y: 84 }, arrowTo: { x: 210, y: 202 }, color: '#3b82f6' }
+      { index: 1, labelX: 96, labelY: 72, arrowFrom: { x: 108, y: 84 }, arrowTo: { x: 114, y: 202 }, color: '#D06070' },
+      { index: 2, labelX: 192, labelY: 72, arrowFrom: { x: 204, y: 84 }, arrowTo: { x: 210, y: 202 }, color: '#C05060' }
     ]
   },
   'h-ru': {
@@ -355,7 +355,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 198, labelY: 76, arrowFrom: { x: 214, y: 86 }, arrowTo: { x: 146, y: 214 }, color: '#ef4444' }
+      { index: 1, labelX: 198, labelY: 76, arrowFrom: { x: 214, y: 86 }, arrowTo: { x: 146, y: 214 }, color: '#D06070' }
     ]
   },
   'h-re': {
@@ -363,7 +363,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 78, arrowFrom: { x: 104, y: 80 }, arrowTo: { x: 214, y: 194 }, color: '#ef4444' }
+      { index: 1, labelX: 88, labelY: 78, arrowFrom: { x: 104, y: 80 }, arrowTo: { x: 214, y: 194 }, color: '#D06070' }
     ]
   },
   'h-ro': {
@@ -371,9 +371,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 86, labelY: 74, arrowFrom: { x: 100, y: 74 }, arrowTo: { x: 184, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 144, labelY: 48, arrowFrom: { x: 154, y: 60 }, arrowTo: { x: 154, y: 142 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 110, arrowFrom: { x: 220, y: 120 }, arrowTo: { x: 188, y: 206 }, color: '#10b981' }
+      { index: 1, labelX: 86, labelY: 74, arrowFrom: { x: 100, y: 74 }, arrowTo: { x: 184, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 144, labelY: 48, arrowFrom: { x: 154, y: 60 }, arrowTo: { x: 154, y: 142 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 110, arrowFrom: { x: 220, y: 120 }, arrowTo: { x: 188, y: 206 }, color: '#A8616F' }
     ]
   },
   'k-a': {
@@ -381,8 +381,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 60, labelY: 58, arrowFrom: { x: 78, y: 52 }, arrowTo: { x: 154, y: 52 }, color: '#ef4444' },
-      { index: 2, labelX: 132, labelY: 104, arrowFrom: { x: 142, y: 116 }, arrowTo: { x: 142, y: 184 }, color: '#3b82f6' }
+      { index: 1, labelX: 60, labelY: 58, arrowFrom: { x: 78, y: 52 }, arrowTo: { x: 154, y: 52 }, color: '#D06070' },
+      { index: 2, labelX: 132, labelY: 104, arrowFrom: { x: 142, y: 116 }, arrowTo: { x: 142, y: 184 }, color: '#C05060' }
     ]
   },
   'k-i': {
@@ -390,8 +390,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 178, labelY: 36, arrowFrom: { x: 190, y: 46 }, arrowTo: { x: 152, y: 118 }, color: '#ef4444' },
-      { index: 2, labelX: 214, labelY: 104, arrowFrom: { x: 224, y: 118 }, arrowTo: { x: 224, y: 196 }, color: '#3b82f6' }
+      { index: 1, labelX: 178, labelY: 36, arrowFrom: { x: 190, y: 46 }, arrowTo: { x: 152, y: 118 }, color: '#D06070' },
+      { index: 2, labelX: 214, labelY: 104, arrowFrom: { x: 224, y: 118 }, arrowTo: { x: 224, y: 196 }, color: '#C05060' }
     ]
   },
   'k-u': {
@@ -399,9 +399,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 138, labelY: 24, arrowFrom: { x: 150, y: 34 }, arrowTo: { x: 150, y: 60 }, color: '#ef4444' },
-      { index: 2, labelX: 70, labelY: 92, arrowFrom: { x: 88, y: 96 }, arrowTo: { x: 154, y: 96 }, color: '#3b82f6' },
-      { index: 3, labelX: 194, labelY: 122, arrowFrom: { x: 204, y: 136 }, arrowTo: { x: 204, y: 208 }, color: '#10b981' }
+      { index: 1, labelX: 138, labelY: 24, arrowFrom: { x: 150, y: 34 }, arrowTo: { x: 150, y: 60 }, color: '#D06070' },
+      { index: 2, labelX: 70, labelY: 92, arrowFrom: { x: 88, y: 96 }, arrowTo: { x: 154, y: 96 }, color: '#C05060' },
+      { index: 3, labelX: 194, labelY: 122, arrowFrom: { x: 204, y: 136 }, arrowTo: { x: 204, y: 208 }, color: '#A8616F' }
     ]
   },
   'k-e': {
@@ -409,9 +409,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 60, labelY: 56, arrowFrom: { x: 78, y: 50 }, arrowTo: { x: 156, y: 50 }, color: '#ef4444' },
-      { index: 2, labelX: 122, labelY: 84, arrowFrom: { x: 132, y: 96 }, arrowTo: { x: 132, y: 176 }, color: '#3b82f6' },
-      { index: 3, labelX: 60, labelY: 222, arrowFrom: { x: 80, y: 214 }, arrowTo: { x: 162, y: 214 }, color: '#10b981' }
+      { index: 1, labelX: 60, labelY: 56, arrowFrom: { x: 78, y: 50 }, arrowTo: { x: 156, y: 50 }, color: '#D06070' },
+      { index: 2, labelX: 122, labelY: 84, arrowFrom: { x: 132, y: 96 }, arrowTo: { x: 132, y: 176 }, color: '#C05060' },
+      { index: 3, labelX: 60, labelY: 222, arrowFrom: { x: 80, y: 214 }, arrowTo: { x: 162, y: 214 }, color: '#A8616F' }
     ]
   },
   'k-o': {
@@ -419,9 +419,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 48, labelY: 46, arrowFrom: { x: 64, y: 46 }, arrowTo: { x: 132, y: 46 }, color: '#ef4444' },
-      { index: 2, labelX: 106, labelY: 76, arrowFrom: { x: 118, y: 88 }, arrowTo: { x: 118, y: 158 }, color: '#3b82f6' },
-      { index: 3, labelX: 64, labelY: 112, arrowFrom: { x: 80, y: 124 }, arrowTo: { x: 60, y: 170 }, color: '#10b981' }
+      { index: 1, labelX: 48, labelY: 46, arrowFrom: { x: 64, y: 46 }, arrowTo: { x: 132, y: 46 }, color: '#D06070' },
+      { index: 2, labelX: 106, labelY: 76, arrowFrom: { x: 118, y: 88 }, arrowTo: { x: 118, y: 158 }, color: '#C05060' },
+      { index: 3, labelX: 64, labelY: 112, arrowFrom: { x: 80, y: 124 }, arrowTo: { x: 60, y: 170 }, color: '#A8616F' }
     ]
   },
   'k-ka': {
@@ -429,8 +429,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 70, labelY: 74, arrowFrom: { x: 86, y: 70 }, arrowTo: { x: 156, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 164, labelY: 90, arrowFrom: { x: 174, y: 102 }, arrowTo: { x: 162, y: 208 }, color: '#3b82f6' }
+      { index: 1, labelX: 70, labelY: 74, arrowFrom: { x: 86, y: 70 }, arrowTo: { x: 156, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 164, labelY: 90, arrowFrom: { x: 174, y: 102 }, arrowTo: { x: 162, y: 208 }, color: '#C05060' }
     ]
   },
   'k-ki': {
@@ -438,9 +438,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 72, labelY: 74, arrowFrom: { x: 88, y: 74 }, arrowTo: { x: 188, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 96, labelY: 122, arrowFrom: { x: 112, y: 124 }, arrowTo: { x: 226, y: 128 }, color: '#3b82f6' },
-      { index: 3, labelX: 212, labelY: 84, arrowFrom: { x: 222, y: 96 }, arrowTo: { x: 146, y: 214 }, color: '#10b981' }
+      { index: 1, labelX: 72, labelY: 74, arrowFrom: { x: 88, y: 74 }, arrowTo: { x: 188, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 96, labelY: 122, arrowFrom: { x: 112, y: 124 }, arrowTo: { x: 226, y: 128 }, color: '#C05060' },
+      { index: 3, labelX: 212, labelY: 84, arrowFrom: { x: 222, y: 96 }, arrowTo: { x: 146, y: 214 }, color: '#A8616F' }
     ]
   },
   'k-ku': {
@@ -448,7 +448,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 198, labelY: 82, arrowFrom: { x: 214, y: 92 }, arrowTo: { x: 130, y: 174 }, color: '#ef4444' }
+      { index: 1, labelX: 198, labelY: 82, arrowFrom: { x: 214, y: 92 }, arrowTo: { x: 130, y: 174 }, color: '#D06070' }
     ]
   },
   'k-ke': {
@@ -456,9 +456,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 92, labelY: 70, arrowFrom: { x: 104, y: 80 }, arrowTo: { x: 146, y: 80 }, color: '#ef4444' },
-      { index: 2, labelX: 150, labelY: 88, arrowFrom: { x: 160, y: 100 }, arrowTo: { x: 154, y: 206 }, color: '#3b82f6' },
-      { index: 3, labelX: 78, labelY: 192, arrowFrom: { x: 94, y: 194 }, arrowTo: { x: 214, y: 194 }, color: '#10b981' }
+      { index: 1, labelX: 92, labelY: 70, arrowFrom: { x: 104, y: 80 }, arrowTo: { x: 146, y: 80 }, color: '#D06070' },
+      { index: 2, labelX: 150, labelY: 88, arrowFrom: { x: 160, y: 100 }, arrowTo: { x: 154, y: 206 }, color: '#C05060' },
+      { index: 3, labelX: 78, labelY: 192, arrowFrom: { x: 94, y: 194 }, arrowTo: { x: 214, y: 194 }, color: '#A8616F' }
     ]
   },
   'k-ko': {
@@ -466,8 +466,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 74, labelY: 84, arrowFrom: { x: 90, y: 84 }, arrowTo: { x: 210, y: 84 }, color: '#ef4444' },
-      { index: 2, labelX: 74, labelY: 186, arrowFrom: { x: 90, y: 186 }, arrowTo: { x: 214, y: 186 }, color: '#3b82f6' }
+      { index: 1, labelX: 74, labelY: 84, arrowFrom: { x: 90, y: 84 }, arrowTo: { x: 210, y: 84 }, color: '#D06070' },
+      { index: 2, labelX: 74, labelY: 186, arrowFrom: { x: 90, y: 186 }, arrowTo: { x: 214, y: 186 }, color: '#C05060' }
     ]
   },
   'k-sa': {
@@ -475,9 +475,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 76, labelY: 74, arrowFrom: { x: 92, y: 74 }, arrowTo: { x: 170, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 132, labelY: 56, arrowFrom: { x: 142, y: 68 }, arrowTo: { x: 142, y: 142 }, color: '#3b82f6' },
-      { index: 3, labelX: 206, labelY: 114, arrowFrom: { x: 216, y: 124 }, arrowTo: { x: 188, y: 204 }, color: '#10b981' }
+      { index: 1, labelX: 76, labelY: 74, arrowFrom: { x: 92, y: 74 }, arrowTo: { x: 170, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 132, labelY: 56, arrowFrom: { x: 142, y: 68 }, arrowTo: { x: 142, y: 142 }, color: '#C05060' },
+      { index: 3, labelX: 206, labelY: 114, arrowFrom: { x: 216, y: 124 }, arrowTo: { x: 188, y: 204 }, color: '#A8616F' }
     ]
   },
   'k-shi': {
@@ -485,9 +485,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 54, arrowFrom: { x: 96, y: 66 }, arrowTo: { x: 120, y: 112 }, color: '#ef4444' },
-      { index: 2, labelX: 144, labelY: 82, arrowFrom: { x: 152, y: 94 }, arrowTo: { x: 176, y: 142 }, color: '#3b82f6' },
-      { index: 3, labelX: 210, labelY: 64, arrowFrom: { x: 220, y: 76 }, arrowTo: { x: 154, y: 214 }, color: '#10b981' }
+      { index: 1, labelX: 88, labelY: 54, arrowFrom: { x: 96, y: 66 }, arrowTo: { x: 120, y: 112 }, color: '#D06070' },
+      { index: 2, labelX: 144, labelY: 82, arrowFrom: { x: 152, y: 94 }, arrowTo: { x: 176, y: 142 }, color: '#C05060' },
+      { index: 3, labelX: 210, labelY: 64, arrowFrom: { x: 220, y: 76 }, arrowTo: { x: 154, y: 214 }, color: '#A8616F' }
     ]
   },
   'k-su': {
@@ -495,8 +495,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 128, labelY: 40, arrowFrom: { x: 140, y: 52 }, arrowTo: { x: 166, y: 94 }, color: '#ef4444' },
-      { index: 2, labelX: 206, labelY: 106, arrowFrom: { x: 218, y: 116 }, arrowTo: { x: 150, y: 208 }, color: '#3b82f6' }
+      { index: 1, labelX: 128, labelY: 40, arrowFrom: { x: 140, y: 52 }, arrowTo: { x: 166, y: 94 }, color: '#D06070' },
+      { index: 2, labelX: 206, labelY: 106, arrowFrom: { x: 218, y: 116 }, arrowTo: { x: 150, y: 208 }, color: '#C05060' }
     ]
   },
   'k-se': {
@@ -504,8 +504,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 98, labelY: 72, arrowFrom: { x: 112, y: 84 }, arrowTo: { x: 112, y: 202 }, color: '#ef4444' },
-      { index: 2, labelX: 62, labelY: 134, arrowFrom: { x: 80, y: 136 }, arrowTo: { x: 220, y: 136 }, color: '#3b82f6' }
+      { index: 1, labelX: 98, labelY: 72, arrowFrom: { x: 112, y: 84 }, arrowTo: { x: 112, y: 202 }, color: '#D06070' },
+      { index: 2, labelX: 62, labelY: 134, arrowFrom: { x: 80, y: 136 }, arrowTo: { x: 220, y: 136 }, color: '#C05060' }
     ]
   },
   'k-so': {
@@ -513,8 +513,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 94, labelY: 56, arrowFrom: { x: 102, y: 68 }, arrowTo: { x: 124, y: 110 }, color: '#ef4444' },
-      { index: 2, labelX: 210, labelY: 70, arrowFrom: { x: 220, y: 82 }, arrowTo: { x: 156, y: 208 }, color: '#3b82f6' }
+      { index: 1, labelX: 94, labelY: 56, arrowFrom: { x: 102, y: 68 }, arrowTo: { x: 124, y: 110 }, color: '#D06070' },
+      { index: 2, labelX: 210, labelY: 70, arrowFrom: { x: 220, y: 82 }, arrowTo: { x: 156, y: 208 }, color: '#C05060' }
     ]
   },
   'k-ta': {
@@ -522,9 +522,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 78, labelY: 68, arrowFrom: { x: 94, y: 68 }, arrowTo: { x: 188, y: 68 }, color: '#ef4444' },
-      { index: 2, labelX: 208, labelY: 78, arrowFrom: { x: 218, y: 90 }, arrowTo: { x: 180, y: 140 }, color: '#3b82f6' },
-      { index: 3, labelX: 92, labelY: 184, arrowFrom: { x: 106, y: 186 }, arrowTo: { x: 206, y: 186 }, color: '#10b981' }
+      { index: 1, labelX: 78, labelY: 68, arrowFrom: { x: 94, y: 68 }, arrowTo: { x: 188, y: 68 }, color: '#D06070' },
+      { index: 2, labelX: 208, labelY: 78, arrowFrom: { x: 218, y: 90 }, arrowTo: { x: 180, y: 140 }, color: '#C05060' },
+      { index: 3, labelX: 92, labelY: 184, arrowFrom: { x: 106, y: 186 }, arrowTo: { x: 206, y: 186 }, color: '#A8616F' }
     ]
   },
   'k-chi': {
@@ -532,9 +532,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 78, labelY: 58, arrowFrom: { x: 92, y: 58 }, arrowTo: { x: 176, y: 58 }, color: '#ef4444' },
-      { index: 2, labelX: 138, labelY: 90, arrowFrom: { x: 148, y: 102 }, arrowTo: { x: 148, y: 150 }, color: '#3b82f6' },
-      { index: 3, labelX: 82, labelY: 176, arrowFrom: { x: 98, y: 180 }, arrowTo: { x: 214, y: 180 }, color: '#10b981' }
+      { index: 1, labelX: 78, labelY: 58, arrowFrom: { x: 92, y: 58 }, arrowTo: { x: 176, y: 58 }, color: '#D06070' },
+      { index: 2, labelX: 138, labelY: 90, arrowFrom: { x: 148, y: 102 }, arrowTo: { x: 148, y: 150 }, color: '#C05060' },
+      { index: 3, labelX: 82, labelY: 176, arrowFrom: { x: 98, y: 180 }, arrowTo: { x: 214, y: 180 }, color: '#A8616F' }
     ]
   },
   'k-tsu': {
@@ -542,9 +542,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 94, labelY: 54, arrowFrom: { x: 102, y: 66 }, arrowTo: { x: 124, y: 112 }, color: '#ef4444' },
-      { index: 2, labelX: 150, labelY: 86, arrowFrom: { x: 158, y: 98 }, arrowTo: { x: 182, y: 146 }, color: '#3b82f6' },
-      { index: 3, labelX: 208, labelY: 60, arrowFrom: { x: 218, y: 72 }, arrowTo: { x: 152, y: 212 }, color: '#10b981' }
+      { index: 1, labelX: 94, labelY: 54, arrowFrom: { x: 102, y: 66 }, arrowTo: { x: 124, y: 112 }, color: '#D06070' },
+      { index: 2, labelX: 150, labelY: 86, arrowFrom: { x: 158, y: 98 }, arrowTo: { x: 182, y: 146 }, color: '#C05060' },
+      { index: 3, labelX: 208, labelY: 60, arrowFrom: { x: 218, y: 72 }, arrowTo: { x: 152, y: 212 }, color: '#A8616F' }
     ]
   },
   'k-te': {
@@ -552,9 +552,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 76, labelY: 66, arrowFrom: { x: 92, y: 66 }, arrowTo: { x: 188, y: 66 }, color: '#ef4444' },
-      { index: 2, labelX: 146, labelY: 94, arrowFrom: { x: 156, y: 106 }, arrowTo: { x: 156, y: 150 }, color: '#3b82f6' },
-      { index: 3, labelX: 74, labelY: 188, arrowFrom: { x: 92, y: 188 }, arrowTo: { x: 216, y: 188 }, color: '#10b981' }
+      { index: 1, labelX: 76, labelY: 66, arrowFrom: { x: 92, y: 66 }, arrowTo: { x: 188, y: 66 }, color: '#D06070' },
+      { index: 2, labelX: 146, labelY: 94, arrowFrom: { x: 156, y: 106 }, arrowTo: { x: 156, y: 150 }, color: '#C05060' },
+      { index: 3, labelX: 74, labelY: 188, arrowFrom: { x: 92, y: 188 }, arrowTo: { x: 216, y: 188 }, color: '#A8616F' }
     ]
   },
   'k-to': {
@@ -562,8 +562,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 138, labelY: 44, arrowFrom: { x: 148, y: 56 }, arrowTo: { x: 148, y: 120 }, color: '#ef4444' },
-      { index: 2, labelX: 166, labelY: 100, arrowFrom: { x: 176, y: 112 }, arrowTo: { x: 156, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 138, labelY: 44, arrowFrom: { x: 148, y: 56 }, arrowTo: { x: 148, y: 120 }, color: '#D06070' },
+      { index: 2, labelX: 166, labelY: 100, arrowFrom: { x: 176, y: 112 }, arrowTo: { x: 156, y: 214 }, color: '#C05060' }
     ]
   },
   'k-na': {
@@ -571,8 +571,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 80, arrowFrom: { x: 108, y: 80 }, arrowTo: { x: 214, y: 80 }, color: '#ef4444' },
-      { index: 2, labelX: 150, labelY: 44, arrowFrom: { x: 160, y: 56 }, arrowTo: { x: 160, y: 206 }, color: '#3b82f6' }
+      { index: 1, labelX: 90, labelY: 80, arrowFrom: { x: 108, y: 80 }, arrowTo: { x: 214, y: 80 }, color: '#D06070' },
+      { index: 2, labelX: 150, labelY: 44, arrowFrom: { x: 160, y: 56 }, arrowTo: { x: 160, y: 206 }, color: '#C05060' }
     ]
   },
   'k-ni': {
@@ -580,8 +580,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 82, labelY: 90, arrowFrom: { x: 100, y: 90 }, arrowTo: { x: 216, y: 90 }, color: '#ef4444' },
-      { index: 2, labelX: 82, labelY: 186, arrowFrom: { x: 100, y: 186 }, arrowTo: { x: 218, y: 186 }, color: '#3b82f6' }
+      { index: 1, labelX: 82, labelY: 90, arrowFrom: { x: 100, y: 90 }, arrowTo: { x: 216, y: 90 }, color: '#D06070' },
+      { index: 2, labelX: 82, labelY: 186, arrowFrom: { x: 100, y: 186 }, arrowTo: { x: 218, y: 186 }, color: '#C05060' }
     ]
   },
   'k-nu': {
@@ -589,7 +589,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 208, labelY: 70, arrowFrom: { x: 224, y: 82 }, arrowTo: { x: 146, y: 212 }, color: '#ef4444' }
+      { index: 1, labelX: 208, labelY: 70, arrowFrom: { x: 224, y: 82 }, arrowTo: { x: 146, y: 212 }, color: '#D06070' }
     ]
   },
   'k-ne': {
@@ -597,10 +597,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 78, labelY: 70, arrowFrom: { x: 94, y: 70 }, arrowTo: { x: 174, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 136, labelY: 46, arrowFrom: { x: 146, y: 58 }, arrowTo: { x: 146, y: 140 }, color: '#3b82f6' },
-      { index: 3, labelX: 92, labelY: 150, arrowFrom: { x: 108, y: 154 }, arrowTo: { x: 194, y: 154 }, color: '#10b981' },
-      { index: 4, labelX: 218, labelY: 114, arrowFrom: { x: 232, y: 124 }, arrowTo: { x: 202, y: 206 }, color: '#f59e0b' }
+      { index: 1, labelX: 78, labelY: 70, arrowFrom: { x: 94, y: 70 }, arrowTo: { x: 174, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 136, labelY: 46, arrowFrom: { x: 146, y: 58 }, arrowTo: { x: 146, y: 140 }, color: '#C05060' },
+      { index: 3, labelX: 92, labelY: 150, arrowFrom: { x: 108, y: 154 }, arrowTo: { x: 194, y: 154 }, color: '#A8616F' },
+      { index: 4, labelX: 218, labelY: 114, arrowFrom: { x: 232, y: 124 }, arrowTo: { x: 202, y: 206 }, color: '#E08B97' }
     ]
   },
   'k-no': {
@@ -608,7 +608,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 202, labelY: 70, arrowFrom: { x: 218, y: 82 }, arrowTo: { x: 142, y: 214 }, color: '#ef4444' }
+      { index: 1, labelX: 202, labelY: 70, arrowFrom: { x: 218, y: 82 }, arrowTo: { x: 142, y: 214 }, color: '#D06070' }
     ]
   },
   'k-ha': {
@@ -616,8 +616,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 92, labelY: 74, arrowFrom: { x: 102, y: 86 }, arrowTo: { x: 130, y: 210 }, color: '#ef4444' },
-      { index: 2, labelX: 194, labelY: 74, arrowFrom: { x: 204, y: 86 }, arrowTo: { x: 174, y: 210 }, color: '#3b82f6' }
+      { index: 1, labelX: 92, labelY: 74, arrowFrom: { x: 102, y: 86 }, arrowTo: { x: 130, y: 210 }, color: '#D06070' },
+      { index: 2, labelX: 194, labelY: 74, arrowFrom: { x: 204, y: 86 }, arrowTo: { x: 174, y: 210 }, color: '#C05060' }
     ]
   },
   'k-hi': {
@@ -625,8 +625,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 100, y: 72 }, arrowTo: { x: 208, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 204, labelY: 102, arrowFrom: { x: 214, y: 114 }, arrowTo: { x: 154, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 100, y: 72 }, arrowTo: { x: 208, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 204, labelY: 102, arrowFrom: { x: 214, y: 114 }, arrowTo: { x: 154, y: 214 }, color: '#C05060' }
     ]
   },
   'k-fu': {
@@ -634,7 +634,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 206, labelY: 74, arrowFrom: { x: 220, y: 86 }, arrowTo: { x: 146, y: 214 }, color: '#ef4444' }
+      { index: 1, labelX: 206, labelY: 74, arrowFrom: { x: 220, y: 86 }, arrowTo: { x: 146, y: 214 }, color: '#D06070' }
     ]
   },
   'k-he': {
@@ -642,7 +642,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 94, labelY: 78, arrowFrom: { x: 110, y: 82 }, arrowTo: { x: 214, y: 194 }, color: '#ef4444' }
+      { index: 1, labelX: 94, labelY: 78, arrowFrom: { x: 110, y: 82 }, arrowTo: { x: 214, y: 194 }, color: '#D06070' }
     ]
   },
   'k-ho': {
@@ -650,10 +650,10 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 4,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 68, arrowFrom: { x: 100, y: 80 }, arrowTo: { x: 104, y: 210 }, color: '#ef4444' },
-      { index: 2, labelX: 194, labelY: 68, arrowFrom: { x: 206, y: 80 }, arrowTo: { x: 208, y: 210 }, color: '#3b82f6' },
-      { index: 3, labelX: 74, labelY: 124, arrowFrom: { x: 90, y: 126 }, arrowTo: { x: 220, y: 126 }, color: '#10b981' },
-      { index: 4, labelX: 74, labelY: 190, arrowFrom: { x: 90, y: 192 }, arrowTo: { x: 220, y: 192 }, color: '#f59e0b' }
+      { index: 1, labelX: 88, labelY: 68, arrowFrom: { x: 100, y: 80 }, arrowTo: { x: 104, y: 210 }, color: '#D06070' },
+      { index: 2, labelX: 194, labelY: 68, arrowFrom: { x: 206, y: 80 }, arrowTo: { x: 208, y: 210 }, color: '#C05060' },
+      { index: 3, labelX: 74, labelY: 124, arrowFrom: { x: 90, y: 126 }, arrowTo: { x: 220, y: 126 }, color: '#A8616F' },
+      { index: 4, labelX: 74, labelY: 190, arrowFrom: { x: 90, y: 192 }, arrowTo: { x: 220, y: 192 }, color: '#E08B97' }
     ]
   },
   'k-ma': {
@@ -661,8 +661,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 86, labelY: 74, arrowFrom: { x: 100, y: 74 }, arrowTo: { x: 212, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 146, labelY: 44, arrowFrom: { x: 156, y: 56 }, arrowTo: { x: 156, y: 210 }, color: '#3b82f6' }
+      { index: 1, labelX: 86, labelY: 74, arrowFrom: { x: 100, y: 74 }, arrowTo: { x: 212, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 146, labelY: 44, arrowFrom: { x: 156, y: 56 }, arrowTo: { x: 156, y: 210 }, color: '#C05060' }
     ]
   },
   'k-mi': {
@@ -670,9 +670,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 82, labelY: 70, arrowFrom: { x: 96, y: 70 }, arrowTo: { x: 190, y: 70 }, color: '#ef4444' },
-      { index: 2, labelX: 82, labelY: 134, arrowFrom: { x: 98, y: 134 }, arrowTo: { x: 192, y: 134 }, color: '#3b82f6' },
-      { index: 3, labelX: 82, labelY: 196, arrowFrom: { x: 98, y: 196 }, arrowTo: { x: 192, y: 196 }, color: '#10b981' }
+      { index: 1, labelX: 82, labelY: 70, arrowFrom: { x: 96, y: 70 }, arrowTo: { x: 190, y: 70 }, color: '#D06070' },
+      { index: 2, labelX: 82, labelY: 134, arrowFrom: { x: 98, y: 134 }, arrowTo: { x: 192, y: 134 }, color: '#C05060' },
+      { index: 3, labelX: 82, labelY: 196, arrowFrom: { x: 98, y: 196 }, arrowTo: { x: 192, y: 196 }, color: '#A8616F' }
     ]
   },
   'k-mu': {
@@ -680,8 +680,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 78, arrowFrom: { x: 104, y: 78 }, arrowTo: { x: 216, y: 78 }, color: '#ef4444' },
-      { index: 2, labelX: 204, labelY: 112, arrowFrom: { x: 216, y: 124 }, arrowTo: { x: 146, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 90, labelY: 78, arrowFrom: { x: 104, y: 78 }, arrowTo: { x: 216, y: 78 }, color: '#D06070' },
+      { index: 2, labelX: 204, labelY: 112, arrowFrom: { x: 216, y: 124 }, arrowTo: { x: 146, y: 214 }, color: '#C05060' }
     ]
   },
   'k-me': {
@@ -689,8 +689,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 102, y: 72 }, arrowTo: { x: 190, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 202, labelY: 104, arrowFrom: { x: 214, y: 116 }, arrowTo: { x: 154, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 102, y: 72 }, arrowTo: { x: 190, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 202, labelY: 104, arrowFrom: { x: 214, y: 116 }, arrowTo: { x: 154, y: 214 }, color: '#C05060' }
     ]
   },
   'k-mo': {
@@ -698,9 +698,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 82, labelY: 72, arrowFrom: { x: 96, y: 72 }, arrowTo: { x: 188, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 82, labelY: 134, arrowFrom: { x: 98, y: 134 }, arrowTo: { x: 190, y: 134 }, color: '#3b82f6' },
-      { index: 3, labelX: 82, labelY: 196, arrowFrom: { x: 98, y: 196 }, arrowTo: { x: 190, y: 196 }, color: '#10b981' }
+      { index: 1, labelX: 82, labelY: 72, arrowFrom: { x: 96, y: 72 }, arrowTo: { x: 188, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 82, labelY: 134, arrowFrom: { x: 98, y: 134 }, arrowTo: { x: 190, y: 134 }, color: '#C05060' },
+      { index: 3, labelX: 82, labelY: 196, arrowFrom: { x: 98, y: 196 }, arrowTo: { x: 190, y: 196 }, color: '#A8616F' }
     ]
   },
   'k-ya': {
@@ -708,8 +708,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 74, arrowFrom: { x: 104, y: 74 }, arrowTo: { x: 198, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 200, labelY: 104, arrowFrom: { x: 212, y: 116 }, arrowTo: { x: 154, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 90, labelY: 74, arrowFrom: { x: 104, y: 74 }, arrowTo: { x: 198, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 200, labelY: 104, arrowFrom: { x: 212, y: 116 }, arrowTo: { x: 154, y: 214 }, color: '#C05060' }
     ]
   },
   'k-yu': {
@@ -717,8 +717,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 102, y: 72 }, arrowTo: { x: 196, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 144, labelY: 46, arrowFrom: { x: 154, y: 58 }, arrowTo: { x: 154, y: 210 }, color: '#3b82f6' }
+      { index: 1, labelX: 88, labelY: 72, arrowFrom: { x: 102, y: 72 }, arrowTo: { x: 196, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 144, labelY: 46, arrowFrom: { x: 154, y: 58 }, arrowTo: { x: 154, y: 210 }, color: '#C05060' }
     ]
   },
   'k-yo': {
@@ -726,9 +726,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 84, labelY: 72, arrowFrom: { x: 98, y: 72 }, arrowTo: { x: 186, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 84, labelY: 134, arrowFrom: { x: 98, y: 134 }, arrowTo: { x: 186, y: 134 }, color: '#3b82f6' },
-      { index: 3, labelX: 84, labelY: 196, arrowFrom: { x: 98, y: 196 }, arrowTo: { x: 186, y: 196 }, color: '#10b981' }
+      { index: 1, labelX: 84, labelY: 72, arrowFrom: { x: 98, y: 72 }, arrowTo: { x: 186, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 84, labelY: 134, arrowFrom: { x: 98, y: 134 }, arrowTo: { x: 186, y: 134 }, color: '#C05060' },
+      { index: 3, labelX: 84, labelY: 196, arrowFrom: { x: 98, y: 196 }, arrowTo: { x: 186, y: 196 }, color: '#A8616F' }
     ]
   },
   'k-wa': {
@@ -736,8 +736,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 84, labelY: 72, arrowFrom: { x: 98, y: 72 }, arrowTo: { x: 188, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 198, labelY: 102, arrowFrom: { x: 210, y: 114 }, arrowTo: { x: 154, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 84, labelY: 72, arrowFrom: { x: 98, y: 72 }, arrowTo: { x: 188, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 198, labelY: 102, arrowFrom: { x: 210, y: 114 }, arrowTo: { x: 154, y: 214 }, color: '#C05060' }
     ]
   },
   'k-wo': {
@@ -745,9 +745,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 84, labelY: 72, arrowFrom: { x: 98, y: 72 }, arrowTo: { x: 182, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 142, labelY: 48, arrowFrom: { x: 152, y: 60 }, arrowTo: { x: 152, y: 138 }, color: '#3b82f6' },
-      { index: 3, labelX: 204, labelY: 110, arrowFrom: { x: 218, y: 120 }, arrowTo: { x: 188, y: 208 }, color: '#10b981' }
+      { index: 1, labelX: 84, labelY: 72, arrowFrom: { x: 98, y: 72 }, arrowTo: { x: 182, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 142, labelY: 48, arrowFrom: { x: 152, y: 60 }, arrowTo: { x: 152, y: 138 }, color: '#C05060' },
+      { index: 3, labelX: 204, labelY: 110, arrowFrom: { x: 218, y: 120 }, arrowTo: { x: 188, y: 208 }, color: '#A8616F' }
     ]
   },
   'k-ra': {
@@ -755,8 +755,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 96, labelY: 72, arrowFrom: { x: 110, y: 72 }, arrowTo: { x: 198, y: 72 }, color: '#ef4444' },
-      { index: 2, labelX: 202, labelY: 102, arrowFrom: { x: 214, y: 114 }, arrowTo: { x: 154, y: 214 }, color: '#3b82f6' }
+      { index: 1, labelX: 96, labelY: 72, arrowFrom: { x: 110, y: 72 }, arrowTo: { x: 198, y: 72 }, color: '#D06070' },
+      { index: 2, labelX: 202, labelY: 102, arrowFrom: { x: 214, y: 114 }, arrowTo: { x: 154, y: 214 }, color: '#C05060' }
     ]
   },
   'k-ri': {
@@ -764,8 +764,8 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 2,
     strokeGuides: [
-      { index: 1, labelX: 98, labelY: 80, arrowFrom: { x: 110, y: 92 }, arrowTo: { x: 116, y: 204 }, color: '#ef4444' },
-      { index: 2, labelX: 194, labelY: 80, arrowFrom: { x: 206, y: 92 }, arrowTo: { x: 212, y: 204 }, color: '#3b82f6' }
+      { index: 1, labelX: 98, labelY: 80, arrowFrom: { x: 110, y: 92 }, arrowTo: { x: 116, y: 204 }, color: '#D06070' },
+      { index: 2, labelX: 194, labelY: 80, arrowFrom: { x: 206, y: 92 }, arrowTo: { x: 212, y: 204 }, color: '#C05060' }
     ]
   },
   'k-ru': {
@@ -773,7 +773,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 196, labelY: 74, arrowFrom: { x: 210, y: 86 }, arrowTo: { x: 144, y: 214 }, color: '#ef4444' }
+      { index: 1, labelX: 196, labelY: 74, arrowFrom: { x: 210, y: 86 }, arrowTo: { x: 144, y: 214 }, color: '#D06070' }
     ]
   },
   'k-re': {
@@ -781,7 +781,7 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 1,
     strokeGuides: [
-      { index: 1, labelX: 90, labelY: 78, arrowFrom: { x: 106, y: 82 }, arrowTo: { x: 214, y: 194 }, color: '#ef4444' }
+      { index: 1, labelX: 90, labelY: 78, arrowFrom: { x: 106, y: 82 }, arrowTo: { x: 214, y: 194 }, color: '#D06070' }
     ]
   },
   'k-ro': {
@@ -789,9 +789,9 @@ const drawingGuideLibrary: Record<string, DrawingData> = {
     viewBoxHeight: 300,
     strokeCount: 3,
     strokeGuides: [
-      { index: 1, labelX: 84, labelY: 74, arrowFrom: { x: 98, y: 74 }, arrowTo: { x: 182, y: 74 }, color: '#ef4444' },
-      { index: 2, labelX: 142, labelY: 48, arrowFrom: { x: 152, y: 60 }, arrowTo: { x: 152, y: 142 }, color: '#3b82f6' },
-      { index: 3, labelX: 204, labelY: 110, arrowFrom: { x: 218, y: 120 }, arrowTo: { x: 188, y: 208 }, color: '#10b981' }
+      { index: 1, labelX: 84, labelY: 74, arrowFrom: { x: 98, y: 74 }, arrowTo: { x: 182, y: 74 }, color: '#D06070' },
+      { index: 2, labelX: 142, labelY: 48, arrowFrom: { x: 152, y: 60 }, arrowTo: { x: 152, y: 142 }, color: '#C05060' },
+      { index: 3, labelX: 204, labelY: 110, arrowFrom: { x: 218, y: 120 }, arrowTo: { x: 188, y: 208 }, color: '#A8616F' }
     ]
   }
 };
@@ -1174,7 +1174,7 @@ const createDerivedDrawingGuides = () => {
         labelY: 78,
         arrowFrom: { x: 214, y: 88 },
         arrowTo: { x: 142, y: 214 },
-        color: '#ef4444'
+        color: '#D06070'
       }
     ]);
   }
@@ -1187,7 +1187,7 @@ const createDerivedDrawingGuides = () => {
         labelY: 78,
         arrowFrom: { x: 214, y: 88 },
         arrowTo: { x: 142, y: 214 },
-        color: '#ef4444'
+        color: '#D06070'
       }
     ]);
   }
@@ -1422,9 +1422,9 @@ export const hiraganaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 3,
         strokeGuides: [
-          { index: 1, labelX: 72, labelY: 126, arrowFrom: { x: 92, y: 128 }, arrowTo: { x: 128, y: 122 }, color: '#ef4444' },
-          { index: 2, labelX: 134, labelY: 52, arrowFrom: { x: 134, y: 70 }, arrowTo: { x: 134, y: 106 }, color: '#3b82f6' },
-          { index: 3, labelX: 228, labelY: 108, arrowFrom: { x: 244, y: 118 }, arrowTo: { x: 216, y: 144 }, color: '#10b981' }
+          { index: 1, labelX: 72, labelY: 126, arrowFrom: { x: 92, y: 128 }, arrowTo: { x: 128, y: 122 }, color: '#D06070' },
+          { index: 2, labelX: 134, labelY: 52, arrowFrom: { x: 134, y: 70 }, arrowTo: { x: 134, y: 106 }, color: '#C05060' },
+          { index: 3, labelX: 228, labelY: 108, arrowFrom: { x: 244, y: 118 }, arrowTo: { x: 216, y: 144 }, color: '#A8616F' }
         ]
       }
     }, 
@@ -1441,8 +1441,8 @@ export const hiraganaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 2,
         strokeGuides: [
-          { index: 1, labelX: 52, labelY: 86, arrowFrom: { x: 70, y: 96 }, arrowTo: { x: 70, y: 158 }, color: '#ef4444' },
-          { index: 2, labelX: 234, labelY: 88, arrowFrom: { x: 224, y: 98 }, arrowTo: { x: 224, y: 154 }, color: '#3b82f6' }
+          { index: 1, labelX: 52, labelY: 86, arrowFrom: { x: 70, y: 96 }, arrowTo: { x: 70, y: 158 }, color: '#D06070' },
+          { index: 2, labelX: 234, labelY: 88, arrowFrom: { x: 224, y: 98 }, arrowTo: { x: 224, y: 154 }, color: '#C05060' }
         ]
       }
     }, 
@@ -1459,8 +1459,8 @@ export const hiraganaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 2,
         strokeGuides: [
-          { index: 1, labelX: 102, labelY: 34, arrowFrom: { x: 118, y: 40 }, arrowTo: { x: 150, y: 56 }, color: '#ef4444' },
-          { index: 2, labelX: 68, labelY: 96, arrowFrom: { x: 86, y: 102 }, arrowTo: { x: 150, y: 114 }, color: '#3b82f6' }
+          { index: 1, labelX: 102, labelY: 34, arrowFrom: { x: 118, y: 40 }, arrowTo: { x: 150, y: 56 }, color: '#D06070' },
+          { index: 2, labelX: 68, labelY: 96, arrowFrom: { x: 86, y: 102 }, arrowTo: { x: 150, y: 114 }, color: '#C05060' }
         ]
       }
     }, 
@@ -1477,8 +1477,8 @@ export const hiraganaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 2,
         strokeGuides: [
-          { index: 1, labelX: 102, labelY: 34, arrowFrom: { x: 118, y: 40 }, arrowTo: { x: 150, y: 58 }, color: '#ef4444' },
-          { index: 2, labelX: 68, labelY: 96, arrowFrom: { x: 86, y: 100 }, arrowTo: { x: 154, y: 100 }, color: '#3b82f6' }
+          { index: 1, labelX: 102, labelY: 34, arrowFrom: { x: 118, y: 40 }, arrowTo: { x: 150, y: 58 }, color: '#D06070' },
+          { index: 2, labelX: 68, labelY: 96, arrowFrom: { x: 86, y: 100 }, arrowTo: { x: 154, y: 100 }, color: '#C05060' }
         ]
       }
     }, 
@@ -1496,9 +1496,9 @@ export const hiraganaSingleMatrix: (Character | null)[][] = [
         strokeCount: 3,
         safeZone: { x: 72, y: 42, width: 156, height: 196 },
         strokeGuides: [
-          { index: 1, labelX: 42, labelY: 42, arrowFrom: { x: 58, y: 42 }, arrowTo: { x: 126, y: 42 }, color: '#ef4444' },
-          { index: 2, labelX: 92, labelY: 18, arrowFrom: { x: 104, y: 28 }, arrowTo: { x: 104, y: 102 }, color: '#3b82f6' },
-          { index: 3, labelX: 228, labelY: 54, arrowFrom: { x: 244, y: 64 }, arrowTo: { x: 264, y: 88 }, color: '#10b981' }
+          { index: 1, labelX: 42, labelY: 42, arrowFrom: { x: 58, y: 42 }, arrowTo: { x: 126, y: 42 }, color: '#D06070' },
+          { index: 2, labelX: 92, labelY: 18, arrowFrom: { x: 104, y: 28 }, arrowTo: { x: 104, y: 102 }, color: '#C05060' },
+          { index: 3, labelX: 228, labelY: 54, arrowFrom: { x: 244, y: 64 }, arrowTo: { x: 264, y: 88 }, color: '#A8616F' }
         ]
       }
     }, 
@@ -1535,8 +1535,8 @@ export const katakanaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 2,
         strokeGuides: [
-          { index: 1, labelX: 60, labelY: 58, arrowFrom: { x: 78, y: 52 }, arrowTo: { x: 154, y: 52 }, color: '#ef4444' },
-          { index: 2, labelX: 132, labelY: 104, arrowFrom: { x: 142, y: 116 }, arrowTo: { x: 142, y: 184 }, color: '#3b82f6' }
+          { index: 1, labelX: 60, labelY: 58, arrowFrom: { x: 78, y: 52 }, arrowTo: { x: 154, y: 52 }, color: '#D06070' },
+          { index: 2, labelX: 132, labelY: 104, arrowFrom: { x: 142, y: 116 }, arrowTo: { x: 142, y: 184 }, color: '#C05060' }
         ]
       }
     }, 
@@ -1553,8 +1553,8 @@ export const katakanaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 2,
         strokeGuides: [
-          { index: 1, labelX: 178, labelY: 36, arrowFrom: { x: 190, y: 46 }, arrowTo: { x: 152, y: 118 }, color: '#ef4444' },
-          { index: 2, labelX: 214, labelY: 104, arrowFrom: { x: 224, y: 118 }, arrowTo: { x: 224, y: 196 }, color: '#3b82f6' }
+          { index: 1, labelX: 178, labelY: 36, arrowFrom: { x: 190, y: 46 }, arrowTo: { x: 152, y: 118 }, color: '#D06070' },
+          { index: 2, labelX: 214, labelY: 104, arrowFrom: { x: 224, y: 118 }, arrowTo: { x: 224, y: 196 }, color: '#C05060' }
         ]
       }
     }, 
@@ -1571,9 +1571,9 @@ export const katakanaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 3,
         strokeGuides: [
-          { index: 1, labelX: 138, labelY: 24, arrowFrom: { x: 150, y: 34 }, arrowTo: { x: 150, y: 60 }, color: '#ef4444' },
-          { index: 2, labelX: 70, labelY: 92, arrowFrom: { x: 88, y: 96 }, arrowTo: { x: 154, y: 96 }, color: '#3b82f6' },
-          { index: 3, labelX: 194, labelY: 122, arrowFrom: { x: 204, y: 136 }, arrowTo: { x: 204, y: 208 }, color: '#10b981' }
+          { index: 1, labelX: 138, labelY: 24, arrowFrom: { x: 150, y: 34 }, arrowTo: { x: 150, y: 60 }, color: '#D06070' },
+          { index: 2, labelX: 70, labelY: 92, arrowFrom: { x: 88, y: 96 }, arrowTo: { x: 154, y: 96 }, color: '#C05060' },
+          { index: 3, labelX: 194, labelY: 122, arrowFrom: { x: 204, y: 136 }, arrowTo: { x: 204, y: 208 }, color: '#A8616F' }
         ]
       }
     }, 
@@ -1590,9 +1590,9 @@ export const katakanaSingleMatrix: (Character | null)[][] = [
         viewBoxHeight: 300,
         strokeCount: 3,
         strokeGuides: [
-          { index: 1, labelX: 60, labelY: 56, arrowFrom: { x: 78, y: 50 }, arrowTo: { x: 156, y: 50 }, color: '#ef4444' },
-          { index: 2, labelX: 122, labelY: 84, arrowFrom: { x: 132, y: 96 }, arrowTo: { x: 132, y: 176 }, color: '#3b82f6' },
-          { index: 3, labelX: 60, labelY: 222, arrowFrom: { x: 80, y: 214 }, arrowTo: { x: 162, y: 214 }, color: '#10b981' }
+          { index: 1, labelX: 60, labelY: 56, arrowFrom: { x: 78, y: 50 }, arrowTo: { x: 156, y: 50 }, color: '#D06070' },
+          { index: 2, labelX: 122, labelY: 84, arrowFrom: { x: 132, y: 96 }, arrowTo: { x: 132, y: 176 }, color: '#C05060' },
+          { index: 3, labelX: 60, labelY: 222, arrowFrom: { x: 80, y: 214 }, arrowTo: { x: 162, y: 214 }, color: '#A8616F' }
         ]
       }
     }, 
@@ -1610,9 +1610,9 @@ export const katakanaSingleMatrix: (Character | null)[][] = [
         strokeCount: 3,
         safeZone: { x: 78, y: 46, width: 150, height: 188 },
         strokeGuides: [
-          { index: 1, labelX: 48, labelY: 46, arrowFrom: { x: 64, y: 46 }, arrowTo: { x: 132, y: 46 }, color: '#ef4444' },
-          { index: 2, labelX: 106, labelY: 76, arrowFrom: { x: 118, y: 88 }, arrowTo: { x: 118, y: 158 }, color: '#3b82f6' },
-          { index: 3, labelX: 64, labelY: 112, arrowFrom: { x: 80, y: 124 }, arrowTo: { x: 60, y: 170 }, color: '#10b981' }
+          { index: 1, labelX: 48, labelY: 46, arrowFrom: { x: 64, y: 46 }, arrowTo: { x: 132, y: 46 }, color: '#D06070' },
+          { index: 2, labelX: 106, labelY: 76, arrowFrom: { x: 118, y: 88 }, arrowTo: { x: 118, y: 158 }, color: '#C05060' },
+          { index: 3, labelX: 64, labelY: 112, arrowFrom: { x: 80, y: 124 }, arrowTo: { x: 60, y: 170 }, color: '#A8616F' }
         ]
       }
     }, 

@@ -102,7 +102,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.lineWidth = 10;
-      ctx.strokeStyle = '#334155';
+      ctx.strokeStyle = '#564C51';
     }
     canvas.setPointerCapture(e.pointerId);
   };
