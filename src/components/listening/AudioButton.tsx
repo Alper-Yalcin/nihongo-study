@@ -5,6 +5,7 @@ import { studyContent } from '../../data/studyContent';
 
 interface Props {
   src: string;
+  fallbackSrc?: string;
   language: AppLanguage;
   autoPlay?: boolean;
   autoPlayToken?: string | number;
@@ -14,6 +15,7 @@ interface Props {
 
 export const AudioButton: React.FC<Props> = ({
   src,
+  fallbackSrc,
   language,
   autoPlay = false,
   autoPlayToken,
@@ -25,22 +27,53 @@ export const AudioButton: React.FC<Props> = ({
   const [error, setError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentSrcRef = useRef<string | null>(null);
+  const failedSrcsRef = useRef<Set<string>>(new Set());
+
+  const resolvePlayableSrc = () => {
+    if (!src && fallbackSrc) {
+      return fallbackSrc;
+    }
+
+    if (src && failedSrcsRef.current.has(src) && fallbackSrc) {
+      return fallbackSrc;
+    }
+
+    return src;
+  };
 
   const ensureAudio = () => {
-    if (!audioRef.current || currentSrcRef.current !== src) {
+    const resolvedSrc = resolvePlayableSrc();
+
+    if (!resolvedSrc) {
+      return null;
+    }
+
+    if (!audioRef.current || currentSrcRef.current !== resolvedSrc) {
       if (audioRef.current) {
         audioRef.current.pause();
       }
 
-      const nextAudio = new Audio(src);
+      const nextAudio = new Audio(resolvedSrc);
       nextAudio.onended = () => setIsPlaying(false);
       nextAudio.onerror = () => {
+        if (currentSrcRef.current) {
+          failedSrcsRef.current.add(currentSrcRef.current);
+        }
+
         setIsPlaying(false);
+
+        if (fallbackSrc && currentSrcRef.current !== fallbackSrc) {
+          audioRef.current = null;
+          currentSrcRef.current = null;
+          playAudio();
+          return;
+        }
+
         setError(true);
       };
 
       audioRef.current = nextAudio;
-      currentSrcRef.current = src;
+      currentSrcRef.current = resolvedSrc;
     }
 
     return audioRef.current;
@@ -48,6 +81,11 @@ export const AudioButton: React.FC<Props> = ({
 
   const playAudio = () => {
     const audio = ensureAudio();
+
+    if (!audio) {
+      setError(true);
+      return;
+    }
 
     setIsPlaying(true);
     setError(false);
@@ -67,7 +105,7 @@ export const AudioButton: React.FC<Props> = ({
         audioRef.current.pause();
       }
     };
-  }, [src, autoPlay, autoPlayToken]);
+  }, [src, fallbackSrc, autoPlay, autoPlayToken]);
 
   return (
     <button

@@ -28,3 +28,41 @@ export const getGoogleTranslateKanaAudioSrc = (characterId?: string) => {
 
   return `/sounds/google-translate/${folder}/${filename}.mp3`;
 };
+
+const normalizeWordAudioName = (value: string) =>
+  value
+    .normalize('NFKC')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\p{L}\p{N}-]/gu, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+export const getGoogleTranslateWordAudioSrc = (wordId?: string) => {
+  if (!wordId) {
+    return undefined;
+  }
+
+  const normalizedId = normalizeWordAudioName(wordId);
+
+  if (!normalizedId) {
+    return undefined;
+  }
+
+  return `/sounds/google-translate/words/${normalizedId}.mp3`;
+};
+
+export const getGoogleTranslateWordAudioFallbackSrc = (wordKana?: string) => {
+  if (!wordKana) {
+    return undefined;
+  }
+
+  const normalizedKana = normalizeWordAudioName(wordKana);
+
+  if (!normalizedKana) {
+    return undefined;
+  }
+
+  return `/sounds/google-translate/words/${normalizedKana}.mp3`;
+};

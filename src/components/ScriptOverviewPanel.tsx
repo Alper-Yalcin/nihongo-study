@@ -16,7 +16,7 @@ import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
 import { scriptLandingContent } from '../content/scriptLandingContent';
 import { studyContent } from '../data/studyContent';
-import { KanaSection, ScriptStudyView, WordItem } from '../types';
+import { KanaSection, ScriptStudyView } from '../types';
 import { StudyTable } from './StudyTable';
 import { ScriptStudyDetailModal } from './ScriptStudyDetailModal';
 import { useKanaProgressSummary } from '../features/kana/progress/progressStore';
@@ -26,7 +26,7 @@ interface Props {
   language: AppLanguage;
   script: 'hiragana' | 'katakana';
   sections: KanaSection[];
-  words: WordItem[];
+  wordCount: number;
   availableViews: ScriptStudyView[];
 }
 
@@ -239,7 +239,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
   language,
   script,
   sections,
-  words,
+  wordCount,
   availableViews
 }) => {
   const copy = overviewCopy[language];
@@ -363,7 +363,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                   {copy.stats.words}
                 </div>
-                <div className="mt-2 text-3xl font-bold text-slate-900">{words.length}</div>
+                <div className="mt-2 text-3xl font-bold text-slate-900">{wordCount}</div>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">

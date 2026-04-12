@@ -96,6 +96,7 @@ export interface ListeningItem {
   acceptedCharacterIds?: string[];
   acceptedCharacters?: Character[];
   audioSrc: string;
+  audioFallbackSrc?: string;
   datasetType: 'character' | 'word';
   character?: Character;
 }

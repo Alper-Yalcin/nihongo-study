@@ -5,7 +5,7 @@ import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
 import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
-import { useDictionaryWords } from '../data/words';
+import { useDictionaryWordSearch } from '../data/words';
 import { getGoogleTranslateKanaAudioSrc } from '../data/kanaAudio';
 import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { getKanaItemById } from '../features/kana/data/kanaInventory';
@@ -38,7 +38,18 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({ language }) => {
   const resolvedScript = item?.script ?? 'hiragana';
   const { getProgress } = useKanaProgressStore();
   const progress = item ? getProgress(item.id) : null;
-  const { words } = useDictionaryWords(resolvedScript);
+  const {
+    words,
+    loading: areRelatedWordsLoading,
+    error: relatedWordsError
+  } = useDictionaryWordSearch({
+    script: resolvedScript,
+    query: item?.char,
+    mode: 'contains',
+    limit: 20,
+    offset: 0,
+    enabled: Boolean(item)
+  });
   const audioSrc = item ? getGoogleTranslateKanaAudioSrc(item.id) : undefined;
   const guideImageSrc = item ? getNhkKanaGuideImageSrc(item.id) : undefined;
   const relatedWords = useMemo(
@@ -180,6 +191,16 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({ language }) => {
 
           <SectionCard title={language === 'tr' ? 'Related words' : 'Related words'} description={language === 'tr' ? 'Karakteri iceren ilk kelime ornekleri.' : 'First vocabulary examples containing this character.'}>
             <div className="space-y-3">
+              {areRelatedWordsLoading && (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                  {language === 'tr' ? 'Ilgili kelimeler yukleniyor...' : 'Loading related words...'}
+                </div>
+              )}
+              {relatedWordsError && (
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700">
+                  {relatedWordsError}
+                </div>
+              )}
               {relatedWords.length === 0 && (
                 <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-500">
                   {language === 'tr' ? 'Bu karakterle iliskili kelime bulunamadi.' : 'No related words were found for this character.'}

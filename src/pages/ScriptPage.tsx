@@ -2,7 +2,7 @@ import React from 'react';
 import { PageContainer } from '../components/PageContainer';
 import { ScriptStudyLayout } from '../components/ScriptStudyLayout';
 import { AppLanguage } from '../data/appPreferences';
-import { useDictionaryWords } from '../data/words';
+import { useDictionaryWordSearch } from '../data/words';
 import { KanaSection, ScriptLayoutView } from '../types';
 
 interface ScriptPageProps {
@@ -20,7 +20,12 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
   getSections,
   initialView = 'overview'
 }) => {
-  const { words, loading, error } = useDictionaryWords(script);
+  const { page, loading, error } = useDictionaryWordSearch({
+    script,
+    limit: 1,
+    offset: 0
+  });
+  const dictionaryWordCount = page.total;
   const statusText = error
     ? language === 'tr'
       ? 'Kelime verisi yuklenemedi. Backend ve veritabani baglantisini kontrol et.'
@@ -49,7 +54,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
         language={language}
         script={script}
         kanaSections={getSections(language)}
-        dictionaryWords={words}
+        dictionaryWordCount={dictionaryWordCount}
         initialView={initialView}
       />
     </PageContainer>

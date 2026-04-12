@@ -247,7 +247,7 @@ Kabul kriterleri:
 
 ## Phase 4a - Word API Refactor
 
-Durum: Partial / open
+Durum: Done
 
 Amac:
 
@@ -258,17 +258,18 @@ Teslimatlar:
 - `/api/words` server-side filter + pagination destekliyor
 - `/api/word-packs` ve `/api/words/:id` endpointleri mevcut
 - dictionary panelinde pagination aktif
-- kalan acik: tum istemci akislarinda bulk preload deseninin azaltilmasi ve pack/detail endpointlerinin UI entegrasyonu
+- dictionary panelinde pack secimi ve word detail endpoint entegrasyonu aktif
+- script/kana path/kana item ekranlarinda bulk preload yerine ihtiyac odakli sorgu deseni aktif
 
 Kabul kriterleri:
 
 - dictionary buyuk word pool'da da hizli kalir
 - sorgu, filtre ve pagination backend uzerinden yurur
-- kalan acik: pack tabanli UI akislari net ve uca bagli hale getirilir
+- pack tabanli UI akislari dictionary panelinde net ve uca bagli calisir
 
 ## Phase 4b - Word Bridge and Stats
 
-Durum: Partial / open
+Durum: Done (stabilizasyon acik)
 
 Amac:
 
@@ -279,8 +280,8 @@ Teslimatlar:
 - kana -> word bridge'in ilk katmani aktif (item detail ve ilgili kelime baglari)
 - stats ekrani aktif
 - curated word packs server tarafinda mevcut
-- kalan acik: curated pack akislari UI'da netlestirilir
-- kalan acik: word listening audio karari ve varlik tamamlama netlestirilir
+- curated pack akislari dictionary panelinde secilebilir ve calisma akislarina bagli
+- word listening audio icin google-translate words yolu + fallback stratejisi uygulandi
 
 Kabul kriterleri:
 
@@ -290,8 +291,8 @@ Kabul kriterleri:
 
 ## Immediate Next Step
 
-Bir sonraki tek odakli is, Phase 4a UI tarafini pack/detail endpoint entegrasyonu ve preload kaliplari acisindan tamamlamaktir.
+Bir sonraki odak, 4a/4b kapanislarindan sonra stabilizasyon ve son mile polish adimlaridir.
 
-- Dictionary UI'da word pack secimi ve detail gorunumu aktif akislari genislet.
-- Script/Kana path/item ekranlarinda gereksiz toplu preload desenlerini azaltip ihtiyaca gore sorgu desenini guclendir.
-- Word tarafinda pagination/filter/pack davranisinin tum girislerden tutarli calistigini smoke test ile dogrula.
+- Word listening audio varlik kapsamini genisletip fallback hit oranini takip et.
+- Kana item ve path ekranlarinda word sorgu limitlerini gercek kullanim metriklerine gore ince ayarla.
+- End-to-end smoke/regression checklist'i ile study/test/play + words akislarinin tum rotalarda tutarli oldugunu dogrula.

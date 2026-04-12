@@ -12,15 +12,14 @@ interface WordStudyContainerProps {
   title: string;
   language: AppLanguage;
   script: 'hiragana' | 'katakana';
-  words: WordItem[];
 }
 
-export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, language, script, words }) => {
+export const WordStudyContainer: React.FC<WordStudyContainerProps> = ({ title, language, script }) => {
   const copy = studyContent[language];
   const [view, setView] = useState<'dictionary' | 'practice' | 'test' | 'result'>('dictionary');
   const [runStats, setRunStats] = useState<RunStats | null>(null);
   const [quizWords, setQuizWords] = useState<WordItem[]>([]);
-  const [quizSourceWords, setQuizSourceWords] = useState<WordItem[]>(words);
+  const [quizSourceWords, setQuizSourceWords] = useState<WordItem[]>([]);
   const [activeMode, setActiveMode] = useState<WordStudyMode>('wordToRomaji');
 
   const buildRandomQuizWords = (sourceWords: WordItem[], count: number) => {

@@ -51,6 +51,7 @@ export interface DictionaryWordSearchParams {
   packId?: string;
   limit?: number;
   offset?: number;
+  enabled?: boolean;
 }
 
 interface DictionaryWordsState {
@@ -324,7 +325,8 @@ export const useDictionaryWordSearch = ({
   level,
   packId,
   limit = 10,
-  offset = 0
+  offset = 0,
+  enabled = true
 }: DictionaryWordSearchParams) => {
   const [words, setWords] = useState<WordItem[]>([]);
   const [page, setPage] = useState<DictionaryWordPage>({
@@ -337,6 +339,19 @@ export const useDictionaryWordSearch = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setWords([]);
+      setPage({
+        total: 0,
+        limit,
+        offset,
+        hasMore: false
+      });
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     let isActive = true;
 
     setLoading(true);
@@ -374,7 +389,7 @@ export const useDictionaryWordSearch = ({
     return () => {
       isActive = false;
     };
-  }, [script, query, mode, level, packId, limit, offset]);
+  }, [script, query, mode, level, packId, limit, offset, enabled]);
 
   return {
     words,

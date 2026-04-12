@@ -8,7 +8,7 @@ import { ListeningStudyContainer } from '../components/listening/ListeningStudyC
 import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
-import { useDictionaryWords } from '../data/words';
+import { useDictionaryWordSearch } from '../data/words';
 import { getKanaItemById } from '../features/kana/data/kanaInventory';
 import { getNextKanaCurriculumGroup } from '../features/kana/curriculum/curriculum';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
@@ -221,7 +221,15 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
   const copy = pageCopy[language];
   const scriptTitle = scriptTitleMap[script];
   const sections = useMemo(() => getSectionsForScript(script, language), [language, script]);
-  const { words } = useDictionaryWords(script);
+  const {
+    words,
+    loading: isWordsLoading,
+    error: wordsError
+  } = useDictionaryWordSearch({
+    script,
+    limit: 200,
+    offset: 0
+  });
   const { listByScript, summaries } = useKanaProgressStore();
   const progressEntries = listByScript(script);
   const summary = summaries[script];
@@ -549,6 +557,16 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
               <ArrowLeft size={16} className="mr-2" />
               {copy.backToFlow}
             </button>
+            {isWordsLoading && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                {language === 'tr' ? 'Kelime havuzu yukleniyor...' : 'Loading word pool...'}
+              </div>
+            )}
+            {wordsError && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {wordsError}
+              </div>
+            )}
             <ListeningStudyContainer
               title={scriptTitle}
               language={language}

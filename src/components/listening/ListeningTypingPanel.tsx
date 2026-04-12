@@ -307,6 +307,7 @@ export const ListeningTypingPanel: React.FC<Props> = ({
           </div>
           <AudioButton
             src={currentItem.audioSrc}
+            fallbackSrc={currentItem.audioFallbackSrc}
             language={language}
             autoPlay={true}
             autoPlayToken={questionToken}

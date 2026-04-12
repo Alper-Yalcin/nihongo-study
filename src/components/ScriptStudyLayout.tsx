@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { KanaSection, ScriptLayoutView, ScriptStudyView, WordItem } from '../types';
+import { KanaSection, ScriptLayoutView, ScriptStudyView } from '../types';
 import { StudyContainer } from './StudyContainer';
 import { WordStudyContainer } from './WordStudyContainer';
 import { ListeningStudyContainer } from './listening/ListeningStudyContainer';
@@ -17,7 +17,7 @@ interface Props {
   language: AppLanguage;
   script: 'hiragana' | 'katakana';
   kanaSections: KanaSection[];
-  dictionaryWords: WordItem[];
+  dictionaryWordCount: number;
   availableViews?: ScriptStudyView[];
   initialView?: ScriptLayoutView;
 }
@@ -27,7 +27,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
   language,
   script,
   kanaSections,
-  dictionaryWords,
+  dictionaryWordCount,
   availableViews = ['typing', 'drawing', 'listening', 'dictionary'],
   initialView = 'overview'
 }) => {
@@ -75,7 +75,7 @@ export const ScriptStudyLayout: React.FC<Props> = ({
             language={language}
             script={script}
             sections={kanaSections}
-            words={dictionaryWords}
+            wordCount={dictionaryWordCount}
             availableViews={availableViews}
           />
         </div>
@@ -107,14 +107,13 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               title={title}
               language={language}
               sections={kanaSections}
-              words={dictionaryWords}
               script={script}
             />
           )}
         </div>
         <div style={{ display: activeView === 'dictionary' ? 'block' : 'none' }}>
           {availableViews.includes('dictionary') && (
-            <WordStudyContainer title={title} language={language} script={script} words={dictionaryWords} />
+            <WordStudyContainer title={title} language={language} script={script} />
           )}
         </div>
       </div>

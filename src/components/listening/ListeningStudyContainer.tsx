@@ -18,7 +18,12 @@ import { AppLanguage } from '../../data/appPreferences';
 import { studyContent } from '../../data/studyContent';
 import { getAcceptedRomajiAnswers } from '../../utils/typing';
 import { shuffleArray } from '../../utils/listening';
-import { getGoogleTranslateKanaAudioSrc } from '../../data/kanaAudio';
+import {
+  getGoogleTranslateKanaAudioSrc,
+  getGoogleTranslateWordAudioFallbackSrc,
+  getGoogleTranslateWordAudioSrc
+} from '../../data/kanaAudio';
+import { useDictionaryWordSearch } from '../../data/words';
 import { useKanaProgressStore } from '../../features/kana/progress/progressStore';
 import {
   getSessionConfigNumber,
@@ -30,7 +35,7 @@ interface Props {
   title: string;
   language: AppLanguage;
   sections: KanaSection[];
-  words: WordItem[];
+  words?: WordItem[];
   script: 'hiragana' | 'katakana';
 }
 
@@ -46,6 +51,16 @@ export const ListeningStudyContainer: React.FC<Props> = ({
 }) => {
   const copy = studyContent[language];
   const { activeSession } = useKanaProgressStore();
+  const {
+    words: fetchedWords,
+    loading: isWordDatasetLoading,
+    error: wordDatasetError
+  } = useDictionaryWordSearch({
+    script,
+    limit: 200,
+    offset: 0,
+    enabled: words === undefined
+  });
   const [view, setView] = useState<View>('table');
   const [datasetType, setDatasetType] = useState<DatasetType>('character');
   const [listeningMode, setListeningMode] = useState<ListeningMode>('recognition');
@@ -106,16 +121,17 @@ export const ListeningStudyContainer: React.FC<Props> = ({
 
   const wordItems = useMemo<ListeningItem[]>(
     () =>
-      words.map((word) => ({
+      (words ?? fetchedWords).map((word) => ({
         id: word.id,
         script: word.script ?? script,
         kana: word.kana,
         romaji: word.romaji,
         acceptedRomaji: [word.romaji],
-        audioSrc: `/audio/words/${word.id}.mp3`,
+        audioSrc: getGoogleTranslateWordAudioSrc(word.id) ?? '',
+        audioFallbackSrc: getGoogleTranslateWordAudioFallbackSrc(word.kana),
         datasetType: 'word'
       })),
-    [script, words]
+    [fetchedWords, script, words]
   );
 
   const currentSection = sections[currentSectionIndex];
@@ -316,6 +332,18 @@ export const ListeningStudyContainer: React.FC<Props> = ({
               </div>
             )}
 
+            {datasetType === 'word' && isWordDatasetLoading && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                {language === 'tr' ? 'Kelime dinleme havuzu yukleniyor...' : 'Loading word listening pool...'}
+              </div>
+            )}
+
+            {datasetType === 'word' && wordDatasetError && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {wordDatasetError}
+              </div>
+            )}
+
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-slate-500" htmlFor={`${script}-listening-count`}>
@@ -344,7 +372,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({
 
               <button
                 onClick={() => handleStart()}
-                disabled={maxCount === 0}
+                disabled={maxCount === 0 || (datasetType === 'word' && isWordDatasetLoading)}
                 className="inline-flex items-center justify-center rounded-lg bg-rose-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
                 title={getModeLabel(listeningMode)}
               >
