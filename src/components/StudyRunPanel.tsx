@@ -11,8 +11,20 @@ import {
   TIMED_MODE_DURATION_SECONDS
 } from '../utils/typing';
 import { formatDuration } from '../utils/formatDuration';
+import { useKanaProgressStore } from '../features/kana/progress/progressStore';
+import { applySessionAnswerToProgress } from '../features/kana/progress/progressService';
+import { StudySession } from '../features/kana/domain/studySession';
+import {
+  completeStudySession,
+  createStudySession,
+  getSessionConfigNumber,
+  isSessionKeyMatch,
+  recordStudySessionAnswer,
+  updateStudySession
+} from '../features/kana/session/sessionEngine';
 
 interface Props {
+  script: 'hiragana' | 'katakana';
   section: KanaSection;
   language: AppLanguage;
   selectedGroupIds: Set<string>;
@@ -39,7 +51,19 @@ const initialSessionStats: SessionStats = {
   totalAnswerMs: 0
 };
 
+const resolveSessionType = (mode: TypingMode) => (mode === 'timed' ? 'speed' : 'learn');
+
+const findCharacterIndex = (items: Character[], characterId: string | null) => {
+  if (!characterId) {
+    return 0;
+  }
+
+  const index = items.findIndex((item) => item.id === characterId);
+  return index >= 0 ? index : 0;
+};
+
 export const StudyRunPanel: React.FC<Props> = ({
+  script,
   section,
   language,
   selectedGroupIds,
@@ -48,6 +72,13 @@ export const StudyRunPanel: React.FC<Props> = ({
   onCancel
 }) => {
   const copy = studyContent[language];
+  const {
+    activeSession,
+    getProgress,
+    saveProgress,
+    saveSession,
+    setActiveSession
+  } = useKanaProgressStore();
   const initialPool = useMemo(() => {
     const chars: Character[] = [];
     section.groups.forEach((group) => {
@@ -57,9 +88,15 @@ export const StudyRunPanel: React.FC<Props> = ({
     });
     return chars;
   }, [section, selectedGroupIds]);
+  const characterMap = useMemo(
+    () => new Map(section.groups.flatMap((group) => group.characters).map((character) => [character.id, character])),
+    [section]
+  );
 
   const isReverseMode = typingMode === 'reverse';
   const isTimedMode = typingMode === 'timed';
+  const sessionKey = `kana:${script}:typing:${typingMode}`;
+  const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
 
   const [pool, setPool] = useState<Character[]>(initialPool);
   const [currentChar, setCurrentChar] = useState<Character | null>(null);
@@ -74,6 +111,7 @@ export const StudyRunPanel: React.FC<Props> = ({
   const sessionStatsRef = useRef(sessionStats);
   const sessionCompleteRef = useRef(isSessionComplete);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const sessionRef = useRef<StudySession | null>(null);
 
   useEffect(() => {
     sessionStatsRef.current = sessionStats;
@@ -106,10 +144,30 @@ export const StudyRunPanel: React.FC<Props> = ({
     return source[randomIndex];
   };
 
-  const setNextCharacter = (source: Character[]) => {
-    const nextChar = pickRandomChar(source);
-    setCurrentChar(nextChar);
-    setRoundStartedAt(Date.now());
+  const buildSessionConfig = (stats: SessionStats, timeSeconds: number) => ({
+    sessionKey,
+    variant: typingMode,
+    sectionId: section.id,
+    selectedGroupIds: [...selectedGroupIds],
+    elapsedSeconds: timeSeconds,
+    correctCount: stats.correctCount,
+    wrongCount: stats.wrongCount,
+    attempts: stats.attempts,
+    currentStreak: stats.currentStreak,
+    bestStreak: stats.bestStreak,
+    totalAnswerMs: stats.totalAnswerMs
+  });
+
+  const persistActiveSession = (
+    nextSession: StudySession,
+    options: { active?: boolean; clearActive?: boolean } = { active: true }
+  ) => {
+    sessionRef.current = nextSession;
+    saveSession(nextSession, options.active ? { active: true } : undefined);
+
+    if (options.clearActive) {
+      setActiveSession(null);
+    }
   };
 
   const finalizeRun = (timeSeconds: number) => {
@@ -120,6 +178,13 @@ export const StudyRunPanel: React.FC<Props> = ({
     clearTransitionTimeout();
     sessionCompleteRef.current = true;
     setIsSessionComplete(true);
+
+    if (sessionRef.current) {
+      persistActiveSession(completeStudySession(sessionRef.current), {
+        active: false,
+        clearActive: true
+      });
+    }
 
     const snapshot = sessionStatsRef.current;
     const completed = isTimedMode ? snapshot.correctCount : initialPool.length;
@@ -143,27 +208,92 @@ export const StudyRunPanel: React.FC<Props> = ({
     });
   };
 
-  const resetSession = () => {
+  const restoreSession = (session: StudySession) => {
+    clearTransitionTimeout();
+
+    const restoredPool = session.itemIds
+      .map((itemId) => characterMap.get(itemId) ?? null)
+      .filter((item): item is Character => item !== null);
+
+    if (restoredPool.length === 0) {
+      sessionRef.current = null;
+      return false;
+    }
+
+    const restoredCurrentChar = restoredPool[session.currentIndex] ?? restoredPool[0];
+    const restoredStats: SessionStats = {
+      correctCount: getSessionConfigNumber(session, 'correctCount') ?? 0,
+      wrongCount: getSessionConfigNumber(session, 'wrongCount') ?? 0,
+      attempts: getSessionConfigNumber(session, 'attempts') ?? 0,
+      currentStreak: getSessionConfigNumber(session, 'currentStreak') ?? 0,
+      bestStreak: getSessionConfigNumber(session, 'bestStreak') ?? 0,
+      totalAnswerMs: getSessionConfigNumber(session, 'totalAnswerMs') ?? 0
+    };
+
+    sessionRef.current = session;
+    sessionStatsRef.current = restoredStats;
+    sessionCompleteRef.current = false;
+    setIsSessionComplete(false);
+    setPool(restoredPool);
+    setCurrentChar(restoredCurrentChar);
+    setInput('');
+    setFeedback('idle');
+    setSessionStats(restoredStats);
+    setElapsedSeconds(getSessionConfigNumber(session, 'elapsedSeconds') ?? 0);
+    setRoundStartedAt(Date.now());
+    focusInput();
+
+    return true;
+  };
+
+  const startNewSession = () => {
     clearTransitionTimeout();
     sessionCompleteRef.current = false;
     setIsSessionComplete(false);
-    setPool(initialPool);
-    setCurrentChar(pickRandomChar(initialPool));
     setInput('');
     setFeedback('idle');
+    sessionStatsRef.current = initialSessionStats;
     setSessionStats(initialSessionStats);
     setElapsedSeconds(0);
     setRoundStartedAt(Date.now());
+
+    if (initialPool.length === 0) {
+      setPool([]);
+      setCurrentChar(null);
+      sessionRef.current = null;
+      return;
+    }
+
+    const initialChar = pickRandomChar(initialPool);
+    const initialIndex = findCharacterIndex(initialPool, initialChar?.id ?? null);
+    const nextSession = createStudySession({
+      script,
+      type: resolveSessionType(typingMode),
+      mode: 'typing',
+      itemIds: initialPool.map((character) => character.id),
+      currentIndex: initialIndex,
+      config: buildSessionConfig(initialSessionStats, 0)
+    });
+
+    persistActiveSession(nextSession);
+    setPool(initialPool);
+    setCurrentChar(initialChar ?? initialPool[0]);
     focusInput();
   };
 
   useEffect(() => {
-    resetSession();
+    if (activeRunSession && restoreSession(activeRunSession)) {
+      return () => {
+        clearTransitionTimeout();
+      };
+    }
+
+    startNewSession();
 
     return () => {
       clearTransitionTimeout();
     };
-  }, [initialPool, typingMode]);
+  }, [activeRunSession?.id, initialPool, typingMode]);
 
   useEffect(() => {
     if (isSessionComplete) {
@@ -189,43 +319,81 @@ export const StudyRunPanel: React.FC<Props> = ({
     }
   }, [currentChar, feedback, isSessionComplete]);
 
+  useEffect(() => {
+    if (!isTimedMode || !sessionRef.current || sessionCompleteRef.current) {
+      return;
+    }
+
+    const nextSession = updateStudySession(sessionRef.current, {
+      config: buildSessionConfig(sessionStatsRef.current, elapsedSeconds)
+    });
+
+    persistActiveSession(nextSession);
+  }, [elapsedSeconds, isTimedMode]);
+
   const isCorrectAnswer = (value: string, character: Character) =>
     isReverseMode
       ? isAcceptedKanaAnswer(value, character.symbol)
       : isAcceptedRomajiAnswer(value, character.label);
 
+  const modeLabel =
+    typingMode === 'current'
+      ? copy.studyRun.currentMode
+      : typingMode === 'reverse'
+        ? copy.studyRun.reverseMode
+        : copy.studyRun.timedMode;
+
   const evaluateAnswer = (rawValue: string) => {
-    if (!currentChar || !rawValue.trim() || feedback !== 'idle' || isSessionComplete) {
+    if (!currentChar || !rawValue.trim() || feedback !== 'idle' || isSessionComplete || !sessionRef.current) {
       return;
     }
 
     const answerDuration = Date.now() - roundStartedAt;
     const isCorrect = isCorrectAnswer(rawValue, currentChar);
+    const answeredAt = new Date().toISOString();
+    const nextStats: SessionStats = {
+      correctCount: sessionStatsRef.current.correctCount + (isCorrect ? 1 : 0),
+      wrongCount: sessionStatsRef.current.wrongCount + (isCorrect ? 0 : 1),
+      attempts: sessionStatsRef.current.attempts + 1,
+      currentStreak: isCorrect ? sessionStatsRef.current.currentStreak + 1 : 0,
+      bestStreak: isCorrect
+        ? Math.max(sessionStatsRef.current.bestStreak, sessionStatsRef.current.currentStreak + 1)
+        : sessionStatsRef.current.bestStreak,
+      totalAnswerMs: sessionStatsRef.current.totalAnswerMs + answerDuration
+    };
+
+    const answerRecord = {
+      itemId: currentChar.id,
+      mode: 'typing' as const,
+      correct: isCorrect,
+      answeredAt,
+      latencyMs: answerDuration,
+      hintsUsed: 0,
+      retries: 0,
+      variant: typingMode,
+      responseItemId: null
+    };
+    const currentProgress = getProgress(currentChar.id);
+
+    if (currentProgress) {
+      saveProgress(applySessionAnswerToProgress(currentProgress, answerRecord));
+    }
 
     setFeedback(isCorrect ? 'correct' : 'wrong');
-
-    setSessionStats((previousStats) => {
-      const nextCorrectCount = previousStats.correctCount + (isCorrect ? 1 : 0);
-      const nextWrongCount = previousStats.wrongCount + (isCorrect ? 0 : 1);
-      const nextAttempts = previousStats.attempts + 1;
-      const nextCurrentStreak = isCorrect ? previousStats.currentStreak + 1 : 0;
-
-      return {
-        correctCount: nextCorrectCount,
-        wrongCount: nextWrongCount,
-        attempts: nextAttempts,
-        currentStreak: nextCurrentStreak,
-        bestStreak: isCorrect
-          ? Math.max(previousStats.bestStreak, nextCurrentStreak)
-          : previousStats.bestStreak,
-        totalAnswerMs: previousStats.totalAnswerMs + answerDuration
-      };
-    });
-
+    setSessionStats(nextStats);
     clearTransitionTimeout();
 
     if (isCorrect) {
       if (isTimedMode) {
+        const nextChar = pickRandomChar(initialPool);
+        const nextIndex = findCharacterIndex(initialPool, nextChar?.id ?? null);
+        const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+          itemIds: initialPool.map((character) => character.id),
+          currentIndex: nextIndex,
+          config: buildSessionConfig(nextStats, elapsedSeconds)
+        });
+
+        persistActiveSession(nextSession);
         transitionTimeoutRef.current = window.setTimeout(() => {
           if (sessionCompleteRef.current) {
             return;
@@ -233,12 +401,23 @@ export const StudyRunPanel: React.FC<Props> = ({
 
           setFeedback('idle');
           setInput('');
-          setNextCharacter(initialPool);
+          setPool(initialPool);
+          setCurrentChar(nextChar);
+          setRoundStartedAt(Date.now());
         }, 220);
         return;
       }
 
       const nextPool = pool.filter((character) => character.id !== currentChar.id);
+      const nextChar = pickRandomChar(nextPool);
+      const nextIndex = findCharacterIndex(nextPool, nextChar?.id ?? null);
+      const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+        itemIds: nextPool.map((character) => character.id),
+        currentIndex: nextIndex,
+        config: buildSessionConfig(nextStats, elapsedSeconds)
+      });
+
+      persistActiveSession(nextSession);
       transitionTimeoutRef.current = window.setTimeout(() => {
         if (sessionCompleteRef.current) {
           return;
@@ -252,11 +431,20 @@ export const StudyRunPanel: React.FC<Props> = ({
         setPool(nextPool);
         setFeedback('idle');
         setInput('');
-        setNextCharacter(nextPool);
+        setCurrentChar(nextChar);
+        setRoundStartedAt(Date.now());
       }, 280);
       return;
     }
 
+    const currentIndex = findCharacterIndex(pool, currentChar.id);
+    const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+      itemIds: pool.map((character) => character.id),
+      currentIndex,
+      config: buildSessionConfig(nextStats, elapsedSeconds)
+    });
+
+    persistActiveSession(nextSession);
     transitionTimeoutRef.current = window.setTimeout(() => {
       if (sessionCompleteRef.current) {
         return;
@@ -286,18 +474,16 @@ export const StudyRunPanel: React.FC<Props> = ({
     }
   };
 
+  const handleRestart = () => {
+    startNewSession();
+  };
+
   const liveAccuracy = calculateAccuracy(sessionStats.correctCount, sessionStats.attempts);
   const liveSpeed = calculateSpeed(sessionStats.correctCount, elapsedSeconds);
   const liveTime = isTimedMode
     ? formatDuration(TIMED_MODE_DURATION_SECONDS - elapsedSeconds)
     : formatDuration(elapsedSeconds);
   const promptTitle = isReverseMode ? copy.studyRun.typeKana : copy.studyRun.typeRomaji;
-  const modeLabel =
-    typingMode === 'current'
-      ? copy.studyRun.currentMode
-      : typingMode === 'reverse'
-        ? copy.studyRun.reverseMode
-        : copy.studyRun.timedMode;
 
   return (
     <div className="flex flex-col items-center py-6" onClick={focusInput}>
@@ -404,7 +590,7 @@ export const StudyRunPanel: React.FC<Props> = ({
               <ArrowLeft size={16} className="mr-1" /> {copy.studyRun.backToSelection}
             </button>
             <button
-              onClick={resetSession}
+              onClick={handleRestart}
               className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
             >
               <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}

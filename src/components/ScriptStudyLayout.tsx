@@ -74,12 +74,24 @@ export const ScriptStudyLayout: React.FC<Props> = ({
         </div>
         <div style={{ display: activeView === 'typing' ? 'block' : 'none' }}>
           {availableViews.includes('typing') && (
-            <StudyContainer title={`${title} ${copy.views.typing}`} language={language} sections={kanaSections} mode="typing" />
+            <StudyContainer
+              title={`${title} ${copy.views.typing}`}
+              language={language}
+              script={script}
+              sections={kanaSections}
+              mode="typing"
+            />
           )}
         </div>
         <div style={{ display: activeView === 'drawing' ? 'block' : 'none' }}>
           {availableViews.includes('drawing') && (
-            <StudyContainer title={`${title} ${copy.views.drawing}`} language={language} sections={kanaSections} mode="drawing" />
+            <StudyContainer
+              title={`${title} ${copy.views.drawing}`}
+              language={language}
+              script={script}
+              sections={kanaSections}
+              mode="drawing"
+            />
           )}
         </div>
         <div style={{ display: activeView === 'listening' ? 'block' : 'none' }}>

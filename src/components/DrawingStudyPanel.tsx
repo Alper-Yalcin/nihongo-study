@@ -8,8 +8,21 @@ import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { studyContent } from '../data/studyContent';
 import { calculateAccuracy, calculateSpeed } from '../utils/typing';
 import { formatDuration } from '../utils/formatDuration';
+import { useKanaProgressStore } from '../features/kana/progress/progressStore';
+import { applySessionAnswerToProgress } from '../features/kana/progress/progressService';
+import { StudySession } from '../features/kana/domain/studySession';
+import {
+  completeStudySession,
+  createStudySession,
+  getSessionConfigBoolean,
+  getSessionConfigNumber,
+  isSessionKeyMatch,
+  recordStudySessionAnswer,
+  updateStudySession
+} from '../features/kana/session/sessionEngine';
 
 interface Props {
+  script: 'hiragana' | 'katakana';
   section: KanaSection;
   language: AppLanguage;
   selectedGroupIds: Set<string>;
@@ -37,7 +50,29 @@ const initialSessionStats: SessionStats = {
   bestStreak: 0
 };
 
+const resolveSessionType = (mode: DrawingMode) => {
+  if (mode === 'speed') {
+    return 'speed';
+  }
+
+  if (mode === 'test' || mode === 'memory') {
+    return 'test';
+  }
+
+  return 'learn';
+};
+
+const findCharacterIndex = (items: Character[], characterId: string | null) => {
+  if (!characterId) {
+    return 0;
+  }
+
+  const index = items.findIndex((item) => item.id === characterId);
+  return index >= 0 ? index : 0;
+};
+
 export const DrawingStudyPanel: React.FC<Props> = ({
+  script,
   section,
   language,
   selectedGroupIds,
@@ -46,6 +81,13 @@ export const DrawingStudyPanel: React.FC<Props> = ({
   onCancel
 }) => {
   const copy = studyContent[language];
+  const {
+    activeSession,
+    getProgress,
+    saveProgress,
+    saveSession,
+    setActiveSession
+  } = useKanaProgressStore();
   const initialPool = useMemo(() => {
     const chars: Character[] = [];
     section.groups.forEach((group) => {
@@ -55,6 +97,10 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     });
     return chars;
   }, [section, selectedGroupIds]);
+  const characterMap = useMemo(
+    () => new Map(section.groups.flatMap((group) => group.characters).map((character) => [character.id, character])),
+    [section]
+  );
 
   const [pool, setPool] = useState<Character[]>(initialPool);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -75,11 +121,14 @@ export const DrawingStudyPanel: React.FC<Props> = ({
   const timeSecondsRef = useRef(timeSeconds);
   const transitionTimeoutRef = useRef<number | null>(null);
   const previewTimeoutRef = useRef<number | null>(null);
+  const sessionRef = useRef<StudySession | null>(null);
 
   const isPracticeMode = drawingMode === 'practice';
   const isTestMode = drawingMode === 'test';
   const isSpeedMode = drawingMode === 'speed';
   const isMemoryMode = drawingMode === 'memory';
+  const sessionKey = `kana:${script}:drawing:${drawingMode}`;
+  const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
 
   useEffect(() => {
     sessionStatsRef.current = sessionStats;
@@ -133,6 +182,34 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     }
   };
 
+  const buildSessionConfig = (stats: SessionStats, elapsed: number) => ({
+    sessionKey,
+    variant: drawingMode,
+    sectionId: section.id,
+    selectedGroupIds: [...selectedGroupIds],
+    timeSeconds: elapsed,
+    correctCount: stats.correctCount,
+    wrongCount: stats.wrongCount,
+    attempts: stats.attempts,
+    currentStreak: stats.currentStreak,
+    bestStreak: stats.bestStreak,
+    showStrokeOrder,
+    showDirectionArrows,
+    showTemplate
+  });
+
+  const persistActiveSession = (
+    nextSession: StudySession,
+    options: { active?: boolean; clearActive?: boolean } = { active: true }
+  ) => {
+    sessionRef.current = nextSession;
+    saveSession(nextSession, options.active ? { active: true } : undefined);
+
+    if (options.clearActive) {
+      setActiveSession(null);
+    }
+  };
+
   const startMemoryPreview = (nextChar: Character | null) => {
     clearScheduledWork();
     clearCanvas();
@@ -151,7 +228,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
   };
 
   const finalizeRun = (finalMode: DrawingMode, resolvedTime = timeSecondsRef.current) => {
-    if (!sessionActiveRef.current) {
+    if (!sessionActiveRef.current && !isPracticeMode) {
       return;
     }
 
@@ -159,6 +236,13 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     sessionActiveRef.current = false;
     setIsSessionActive(false);
     setIsMemoryPreviewVisible(false);
+
+    if (sessionRef.current) {
+      persistActiveSession(completeStudySession(sessionRef.current), {
+        active: false,
+        clearActive: true
+      });
+    }
 
     const snapshot = sessionStatsRef.current;
 
@@ -177,10 +261,51 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     });
   };
 
-  const initializeMode = (nextMode: DrawingMode) => {
+  const restoreSession = (session: StudySession) => {
     clearScheduledWork();
+
+    const restoredPool = session.itemIds
+      .map((itemId) => characterMap.get(itemId) ?? null)
+      .filter((item): item is Character => item !== null);
+
+    const fallbackPool = restoredPool.length > 0 ? restoredPool : initialPool;
+
+    if (fallbackPool.length === 0) {
+      sessionRef.current = null;
+      return false;
+    }
+
+    const restoredIndex = Math.min(Math.max(session.currentIndex, 0), fallbackPool.length - 1);
+    const restoredStats: SessionStats = {
+      correctCount: getSessionConfigNumber(session, 'correctCount') ?? 0,
+      wrongCount: getSessionConfigNumber(session, 'wrongCount') ?? 0,
+      attempts: getSessionConfigNumber(session, 'attempts') ?? 0,
+      currentStreak: getSessionConfigNumber(session, 'currentStreak') ?? 0,
+      bestStreak: getSessionConfigNumber(session, 'bestStreak') ?? 0
+    };
+
+    sessionRef.current = session;
+    sessionStatsRef.current = restoredStats;
+    sessionActiveRef.current = !isPracticeMode;
+    setIsSessionActive(!isPracticeMode);
+    setPool(fallbackPool);
+    setCurrentIndex(restoredIndex);
+    setCurrentChar(fallbackPool[restoredIndex] ?? fallbackPool[0]);
+    setFeedback('idle');
+    setSessionStats(restoredStats);
+    setTimeSeconds(getSessionConfigNumber(session, 'timeSeconds') ?? 0);
+    setIsMemoryPreviewVisible(false);
+    setShowStrokeOrder(getSessionConfigBoolean(session, 'showStrokeOrder') ?? true);
+    setShowDirectionArrows(getSessionConfigBoolean(session, 'showDirectionArrows') ?? true);
+    setShowTemplate(getSessionConfigBoolean(session, 'showTemplate') ?? true);
     clearCanvas();
 
+    return true;
+  };
+
+  const startNewSession = () => {
+    clearScheduledWork();
+    clearCanvas();
     setPool(initialPool);
     setCurrentIndex(0);
     setFeedback('idle');
@@ -190,33 +315,59 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     timeSecondsRef.current = 0;
     setIsMemoryPreviewVisible(false);
 
-    if (nextMode === 'practice') {
+    if (initialPool.length === 0) {
+      setCurrentChar(null);
       sessionActiveRef.current = false;
       setIsSessionActive(false);
-      setCurrentChar(initialPool[0] ?? null);
+      sessionRef.current = null;
+      return;
+    }
+
+    const initialChar = drawingMode === 'practice' ? initialPool[0] : pickRandomChar(initialPool);
+    const initialIndex = drawingMode === 'practice' ? 0 : findCharacterIndex(initialPool, initialChar?.id ?? null);
+    const nextSession = createStudySession({
+      script,
+      type: resolveSessionType(drawingMode),
+      mode: 'drawing',
+      itemIds: initialPool.map((character) => character.id),
+      currentIndex: initialIndex,
+      config: buildSessionConfig(initialSessionStats, 0)
+    });
+
+    persistActiveSession(nextSession);
+
+    if (drawingMode === 'practice') {
+      sessionActiveRef.current = false;
+      setIsSessionActive(false);
+      setCurrentChar(initialPool[0]);
       return;
     }
 
     sessionActiveRef.current = true;
     setIsSessionActive(true);
 
-    const nextChar = pickRandomChar(initialPool);
-
-    if (nextMode === 'memory') {
-      startMemoryPreview(nextChar);
+    if (drawingMode === 'memory') {
+      startMemoryPreview(initialChar);
       return;
     }
 
-    setCurrentChar(nextChar);
+    setCurrentChar(initialChar);
+    setCurrentIndex(initialIndex);
   };
 
   useEffect(() => {
-    initializeMode(drawingMode);
+    if (activeRunSession && restoreSession(activeRunSession)) {
+      return () => {
+        clearScheduledWork();
+      };
+    }
+
+    startNewSession();
 
     return () => {
       clearScheduledWork();
     };
-  }, [initialPool, drawingMode]);
+  }, [activeRunSession?.id, drawingMode, initialPool]);
 
   useEffect(() => {
     if (!isSessionActive) {
@@ -236,6 +387,18 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     }
   }, [isSpeedMode, isSessionActive, timeSeconds]);
 
+  useEffect(() => {
+    if (!sessionRef.current || !sessionActiveRef.current) {
+      return;
+    }
+
+    const nextSession = updateStudySession(sessionRef.current, {
+      config: buildSessionConfig(sessionStatsRef.current, timeSeconds)
+    });
+
+    persistActiveSession(nextSession);
+  }, [timeSeconds]);
+
   const handleClear = () => {
     if (feedback !== 'idle' || isMemoryPreviewVisible) {
       return;
@@ -245,7 +408,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
   };
 
   const handleNextPractice = () => {
-    if (initialPool.length === 0) {
+    if (initialPool.length === 0 || !sessionRef.current) {
       return;
     }
 
@@ -253,13 +416,21 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     setFeedback('idle');
     setCurrentIndex((previousIndex) => {
       const nextIndex = (previousIndex + 1) % initialPool.length;
-      setCurrentChar(initialPool[nextIndex]);
+      const nextChar = initialPool[nextIndex];
+      setCurrentChar(nextChar);
+      persistActiveSession(
+        updateStudySession(sessionRef.current as StudySession, {
+          itemIds: initialPool.map((character) => character.id),
+          currentIndex: nextIndex,
+          config: buildSessionConfig(sessionStatsRef.current, timeSecondsRef.current)
+        })
+      );
       return nextIndex;
     });
   };
 
   const handlePrevPractice = () => {
-    if (initialPool.length === 0) {
+    if (initialPool.length === 0 || !sessionRef.current) {
       return;
     }
 
@@ -267,13 +438,21 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     setFeedback('idle');
     setCurrentIndex((previousIndex) => {
       const nextIndex = (previousIndex - 1 + initialPool.length) % initialPool.length;
-      setCurrentChar(initialPool[nextIndex]);
+      const nextChar = initialPool[nextIndex];
+      setCurrentChar(nextChar);
+      persistActiveSession(
+        updateStudySession(sessionRef.current as StudySession, {
+          itemIds: initialPool.map((character) => character.id),
+          currentIndex: nextIndex,
+          config: buildSessionConfig(sessionStatsRef.current, timeSecondsRef.current)
+        })
+      );
       return nextIndex;
     });
   };
 
   const handleCheck = () => {
-    if (!currentChar || feedback !== 'idle' || isMemoryPreviewVisible) {
+    if (!currentChar || feedback !== 'idle' || isMemoryPreviewVisible || !sessionRef.current) {
       return;
     }
 
@@ -287,34 +466,50 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       tolerance: isPracticeMode ? 'practice' : 'standard',
       guideImageLayout: isPracticeMode ? canvasRef.current?.getGuideImageLayout() : null,
     });
-    setFeedback(isCorrect ? 'correct' : 'wrong');
-
-    setSessionStats((previousStats) => {
-      const nextAttempts = previousStats.attempts + 1;
-      const nextCorrectCount = previousStats.correctCount + (isCorrect ? 1 : 0);
-      const nextWrongCount = previousStats.wrongCount + (isCorrect ? 0 : 1);
-      const nextCurrentStreak = isMemoryMode
+    const answeredAt = new Date().toISOString();
+    const nextStats: SessionStats = {
+      attempts: sessionStatsRef.current.attempts + 1,
+      correctCount: sessionStatsRef.current.correctCount + (isCorrect ? 1 : 0),
+      wrongCount: sessionStatsRef.current.wrongCount + (isCorrect ? 0 : 1),
+      currentStreak: isMemoryMode
         ? isCorrect
-          ? previousStats.currentStreak + 1
+          ? sessionStatsRef.current.currentStreak + 1
           : 0
-        : previousStats.currentStreak;
+        : sessionStatsRef.current.currentStreak,
+      bestStreak:
+        isMemoryMode && isCorrect
+          ? Math.max(sessionStatsRef.current.bestStreak, sessionStatsRef.current.currentStreak + 1)
+          : sessionStatsRef.current.bestStreak
+    };
+    const answerRecord = {
+      itemId: currentChar.id,
+      mode: 'drawing' as const,
+      correct: isCorrect,
+      answeredAt,
+      latencyMs: 0,
+      hintsUsed: isPracticeMode ? 1 : 0,
+      retries: 0,
+      variant: drawingMode,
+      responseItemId: null
+    };
+    const currentProgress = getProgress(currentChar.id);
 
-      return {
-        attempts: nextAttempts,
-        correctCount: nextCorrectCount,
-        wrongCount: nextWrongCount,
-        currentStreak: nextCurrentStreak,
-        bestStreak:
-          isMemoryMode && isCorrect
-            ? Math.max(previousStats.bestStreak, nextCurrentStreak)
-            : previousStats.bestStreak
-      };
-    });
+    if (currentProgress) {
+      saveProgress(applySessionAnswerToProgress(currentProgress, answerRecord));
+    }
 
+    setFeedback(isCorrect ? 'correct' : 'wrong');
+    setSessionStats(nextStats);
     clearScheduledWork();
 
     if (isCorrect) {
       if (isPracticeMode) {
+        const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+          itemIds: initialPool.map((character) => character.id),
+          currentIndex,
+          config: buildSessionConfig(nextStats, timeSecondsRef.current)
+        });
+        persistActiveSession(nextSession);
         transitionTimeoutRef.current = window.setTimeout(() => {
           setFeedback('idle');
         }, 900);
@@ -323,6 +518,15 @@ export const DrawingStudyPanel: React.FC<Props> = ({
 
       if (isTestMode) {
         const nextPool = pool.filter((character) => character.id !== currentChar.id);
+        const nextChar = pickRandomChar(nextPool);
+        const nextIndex = findCharacterIndex(nextPool, nextChar?.id ?? null);
+        const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+          itemIds: nextPool.map((character) => character.id),
+          currentIndex: nextIndex,
+          config: buildSessionConfig(nextStats, timeSecondsRef.current)
+        });
+        persistActiveSession(nextSession);
+
         transitionTimeoutRef.current = window.setTimeout(() => {
           if (!sessionActiveRef.current) {
             return;
@@ -334,14 +538,24 @@ export const DrawingStudyPanel: React.FC<Props> = ({
           }
 
           setPool(nextPool);
+          setCurrentIndex(nextIndex);
           setFeedback('idle');
           clearCanvas();
-          setCurrentChar(pickRandomChar(nextPool));
+          setCurrentChar(nextChar);
         }, 900);
         return;
       }
 
       if (isSpeedMode) {
+        const nextChar = pickRandomChar(initialPool);
+        const nextIndex = findCharacterIndex(initialPool, nextChar?.id ?? null);
+        const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+          itemIds: initialPool.map((character) => character.id),
+          currentIndex: nextIndex,
+          config: buildSessionConfig(nextStats, timeSecondsRef.current)
+        });
+        persistActiveSession(nextSession);
+
         transitionTimeoutRef.current = window.setTimeout(() => {
           if (!sessionActiveRef.current) {
             return;
@@ -349,24 +563,43 @@ export const DrawingStudyPanel: React.FC<Props> = ({
 
           setFeedback('idle');
           clearCanvas();
-          setCurrentChar(pickRandomChar(initialPool));
+          setPool(initialPool);
+          setCurrentIndex(nextIndex);
+          setCurrentChar(nextChar);
         }, 320);
         return;
       }
 
       if (isMemoryMode) {
+        const nextChar = pickRandomChar(initialPool);
+        const nextIndex = findCharacterIndex(initialPool, nextChar?.id ?? null);
+        const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+          itemIds: initialPool.map((character) => character.id),
+          currentIndex: nextIndex,
+          config: buildSessionConfig(nextStats, timeSecondsRef.current)
+        });
+        persistActiveSession(nextSession);
+
         transitionTimeoutRef.current = window.setTimeout(() => {
           if (!sessionActiveRef.current) {
             return;
           }
 
           setFeedback('idle');
-          startMemoryPreview(pickRandomChar(initialPool));
+          setCurrentIndex(nextIndex);
+          startMemoryPreview(nextChar);
         }, 700);
       }
 
       return;
     }
+
+    const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+      itemIds: pool.map((character) => character.id),
+      currentIndex: findCharacterIndex(pool, currentChar.id),
+      config: buildSessionConfig(nextStats, timeSecondsRef.current)
+    });
+    persistActiveSession(nextSession);
 
     if (isPracticeMode) {
       transitionTimeoutRef.current = window.setTimeout(() => {
@@ -384,6 +617,8 @@ export const DrawingStudyPanel: React.FC<Props> = ({
     }
 
     if (isSpeedMode) {
+      const nextChar = pickRandomChar(initialPool);
+      const nextIndex = findCharacterIndex(initialPool, nextChar?.id ?? null);
       transitionTimeoutRef.current = window.setTimeout(() => {
         if (!sessionActiveRef.current) {
           return;
@@ -391,7 +626,9 @@ export const DrawingStudyPanel: React.FC<Props> = ({
 
         setFeedback('idle');
         clearCanvas();
-        setCurrentChar(pickRandomChar(initialPool));
+        setPool(initialPool);
+        setCurrentIndex(nextIndex);
+        setCurrentChar(nextChar);
       }, 550);
       return;
     }
@@ -589,14 +826,12 @@ export const DrawingStudyPanel: React.FC<Props> = ({
           >
             <ArrowLeft size={16} className="mr-1" /> {copy.drawing.backToSelection}
           </button>
-          {!isPracticeMode && (
-            <button
-              onClick={() => initializeMode(drawingMode)}
-              className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
-            >
-              <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
-            </button>
-          )}
+          <button
+            onClick={startNewSession}
+            className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700"
+          >
+            <RotateCcw size={16} className="mr-1" /> {copy.common.restartRun}
+          </button>
         </div>
       </div>
     </div>

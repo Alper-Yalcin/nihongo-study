@@ -6,6 +6,8 @@ import { ListeningTypingPanel } from './ListeningTypingPanel';
 import { ListeningWritingPanel } from './ListeningWritingPanel';
 
 interface Props {
+  script: 'hiragana' | 'katakana';
+  datasetType: 'character' | 'word';
   language: AppLanguage;
   items: ListeningItem[];
   sourceItems: ListeningItem[];
@@ -15,6 +17,8 @@ interface Props {
 }
 
 export const ListeningStudyPanel: React.FC<Props> = ({
+  script,
+  datasetType,
   language,
   items,
   sourceItems,
@@ -25,6 +29,8 @@ export const ListeningStudyPanel: React.FC<Props> = ({
   if (mode === 'recognition') {
     return (
       <ListeningRecognitionPanel
+        script={script}
+        datasetType={datasetType}
         language={language}
         items={items}
         sourceItems={sourceItems}
@@ -37,6 +43,8 @@ export const ListeningStudyPanel: React.FC<Props> = ({
   if (mode === 'typing') {
     return (
       <ListeningTypingPanel
+        script={script}
+        datasetType={datasetType}
         language={language}
         items={items}
         onFinish={onFinish}
@@ -47,6 +55,8 @@ export const ListeningStudyPanel: React.FC<Props> = ({
 
   return (
     <ListeningWritingPanel
+      script={script}
+      datasetType={datasetType}
       language={language}
       items={items}
       onFinish={onFinish}

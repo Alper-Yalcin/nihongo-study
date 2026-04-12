@@ -30,7 +30,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
       : null;
 
   return (
-    <PageContainer title={title}>
+    <PageContainer>
       {statusText && (
         <div
           className={`rounded-2xl border px-4 py-3 text-sm ${

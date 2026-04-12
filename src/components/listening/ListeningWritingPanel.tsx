@@ -7,8 +7,20 @@ import { evaluateDrawing } from '../../utils/DrawingEvaluator';
 import { ArrowLeft, Check, CheckCircle2, Eraser, SkipForward, XCircle } from 'lucide-react';
 import { AudioButton } from './AudioButton';
 import { DrawingCanvas, DrawingCanvasRef } from '../DrawingCanvas';
+import { useKanaProgressStore } from '../../features/kana/progress/progressStore';
+import { applySessionAnswerToProgress } from '../../features/kana/progress/progressService';
+import { StudySession } from '../../features/kana/domain/studySession';
+import {
+  completeStudySession,
+  createStudySession,
+  getSessionConfigNumber,
+  isSessionKeyMatch,
+  recordStudySessionAnswer
+} from '../../features/kana/session/sessionEngine';
 
 interface Props {
+  script: 'hiragana' | 'katakana';
+  datasetType: 'character' | 'word';
   language: AppLanguage;
   items: ListeningItem[];
   onFinish: (stats: RunStats) => void;
@@ -36,12 +48,18 @@ const initialSessionStats: SessionStats = {
 };
 
 export const ListeningWritingPanel: React.FC<Props> = ({
+  script,
+  datasetType,
   language,
   items,
   onFinish,
   onCancel
 }) => {
   const copy = studyContent[language];
+  const { activeSession, getProgress, saveProgress, saveSession, setActiveSession } = useKanaProgressStore();
+  const sessionKey = `kana:${script}:listening:${datasetType}:writing`;
+  const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [feedback, setFeedback] = useState<'idle' | 'correct' | 'wrong'>('idle');
   const [sessionStats, setSessionStats] = useState<SessionStats>(initialSessionStats);
@@ -51,8 +69,13 @@ export const ListeningWritingPanel: React.FC<Props> = ({
   const sessionStatsRef = useRef(initialSessionStats);
   const questionStartedAtRef = useRef(Date.now());
   const transitionTimeoutRef = useRef<number | null>(null);
+  const sessionRef = useRef<StudySession | null>(null);
 
   const currentItem = items[currentIndex];
+
+  useEffect(() => {
+    sessionStatsRef.current = sessionStats;
+  }, [sessionStats]);
 
   useEffect(() => {
     if (!currentItem) {
@@ -74,8 +97,88 @@ export const ListeningWritingPanel: React.FC<Props> = ({
     []
   );
 
+  const buildSessionConfig = (stats: SessionStats, index: number) => ({
+    sessionKey,
+    variant: 'writing',
+    datasetType,
+    questionCount: items.length,
+    attempts: stats.attempts,
+    correct: stats.correct,
+    wrong: stats.wrong,
+    currentStreak: stats.currentStreak,
+    bestStreak: stats.bestStreak,
+    totalResponseMs: stats.totalResponseMs,
+    totalDrawingScore: stats.totalDrawingScore,
+    currentIndex: index
+  });
+
+  const persistActiveSession = (
+    nextSession: StudySession,
+    options: { active?: boolean; clearActive?: boolean } = { active: true }
+  ) => {
+    sessionRef.current = nextSession;
+    saveSession(nextSession, options.active ? { active: true } : undefined);
+
+    if (options.clearActive) {
+      setActiveSession(null);
+    }
+  };
+
+  const restoreSession = (session: StudySession) => {
+    const restoredStats = {
+      attempts: getSessionConfigNumber(session, 'attempts') ?? 0,
+      correct: getSessionConfigNumber(session, 'correct') ?? 0,
+      wrong: getSessionConfigNumber(session, 'wrong') ?? 0,
+      currentStreak: getSessionConfigNumber(session, 'currentStreak') ?? 0,
+      bestStreak: getSessionConfigNumber(session, 'bestStreak') ?? 0,
+      totalResponseMs: getSessionConfigNumber(session, 'totalResponseMs') ?? 0,
+      totalDrawingScore: getSessionConfigNumber(session, 'totalDrawingScore') ?? 0
+    };
+    sessionRef.current = session;
+    setCurrentIndex(Math.min(Math.max(session.currentIndex, 0), Math.max(items.length - 1, 0)));
+    setFeedback('idle');
+    sessionStatsRef.current = restoredStats;
+    setSessionStats(restoredStats);
+  };
+
+  const startNewSession = () => {
+    const nextSession = createStudySession({
+      script,
+      type: 'test',
+      mode: 'listening',
+      itemIds: items.map((item) => item.id),
+      currentIndex: 0,
+      config: buildSessionConfig(initialSessionStats, 0)
+    });
+
+    persistActiveSession(nextSession);
+    setCurrentIndex(0);
+    setFeedback('idle');
+    sessionStatsRef.current = initialSessionStats;
+    setSessionStats(initialSessionStats);
+  };
+
+  useEffect(() => {
+    if (activeRunSession) {
+      restoreSession(activeRunSession);
+      return;
+    }
+
+    startNewSession();
+  }, [activeRunSession?.id, items]);
+
   const finishRun = (snapshot: SessionStats) => {
-    const timeSeconds = Math.max(1, Math.floor((Date.now() - startedAt) / 1000));
+    const sessionStartedAt = sessionRef.current?.startedAt
+      ? new Date(sessionRef.current.startedAt).getTime()
+      : startedAt;
+    const timeSeconds = Math.max(1, Math.floor((Date.now() - sessionStartedAt) / 1000));
+
+    if (sessionRef.current) {
+      persistActiveSession(completeStudySession(sessionRef.current), {
+        active: false,
+        clearActive: true
+      });
+    }
 
     onFinish(
       buildListeningRunStats({
@@ -93,17 +196,17 @@ export const ListeningWritingPanel: React.FC<Props> = ({
     );
   };
 
-  const goToNextQuestion = () => {
-    if (currentIndex >= items.length - 1) {
-      finishRun(sessionStatsRef.current);
+  const goToNextQuestion = (nextStats: SessionStats, nextIndex: number) => {
+    if (nextIndex >= items.length) {
+      finishRun(nextStats);
       return;
     }
 
-    setCurrentIndex((previousIndex) => previousIndex + 1);
+    setCurrentIndex(nextIndex);
   };
 
   const recordAnswer = (isCorrect: boolean, drawingScore: number) => {
-    if (!currentItem || !currentItem.character || feedback !== 'idle') {
+    if (!currentItem || !currentItem.character || feedback !== 'idle' || !sessionRef.current) {
       return;
     }
 
@@ -119,13 +222,41 @@ export const ListeningWritingPanel: React.FC<Props> = ({
       totalResponseMs: sessionStatsRef.current.totalResponseMs + responseMs,
       totalDrawingScore: sessionStatsRef.current.totalDrawingScore + drawingScore
     };
+    const answeredAt = new Date().toISOString();
+    const answerRecord = {
+      itemId: currentItem.id,
+      mode: 'listening' as const,
+      correct: isCorrect,
+      answeredAt,
+      latencyMs: responseMs,
+      hintsUsed: 0,
+      retries: 0,
+      responseItemId: null,
+      variant: 'writing'
+    };
+
+    if (datasetType === 'character') {
+      const currentProgress = getProgress(currentItem.id);
+
+      if (currentProgress) {
+        saveProgress(applySessionAnswerToProgress(currentProgress, answerRecord));
+      }
+    }
 
     sessionStatsRef.current = nextStats;
     setSessionStats(nextStats);
     setFeedback(isCorrect ? 'correct' : 'wrong');
 
+    const nextIndex = currentIndex + 1;
+    const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+      itemIds: items.map((item) => item.id),
+      currentIndex: nextIndex,
+      config: buildSessionConfig(nextStats, nextIndex)
+    });
+
+    persistActiveSession(nextSession);
     transitionTimeoutRef.current = window.setTimeout(() => {
-      goToNextQuestion();
+      goToNextQuestion(nextStats, nextIndex);
     }, isCorrect ? 700 : 1100);
   };
 

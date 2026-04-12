@@ -10,8 +10,20 @@ import {
 } from '../../utils/listening';
 import { ArrowLeft, CheckCircle2, SkipForward, XCircle } from 'lucide-react';
 import { AudioButton } from './AudioButton';
+import { useKanaProgressStore } from '../../features/kana/progress/progressStore';
+import { applySessionAnswerToProgress } from '../../features/kana/progress/progressService';
+import { StudySession } from '../../features/kana/domain/studySession';
+import {
+  completeStudySession,
+  createStudySession,
+  getSessionConfigNumber,
+  isSessionKeyMatch,
+  recordStudySessionAnswer
+} from '../../features/kana/session/sessionEngine';
 
 interface Props {
+  script: 'hiragana' | 'katakana';
+  datasetType: 'character' | 'word';
   language: AppLanguage;
   items: ListeningItem[];
   sourceItems: ListeningItem[];
@@ -38,6 +50,8 @@ const initialSessionStats: SessionStats = {
 };
 
 export const ListeningRecognitionPanel: React.FC<Props> = ({
+  script,
+  datasetType,
   language,
   items,
   sourceItems,
@@ -45,6 +59,10 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
   onCancel
 }) => {
   const copy = studyContent[language];
+  const { activeSession, getProgress, saveProgress, saveSession, setActiveSession } = useKanaProgressStore();
+  const sessionKey = `kana:${script}:listening:${datasetType}:recognition`;
+  const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'idle' | 'correct' | 'wrong'>('idle');
@@ -54,6 +72,7 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
   const sessionStatsRef = useRef(initialSessionStats);
   const questionStartedAtRef = useRef(Date.now());
   const transitionTimeoutRef = useRef<number | null>(null);
+  const sessionRef = useRef<StudySession | null>(null);
 
   const currentItem = items[currentIndex];
 
@@ -64,6 +83,10 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
 
     return buildRecognitionOptions(currentItem, sourceItems, Math.min(4, sourceItems.length || 1));
   }, [currentItem, sourceItems]);
+
+  useEffect(() => {
+    sessionStatsRef.current = sessionStats;
+  }, [sessionStats]);
 
   useEffect(() => {
     if (!currentItem) {
@@ -83,8 +106,89 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
     []
   );
 
+  const buildSessionConfig = (stats: SessionStats, index: number) => ({
+    sessionKey,
+    variant: 'recognition',
+    datasetType,
+    sourceItemIds: sourceItems.map((item) => item.id),
+    questionCount: items.length,
+    attempts: stats.attempts,
+    correct: stats.correct,
+    wrong: stats.wrong,
+    currentStreak: stats.currentStreak,
+    bestStreak: stats.bestStreak,
+    totalResponseMs: stats.totalResponseMs,
+    currentIndex: index
+  });
+
+  const persistActiveSession = (
+    nextSession: StudySession,
+    options: { active?: boolean; clearActive?: boolean } = { active: true }
+  ) => {
+    sessionRef.current = nextSession;
+    saveSession(nextSession, options.active ? { active: true } : undefined);
+
+    if (options.clearActive) {
+      setActiveSession(null);
+    }
+  };
+
+  const restoreSession = (session: StudySession) => {
+    const restoredStats = {
+      attempts: getSessionConfigNumber(session, 'attempts') ?? 0,
+      correct: getSessionConfigNumber(session, 'correct') ?? 0,
+      wrong: getSessionConfigNumber(session, 'wrong') ?? 0,
+      currentStreak: getSessionConfigNumber(session, 'currentStreak') ?? 0,
+      bestStreak: getSessionConfigNumber(session, 'bestStreak') ?? 0,
+      totalResponseMs: getSessionConfigNumber(session, 'totalResponseMs') ?? 0
+    };
+    sessionRef.current = session;
+    setCurrentIndex(Math.min(Math.max(session.currentIndex, 0), Math.max(items.length - 1, 0)));
+    setSelectedId(null);
+    setFeedback('idle');
+    sessionStatsRef.current = restoredStats;
+    setSessionStats(restoredStats);
+  };
+
+  const startNewSession = () => {
+    const nextSession = createStudySession({
+      script,
+      type: 'test',
+      mode: 'listening',
+      itemIds: items.map((item) => item.id),
+      currentIndex: 0,
+      config: buildSessionConfig(initialSessionStats, 0)
+    });
+
+    persistActiveSession(nextSession);
+    setCurrentIndex(0);
+    setSelectedId(null);
+    setFeedback('idle');
+    sessionStatsRef.current = initialSessionStats;
+    setSessionStats(initialSessionStats);
+  };
+
+  useEffect(() => {
+    if (activeRunSession) {
+      restoreSession(activeRunSession);
+      return;
+    }
+
+    startNewSession();
+  }, [activeRunSession?.id, items, sourceItems]);
+
   const finishRun = (snapshot: SessionStats) => {
-    const timeSeconds = Math.max(1, Math.floor((Date.now() - startedAt) / 1000));
+    const sessionStartedAt = sessionRef.current?.startedAt
+      ? new Date(sessionRef.current.startedAt).getTime()
+      : startedAt;
+    const timeSeconds = Math.max(1, Math.floor((Date.now() - sessionStartedAt) / 1000));
+
+    if (sessionRef.current) {
+      persistActiveSession(completeStudySession(sessionRef.current), {
+        active: false,
+        clearActive: true
+      });
+    }
 
     onFinish(
       buildListeningRunStats({
@@ -101,19 +205,19 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
     );
   };
 
-  const goToNextQuestion = () => {
-    if (currentIndex >= items.length - 1) {
-      finishRun(sessionStatsRef.current);
+  const goToNextQuestion = (nextStats: SessionStats, nextIndex: number) => {
+    if (nextIndex >= items.length) {
+      finishRun(nextStats);
       return;
     }
 
-    setCurrentIndex((previousIndex) => previousIndex + 1);
+    setCurrentIndex(nextIndex);
     setSelectedId(null);
     setFeedback('idle');
   };
 
   const recordAnswer = (isCorrect: boolean, resolvedSelectedId: string | null) => {
-    if (!currentItem || feedback !== 'idle') {
+    if (!currentItem || feedback !== 'idle' || !sessionRef.current) {
       return;
     }
 
@@ -128,14 +232,42 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
         : sessionStatsRef.current.bestStreak,
       totalResponseMs: sessionStatsRef.current.totalResponseMs + responseMs
     };
+    const answeredAt = new Date().toISOString();
+    const answerRecord = {
+      itemId: currentItem.id,
+      mode: 'listening' as const,
+      correct: isCorrect,
+      answeredAt,
+      latencyMs: responseMs,
+      hintsUsed: 0,
+      retries: 0,
+      responseItemId: resolvedSelectedId,
+      variant: 'recognition'
+    };
+
+    if (datasetType === 'character') {
+      const currentProgress = getProgress(currentItem.id);
+
+      if (currentProgress) {
+        saveProgress(applySessionAnswerToProgress(currentProgress, answerRecord));
+      }
+    }
 
     sessionStatsRef.current = nextStats;
     setSessionStats(nextStats);
     setSelectedId(resolvedSelectedId);
     setFeedback(isCorrect ? 'correct' : 'wrong');
 
+    const nextIndex = currentIndex + 1;
+    const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+      itemIds: items.map((item) => item.id),
+      currentIndex: nextIndex,
+      config: buildSessionConfig(nextStats, nextIndex)
+    });
+
+    persistActiveSession(nextSession);
     transitionTimeoutRef.current = window.setTimeout(() => {
-      goToNextQuestion();
+      goToNextQuestion(nextStats, nextIndex);
     }, isCorrect ? 650 : 1000);
   };
 

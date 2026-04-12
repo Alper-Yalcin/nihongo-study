@@ -19,6 +19,12 @@ import { studyContent } from '../../data/studyContent';
 import { getAcceptedRomajiAnswers } from '../../utils/typing';
 import { shuffleArray } from '../../utils/listening';
 import { getGoogleTranslateKanaAudioSrc } from '../../data/kanaAudio';
+import { useKanaProgressStore } from '../../features/kana/progress/progressStore';
+import {
+  getSessionConfigNumber,
+  getSessionConfigString,
+  getSessionConfigStringArray
+} from '../../features/kana/session/sessionEngine';
 
 interface Props {
   title: string;
@@ -39,6 +45,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({
   script
 }) => {
   const copy = studyContent[language];
+  const { activeSession } = useKanaProgressStore();
   const [view, setView] = useState<View>('table');
   const [datasetType, setDatasetType] = useState<DatasetType>('character');
   const [listeningMode, setListeningMode] = useState<ListeningMode>('recognition');
@@ -116,6 +123,25 @@ export const ListeningStudyContainer: React.FC<Props> = ({
   const maxCount = activePool.length;
   const safeMaxCount = Math.max(maxCount, 1);
   const isWritingDisabled = datasetType === 'word';
+  const matchingActiveSession =
+    activeSession &&
+    activeSession.script === script &&
+    activeSession.mode === 'listening' &&
+    activeSession.status === 'active'
+      ? activeSession
+      : null;
+  const resumeCopy =
+    language === 'tr'
+      ? {
+          title: 'Devam eden dinleme oturumu bulundu',
+          description: 'Yarim kalan dinleme akisini tekrar acabilirsin.',
+          action: 'Dinlemeyi surdur'
+        }
+      : {
+          title: 'Active listening session found',
+          description: 'You can reopen the interrupted listening flow.',
+          action: 'Resume listening'
+        };
 
   useEffect(() => {
     setQuestionCount((previousCount) => Math.min(Math.max(previousCount, 1), safeMaxCount));
@@ -150,6 +176,44 @@ export const ListeningStudyContainer: React.FC<Props> = ({
     setRunStats(null);
     setLastRunMode(resolvedMode);
     setLastRunDatasetType(datasetType);
+    setView('run');
+  };
+
+  const handleResumeSession = () => {
+    if (!matchingActiveSession) {
+      return;
+    }
+
+    const restoredDatasetType =
+      getSessionConfigString(matchingActiveSession, 'datasetType') === 'word' ? 'word' : 'character';
+    const restoredMode = getSessionConfigString(matchingActiveSession, 'variant');
+    const resolvedMode =
+      restoredMode === 'recognition' || restoredMode === 'typing' || restoredMode === 'writing'
+        ? restoredMode
+        : 'recognition';
+    const sourcePool = restoredDatasetType === 'character' ? characterItems : wordItems;
+    const sourceMap = new Map(sourcePool.map((item) => [item.id, item]));
+    const sourceIds = getSessionConfigStringArray(matchingActiveSession, 'sourceItemIds');
+    const restoredSourceItems =
+      sourceIds.length > 0
+        ? sourceIds
+            .map((itemId) => sourceMap.get(itemId) ?? null)
+            .filter((item): item is ListeningItem => item !== null)
+        : sourcePool;
+    const restoredQuizItems = matchingActiveSession.itemIds
+      .map((itemId) => sourceMap.get(itemId) ?? null)
+      .filter((item): item is ListeningItem => item !== null);
+
+    setDatasetType(restoredDatasetType);
+    setListeningMode(resolvedMode === 'writing' && restoredDatasetType === 'word' ? 'recognition' : resolvedMode);
+    setQuestionCount(
+      getSessionConfigNumber(matchingActiveSession, 'questionCount') ?? Math.max(restoredQuizItems.length, 1)
+    );
+    setSourceItems(restoredSourceItems);
+    setQuizItems(restoredQuizItems);
+    setRunStats(null);
+    setLastRunMode(resolvedMode === 'writing' && restoredDatasetType === 'word' ? 'recognition' : resolvedMode);
+    setLastRunDatasetType(restoredDatasetType);
     setView('run');
   };
 
@@ -193,6 +257,24 @@ export const ListeningStudyContainer: React.FC<Props> = ({
           <div className="mb-2 text-center text-sm text-slate-500">
             {copy.listening.clickHint}
           </div>
+
+          {matchingActiveSession && (
+            <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-amber-900">{resumeCopy.title}</div>
+                  <p className="mt-1 text-sm text-amber-800">{resumeCopy.description}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleResumeSession}
+                  className="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+                >
+                  {resumeCopy.action}
+                </button>
+              </div>
+            </div>
+          )}
 
           <CharacterListeningTable section={currentSection} script={script} language={language} />
 
@@ -276,6 +358,8 @@ export const ListeningStudyContainer: React.FC<Props> = ({
 
       {view === 'run' && (
         <ListeningStudyPanel
+          script={script}
+          datasetType={lastRunDatasetType}
           language={language}
           items={quizItems}
           sourceItems={sourceItems}
