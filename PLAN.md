@@ -21,7 +21,21 @@ Ana sabitler:
 - top-level IA `Home / Study / Test / Play / Search / Account` cizgisine tasinir
 - kanji ilk surumde placeholder/overview seviyesinde kalir
 
+## Current Status
+
+- Route-based app shell aktif ve ana navigation route-first calisiyor.
+- Desktop navbar rewrite fiilen tamamlandi; mobile navbar ve footer da aktif.
+- Home page foundation tamamlandi.
+- Kana domain/persistence foundation tamamlandi.
+- Learn/review/weak/confusable akislari gercek veriyle calisiyor.
+- Session engine entegrasyonu typing/drawing/listening tarafinda ortak orchestration katmanina tasindi.
+- Word API tarafinda server-side filter/pagination ve ek endpointler var, ama UI entegrasyonu parcali.
+- Proje UI-first siralamada Phase 2c ve Phase 3b kapanisina ulasip Phase 4a UI tamamlama adimina gecmis durumda.
+- Kalan acik ana konu, word tarafinda pack/detail endpointlerinin tum ilgili UI akislarinda tutarli kullanimi ve preload desenlerinin azaltilmasi.
+
 ## Phase 0 - Shell Prep
+
+Durum: Done
 
 Amac:
 
@@ -44,24 +58,28 @@ Kabul kriterleri:
 
 ## Phase 1a - Router Skeleton
 
+Durum: Mostly done
+
 Amac:
 
 - state tabanli ana gezinmeyi route tabanli shell'e tasimak
 
 Teslimatlar:
 
-- app shell route tabanli hale getirilir
-- `/` home route'u olur
-- `/kana/:script/overview` route'lari eklenir
-- kanji placeholder route'lari eklenir
-- eski ekranlar gecici olarak yeni route'lara baglanir
+- app shell route tabanli hale getirildi
+- `/` home route'u aktif
+- hiragana/katakana overview route'lari aktif
+- kanji placeholder/overview route'u aktif
+- eski entry path'lerinin bir kismi redirect ile yeni route'lara baglandi
 
 Kabul kriterleri:
 
-- URL ile ana kana entry'lerine ulasilabilir
-- route degisimi artik sadece local component state'e bagimli degildir
+- URL ile ana kana entry'lerine ulasilabiliyor
+- kalan acik: canonical route yapisi ve redirect/fallback temizligi tamamlanmali
 
 ## Phase 1b - Desktop Navbar Rewrite
+
+Durum: Done
 
 Amac:
 
@@ -82,6 +100,8 @@ Kabul kriterleri:
 
 ## Phase 1c - Mobile Navbar and Footer Rewrite
 
+Durum: Mostly done
+
 Amac:
 
 - shell navigasyonunu mobil ve footer tarafinda tamamlamak
@@ -91,14 +111,17 @@ Teslimatlar:
 - mobile navbar yeni IA ile uyumlu hale gelir
 - mobile navigation sade ama bilgi mimarisine uygun olur
 - footer cok sutunlu bilgi merkezi olarak yeniden kurulur
-- footer link kolonlari urunun farkli alanlarina gercek gecis sunar
+- footer link kolonlari urunun farkli alanlarina gecis sunar
 
 Kabul kriterleri:
 
 - mobilde navigation hala erisilebilir kalir
 - footer dekoratif degil, gercek navigasyon merkezi olur
+- kalan acik: nav/footer linklerinin placeholder veya redirect/fallback'e dusen kisimlari temizlenir
 
 ## Phase 2a - Home Page Foundation
+
+Durum: Done
 
 Amac:
 
@@ -118,6 +141,8 @@ Kabul kriterleri:
 
 ## Phase 2b - Kana Overview Rewrite
 
+Durum: Mostly done
+
 Amac:
 
 - calisma hakkinda bilgi alma ve calisma baslatma deneyimini duzeltmek
@@ -133,25 +158,34 @@ Kabul kriterleri:
 
 - kullanici overview'de ne okuyacagini ve neye tiklayacagini anlar
 - calisma baslatma alani daha guclu ve aciklayici olur
+- kalan acik: overview'den baslatilan akislarin ana yolu local state degil route uzerinden calismalidir
 
 ## Phase 2c - Study/Test/Play Entry Mapping
 
+Durum: Done
+
 Amac:
 
-- yeni IA ile kana ekranlari arasindaki urun koprulerini tamamlamak
+- yeni IA ile kana ekranlari arasindaki urun koprulerini kapatmak ve UI-route tutarliligini bitirmek
 
 Teslimatlar:
 
-- `Study / Test / Play` dropdown girisleri gercek route'lara baglanir
-- hiragana ve katakana icin study/test/play haritasi netlesir
-- kanji bu fazda hala placeholder seviyesinde kalir
+- overview/start aksiyonlarinda local activeView gecislerinin ana yol olmaktan cikarilmasi
+- overview CTA aksiyonlarinin route-driven hale getirilmesi
+- `Study / Test / Play` dropdown, overview CTA ve footer mapping'inin ayni route gercegine baglanmasi
+- hiragana ve katakana icin study/test/play haritasinin off-plan baglarinin temizlenmesi
+- kanji tarafinin placeholder kapsaminda acik ve tutarli kalmasi
+- placeholder/redirect/fallback dongulerinin Phase 2 beklentisi olan destinasyonlarda temizlenmesi
 
 Kabul kriterleri:
 
-- kullanici top nav'dan urun akislarini anlayarak ilgili kana alanina gidebilir
-- navigation ve overview CTA'lari birbiriyle celismez
+- kullanici top nav'dan urun akislarini anlayarak ilgili kana alanina dogrudan gidebilir
+- navigation, footer ve overview CTA'lari birbirini route seviyesinde dogru tamamlar
+- URL/back-forward davranisi ana calisma girislerinde tutarli calisir
 
 ## Phase 3a - Kana Domain and Persistence Foundation
+
+Durum: Done
 
 Amac:
 
@@ -171,23 +205,27 @@ Kabul kriterleri:
 
 ## Phase 3b - Session Engine Integration
 
+Durum: Done
+
 Amac:
 
 - typing, drawing ve listening'i ortak ogrenme pipeline'ina baglamak
 
 Teslimatlar:
 
-- ortak session event modeli kurulur
-- typing, drawing ve listening sonuc verileri ortak scoring/update akisina baglanir
-- session sonunda progress guncellenir
-- session resume calisir
+- typing, drawing ve listening tarafinda session olusturma/guncelleme/tamamlama aktif
+- session sonunda progress guncellemesi aktif
+- session resume aktif
+- modlar arasi ortak session orchestration katmani aktif
 
 Kabul kriterleri:
 
-- modlar bagimsiz skor ekranlari gibi calismaz
 - session yarim birakilip geri acilabilir
+- ayni session pipeline kurgusu modlar arasi tekil katman uzerinden calisir
 
 ## Phase 3c - Review, Weak, Confusable
+
+Durum: Done (stabilizasyon acik)
 
 Amac:
 
@@ -209,22 +247,28 @@ Kabul kriterleri:
 
 ## Phase 4a - Word API Refactor
 
+Durum: Partial / open
+
 Amac:
 
 - kelime tarafini olceklenebilir hale getirmek
 
 Teslimatlar:
 
-- `/api/words` server-side filter + pagination destekler
-- `/api/word-packs` ve `/api/words/:id` eklenir
-- client tum kelimeleri tek seferde cekmeyi birakir
+- `/api/words` server-side filter + pagination destekliyor
+- `/api/word-packs` ve `/api/words/:id` endpointleri mevcut
+- dictionary panelinde pagination aktif
+- kalan acik: tum istemci akislarinda bulk preload deseninin azaltilmasi ve pack/detail endpointlerinin UI entegrasyonu
 
 Kabul kriterleri:
 
 - dictionary buyuk word pool'da da hizli kalir
 - sorgu, filtre ve pagination backend uzerinden yurur
+- kalan acik: pack tabanli UI akislari net ve uca bagli hale getirilir
 
 ## Phase 4b - Word Bridge and Stats
+
+Durum: Partial / open
 
 Amac:
 
@@ -232,14 +276,22 @@ Amac:
 
 Teslimatlar:
 
-- curated word packs eklenir
-- kana -> word bridge eklenir
-- dictionary yeni packs ile butunlesir
-- stats ekrani tamamlanir
-- word listening icin audio karari uygulanir
+- kana -> word bridge'in ilk katmani aktif (item detail ve ilgili kelime baglari)
+- stats ekrani aktif
+- curated word packs server tarafinda mevcut
+- kalan acik: curated pack akislari UI'da netlestirilir
+- kalan acik: word listening audio karari ve varlik tamamlama netlestirilir
 
 Kabul kriterleri:
 
 - her karakter yalniz gorunmez; kelime bagi da sunar
 - stats gercek progress verisini yansitir
 - word listening yarim calisan durum birakmaz
+
+## Immediate Next Step
+
+Bir sonraki tek odakli is, Phase 4a UI tarafini pack/detail endpoint entegrasyonu ve preload kaliplari acisindan tamamlamaktir.
+
+- Dictionary UI'da word pack secimi ve detail gorunumu aktif akislari genislet.
+- Script/Kana path/item ekranlarinda gereksiz toplu preload desenlerini azaltip ihtiyaca gore sorgu desenini guclendir.
+- Word tarafinda pagination/filter/pack davranisinin tum girislerden tutarli calistigini smoke test ile dogrula.

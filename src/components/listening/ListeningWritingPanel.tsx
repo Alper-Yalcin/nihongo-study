@@ -8,15 +8,18 @@ import { ArrowLeft, Check, CheckCircle2, Eraser, SkipForward, XCircle } from 'lu
 import { AudioButton } from './AudioButton';
 import { DrawingCanvas, DrawingCanvasRef } from '../DrawingCanvas';
 import { useKanaProgressStore } from '../../features/kana/progress/progressStore';
-import { applySessionAnswerToProgress } from '../../features/kana/progress/progressService';
 import { StudySession } from '../../features/kana/domain/studySession';
 import {
-  completeStudySession,
   createStudySession,
   getSessionConfigNumber,
-  isSessionKeyMatch,
-  recordStudySessionAnswer
+  isSessionKeyMatch
 } from '../../features/kana/session/sessionEngine';
+import {
+  completeAndPersistSession,
+  persistSessionState,
+  recordAnswerAndPersistSession,
+  syncProgressFromSessionAnswer
+} from '../../features/kana/session/sessionRunCoordinator';
 
 interface Props {
   script: 'hiragana' | 'katakana';
@@ -70,6 +73,15 @@ export const ListeningWritingPanel: React.FC<Props> = ({
   const questionStartedAtRef = useRef(Date.now());
   const transitionTimeoutRef = useRef<number | null>(null);
   const sessionRef = useRef<StudySession | null>(null);
+  const sessionPersistenceContext = {
+    sessionRef,
+    saveSession,
+    setActiveSession
+  };
+  const progressSyncContext = {
+    getProgress,
+    saveProgress
+  };
 
   const currentItem = items[currentIndex];
 
@@ -112,18 +124,6 @@ export const ListeningWritingPanel: React.FC<Props> = ({
     currentIndex: index
   });
 
-  const persistActiveSession = (
-    nextSession: StudySession,
-    options: { active?: boolean; clearActive?: boolean } = { active: true }
-  ) => {
-    sessionRef.current = nextSession;
-    saveSession(nextSession, options.active ? { active: true } : undefined);
-
-    if (options.clearActive) {
-      setActiveSession(null);
-    }
-  };
-
   const restoreSession = (session: StudySession) => {
     const restoredStats = {
       attempts: getSessionConfigNumber(session, 'attempts') ?? 0,
@@ -151,7 +151,7 @@ export const ListeningWritingPanel: React.FC<Props> = ({
       config: buildSessionConfig(initialSessionStats, 0)
     });
 
-    persistActiveSession(nextSession);
+    persistSessionState(sessionPersistenceContext, nextSession);
     setCurrentIndex(0);
     setFeedback('idle');
     sessionStatsRef.current = initialSessionStats;
@@ -173,12 +173,7 @@ export const ListeningWritingPanel: React.FC<Props> = ({
       : startedAt;
     const timeSeconds = Math.max(1, Math.floor((Date.now() - sessionStartedAt) / 1000));
 
-    if (sessionRef.current) {
-      persistActiveSession(completeStudySession(sessionRef.current), {
-        active: false,
-        clearActive: true
-      });
-    }
+    completeAndPersistSession(sessionPersistenceContext);
 
     onFinish(
       buildListeningRunStats({
@@ -235,26 +230,18 @@ export const ListeningWritingPanel: React.FC<Props> = ({
       variant: 'writing'
     };
 
-    if (datasetType === 'character') {
-      const currentProgress = getProgress(currentItem.id);
-
-      if (currentProgress) {
-        saveProgress(applySessionAnswerToProgress(currentProgress, answerRecord));
-      }
-    }
+    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType });
 
     sessionStatsRef.current = nextStats;
     setSessionStats(nextStats);
     setFeedback(isCorrect ? 'correct' : 'wrong');
 
     const nextIndex = currentIndex + 1;
-    const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+    recordAnswerAndPersistSession(sessionPersistenceContext, answerRecord, {
       itemIds: items.map((item) => item.id),
       currentIndex: nextIndex,
       config: buildSessionConfig(nextStats, nextIndex)
     });
-
-    persistActiveSession(nextSession);
     transitionTimeoutRef.current = window.setTimeout(() => {
       goToNextQuestion(nextStats, nextIndex);
     }, isCorrect ? 700 : 1100);

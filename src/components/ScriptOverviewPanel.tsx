@@ -28,7 +28,6 @@ interface Props {
   sections: KanaSection[];
   words: WordItem[];
   availableViews: ScriptStudyView[];
-  onSelectView: (view: ScriptStudyView) => void;
 }
 
 type SummaryCardId =
@@ -68,6 +67,21 @@ const viewCardClassMap = {
     button: 'bg-amber-600 hover:bg-amber-700'
   }
 } as const;
+
+const startHrefByView: Record<'hiragana' | 'katakana', Record<ScriptStudyView, string>> = {
+  hiragana: {
+    typing: appShellRoutes.hiraganaLearn,
+    drawing: appShellRoutes.hiraganaLearn,
+    listening: appShellRoutes.hiraganaLearn,
+    dictionary: appShellRoutes.hiraganaWords
+  },
+  katakana: {
+    typing: appShellRoutes.katakanaLearn,
+    drawing: appShellRoutes.katakanaLearn,
+    listening: appShellRoutes.katakanaLearn,
+    dictionary: appShellRoutes.katakanaWords
+  }
+};
 
 const scriptToneMap = {
   hiragana: {
@@ -226,8 +240,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
   script,
   sections,
   words,
-  availableViews,
-  onSelectView
+  availableViews
 }) => {
   const copy = overviewCopy[language];
   const pageCopy = scriptLandingContent[language][script];
@@ -418,6 +431,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
               const sectionDetail = pageCopy.sections[view];
               const Icon = viewIcons[view];
               const style = viewCardClassMap[view];
+              const startHref = startHrefByView[script][view];
 
               return (
                 <div
@@ -446,14 +460,13 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
                     >
                       {copy.actions.learnMore}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => onSelectView(view)}
+                    <Link
+                      to={startHref}
                       className={`inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white transition-colors ${style.button}`}
                     >
                       {copy.actions.start}
                       <ArrowRight size={16} className="ml-2" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               );

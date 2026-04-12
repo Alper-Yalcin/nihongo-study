@@ -36,10 +36,6 @@ const deserializeKanaFontStyle = (value: string): KanaFontStyleId =>
     ? (value as KanaFontStyleId)
     : defaultKanaFontStyleId;
 
-const hiraganaFutureRoutes = [appShellRoutes.hiraganaWords];
-
-const katakanaFutureRoutes = [appShellRoutes.katakanaWords];
-
 export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -139,6 +135,7 @@ export default function App() {
           <Route path="/hiragana" element={<Navigate to={appShellRoutes.hiraganaOverview} replace />} />
           <Route path="/katakana" element={<Navigate to={appShellRoutes.katakanaOverview} replace />} />
           <Route path="/kanji" element={<Navigate to={appShellRoutes.kanjiOverview} replace />} />
+          <Route path="/kanji/overview" element={<Navigate to={appShellRoutes.kanjiOverview} replace />} />
           <Route path="/settings" element={<Navigate to={appShellRoutes.settings} replace />} />
 
           <Route path="/kana/hiragana" element={<Navigate to={appShellRoutes.hiraganaOverview} replace />} />
@@ -163,14 +160,10 @@ export default function App() {
             path={appShellRoutes.hiraganaStats}
             element={<KanaStatsPage script="hiragana" language={language} />}
           />
-          {hiraganaFutureRoutes.map((path) => (
-            <React.Fragment key={path}>
-              <Route
-                path={path}
-                element={<Navigate to={appShellRoutes.hiraganaOverview} replace />}
-              />
-            </React.Fragment>
-          ))}
+          <Route
+            path={appShellRoutes.hiraganaWords}
+            element={<Hiragana language={language} initialView="dictionary" />}
+          />
 
           <Route path="/kana/katakana" element={<Navigate to={appShellRoutes.katakanaOverview} replace />} />
           <Route path={appShellRoutes.katakanaOverview} element={<Katakana language={language} />} />
@@ -194,16 +187,11 @@ export default function App() {
             path={appShellRoutes.katakanaStats}
             element={<KanaStatsPage script="katakana" language={language} />}
           />
-          {katakanaFutureRoutes.map((path) => (
-            <React.Fragment key={path}>
-              <Route
-                path={path}
-                element={<Navigate to={appShellRoutes.katakanaOverview} replace />}
-              />
-            </React.Fragment>
-          ))}
+          <Route
+            path={appShellRoutes.katakanaWords}
+            element={<Katakana language={language} initialView="dictionary" />}
+          />
 
-          <Route path="/kana/kanji/overview" element={<Navigate to={appShellRoutes.kanjiOverview} replace />} />
           <Route path={appShellRoutes.kanjiOverview} element={<Kanji language={language} />} />
           <Route path="/kana/item/:kanaId" element={<KanaItemPage language={language} />} />
           <Route path="/kana/session/:sessionId" element={<KanaSessionPage language={language} />} />

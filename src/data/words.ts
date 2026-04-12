@@ -7,6 +7,26 @@ type ScriptType = NonNullable<WordItem['script']>;
 export type DictionaryQueryMode = 'contains' | 'prefix' | 'exact';
 export type DictionaryJlptLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1';
 
+export interface DictionaryWordPack {
+  id: string;
+  title: string;
+  description: string;
+  script: ScriptType;
+  level?: DictionaryJlptLevel;
+  mode?: DictionaryQueryMode;
+  query?: string;
+  offset: number;
+  maxItems: number;
+  estimatedCount: number;
+}
+
+export interface DictionaryWordDetail extends WordItem {
+  script: ScriptType;
+  meanings: string[];
+  jlptLevel: DictionaryJlptLevel | null;
+  tags?: string;
+}
+
 export interface DictionaryWordPage {
   total: number;
   limit: number;
@@ -17,6 +37,10 @@ export interface DictionaryWordPage {
 interface DictionaryWordsResponse {
   items: WordItem[];
   page: DictionaryWordPage;
+}
+
+interface DictionaryWordPacksResponse {
+  items: DictionaryWordPack[];
 }
 
 export interface DictionaryWordSearchParams {
@@ -75,13 +99,39 @@ const buildWordsApiPath = ({
   return `/api/words?${searchParams.toString()}`;
 };
 
+const buildWordPacksApiPath = (script: ScriptType) => {
+  const searchParams = new URLSearchParams();
+  searchParams.set('script', script);
+  return `/api/word-packs?${searchParams.toString()}`;
+};
+
+const buildWordDetailApiPath = (wordId: string, script: ScriptType) => {
+  const encodedWordId = encodeURIComponent(wordId);
+  const searchParams = new URLSearchParams();
+  searchParams.set('script', script);
+  return `/api/words/${encodedWordId}?${searchParams.toString()}`;
+};
+
 export const searchDictionaryWords = async (
   params: DictionaryWordSearchParams
 ): Promise<DictionaryWordsResponse> =>
   fetchJson<DictionaryWordsResponse>(buildWordsApiPath(params));
 
+export const listDictionaryWordPacks = async (script: ScriptType): Promise<DictionaryWordPack[]> => {
+  const response = await fetchJson<DictionaryWordPacksResponse>(buildWordPacksApiPath(script));
+  return response.items;
+};
+
+export const getDictionaryWordById = async (
+  wordId: string,
+  script: ScriptType
+): Promise<DictionaryWordDetail> =>
+  fetchJson<DictionaryWordDetail>(buildWordDetailApiPath(wordId, script));
+
 const wordCache = new Map<ScriptType, DictionaryWordsState>();
 const pendingRequests = new Map<ScriptType, Promise<WordItem[]>>();
+const wordPackCache = new Map<ScriptType, DictionaryWordPack[]>();
+const pendingWordPackRequests = new Map<ScriptType, Promise<DictionaryWordPack[]>>();
 
 export const loadDictionaryWords = async (script: ScriptType): Promise<WordItem[]> => {
   const cached = wordCache.get(script);
@@ -172,6 +222,99 @@ export const useDictionaryWords = (script: ScriptType) => {
   }, [script]);
 
   return { words, page, loading, error };
+};
+
+export const useDictionaryWordPacks = (script: ScriptType) => {
+  const [packs, setPacks] = useState<DictionaryWordPack[]>(() => wordPackCache.get(script) ?? []);
+  const [loading, setLoading] = useState(!wordPackCache.has(script));
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    setError(null);
+    setLoading(!wordPackCache.has(script));
+
+    const cached = wordPackCache.get(script);
+
+    if (cached) {
+      setPacks(cached);
+      return () => {
+        isActive = false;
+      };
+    }
+
+    const pending = pendingWordPackRequests.get(script);
+
+    if (pending) {
+      pending
+        .then((items) => {
+          if (!isActive) {
+            return;
+          }
+
+          setPacks(items);
+          setLoading(false);
+        })
+        .catch((requestError: unknown) => {
+          if (!isActive) {
+            return;
+          }
+
+          const message =
+            requestError instanceof Error ? requestError.message : 'Failed to load word packs.';
+          setError(message);
+          setLoading(false);
+        });
+
+      return () => {
+        isActive = false;
+      };
+    }
+
+    const request = listDictionaryWordPacks(script)
+      .then((items) => {
+        wordPackCache.set(script, items);
+        pendingWordPackRequests.delete(script);
+        return items;
+      })
+      .catch((requestError) => {
+        pendingWordPackRequests.delete(script);
+        throw requestError;
+      });
+
+    pendingWordPackRequests.set(script, request);
+
+    request
+      .then((items) => {
+        if (!isActive) {
+          return;
+        }
+
+        setPacks(items);
+        setLoading(false);
+      })
+      .catch((requestError: unknown) => {
+        if (!isActive) {
+          return;
+        }
+
+        const message =
+          requestError instanceof Error ? requestError.message : 'Failed to load word packs.';
+        setError(message);
+        setLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [script]);
+
+  return {
+    packs,
+    loading,
+    error
+  };
 };
 
 export const useDictionaryWordSearch = ({

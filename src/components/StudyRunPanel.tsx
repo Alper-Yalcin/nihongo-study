@@ -12,16 +12,19 @@ import {
 } from '../utils/typing';
 import { formatDuration } from '../utils/formatDuration';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
-import { applySessionAnswerToProgress } from '../features/kana/progress/progressService';
 import { StudySession } from '../features/kana/domain/studySession';
 import {
-  completeStudySession,
   createStudySession,
   getSessionConfigNumber,
-  isSessionKeyMatch,
-  recordStudySessionAnswer,
-  updateStudySession
+  isSessionKeyMatch
 } from '../features/kana/session/sessionEngine';
+import {
+  completeAndPersistSession,
+  persistSessionState,
+  recordAnswerAndPersistSession,
+  syncProgressFromSessionAnswer,
+  updateSessionConfigAndPersist
+} from '../features/kana/session/sessionRunCoordinator';
 
 interface Props {
   script: 'hiragana' | 'katakana';
@@ -112,6 +115,15 @@ export const StudyRunPanel: React.FC<Props> = ({
   const sessionCompleteRef = useRef(isSessionComplete);
   const transitionTimeoutRef = useRef<number | null>(null);
   const sessionRef = useRef<StudySession | null>(null);
+  const sessionPersistenceContext = {
+    sessionRef,
+    saveSession,
+    setActiveSession
+  };
+  const progressSyncContext = {
+    getProgress,
+    saveProgress
+  };
 
   useEffect(() => {
     sessionStatsRef.current = sessionStats;
@@ -158,18 +170,6 @@ export const StudyRunPanel: React.FC<Props> = ({
     totalAnswerMs: stats.totalAnswerMs
   });
 
-  const persistActiveSession = (
-    nextSession: StudySession,
-    options: { active?: boolean; clearActive?: boolean } = { active: true }
-  ) => {
-    sessionRef.current = nextSession;
-    saveSession(nextSession, options.active ? { active: true } : undefined);
-
-    if (options.clearActive) {
-      setActiveSession(null);
-    }
-  };
-
   const finalizeRun = (timeSeconds: number) => {
     if (sessionCompleteRef.current) {
       return;
@@ -179,12 +179,7 @@ export const StudyRunPanel: React.FC<Props> = ({
     sessionCompleteRef.current = true;
     setIsSessionComplete(true);
 
-    if (sessionRef.current) {
-      persistActiveSession(completeStudySession(sessionRef.current), {
-        active: false,
-        clearActive: true
-      });
-    }
+    completeAndPersistSession(sessionPersistenceContext);
 
     const snapshot = sessionStatsRef.current;
     const completed = isTimedMode ? snapshot.correctCount : initialPool.length;
@@ -275,7 +270,7 @@ export const StudyRunPanel: React.FC<Props> = ({
       config: buildSessionConfig(initialSessionStats, 0)
     });
 
-    persistActiveSession(nextSession);
+    persistSessionState(sessionPersistenceContext, nextSession);
     setPool(initialPool);
     setCurrentChar(initialChar ?? initialPool[0]);
     focusInput();
@@ -324,11 +319,9 @@ export const StudyRunPanel: React.FC<Props> = ({
       return;
     }
 
-    const nextSession = updateStudySession(sessionRef.current, {
+    updateSessionConfigAndPersist(sessionPersistenceContext, {
       config: buildSessionConfig(sessionStatsRef.current, elapsedSeconds)
     });
-
-    persistActiveSession(nextSession);
   }, [elapsedSeconds, isTimedMode]);
 
   const isCorrectAnswer = (value: string, character: Character) =>
@@ -373,11 +366,7 @@ export const StudyRunPanel: React.FC<Props> = ({
       variant: typingMode,
       responseItemId: null
     };
-    const currentProgress = getProgress(currentChar.id);
-
-    if (currentProgress) {
-      saveProgress(applySessionAnswerToProgress(currentProgress, answerRecord));
-    }
+    syncProgressFromSessionAnswer(progressSyncContext, answerRecord);
 
     setFeedback(isCorrect ? 'correct' : 'wrong');
     setSessionStats(nextStats);
@@ -387,13 +376,11 @@ export const StudyRunPanel: React.FC<Props> = ({
       if (isTimedMode) {
         const nextChar = pickRandomChar(initialPool);
         const nextIndex = findCharacterIndex(initialPool, nextChar?.id ?? null);
-        const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+        recordAnswerAndPersistSession(sessionPersistenceContext, answerRecord, {
           itemIds: initialPool.map((character) => character.id),
           currentIndex: nextIndex,
           config: buildSessionConfig(nextStats, elapsedSeconds)
         });
-
-        persistActiveSession(nextSession);
         transitionTimeoutRef.current = window.setTimeout(() => {
           if (sessionCompleteRef.current) {
             return;
@@ -411,13 +398,11 @@ export const StudyRunPanel: React.FC<Props> = ({
       const nextPool = pool.filter((character) => character.id !== currentChar.id);
       const nextChar = pickRandomChar(nextPool);
       const nextIndex = findCharacterIndex(nextPool, nextChar?.id ?? null);
-      const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+      recordAnswerAndPersistSession(sessionPersistenceContext, answerRecord, {
         itemIds: nextPool.map((character) => character.id),
         currentIndex: nextIndex,
         config: buildSessionConfig(nextStats, elapsedSeconds)
       });
-
-      persistActiveSession(nextSession);
       transitionTimeoutRef.current = window.setTimeout(() => {
         if (sessionCompleteRef.current) {
           return;
@@ -438,13 +423,11 @@ export const StudyRunPanel: React.FC<Props> = ({
     }
 
     const currentIndex = findCharacterIndex(pool, currentChar.id);
-    const nextSession = recordStudySessionAnswer(sessionRef.current, answerRecord, {
+    recordAnswerAndPersistSession(sessionPersistenceContext, answerRecord, {
       itemIds: pool.map((character) => character.id),
       currentIndex,
       config: buildSessionConfig(nextStats, elapsedSeconds)
     });
-
-    persistActiveSession(nextSession);
     transitionTimeoutRef.current = window.setTimeout(() => {
       if (sessionCompleteRef.current) {
         return;

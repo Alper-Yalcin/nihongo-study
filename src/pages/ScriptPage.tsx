@@ -3,20 +3,22 @@ import { PageContainer } from '../components/PageContainer';
 import { ScriptStudyLayout } from '../components/ScriptStudyLayout';
 import { AppLanguage } from '../data/appPreferences';
 import { useDictionaryWords } from '../data/words';
-import { KanaSection } from '../types';
+import { KanaSection, ScriptLayoutView } from '../types';
 
 interface ScriptPageProps {
   title: string;
   script: 'hiragana' | 'katakana';
   language: AppLanguage;
   getSections: (language: AppLanguage) => KanaSection[];
+  initialView?: ScriptLayoutView;
 }
 
 export const ScriptPage: React.FC<ScriptPageProps> = ({
   title,
   script,
   language,
-  getSections
+  getSections,
+  initialView = 'overview'
 }) => {
   const { words, loading, error } = useDictionaryWords(script);
   const statusText = error
@@ -48,6 +50,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
         script={script}
         kanaSections={getSections(language)}
         dictionaryWords={words}
+        initialView={initialView}
       />
     </PageContainer>
   );

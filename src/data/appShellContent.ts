@@ -16,7 +16,7 @@ export const appShellRoutes = {
   katakanaConfusable: '/kana/katakana/confusable',
   katakanaWords: '/kana/katakana/words',
   katakanaStats: '/kana/katakana/stats',
-  kanjiOverview: '/kanji/overview',
+  kanjiOverview: '/kana/kanji/overview',
   search: '/search',
   account: '/account',
   settings: '/account/settings'
@@ -149,38 +149,26 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
           label: 'Test',
           groups: [
             {
-              id: 'kana',
-              title: 'Kana',
-              links: [
-                {
-                  id: 'kana-mixed-review',
-                  label: 'Mixed Review',
-                  description: 'Kana genel tekrar ve kontrol akisi.',
-                  href: appShellRoutes.hiraganaReview
-                },
-                {
-                  id: 'kana-weak-items',
-                  label: 'Weak Items',
-                  description: 'En cok zorlanilan karakterleri ayri test et.',
-                  href: appShellRoutes.hiraganaWeak
-                },
-                {
-                  id: 'kana-confusables',
-                  label: 'Confusables',
-                  description: 'Karistirilan kana ciftlerini ayri calis.',
-                  href: appShellRoutes.hiraganaConfusable
-                }
-              ]
-            },
-            {
               id: 'hiragana',
               title: 'Hiragana',
               links: [
+                {
+                  id: 'hiragana-review-test',
+                  label: 'Review Queue',
+                  description: 'Hiragana due review akisini ac.',
+                  href: appShellRoutes.hiraganaReview
+                },
                 {
                   id: 'hiragana-weak-test',
                   label: 'Weak Review',
                   description: 'Hiragana tarafindaki zayif itemleri kontrol et.',
                   href: appShellRoutes.hiraganaWeak
+                },
+                {
+                  id: 'hiragana-confusable-test',
+                  label: 'Confusable Drill',
+                  description: 'Hiragana karisma ciftlerini ayri test et.',
+                  href: appShellRoutes.hiraganaConfusable
                 },
                 {
                   id: 'hiragana-stats',
@@ -195,10 +183,22 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               title: 'Katakana',
               links: [
                 {
+                  id: 'katakana-review-test',
+                  label: 'Review Queue',
+                  description: 'Katakana due review akisini ac.',
+                  href: appShellRoutes.katakanaReview
+                },
+                {
                   id: 'katakana-weak-test',
                   label: 'Weak Review',
                   description: 'Katakana tarafindaki zayif itemleri kontrol et.',
                   href: appShellRoutes.katakanaWeak
+                },
+                {
+                  id: 'katakana-confusable-test',
+                  label: 'Confusable Drill',
+                  description: 'Katakana karisma ciftlerini ayri test et.',
+                  href: appShellRoutes.katakanaConfusable
                 },
                 {
                   id: 'katakana-stats',
@@ -221,8 +221,8 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
                 {
                   id: 'hiragana-play-overview',
                   label: 'Quick Start',
-                  description: 'Hiragana icin hizli drill ve oyun benzeri giris.',
-                  href: appShellRoutes.hiraganaOverview
+                  description: 'Hiragana learn akisini hizli ac.',
+                  href: appShellRoutes.hiraganaLearn
                 }
               ]
             },
@@ -233,8 +233,8 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
                 {
                   id: 'katakana-play-overview',
                   label: 'Quick Start',
-                  description: 'Katakana icin hizli drill ve oyun benzeri giris.',
-                  href: appShellRoutes.katakanaOverview
+                  description: 'Katakana learn akisini hizli ac.',
+                  href: appShellRoutes.katakanaLearn
                 }
               ]
             },
@@ -506,38 +506,26 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
           label: 'Test',
           groups: [
             {
-              id: 'kana',
-              title: 'Kana',
-              links: [
-                {
-                  id: 'kana-mixed-review',
-                  label: 'Mixed Review',
-                  description: 'Open the combined kana review entry.',
-                  href: appShellRoutes.hiraganaReview
-                },
-                {
-                  id: 'kana-weak-items',
-                  label: 'Weak Items',
-                  description: 'Focus on the items that need extra work.',
-                  href: appShellRoutes.hiraganaWeak
-                },
-                {
-                  id: 'kana-confusables',
-                  label: 'Confusables',
-                  description: 'Practice commonly confused kana pairs.',
-                  href: appShellRoutes.hiraganaConfusable
-                }
-              ]
-            },
-            {
               id: 'hiragana',
               title: 'Hiragana',
               links: [
+                {
+                  id: 'hiragana-review-test',
+                  label: 'Review Queue',
+                  description: 'Open the hiragana due review flow.',
+                  href: appShellRoutes.hiraganaReview
+                },
                 {
                   id: 'hiragana-weak-test',
                   label: 'Weak Review',
                   description: 'Check the weakest hiragana items.',
                   href: appShellRoutes.hiraganaWeak
+                },
+                {
+                  id: 'hiragana-confusable-test',
+                  label: 'Confusable Drill',
+                  description: 'Practice the most confused hiragana pairs.',
+                  href: appShellRoutes.hiraganaConfusable
                 },
                 {
                   id: 'hiragana-stats',
@@ -552,10 +540,22 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               title: 'Katakana',
               links: [
                 {
+                  id: 'katakana-review-test',
+                  label: 'Review Queue',
+                  description: 'Open the katakana due review flow.',
+                  href: appShellRoutes.katakanaReview
+                },
+                {
                   id: 'katakana-weak-test',
                   label: 'Weak Review',
                   description: 'Check the weakest katakana items.',
                   href: appShellRoutes.katakanaWeak
+                },
+                {
+                  id: 'katakana-confusable-test',
+                  label: 'Confusable Drill',
+                  description: 'Practice the most confused katakana pairs.',
+                  href: appShellRoutes.katakanaConfusable
                 },
                 {
                   id: 'katakana-stats',
@@ -578,8 +578,8 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
                 {
                   id: 'hiragana-play-overview',
                   label: 'Quick Start',
-                  description: 'Enter the lightweight hiragana drill entry.',
-                  href: appShellRoutes.hiraganaOverview
+                  description: 'Jump directly into the hiragana learn flow.',
+                  href: appShellRoutes.hiraganaLearn
                 }
               ]
             },
@@ -590,8 +590,8 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
                 {
                   id: 'katakana-play-overview',
                   label: 'Quick Start',
-                  description: 'Enter the lightweight katakana drill entry.',
-                  href: appShellRoutes.katakanaOverview
+                  description: 'Jump directly into the katakana learn flow.',
+                  href: appShellRoutes.katakanaLearn
                 }
               ]
             },

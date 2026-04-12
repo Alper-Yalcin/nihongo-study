@@ -5,8 +5,14 @@ import { Search, ChevronLeft, ChevronRight, Keyboard, ListChecks } from 'lucide-
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
 import { wordStudyContent } from '../data/wordStudyContent';
-import { useMeaningTranslations } from '../utils/wordMeaning';
-import { searchDictionaryWords, useDictionaryWordSearch } from '../data/words';
+import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
+import {
+  DictionaryWordDetail,
+  getDictionaryWordById,
+  searchDictionaryWords,
+  useDictionaryWordPacks,
+  useDictionaryWordSearch
+} from '../data/words';
 
 const studyModes: WordStudyMode[] = ['wordToRomaji', 'wordToMeaning', 'meaningToWord', 'test'];
 
@@ -25,16 +31,46 @@ export const WordDictionaryPanel: React.FC<Props> = ({
   const wordCopy = wordStudyContent[language];
   const meaningTranslations = useMeaningTranslations(language);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPackId, setSelectedPackId] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [questionCount, setQuestionCount] = useState(10);
   const [isStartingMode, setIsStartingMode] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [selectedWord, setSelectedWord] = useState<WordItem | null>(null);
+  const [selectedWordDetail, setSelectedWordDetail] = useState<DictionaryWordDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
   const pageSize = 10;
   const normalizedSearch = searchTerm.trim();
+  const { packs, loading: packsLoading, error: packsError } = useDictionaryWordPacks(script);
+  const dictionaryUiCopy = language === 'tr'
+    ? {
+        packLabel: 'Kelime Paketi',
+        allPacks: 'Tum Paketler',
+        loadingPacks: 'Paketler yukleniyor...',
+        detailAction: 'Detay',
+        detailTitle: 'Kelime Detayi',
+        detailLoading: 'Kelime detayi yukleniyor...',
+        jlptLabel: 'JLPT',
+        tagsLabel: 'Etiketler',
+        noMeaning: 'Anlam bulunmuyor'
+      }
+    : {
+        packLabel: 'Word Pack',
+        allPacks: 'All Packs',
+        loadingPacks: 'Loading packs...',
+        detailAction: 'Details',
+        detailTitle: 'Word Detail',
+        detailLoading: 'Loading word detail...',
+        jlptLabel: 'JLPT',
+        tagsLabel: 'Tags',
+        noMeaning: 'No meaning available'
+      };
 
   const { words: paginatedWords, page, loading, error } = useDictionaryWordSearch({
     script,
     query: normalizedSearch || undefined,
+    packId: selectedPackId || undefined,
     limit: pageSize,
     offset: (currentPage - 1) * pageSize
   });
@@ -45,7 +81,13 @@ export const WordDictionaryPanel: React.FC<Props> = ({
 
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, selectedPackId]);
+
+  React.useEffect(() => {
+    setSelectedWord(null);
+    setSelectedWordDetail(null);
+    setDetailError(null);
+  }, [selectedPackId]);
 
   React.useEffect(() => {
     setCurrentPage((previousPage) => Math.min(previousPage, totalPages));
@@ -60,6 +102,49 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       return Math.min(Math.max(previousCount, 1), maxQuestionCount);
     });
   }, [availableWordCount, maxQuestionCount]);
+
+  React.useEffect(() => {
+    if (!selectedWord) {
+      setSelectedWordDetail(null);
+      setDetailError(null);
+      setDetailLoading(false);
+      return;
+    }
+
+    let isActive = true;
+
+    setDetailLoading(true);
+    setDetailError(null);
+
+    getDictionaryWordById(selectedWord.id, script)
+      .then((detail) => {
+        if (!isActive) {
+          return;
+        }
+
+        setSelectedWordDetail(detail);
+        setDetailLoading(false);
+      })
+      .catch((requestError: unknown) => {
+        if (!isActive) {
+          return;
+        }
+
+        const message =
+          requestError instanceof Error
+            ? requestError.message
+            : language === 'tr'
+              ? 'Kelime detayi yuklenemedi.'
+              : 'Failed to load word detail.';
+
+        setDetailError(message);
+        setDetailLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [language, script, selectedWord?.id]);
 
   const handlePrevPage = () => setCurrentPage((page) => Math.max(1, page - 1));
   const handleNextPage = () => setCurrentPage((page) => Math.min(totalPages, page + 1));
@@ -87,6 +172,20 @@ export const WordDictionaryPanel: React.FC<Props> = ({
     setQuestionCount(nextValue);
   };
 
+  const resolveWordMeaning = (word: Pick<WordItem, 'meaning' | 'meanings'>) => {
+    const localizedMeaning = getLocalizedWordMeaning(word.meaning, language, meaningTranslations);
+
+    if (localizedMeaning) {
+      return localizedMeaning;
+    }
+
+    if (Array.isArray(word.meanings) && word.meanings.length > 0) {
+      return word.meanings.join(', ');
+    }
+
+    return dictionaryUiCopy.noMeaning;
+  };
+
   const fetchStudySourceWords = async (mode: WordStudyMode, requestedCount: number) => {
     const minimumWordCount = mode === 'test' ? 4 : 1;
     const targetCount = Math.max(minimumWordCount, Math.min(requestedCount, maxQuestionCount));
@@ -103,6 +202,7 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       const response = await searchDictionaryWords({
         script,
         query: normalizedSearch || undefined,
+        packId: selectedPackId || undefined,
         limit: requestLimit,
         offset: nextOffset
       });
@@ -176,17 +276,43 @@ export const WordDictionaryPanel: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Search size={18} className="text-slate-400" />
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search size={18} className="text-slate-400" />
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={copy.dictionary.searchPlaceholder}
+            className="w-full rounded-xl border border-slate-200 py-2 pr-4 pl-10 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          />
         </div>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder={copy.dictionary.searchPlaceholder}
-          className="w-full rounded-xl border border-slate-200 py-2 pr-4 pl-10 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-        />
+
+        <div>
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            {dictionaryUiCopy.packLabel}
+          </label>
+          <select
+            value={selectedPackId}
+            onChange={(event) => setSelectedPackId(event.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          >
+            <option value="">{dictionaryUiCopy.allPacks}</option>
+            {packs.map((pack) => (
+              <option key={pack.id} value={pack.id}>
+                {`${pack.title} (${pack.estimatedCount})`}
+              </option>
+            ))}
+          </select>
+          {packsLoading && (
+            <div className="mt-1 text-xs text-slate-500">{dictionaryUiCopy.loadingPacks}</div>
+          )}
+          {packsError && (
+            <div className="mt-1 text-xs text-rose-600">{packsError}</div>
+          )}
+        </div>
       </div>
 
       <WordTable
@@ -194,6 +320,9 @@ export const WordDictionaryPanel: React.FC<Props> = ({
         meaningTranslations={meaningTranslations}
         words={paginatedWords}
         startIndex={page.offset}
+        onSelectWord={setSelectedWord}
+        selectedWordId={selectedWord?.id ?? null}
+        detailActionLabel={dictionaryUiCopy.detailAction}
       />
 
       {loading && (
@@ -205,6 +334,50 @@ export const WordDictionaryPanel: React.FC<Props> = ({
       {error && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {error}
+        </div>
+      )}
+
+      {selectedWord && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            {dictionaryUiCopy.detailTitle}
+          </div>
+
+          {detailLoading && (
+            <div className="text-sm text-slate-500">{dictionaryUiCopy.detailLoading}</div>
+          )}
+
+          {detailError && (
+            <div className="mb-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+              {detailError}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <div className="font-jp text-2xl font-semibold text-slate-900">
+              {selectedWordDetail?.kanji ?? selectedWord.kanji ?? selectedWordDetail?.kana ?? selectedWord.kana}
+            </div>
+            <div className="text-sm text-slate-600">
+              {selectedWordDetail?.kana ?? selectedWord.kana} / {selectedWordDetail?.romaji ?? selectedWord.romaji}
+            </div>
+            <div className="text-sm text-slate-700">
+              {resolveWordMeaning(selectedWordDetail ?? selectedWord)}
+            </div>
+            {(selectedWordDetail?.jlptLevel || selectedWordDetail?.tags) && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {selectedWordDetail?.jlptLevel && (
+                  <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
+                    {`${dictionaryUiCopy.jlptLabel}: ${selectedWordDetail.jlptLevel}`}
+                  </span>
+                )}
+                {selectedWordDetail?.tags && (
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                    {`${dictionaryUiCopy.tagsLabel}: ${selectedWordDetail.tags}`}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

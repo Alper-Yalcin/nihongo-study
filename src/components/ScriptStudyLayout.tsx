@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { KanaSection, ScriptLayoutView, ScriptStudyView, WordItem } from '../types';
 import { StudyContainer } from './StudyContainer';
 import { WordStudyContainer } from './WordStudyContainer';
 import { ListeningStudyContainer } from './listening/ListeningStudyContainer';
 import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { AppLanguage } from '../data/appPreferences';
 import { studyContent } from '../data/studyContent';
 import { scriptLandingContent } from '../content/scriptLandingContent';
 import { ScriptOverviewPanel } from './ScriptOverviewPanel';
 import { getBackToOverviewLabel } from './landing/landingUtils';
+import { appShellRoutes } from '../data/appShellContent';
 
 interface Props {
   title: string;
@@ -17,6 +19,7 @@ interface Props {
   kanaSections: KanaSection[];
   dictionaryWords: WordItem[];
   availableViews?: ScriptStudyView[];
+  initialView?: ScriptLayoutView;
 }
 
 export const ScriptStudyLayout: React.FC<Props> = ({
@@ -25,11 +28,13 @@ export const ScriptStudyLayout: React.FC<Props> = ({
   script,
   kanaSections,
   dictionaryWords,
-  availableViews = ['typing', 'drawing', 'listening', 'dictionary']
+  availableViews = ['typing', 'drawing', 'listening', 'dictionary'],
+  initialView = 'overview'
 }) => {
-  const [activeView, setActiveView] = useState<ScriptLayoutView>('overview');
+  const [activeView, setActiveView] = useState<ScriptLayoutView>(initialView);
   const copy = studyContent[language];
   const overviewCopy = scriptLandingContent[language][script];
+  const overviewHref = script === 'hiragana' ? appShellRoutes.hiraganaOverview : appShellRoutes.katakanaOverview;
   const activeViewLabel =
     activeView === 'typing'
       ? copy.views.typing
@@ -39,6 +44,10 @@ export const ScriptStudyLayout: React.FC<Props> = ({
           ? copy.views.listening
           : copy.views.dictionary;
   const backToOverviewLabel = getBackToOverviewLabel(language);
+
+  useEffect(() => {
+    setActiveView(initialView);
+  }, [initialView]);
 
   return (
     <div className="space-y-6">
@@ -51,14 +60,13 @@ export const ScriptStudyLayout: React.FC<Props> = ({
               </div>
               <h2 className="mt-2 text-2xl font-bold text-slate-900">{`${title} ${activeViewLabel}`}</h2>
             </div>
-            <button
-              type="button"
-              onClick={() => setActiveView('overview')}
+            <Link
+              to={overviewHref}
               className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
             >
               <ArrowLeft size={16} className="mr-2" />
               {backToOverviewLabel}
-            </button>
+            </Link>
           </div>
         )}
         <div style={{ display: activeView === 'overview' ? 'block' : 'none' }}>
@@ -69,7 +77,6 @@ export const ScriptStudyLayout: React.FC<Props> = ({
             sections={kanaSections}
             words={dictionaryWords}
             availableViews={availableViews}
-            onSelectView={setActiveView}
           />
         </div>
         <div style={{ display: activeView === 'typing' ? 'block' : 'none' }}>
