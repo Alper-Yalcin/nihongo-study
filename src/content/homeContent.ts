@@ -82,7 +82,7 @@ interface HomeContent {
 export const homeContent: Record<AppLanguage, HomeContent> = {
   tr: {
     hero: {
-      eyebrow: 'Kotonoha Home',
+      eyebrow: 'Kototsuna Home',
       title: 'Kana calismasini urun gibi hissettiren giris katmani',
       lead: 'Typing, drawing, listening ve dictionary araclarini tek tek gostermek yerine; neye sahip oldugunu, nasil kullanacagini ve nereden baslaman gerektigini daha net anlatan yeni home sayfasi.',
       copy:
@@ -120,7 +120,7 @@ export const homeContent: Record<AppLanguage, HomeContent> = {
       eyebrow: 'Bugun Elinde Olanlar',
       title: 'Mevcut araclar tek yerde toplanmis durumda',
       description:
-        'Kotonoha zaten bos degil. Asil sorun arac eksikligi degil; bunlarin daha iyi anlatilmasi ve dogru giris noktalarina baglanmasi.',
+        'Kototsuna zaten bos degil. Asil sorun arac eksikligi degil; bunlarin daha iyi anlatilmasi ve dogru giris noktalarina baglanmasi.',
       systems: [
         {
           id: 'typing',
@@ -234,7 +234,7 @@ export const homeContent: Record<AppLanguage, HomeContent> = {
   },
   en: {
     hero: {
-      eyebrow: 'Kotonoha Home',
+      eyebrow: 'Kototsuna Home',
       title: 'A real entry layer for kana study',
       lead: 'Instead of exposing typing, drawing, listening, and dictionary as isolated tools, this home page explains what the product has, how it is organized, and where to begin.',
       copy:
@@ -272,7 +272,7 @@ export const homeContent: Record<AppLanguage, HomeContent> = {
       eyebrow: 'What Exists Today',
       title: 'The current toolset already has substance',
       description:
-        'Kotonoha is not empty. The main problem is not missing tools; it is that the tools need better explanation and better entry points.',
+        'Kototsuna is not empty. The main problem is not missing tools; it is that the tools need better explanation and better entry points.',
       systems: [
         {
           id: 'typing',

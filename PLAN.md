@@ -1,4 +1,4 @@
-# Kotonoha Kana Rebuild Plan
+# Kototsuna Kana Rebuild Plan
 
 ## Summary
 

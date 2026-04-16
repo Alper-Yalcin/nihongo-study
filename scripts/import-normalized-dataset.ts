@@ -8,7 +8,7 @@ import { loadAllLegacyDictionaryRecords, LegacyDictionaryWordRecord } from './le
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
-const DATABASE_PATH = path.join(ROOT, 'database', 'kotonoha.sqlite');
+const DATABASE_PATH = path.join(ROOT, 'database', 'kototsuna.sqlite');
 const NORMALIZED_DIR = path.join(ROOT, 'data-sources', 'normalized');
 
 type NormalizedWordScriptType = 'hiragana_word' | 'katakana_word' | 'kanji_word';

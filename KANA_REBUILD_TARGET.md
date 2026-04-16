@@ -1,12 +1,12 @@
-# Kotonoha Kana Rebuild Target
+# Kototsuna Kana Rebuild Target
 
 ## Amac
 
-Bu belge, Kotonoha'nin kana tarafini yeniden kurarken ulasilmasi gereken urun hedeflerini, teknik yonu ve zorunlu feature kapsamlarini tek yerde toplar.
+Bu belge, Kototsuna'nin kana tarafini yeniden kurarken ulasilmasi gereken urun hedeflerini, teknik yonu ve zorunlu feature kapsamlarini tek yerde toplar.
 
 Ana hedef:
 
-- Kotonoha'yi "cok modlu kana araci" yapisindan cikarip "ogrenciyi yonlendiren, ilerlemeyi takip eden, review uretebilen, kelimeye bag kuran kana ogrenme sistemi" haline getirmek
+- Kototsuna'yi "cok modlu kana araci" yapisindan cikarip "ogrenciyi yonlendiren, ilerlemeyi takip eden, review uretebilen, kelimeye bag kuran kana ogrenme sistemi" haline getirmek
 
 Bu rebuild'in odagi yeni mod eklemek degil, ogrenme omurgasini kurmaktir.
 

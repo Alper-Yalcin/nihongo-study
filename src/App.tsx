@@ -24,9 +24,12 @@ import { appShellRoutes } from './data/appShellContent';
 import { getPathForTab, getTabFromPath } from './utils/tabNavigation';
 import { KanaProgressProvider } from './features/kana/progress/progressStore';
 
-const KANA_FONT_STORAGE_KEY = 'kotonoha.kana-font-style';
-const APP_LANGUAGE_STORAGE_KEY = 'kotonoha.app-language';
-const THEME_MODE_STORAGE_KEY = 'kotonoha.theme-mode';
+const KANA_FONT_STORAGE_KEY = 'kototsuna.kana-font-style';
+const APP_LANGUAGE_STORAGE_KEY = 'kototsuna.app-language';
+const THEME_MODE_STORAGE_KEY = 'kototsuna.theme-mode';
+const LEGACY_KANA_FONT_STORAGE_KEY = 'kotonoha.kana-font-style';
+const LEGACY_APP_LANGUAGE_STORAGE_KEY = 'kotonoha.app-language';
+const LEGACY_THEME_MODE_STORAGE_KEY = 'kotonoha.theme-mode';
 
 const serializeString = <T extends string>(value: T) => value;
 const deserializeLanguage = (value: string): AppLanguage => (value === 'en' ? 'en' : 'tr');
@@ -44,7 +47,8 @@ export default function App() {
     'tr',
     {
       serialize: serializeString,
-      deserialize: deserializeLanguage
+      deserialize: deserializeLanguage,
+      legacyKeys: [LEGACY_APP_LANGUAGE_STORAGE_KEY]
     }
   );
   const [themeMode, setThemeMode] = usePersistentState<ThemeMode>(
@@ -52,7 +56,8 @@ export default function App() {
     'light',
     {
       serialize: serializeString,
-      deserialize: deserializeThemeMode
+      deserialize: deserializeThemeMode,
+      legacyKeys: [LEGACY_THEME_MODE_STORAGE_KEY]
     }
   );
   const [kanaFontStyle, setKanaFontStyle] = usePersistentState<KanaFontStyleId>(
@@ -60,7 +65,8 @@ export default function App() {
     defaultKanaFontStyleId,
     {
       serialize: serializeString,
-      deserialize: deserializeKanaFontStyle
+      deserialize: deserializeKanaFontStyle,
+      legacyKeys: [LEGACY_KANA_FONT_STORAGE_KEY]
     }
   );
 

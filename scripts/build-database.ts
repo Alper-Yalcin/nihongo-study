@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 const DATABASE_DIR = path.join(ROOT, 'database');
-const DATABASE_PATH = path.join(DATABASE_DIR, 'kotonoha.sqlite');
+const DATABASE_PATH = path.join(DATABASE_DIR, 'kototsuna.sqlite');
 
 const ensureDatabaseDirectory = () => {
   fs.mkdirSync(DATABASE_DIR, { recursive: true });

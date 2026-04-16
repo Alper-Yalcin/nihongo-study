@@ -1,4 +1,4 @@
-# Kotonoha
+# Kototsuna
 
 React + Vite frontend and Express + SQLite backend for kana, kanji, listening, drawing, and dictionary study flows.
 

@@ -90,9 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const themeText = themeLabels[language];
   const isDark = themeMode === 'dark';
-  const logoSrc = isDark
-    ? '/logo/Kotonoha_logo_with_sakura_design-removebg-preview.svg'
-    : '/logo/Kotonoha_logo_with_cherry_blossoms-removebg-preview.svg';
+  const logoSrc = '/logo/kototsuna-logo.png';
 
   const selectedLanguage = useMemo(
     () => languageOptions.find((option) => option.id === language) ?? languageOptions[0],
@@ -201,7 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className={`hidden items-stretch overflow-visible ${desktopBarClass} sm:flex`}>
           <div className={`flex w-52 flex-shrink-0 items-center justify-center border-r px-3 ${utilityBorderClass}`}>
             <Link to={appShellRoutes.home} className="flex items-center justify-center">
-              <img src={logoSrc} alt="Kotonoha logo" className="h-14 w-auto max-w-full object-contain" />
+              <img src={logoSrc} alt="Kototsuna logo" className="h-14 w-auto max-w-full object-contain" />
             </Link>
           </div>
 
@@ -364,7 +362,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Link to={appShellRoutes.home} className="flex items-center">
               <img
                 src={logoSrc}
-                alt="Kotonoha logo"
+                alt="Kototsuna logo"
                 className="h-12 w-auto max-w-[180px] object-contain"
               />
             </Link>

@@ -1,7 +1,11 @@
 import { getKanaItemById, kanaInventory } from '../data/kanaInventory';
 import { KanaItem, KanaScript } from '../domain/kanaItem';
 import { createInitialKanaProgress, KanaProgress } from '../domain/kanaProgress';
-import { KANA_PROGRESS_STORAGE_KEY, ProgressRepository } from './progressRepository';
+import {
+  KANA_PROGRESS_STORAGE_KEY,
+  LEGACY_KANA_PROGRESS_STORAGE_KEY,
+  ProgressRepository
+} from './progressRepository';
 
 interface ProgressStoragePayload {
   version: 1;
@@ -35,7 +39,19 @@ const readRawValue = (): string | null => {
   }
 
   try {
-    return window.localStorage.getItem(KANA_PROGRESS_STORAGE_KEY);
+    const currentValue = window.localStorage.getItem(KANA_PROGRESS_STORAGE_KEY);
+
+    if (currentValue !== null) {
+      return currentValue;
+    }
+
+    const legacyValue = window.localStorage.getItem(LEGACY_KANA_PROGRESS_STORAGE_KEY);
+
+    if (legacyValue !== null) {
+      window.localStorage.setItem(KANA_PROGRESS_STORAGE_KEY, legacyValue);
+    }
+
+    return legacyValue;
   } catch {
     return null;
   }
@@ -207,6 +223,7 @@ export const localProgressRepository: ProgressRepository = {
 
     try {
       window.localStorage.removeItem(KANA_PROGRESS_STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_KANA_PROGRESS_STORAGE_KEY);
     } catch {
       // Ignore storage clear failures and keep the memory payload reset.
     }

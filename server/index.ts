@@ -13,6 +13,6 @@ const PORT = Number(process.env.PORT || 3001);
 const app = createApp({ distDir: DIST_DIR });
 
 app.listen(PORT, () => {
-  console.log(`Kotonoha backend listening on http://localhost:${PORT}`);
+  console.log(`Kototsuna backend listening on http://localhost:${PORT}`);
   console.log(`SQLite database: ${DATABASE_PATH}`);
 });

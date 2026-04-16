@@ -3,7 +3,7 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 
 const ROOT = process.cwd();
-const DATABASE_PATH = path.join(ROOT, 'database', 'kotonoha.sqlite');
+const DATABASE_PATH = path.join(ROOT, 'database', 'kototsuna.sqlite');
 const BASE_TRANSLATIONS_PATH = path.join(ROOT, 'scripts', 'data', 'meaningTranslations.ts');
 const GENERATED_TRANSLATIONS_PATH = path.join(ROOT, 'scripts', 'data', 'meaningTranslations.generated.json');
 const TARGET_LANGUAGE = 'tr';

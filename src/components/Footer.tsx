@@ -10,11 +10,11 @@ interface FooterProps {
 
 const footerIntroCopy: Record<AppLanguage, { description: string; supportLine: string }> = {
   tr: {
-    description: 'Kotonoha, kana odakli calisma akisini tek yerde toplayan ve giderek daha yonlendirilmis bir ogrenme sistemi haline gelen bir platformdur.',
+    description: 'Kototsuna, kana odakli calisma akisini tek yerde toplayan ve giderek daha yonlendirilmis bir ogrenme sistemi haline gelen bir platformdur.',
     supportLine: 'Study, test, play ve arama alanlari yeni shell icinde birbirine baglandi.'
   },
   en: {
-    description: 'Kotonoha is evolving into a guided learning platform that brings kana-focused study, testing, play, and discovery into one shell.',
+    description: 'Kototsuna is evolving into a guided learning platform that brings kana-focused study, testing, play, and discovery into one shell.',
     supportLine: 'Study, test, play, and search now connect through the new navigation shell.'
   }
 };
@@ -36,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({ language, themeMode }) => {
               to={appShellRoutes.home}
               className={`inline-flex text-xl font-semibold transition-colors ${isDark ? 'text-white hover:text-sky-200' : 'text-slate-900 hover:text-sky-600'}`}
             >
-              Kotonoha
+              Kototsuna
             </Link>
             <p className={`text-sm leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               {intro.description}
@@ -74,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({ language, themeMode }) => {
             isDark ? 'text-slate-500' : 'text-slate-500'
           }`}
         >
-          <p>{`© ${currentYear} Kotonoha`}</p>
+          <p>{`(c) ${currentYear} Kototsuna`}</p>
           <p>{intro.supportLine}</p>
         </div>
       </div>

@@ -4,7 +4,11 @@ import {
   StudySessionConfigValue,
   StudySessionSummary
 } from '../domain/studySession';
-import { KANA_SESSION_STORAGE_KEY, SessionRepository } from './sessionRepository';
+import {
+  KANA_SESSION_STORAGE_KEY,
+  LEGACY_KANA_SESSION_STORAGE_KEY,
+  SessionRepository
+} from './sessionRepository';
 
 interface SessionStoragePayload {
   version: 1;
@@ -121,7 +125,19 @@ const readRawValue = (): string | null => {
   }
 
   try {
-    return window.localStorage.getItem(KANA_SESSION_STORAGE_KEY);
+    const currentValue = window.localStorage.getItem(KANA_SESSION_STORAGE_KEY);
+
+    if (currentValue !== null) {
+      return currentValue;
+    }
+
+    const legacyValue = window.localStorage.getItem(LEGACY_KANA_SESSION_STORAGE_KEY);
+
+    if (legacyValue !== null) {
+      window.localStorage.setItem(KANA_SESSION_STORAGE_KEY, legacyValue);
+    }
+
+    return legacyValue;
   } catch {
     return null;
   }
@@ -289,6 +305,7 @@ export const localSessionRepository: SessionRepository = {
 
     try {
       window.localStorage.removeItem(KANA_SESSION_STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_KANA_SESSION_STORAGE_KEY);
     } catch {
       // Ignore storage clear failures and keep the memory payload reset.
     }

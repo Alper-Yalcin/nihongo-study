@@ -14,7 +14,7 @@ import requests
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DATABASE_PATH = ROOT / "database" / "kotonoha.sqlite"
+DATABASE_PATH = ROOT / "database" / "kototsuna.sqlite"
 TABLES = ("hiragana_words", "katakana_words", "kanji_words")
 VALID_LEVELS = ("N5", "N4", "N3", "N2", "N1")
 LEVEL_ORDER = {level: index for index, level in enumerate(VALID_LEVELS)}
@@ -412,7 +412,7 @@ def run_enrichment(
     connection = get_connection()
     ensure_web_lookup_tables(connection)
     session = requests.Session()
-    session.headers.update({"User-Agent": "kotonoha-jlpt-enricher/1.0"})
+    session.headers.update({"User-Agent": "kototsuna-jlpt-enricher/1.0"})
 
     try:
         for table_name in tables:

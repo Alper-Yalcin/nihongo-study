@@ -1,1 +1,1 @@
-database/kotonoha.sqlite filter=lfs diff=lfs merge=lfs -text
+database/kototsuna.sqlite filter=lfs diff=lfs merge=lfs -text

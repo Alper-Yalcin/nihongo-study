@@ -5,6 +5,7 @@ type InitialValue<T> = T | (() => T);
 interface UsePersistentStateOptions<T> {
   serialize?: (value: T) => string;
   deserialize?: (value: string) => T;
+  legacyKeys?: string[];
 }
 
 const resolveInitialValue = <T,>(initialValue: InitialValue<T>) =>
@@ -17,6 +18,7 @@ export const usePersistentState = <T,>(
 ): readonly [T, Dispatch<SetStateAction<T>>] => {
   const serialize = options.serialize ?? JSON.stringify;
   const deserialize = options.deserialize ?? JSON.parse;
+  const legacyKeys = options.legacyKeys ?? [];
 
   const [value, setValue] = useState<T>(() => {
     const fallback = resolveInitialValue(initialValue);
@@ -27,15 +29,31 @@ export const usePersistentState = <T,>(
 
     const savedValue = window.localStorage.getItem(key);
 
-    if (savedValue === null) {
-      return fallback;
+    if (savedValue !== null) {
+      try {
+        return deserialize(savedValue);
+      } catch {
+        return fallback;
+      }
     }
 
-    try {
-      return deserialize(savedValue);
-    } catch {
-      return fallback;
+    for (const legacyKey of legacyKeys) {
+      const legacyValue = window.localStorage.getItem(legacyKey);
+
+      if (legacyValue === null) {
+        continue;
+      }
+
+      try {
+        const parsedValue = deserialize(legacyValue);
+        window.localStorage.setItem(key, serialize(parsedValue));
+        return parsedValue;
+      } catch {
+        return fallback;
+      }
     }
+
+    return fallback;
   });
 
   useEffect(() => {
