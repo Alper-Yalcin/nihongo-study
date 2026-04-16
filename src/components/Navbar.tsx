@@ -90,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const themeText = themeLabels[language];
   const isDark = themeMode === 'dark';
-  const logoSrc = '/logo/kototsuna-logo.png';
+  const logoSrc = isDark ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
 
   const selectedLanguage = useMemo(
     () => languageOptions.find((option) => option.id === language) ?? languageOptions[0],
@@ -198,8 +198,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
         <div className={`hidden items-stretch overflow-visible ${desktopBarClass} sm:flex`}>
           <div className={`flex w-52 flex-shrink-0 items-center justify-center border-r px-3 ${utilityBorderClass}`}>
-            <Link to={appShellRoutes.home} className="flex items-center justify-center">
-              <img src={logoSrc} alt="Kototsuna logo" className="h-14 w-auto max-w-full object-contain" />
+            <Link to={appShellRoutes.home} className="flex h-14 w-full items-center justify-center overflow-hidden">
+              <img
+                src={logoSrc}
+                alt="Kototsuna logo"
+                className="h-14 w-auto max-w-none scale-[2.5] object-contain"
+              />
             </Link>
           </div>
 
@@ -359,11 +363,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <div className="space-y-3 sm:hidden">
           <div className={`flex items-center justify-between rounded-xl px-3 py-2 ${panelClass}`}>
-            <Link to={appShellRoutes.home} className="flex items-center">
+            <Link to={appShellRoutes.home} className="flex h-12 w-[180px] items-center overflow-hidden">
               <img
                 src={logoSrc}
                 alt="Kototsuna logo"
-                className="h-12 w-auto max-w-[180px] object-contain"
+                className="h-12 w-auto max-w-none scale-[2.5] object-contain"
               />
             </Link>
 
