@@ -205,9 +205,9 @@ export const homeContent: Record<AppLanguage, HomeContent> = {
         {
           id: 'kanji',
           title: 'Kanji',
-          description: 'Yeni shell ile uyumlu placeholder alan. Ayrintili urun akisi daha sonra genisleyecek.',
-          actionLabel: 'Kanji placeholder',
-          secondaryLabel: 'Sonraki fazlara hazir'
+          description: 'MVP track ile 100+ karaktere reading/meaning/example odakli giris sunan aktif alan.',
+          actionLabel: 'Kanji overview',
+          secondaryLabel: 'Kanji tracki ac'
         }
       ]
     },
@@ -357,9 +357,9 @@ export const homeContent: Record<AppLanguage, HomeContent> = {
         {
           id: 'kanji',
           title: 'Kanji',
-          description: 'A placeholder area that already fits the new shell and will be expanded later.',
-          actionLabel: 'Kanji placeholder',
-          secondaryLabel: 'Reserved for later phases'
+          description: 'An active MVP track with 100+ characters and reading/meaning/example practice.',
+          actionLabel: 'Kanji overview',
+          secondaryLabel: 'Open kanji track'
         }
       ]
     },

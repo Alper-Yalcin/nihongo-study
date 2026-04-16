@@ -76,6 +76,7 @@ export const StudyRunPanel: React.FC<Props> = ({
 }) => {
   const copy = studyContent[language];
   const {
+    scope,
     activeSession,
     getProgress,
     saveProgress,
@@ -98,7 +99,7 @@ export const StudyRunPanel: React.FC<Props> = ({
 
   const isReverseMode = typingMode === 'reverse';
   const isTimedMode = typingMode === 'timed';
-  const sessionKey = `kana:${script}:typing:${typingMode}`;
+  const sessionKey = `kana:${scope}:${script}:typing:${typingMode}`;
   const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
 
   const [pool, setPool] = useState<Character[]>(initialPool);

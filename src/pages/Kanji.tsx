@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
   BookOpenText,
@@ -8,14 +8,278 @@ import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
 import { StudyNavigator } from '../components/StudyNavigator';
 import { AppLanguage } from '../data/appPreferences';
+import { useDictionaryWordSearch } from '../data/words';
 import { kanjiContent } from '../data/studyContent';
 import { KanjiOverviewTrack, scriptLandingContent } from '../content/scriptLandingContent';
 import { StudyLandingPage } from '../components/landing/StudyLandingPage';
 import { getBackToOverviewLabel } from '../components/landing/landingUtils';
+import { WordItem } from '../types';
+import { usePersistentState } from '../hooks/usePersistentState';
 
 interface Props {
   language: AppLanguage;
 }
+
+type KanjiTrackSectionId = 'beginner' | 'intermediate' | 'advanced';
+type KanjiLearningStatus = 'new' | 'review' | 'known';
+
+interface KanjiTrackExample {
+  id: string;
+  surface: string;
+  reading: string;
+  meaning: string;
+}
+
+interface KanjiTrackItem {
+  char: string;
+  frequency: number;
+  readings: string[];
+  meanings: string[];
+  examples: KanjiTrackExample[];
+}
+
+interface KanjiMvpProgressState {
+  statusByChar: Record<string, KanjiLearningStatus>;
+  activityDays: string[];
+}
+
+const KANJI_MVP_PROGRESS_STORAGE_KEY = 'kototsuna.kanji.mvp-progress.v1';
+const LEGACY_KANJI_MVP_PROGRESS_STORAGE_KEY = 'kotonoha.kanji.mvp-progress.v1';
+const kanjiCharPattern = /[\u4E00-\u9FFF]/g;
+
+const createInitialKanjiMvpProgressState = (): KanjiMvpProgressState => ({
+  statusByChar: {},
+  activityDays: []
+});
+
+const deserializeKanjiMvpProgressState = (value: string): KanjiMvpProgressState => {
+  try {
+    const parsed = JSON.parse(value) as Partial<KanjiMvpProgressState>;
+
+    if (!parsed || typeof parsed !== 'object') {
+      return createInitialKanjiMvpProgressState();
+    }
+
+    const statusByChar =
+      parsed.statusByChar && typeof parsed.statusByChar === 'object'
+        ? Object.fromEntries(
+            Object.entries(parsed.statusByChar).filter((entry): entry is [string, KanjiLearningStatus] => {
+              const [, status] = entry;
+              return status === 'new' || status === 'review' || status === 'known';
+            })
+          )
+        : {};
+
+    const activityDays = Array.isArray(parsed.activityDays)
+      ? parsed.activityDays.filter((item): item is string => typeof item === 'string').slice(0, 90)
+      : [];
+
+    return {
+      statusByChar,
+      activityDays
+    };
+  } catch {
+    return createInitialKanjiMvpProgressState();
+  }
+};
+
+const getLocalDayKey = (dateValue: Date | string) => {
+  const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+  const year = String(date.getFullYear());
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const addDays = (date: Date, days: number) => {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+};
+
+const calculateActivityStreak = (activityDays: string[]) => {
+  if (activityDays.length === 0) {
+    return 0;
+  }
+
+  const daySet = new Set(activityDays);
+  const today = new Date();
+  const todayKey = getLocalDayKey(today);
+  const yesterday = addDays(today, -1);
+  const yesterdayKey = getLocalDayKey(yesterday);
+
+  if (!daySet.has(todayKey) && !daySet.has(yesterdayKey)) {
+    return 0;
+  }
+
+  let streak = 0;
+  let cursor = daySet.has(todayKey) ? today : yesterday;
+
+  while (daySet.has(getLocalDayKey(cursor))) {
+    streak += 1;
+    cursor = addDays(cursor, -1);
+  }
+
+  return streak;
+};
+
+const resolveWordMeanings = (word: WordItem) => {
+  if (Array.isArray(word.meanings) && word.meanings.length > 0) {
+    return word.meanings.map((meaning) => meaning.trim()).filter((meaning) => meaning.length > 0);
+  }
+
+  if (typeof word.meaning === 'string' && word.meaning.trim().length > 0) {
+    return word.meaning
+      .split(';')
+      .map((meaning) => meaning.trim())
+      .filter((meaning) => meaning.length > 0);
+  }
+
+  return [];
+};
+
+const buildKanjiTrackItems = (words: WordItem[], maxCharacters = 140): KanjiTrackItem[] => {
+  const aggregates = new Map<string, {
+    frequency: number;
+    readings: Set<string>;
+    meanings: Set<string>;
+    examples: KanjiTrackExample[];
+  }>();
+
+  words.forEach((word) => {
+    if (typeof word.kanji !== 'string' || word.kanji.trim().length === 0) {
+      return;
+    }
+
+    const matchedChars = word.kanji.match(kanjiCharPattern);
+
+    if (!matchedChars || matchedChars.length === 0) {
+      return;
+    }
+
+    const uniqueChars = Array.from(new Set(matchedChars));
+    const meanings = resolveWordMeanings(word);
+    const primaryMeaning = meanings[0] ?? '-';
+
+    uniqueChars.forEach((char) => {
+      const aggregate =
+        aggregates.get(char) ?? {
+          frequency: 0,
+          readings: new Set<string>(),
+          meanings: new Set<string>(),
+          examples: []
+        };
+
+      aggregate.frequency += 1;
+
+      if (word.kana.trim().length > 0) {
+        aggregate.readings.add(word.kana.trim());
+      }
+
+      meanings.slice(0, 3).forEach((meaning) => aggregate.meanings.add(meaning));
+
+      if (aggregate.examples.length < 3) {
+        aggregate.examples.push({
+          id: word.id,
+          surface: word.kanji ?? word.kana,
+          reading: word.kana,
+          meaning: primaryMeaning
+        });
+      }
+
+      aggregates.set(char, aggregate);
+    });
+  });
+
+  return Array.from(aggregates.entries())
+    .sort((left, right) => {
+      const frequencyDiff = right[1].frequency - left[1].frequency;
+
+      if (frequencyDiff !== 0) {
+        return frequencyDiff;
+      }
+
+      return left[0].localeCompare(right[0]);
+    })
+    .slice(0, maxCharacters)
+    .map(([char, aggregate]) => ({
+      char,
+      frequency: aggregate.frequency,
+      readings: Array.from(aggregate.readings).slice(0, 3),
+      meanings: Array.from(aggregate.meanings).slice(0, 3),
+      examples: aggregate.examples.slice(0, 2)
+    }));
+};
+
+const kanjiTrackRanges: Record<KanjiTrackSectionId, [number, number]> = {
+  beginner: [0, 50],
+  intermediate: [50, 100],
+  advanced: [100, 140]
+};
+
+const kanjiMvpCopy = {
+  tr: {
+    loading: 'Kanji havuzu yukleniyor...',
+    error: 'Kanji havuzu yuklenemedi.',
+    empty: 'Bu bolum icin yeterli kanji karakteri bulunamadi.',
+    stats: {
+      track: 'Track',
+      known: 'Bilinen',
+      review: 'Review',
+      streak: 'Streak'
+    },
+    labels: {
+      reading: 'Okunus',
+      meaning: 'Anlam',
+      example: 'Ornek',
+      context: 'Baglam',
+      frequency: 'Kullanim'
+    },
+    actions: {
+      known: 'Biliyorum',
+      review: 'Tekrar et',
+      markNew: 'Sifirla'
+    },
+    statuses: {
+      known: 'Biliniyor',
+      review: 'Review',
+      new: 'Yeni'
+    },
+    contextWithExample: (surface: string) => `${surface} icinde tekrar gorunur.`,
+    fallbackContext: 'Bu karakter track icinde yuksek frekansli kelimelerde gorunur.'
+  },
+  en: {
+    loading: 'Loading kanji pool...',
+    error: 'Failed to load kanji pool.',
+    empty: 'Not enough kanji characters were found for this section.',
+    stats: {
+      track: 'Track',
+      known: 'Known',
+      review: 'Review',
+      streak: 'Streak'
+    },
+    labels: {
+      reading: 'Reading',
+      meaning: 'Meaning',
+      example: 'Example',
+      context: 'Context',
+      frequency: 'Usage'
+    },
+    actions: {
+      known: 'Know it',
+      review: 'Needs review',
+      markNew: 'Reset'
+    },
+    statuses: {
+      known: 'Known',
+      review: 'Review',
+      new: 'New'
+    },
+    contextWithExample: (surface: string) => `Shows up again in ${surface}.`,
+    fallbackContext: 'This character appears frequently inside the current track.'
+  }
+} as const;
 
 const featureCardStyles = [
   {
@@ -37,11 +301,97 @@ const featureCardStyles = [
 
 export const Kanji: React.FC<Props> = ({ language }) => {
   const copy = kanjiContent[language];
+  const mvpCopy = kanjiMvpCopy[language];
   const landingCopy = scriptLandingContent[language];
   const pageCopy = landingCopy.kanji;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeView, setActiveView] = useState<'overview' | 'study'>('overview');
+
+  const [mvpProgress, setMvpProgress] = usePersistentState<KanjiMvpProgressState>(
+    KANJI_MVP_PROGRESS_STORAGE_KEY,
+    createInitialKanjiMvpProgressState,
+    {
+      serialize: JSON.stringify,
+      deserialize: deserializeKanjiMvpProgressState,
+      legacyKeys: [LEGACY_KANJI_MVP_PROGRESS_STORAGE_KEY]
+    }
+  );
+
+  const kanjiWordState = useDictionaryWordSearch({
+    script: 'kanji',
+    limit: 240,
+    offset: 0
+  });
+
+  const trackItems = useMemo(
+    () => buildKanjiTrackItems(kanjiWordState.words, 140),
+    [kanjiWordState.words]
+  );
+
   const currentSection = copy.sections[currentIndex];
+  const currentTrackSectionId = currentSection.id as KanjiTrackSectionId;
+  const [startIndex, endIndex] = kanjiTrackRanges[currentTrackSectionId] ?? [0, 0];
+  const sectionTrackItems = trackItems.slice(startIndex, endIndex);
+
+  const sectionKnownCount = sectionTrackItems.filter(
+    (item) => mvpProgress.statusByChar[item.char] === 'known'
+  ).length;
+  const sectionReviewCount = sectionTrackItems.filter(
+    (item) => mvpProgress.statusByChar[item.char] === 'review'
+  ).length;
+  const activityStreak = useMemo(
+    () => calculateActivityStreak(mvpProgress.activityDays),
+    [mvpProgress.activityDays]
+  );
+
+  const [activeChar, setActiveChar] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (sectionTrackItems.length === 0) {
+      setActiveChar(null);
+      return;
+    }
+
+    if (!activeChar || !sectionTrackItems.some((item) => item.char === activeChar)) {
+      setActiveChar(sectionTrackItems[0].char);
+    }
+  }, [activeChar, sectionTrackItems]);
+
+  const activeTrackItem =
+    sectionTrackItems.find((item) => item.char === activeChar) ?? sectionTrackItems[0] ?? null;
+
+  const setCharacterStatus = (char: string, status: KanjiLearningStatus) => {
+    const todayKey = getLocalDayKey(new Date());
+
+    setMvpProgress((previous) => {
+      const nextStatusByChar = {
+        ...previous.statusByChar,
+        [char]: status
+      };
+      const activityDaySet = new Set(previous.activityDays);
+      activityDaySet.add(todayKey);
+
+      return {
+        statusByChar: nextStatusByChar,
+        activityDays: Array.from(activityDaySet.values())
+          .sort((left: string, right: string) => right.localeCompare(left))
+          .slice(0, 90)
+      };
+    });
+  };
+
+  const clearCharacterStatus = (char: string) => {
+    setMvpProgress((previous) => {
+      const nextStatusByChar = { ...previous.statusByChar };
+      delete nextStatusByChar[char];
+
+      return {
+        ...previous,
+        statusByChar: nextStatusByChar
+      };
+    });
+  };
+
   const featureCards = pageCopy.featureCards.map((card, index) => {
     const style = featureCardStyles[index];
 
@@ -137,10 +487,182 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                 onPrev={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
                 language={language}
               />
-              <div className="h-64 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center">
-                <p className="mb-2 font-medium text-slate-500">{currentSection.description}</p>
-                <p className="text-sm text-slate-400">{copy.placeholder}</p>
-              </div>
+
+              {kanjiWordState.loading && (
+                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                  {mvpCopy.loading}
+                </div>
+              )}
+
+              {!kanjiWordState.loading && kanjiWordState.error && (
+                <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                  {mvpCopy.error}
+                </div>
+              )}
+
+              {!kanjiWordState.loading && !kanjiWordState.error && sectionTrackItems.length === 0 && (
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  {mvpCopy.empty}
+                </div>
+              )}
+
+              {sectionTrackItems.length > 0 && (
+                <div className="mt-6 space-y-6">
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        {mvpCopy.stats.track}
+                      </div>
+                      <div className="mt-2 text-2xl font-bold text-slate-900">{sectionTrackItems.length}</div>
+                    </div>
+                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
+                        {mvpCopy.stats.known}
+                      </div>
+                      <div className="mt-2 text-2xl font-bold text-emerald-800">{sectionKnownCount}</div>
+                    </div>
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">
+                        {mvpCopy.stats.review}
+                      </div>
+                      <div className="mt-2 text-2xl font-bold text-amber-800">{sectionReviewCount}</div>
+                    </div>
+                    <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-700">
+                        {mvpCopy.stats.streak}
+                      </div>
+                      <div className="mt-2 text-2xl font-bold text-indigo-800">{activityStreak}</div>
+                    </div>
+                  </div>
+
+                  {activeTrackItem && (
+                    <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-4">
+                          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 text-5xl font-bold text-slate-900">
+                            {activeTrackItem.char}
+                          </div>
+                          <div>
+                            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                              {mvpCopy.labels.frequency}
+                            </div>
+                            <div className="mt-1 text-sm font-semibold text-slate-700">
+                              {`${activeTrackItem.frequency}x`}
+                            </div>
+                          </div>
+                        </div>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${
+                          mvpProgress.statusByChar[activeTrackItem.char] === 'known'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : mvpProgress.statusByChar[activeTrackItem.char] === 'review'
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {mvpProgress.statusByChar[activeTrackItem.char]
+                            ? mvpCopy.statuses[mvpProgress.statusByChar[activeTrackItem.char]]
+                            : mvpCopy.statuses.new}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 grid gap-3 md:grid-cols-2">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                            {mvpCopy.labels.reading}
+                          </div>
+                          <div className="mt-2 text-sm text-slate-700">
+                            {activeTrackItem.readings.join(', ') || '-'}
+                          </div>
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                            {mvpCopy.labels.meaning}
+                          </div>
+                          <div className="mt-2 text-sm text-slate-700">
+                            {activeTrackItem.meanings.join(', ') || '-'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                          {mvpCopy.labels.example}
+                        </div>
+                        {activeTrackItem.examples.length > 0 ? (
+                          activeTrackItem.examples.map((example) => (
+                            <p key={example.id} className="text-sm text-slate-700">
+                              {`${example.surface} (${example.reading}) - ${example.meaning}`}
+                            </p>
+                          ))
+                        ) : (
+                          <p className="text-sm text-slate-500">-</p>
+                        )}
+                        <div className="pt-1 text-xs text-slate-500">
+                          <span className="font-semibold text-slate-600">{`${mvpCopy.labels.context}: `}</span>
+                          {activeTrackItem.examples[1]
+                            ? mvpCopy.contextWithExample(activeTrackItem.examples[1].surface)
+                            : mvpCopy.fallbackContext}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCharacterStatus(activeTrackItem.char, 'known')}
+                          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+                        >
+                          {mvpCopy.actions.known}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCharacterStatus(activeTrackItem.char, 'review')}
+                          className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+                        >
+                          {mvpCopy.actions.review}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => clearCharacterStatus(activeTrackItem.char)}
+                          className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                        >
+                          {mvpCopy.actions.markNew}
+                        </button>
+                      </div>
+                    </article>
+                  )}
+
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {sectionTrackItems.map((item) => {
+                      const status = mvpProgress.statusByChar[item.char] ?? 'new';
+
+                      return (
+                        <button
+                          key={item.char}
+                          type="button"
+                          onClick={() => setActiveChar(item.char)}
+                          className={`rounded-2xl border p-3 text-left transition-colors ${
+                            activeTrackItem?.char === item.char
+                              ? 'border-indigo-300 bg-indigo-50'
+                              : status === 'known'
+                                ? 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100'
+                                : status === 'review'
+                                  ? 'border-amber-200 bg-amber-50 hover:bg-amber-100'
+                                  : 'border-slate-200 bg-white hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-3xl font-bold text-slate-900">{item.char}</div>
+                            <span className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+                              {mvpCopy.statuses[status]}
+                            </span>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-600">{item.readings[0] ?? '-'}</div>
+                          <div className="mt-1 line-clamp-1 text-xs text-slate-500">{item.meanings[0] ?? '-'}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </SectionCard>
           </div>
         )}

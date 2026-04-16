@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
+import { getKanaEntryRoute, KanaAppScope } from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
 import { getKanaGroupProgressStats, getWeakKanaProgressEntries } from '../features/kana/review/reviewSelectors';
@@ -14,6 +14,7 @@ import { getKanaItemById } from '../features/kana/data/kanaInventory';
 interface KanaStatsPageProps {
   script: KanaScript;
   language: AppLanguage;
+  scope?: KanaAppScope;
 }
 
 const scriptTitleMap: Record<KanaScript, string> = {
@@ -21,17 +22,17 @@ const scriptTitleMap: Record<KanaScript, string> = {
   katakana: 'Katakana'
 };
 
-const overviewRouteByScript: Record<KanaScript, string> = {
-  hiragana: appShellRoutes.hiraganaOverview,
-  katakana: appShellRoutes.katakanaOverview
-};
-
 const getSectionsForScript = (script: KanaScript, language: AppLanguage) =>
   script === 'hiragana'
     ? getLocalizedHiraganaSections(language)
     : getLocalizedKatakanaSections(language);
 
-export const KanaStatsPage: React.FC<KanaStatsPageProps> = ({ script, language }) => {
+export const KanaStatsPage: React.FC<KanaStatsPageProps> = ({
+  script,
+  language,
+  scope = 'study' as KanaAppScope
+}) => {
+  const resolvedScope: KanaAppScope = scope;
   const scriptTitle = scriptTitleMap[script];
   const sections = useMemo(() => getSectionsForScript(script, language), [language, script]);
   const { listByScript, summaries } = useKanaProgressStore();
@@ -52,7 +53,7 @@ export const KanaStatsPage: React.FC<KanaStatsPageProps> = ({ script, language }
         <section className="rounded-[2rem] border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-8 shadow-sm md:p-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl space-y-4">
-              <Link to={overviewRouteByScript[script]} className="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
+              <Link to={getKanaEntryRoute(script, resolvedScope)} className="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
                 <ArrowLeft size={16} className="mr-2" />
                 {language === 'tr' ? 'Overview sayfasina don' : 'Back to overview'}
               </Link>

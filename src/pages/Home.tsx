@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ArrowRight,
   AudioLines,
@@ -19,9 +19,19 @@ import { PageContainer } from '../components/PageContainer';
 import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
 import { homeContent } from '../content/homeContent';
+import { useKanaProgressSummary } from '../features/kana/progress/progressStore';
 
 interface HomeProps {
   language: AppLanguage;
+}
+
+interface NextBestActionCard {
+  id: string;
+  title: string;
+  reason: string;
+  actionLabel: string;
+  href: string;
+  priority: 'high' | 'normal';
 }
 
 const shellAreaIcons = {
@@ -48,11 +58,11 @@ const foundationIcons = {
 const scriptRouteMap = {
   hiragana: {
     primaryHref: appShellRoutes.hiraganaOverview,
-    secondaryHref: appShellRoutes.hiraganaOverview
+    secondaryHref: appShellRoutes.hiraganaLearn
   },
   katakana: {
     primaryHref: appShellRoutes.katakanaOverview,
-    secondaryHref: appShellRoutes.katakanaOverview
+    secondaryHref: appShellRoutes.katakanaPlay
   },
   kanji: {
     primaryHref: appShellRoutes.kanjiOverview,
@@ -66,8 +76,156 @@ const scriptCardShellClass = {
   kanji: 'border-amber-200 bg-gradient-to-br from-amber-50 to-white'
 } as const;
 
+const nextBestActionCopy = {
+  tr: {
+    eyebrow: 'Next Best Action',
+    title: 'Bugun en iyi sonraki adim',
+    description:
+      'Bu kartlar progress verisine gore otomatik onerilir. Once due/weak temizlenir, sonra learn ve play dengesine gecilir.',
+    priorityHigh: 'Yuksek oncelik',
+    priorityNormal: 'Siradaki adim',
+    reasons: {
+      due: (count: number) => `${count} due item bekliyor. Once review queue ile ritmi koru.`,
+      weak: (count: number) => `${count} weak item goruluyor. Kisa bir weak drill etkili olur.`,
+      learn: 'Yeni item acmak icin learn path tarafinda ilerleme zamani.',
+      play: 'Temel denge iyi. Simdi play challenge ile pekistirme zamani.',
+      kanji: 'Kanji MVP track (100-140 karakter) aktif. Reading/meaning/example kartlari hazir.'
+    },
+    actions: {
+      review: 'Review queueyi ac',
+      weak: 'Weak drilli ac',
+      learn: 'Learn pathi ac',
+      play: 'Play dashboardi ac',
+      kanji: 'Kanji tracki ac'
+    }
+  },
+  en: {
+    eyebrow: 'Next Best Action',
+    title: 'Your best next move today',
+    description:
+      'These cards are generated from progress signals. Clear due/weak pressure first, then continue with learn/play balance.',
+    priorityHigh: 'High priority',
+    priorityNormal: 'Next step',
+    reasons: {
+      due: (count: number) => `${count} items are due. Start with the review queue to keep momentum.`,
+      weak: (count: number) => `${count} weak items detected. A short weak drill will help.`,
+      learn: 'You have room to unlock new items from the learn path.',
+      play: 'Core progress looks stable. Reinforce with a quick play challenge.',
+      kanji: 'The Kanji MVP track (100-140 characters) is live with reading/meaning/example cards.'
+    },
+    actions: {
+      review: 'Open review queue',
+      weak: 'Open weak drill',
+      learn: 'Open learn path',
+      play: 'Open play dashboard',
+      kanji: 'Open kanji track'
+    }
+  }
+} as const;
+
+const buildNextBestActionCard = (
+  script: 'hiragana' | 'katakana',
+  dueCount: number,
+  weakCount: number,
+  tracked: number,
+  total: number,
+  language: AppLanguage
+): NextBestActionCard => {
+  const copy = nextBestActionCopy[language];
+  const scriptTitle = script === 'hiragana' ? 'Hiragana' : 'Katakana';
+
+  if (dueCount > 0) {
+    return {
+      id: `${script}-due`,
+      title: `${scriptTitle} Review`,
+      reason: copy.reasons.due(dueCount),
+      actionLabel: copy.actions.review,
+      href: script === 'hiragana' ? appShellRoutes.hiraganaReview : appShellRoutes.katakanaReview,
+      priority: 'high'
+    };
+  }
+
+  if (weakCount > 0) {
+    return {
+      id: `${script}-weak`,
+      title: `${scriptTitle} Weak Drill`,
+      reason: copy.reasons.weak(weakCount),
+      actionLabel: copy.actions.weak,
+      href: script === 'hiragana' ? appShellRoutes.hiraganaWeak : appShellRoutes.katakanaWeak,
+      priority: 'high'
+    };
+  }
+
+  if (tracked < Math.max(8, Math.round(total * 0.45))) {
+    return {
+      id: `${script}-learn`,
+      title: `${scriptTitle} Learn Path`,
+      reason: copy.reasons.learn,
+      actionLabel: copy.actions.learn,
+      href: script === 'hiragana' ? appShellRoutes.hiraganaLearn : appShellRoutes.katakanaLearn,
+      priority: 'normal'
+    };
+  }
+
+  return {
+    id: `${script}-play`,
+    title: `${scriptTitle} Play`,
+    reason: copy.reasons.play,
+    actionLabel: copy.actions.play,
+    href: script === 'hiragana' ? appShellRoutes.hiraganaPlay : appShellRoutes.katakanaPlay,
+    priority: 'normal'
+  };
+};
+
 export const Home: React.FC<HomeProps> = ({ language }) => {
   const copy = homeContent[language];
+  const nextCopy = nextBestActionCopy[language];
+  const hiraganaSummary = useKanaProgressSummary('hiragana');
+  const katakanaSummary = useKanaProgressSummary('katakana');
+
+  const nextBestActions = useMemo<NextBestActionCard[]>(() => {
+    const hiraganaAction = buildNextBestActionCard(
+      'hiragana',
+      hiraganaSummary.dueCount,
+      hiraganaSummary.weakCount,
+      hiraganaSummary.tracked,
+      hiraganaSummary.totalCount,
+      language
+    );
+    const katakanaAction = buildNextBestActionCard(
+      'katakana',
+      katakanaSummary.dueCount,
+      katakanaSummary.weakCount,
+      katakanaSummary.tracked,
+      katakanaSummary.totalCount,
+      language
+    );
+
+    return [
+      hiraganaAction,
+      katakanaAction,
+      {
+        id: 'kanji-track',
+        title: 'Kanji MVP',
+        reason: nextCopy.reasons.kanji,
+        actionLabel: nextCopy.actions.kanji,
+        href: appShellRoutes.kanjiOverview,
+        priority: 'normal'
+      }
+    ];
+  }, [
+    hiraganaSummary.dueCount,
+    hiraganaSummary.totalCount,
+    hiraganaSummary.tracked,
+    hiraganaSummary.weakCount,
+    katakanaSummary.dueCount,
+    katakanaSummary.totalCount,
+    katakanaSummary.tracked,
+    katakanaSummary.weakCount,
+    language,
+    nextCopy.actions.kanji,
+    nextCopy.reasons.kanji
+  ]);
 
   return (
     <PageContainer>
@@ -142,6 +300,48 @@ export const Home: React.FC<HomeProps> = ({ language }) => {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="space-y-8">
+          <div className="space-y-3">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+              {nextCopy.eyebrow}
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+              {nextCopy.title}
+            </h2>
+            <p className="max-w-4xl text-base leading-8 text-slate-600 md:text-lg">
+              {nextCopy.description}
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {nextBestActions.map((action) => (
+              <div
+                key={action.id}
+                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-2xl font-semibold text-slate-900">{action.title}</h3>
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                    action.priority === 'high'
+                      ? 'bg-rose-100 text-rose-700'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {action.priority === 'high' ? nextCopy.priorityHigh : nextCopy.priorityNormal}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{action.reason}</p>
+                <Link
+                  to={action.href}
+                  className="mt-6 inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+                >
+                  {action.actionLabel}
+                  <ArrowRight size={16} className="ml-2" />
+                </Link>
+              </div>
+            ))}
           </div>
         </section>
 

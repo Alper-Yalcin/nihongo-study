@@ -1,26 +1,111 @@
 import { AppLanguage } from './appPreferences';
 
+type KanaRouteScript = 'hiragana' | 'katakana';
+export type KanaAppScope = 'study' | 'play';
+type KanaPlayNavView =
+  | 'overview'
+  | 'kana-match'
+  | 'meaning-match'
+  | 'speed-tap'
+  | 'memory-flip';
+
 export const appShellRoutes = {
   home: '/',
   hiraganaOverview: '/kana/hiragana/overview',
   hiraganaLearn: '/kana/hiragana/learn',
+  hiraganaPlay: '/kana/hiragana/play',
   hiraganaReview: '/kana/hiragana/review',
   hiraganaWeak: '/kana/hiragana/weak',
   hiraganaConfusable: '/kana/hiragana/confusable',
   hiraganaWords: '/kana/hiragana/words',
   hiraganaStats: '/kana/hiragana/stats',
+  hiraganaPlayStats: '/kana/hiragana/play/stats',
+  hiraganaPlayItemBase: '/kana/hiragana/play/item',
+  hiraganaPlaySessionBase: '/kana/hiragana/play/session',
   katakanaOverview: '/kana/katakana/overview',
   katakanaLearn: '/kana/katakana/learn',
+  katakanaPlay: '/kana/katakana/play',
   katakanaReview: '/kana/katakana/review',
   katakanaWeak: '/kana/katakana/weak',
   katakanaConfusable: '/kana/katakana/confusable',
   katakanaWords: '/kana/katakana/words',
   katakanaStats: '/kana/katakana/stats',
+  katakanaPlayStats: '/kana/katakana/play/stats',
+  katakanaPlayItemBase: '/kana/katakana/play/item',
+  katakanaPlaySessionBase: '/kana/katakana/play/session',
   kanjiOverview: '/kana/kanji/overview',
   search: '/search',
   account: '/account',
   settings: '/account/settings'
 } as const;
+
+const studyLearnRouteByScript: Record<KanaRouteScript, string> = {
+  hiragana: appShellRoutes.hiraganaLearn,
+  katakana: appShellRoutes.katakanaLearn
+};
+
+const playRouteByScript: Record<KanaRouteScript, string> = {
+  hiragana: appShellRoutes.hiraganaPlay,
+  katakana: appShellRoutes.katakanaPlay
+};
+
+const getKanaPlayViewRoute = (script: KanaRouteScript, view: KanaPlayNavView): string => {
+  const baseRoute = playRouteByScript[script];
+
+  if (view === 'overview') {
+    return baseRoute;
+  }
+
+  return `${baseRoute}?game=${view}`;
+};
+
+const studyStatsRouteByScript: Record<KanaRouteScript, string> = {
+  hiragana: appShellRoutes.hiraganaStats,
+  katakana: appShellRoutes.katakanaStats
+};
+
+const playStatsRouteByScript: Record<KanaRouteScript, string> = {
+  hiragana: appShellRoutes.hiraganaPlayStats,
+  katakana: appShellRoutes.katakanaPlayStats
+};
+
+const playItemBaseByScript: Record<KanaRouteScript, string> = {
+  hiragana: appShellRoutes.hiraganaPlayItemBase,
+  katakana: appShellRoutes.katakanaPlayItemBase
+};
+
+const playSessionBaseByScript: Record<KanaRouteScript, string> = {
+  hiragana: appShellRoutes.hiraganaPlaySessionBase,
+  katakana: appShellRoutes.katakanaPlaySessionBase
+};
+
+export const getKanaEntryRoute = (
+  script: KanaRouteScript,
+  scope: KanaAppScope = 'study'
+) => (scope === 'play' ? playRouteByScript[script] : studyLearnRouteByScript[script]);
+
+export const getKanaStatsRoute = (
+  script: KanaRouteScript,
+  scope: KanaAppScope = 'study'
+) => (scope === 'play' ? playStatsRouteByScript[script] : studyStatsRouteByScript[script]);
+
+export const getKanaItemRoute = (
+  script: KanaRouteScript,
+  kanaId: string,
+  scope: KanaAppScope = 'study'
+) =>
+  scope === 'play'
+    ? `${playItemBaseByScript[script]}/${kanaId}`
+    : `/kana/item/${kanaId}`;
+
+export const getKanaSessionRoute = (
+  script: KanaRouteScript,
+  sessionId: string,
+  scope: KanaAppScope = 'study'
+) =>
+  scope === 'play'
+    ? `${playSessionBaseByScript[script]}/${sessionId}`
+    : `/kana/session/${sessionId}`;
 
 export type AppShellNavItemId =
   | 'home'
@@ -220,9 +305,33 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               links: [
                 {
                   id: 'hiragana-play-overview',
-                  label: 'Quick Start',
-                  description: 'Hiragana learn akisini hizli ac.',
-                  href: appShellRoutes.hiraganaLearn
+                  label: 'Overview',
+                  description: 'Hiragana play ozetini ac.',
+                  href: getKanaPlayViewRoute('hiragana', 'overview')
+                },
+                {
+                  id: 'hiragana-play-kana-match',
+                  label: 'Kana Match',
+                  description: 'Gosterilen karakterin dogru okunuusunu sec.',
+                  href: getKanaPlayViewRoute('hiragana', 'kana-match')
+                },
+                {
+                  id: 'hiragana-play-meaning-match',
+                  label: 'Meaning Match',
+                  description: 'Kelimeyi gor ve dogru anlami sec.',
+                  href: getKanaPlayViewRoute('hiragana', 'meaning-match')
+                },
+                {
+                  id: 'hiragana-play-speed-tap',
+                  label: 'Speed Tap',
+                  description: 'Hiz odakli secim modu (yakinda).',
+                  href: getKanaPlayViewRoute('hiragana', 'speed-tap')
+                },
+                {
+                  id: 'hiragana-play-memory-flip',
+                  label: 'Memory Flip',
+                  description: 'Kart eslestirme modu (yakinda).',
+                  href: getKanaPlayViewRoute('hiragana', 'memory-flip')
                 }
               ]
             },
@@ -232,9 +341,33 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               links: [
                 {
                   id: 'katakana-play-overview',
-                  label: 'Quick Start',
-                  description: 'Katakana learn akisini hizli ac.',
-                  href: appShellRoutes.katakanaLearn
+                  label: 'Overview',
+                  description: 'Katakana play ozetini ac.',
+                  href: getKanaPlayViewRoute('katakana', 'overview')
+                },
+                {
+                  id: 'katakana-play-kana-match',
+                  label: 'Kana Match',
+                  description: 'Gosterilen karakterin dogru okunuusunu sec.',
+                  href: getKanaPlayViewRoute('katakana', 'kana-match')
+                },
+                {
+                  id: 'katakana-play-meaning-match',
+                  label: 'Meaning Match',
+                  description: 'Kelimeyi gor ve dogru anlami sec.',
+                  href: getKanaPlayViewRoute('katakana', 'meaning-match')
+                },
+                {
+                  id: 'katakana-play-speed-tap',
+                  label: 'Speed Tap',
+                  description: 'Hiz odakli secim modu (yakinda).',
+                  href: getKanaPlayViewRoute('katakana', 'speed-tap')
+                },
+                {
+                  id: 'katakana-play-memory-flip',
+                  label: 'Memory Flip',
+                  description: 'Kart eslestirme modu (yakinda).',
+                  href: getKanaPlayViewRoute('katakana', 'memory-flip')
                 }
               ]
             },
@@ -252,16 +385,6 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               ]
             }
           ]
-        },
-        {
-          id: 'search',
-          label: 'Search',
-          href: appShellRoutes.search
-        },
-        {
-          id: 'account',
-          label: 'Account',
-          href: appShellRoutes.account
         }
       ]
     },
@@ -577,9 +700,33 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               links: [
                 {
                   id: 'hiragana-play-overview',
-                  label: 'Quick Start',
-                  description: 'Jump directly into the hiragana learn flow.',
-                  href: appShellRoutes.hiraganaLearn
+                  label: 'Overview',
+                  description: 'Open the hiragana play overview.',
+                  href: getKanaPlayViewRoute('hiragana', 'overview')
+                },
+                {
+                  id: 'hiragana-play-kana-match',
+                  label: 'Kana Match',
+                  description: 'Pick the correct reading for the shown character.',
+                  href: getKanaPlayViewRoute('hiragana', 'kana-match')
+                },
+                {
+                  id: 'hiragana-play-meaning-match',
+                  label: 'Meaning Match',
+                  description: 'Read a word and pick the correct meaning.',
+                  href: getKanaPlayViewRoute('hiragana', 'meaning-match')
+                },
+                {
+                  id: 'hiragana-play-speed-tap',
+                  label: 'Speed Tap',
+                  description: 'Fast selection mode (coming soon).',
+                  href: getKanaPlayViewRoute('hiragana', 'speed-tap')
+                },
+                {
+                  id: 'hiragana-play-memory-flip',
+                  label: 'Memory Flip',
+                  description: 'Matching-card mode (coming soon).',
+                  href: getKanaPlayViewRoute('hiragana', 'memory-flip')
                 }
               ]
             },
@@ -589,9 +736,33 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               links: [
                 {
                   id: 'katakana-play-overview',
-                  label: 'Quick Start',
-                  description: 'Jump directly into the katakana learn flow.',
-                  href: appShellRoutes.katakanaLearn
+                  label: 'Overview',
+                  description: 'Open the katakana play overview.',
+                  href: getKanaPlayViewRoute('katakana', 'overview')
+                },
+                {
+                  id: 'katakana-play-kana-match',
+                  label: 'Kana Match',
+                  description: 'Pick the correct reading for the shown character.',
+                  href: getKanaPlayViewRoute('katakana', 'kana-match')
+                },
+                {
+                  id: 'katakana-play-meaning-match',
+                  label: 'Meaning Match',
+                  description: 'Read a word and pick the correct meaning.',
+                  href: getKanaPlayViewRoute('katakana', 'meaning-match')
+                },
+                {
+                  id: 'katakana-play-speed-tap',
+                  label: 'Speed Tap',
+                  description: 'Fast selection mode (coming soon).',
+                  href: getKanaPlayViewRoute('katakana', 'speed-tap')
+                },
+                {
+                  id: 'katakana-play-memory-flip',
+                  label: 'Memory Flip',
+                  description: 'Matching-card mode (coming soon).',
+                  href: getKanaPlayViewRoute('katakana', 'memory-flip')
                 }
               ]
             },
@@ -609,16 +780,6 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
               ]
             }
           ]
-        },
-        {
-          id: 'search',
-          label: 'Search',
-          href: appShellRoutes.search
-        },
-        {
-          id: 'account',
-          label: 'Account',
-          href: appShellRoutes.account
         }
       ]
     },

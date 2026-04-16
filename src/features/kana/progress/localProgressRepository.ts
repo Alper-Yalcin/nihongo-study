@@ -3,8 +3,11 @@ import { KanaItem, KanaScript } from '../domain/kanaItem';
 import { createInitialKanaProgress, KanaProgress } from '../domain/kanaProgress';
 import {
   KANA_PROGRESS_STORAGE_KEY,
-  LEGACY_KANA_PROGRESS_STORAGE_KEY,
-  ProgressRepository
+  KANA_PLAY_PROGRESS_STORAGE_KEY,
+  LEGACY_KANA_PLAY_PROGRESS_STORAGE_KEY,
+  getProgressStorageKeys,
+  ProgressRepository,
+  ProgressStorageKeys
 } from './progressRepository';
 
 interface ProgressStoragePayload {
@@ -13,13 +16,11 @@ interface ProgressStoragePayload {
   updatedAt: string;
 }
 
-const DEFAULT_PAYLOAD: ProgressStoragePayload = {
+const createDefaultPayload = (): ProgressStoragePayload => ({
   version: 1,
   entries: [],
   updatedAt: new Date(0).toISOString()
-};
-
-let memoryPayload: ProgressStoragePayload = DEFAULT_PAYLOAD;
+});
 
 const isKanaScript = (value: unknown): value is KanaScript =>
   value === 'hiragana' || value === 'katakana';
@@ -32,44 +33,6 @@ const asNumber = (value: unknown, fallback = 0): number =>
 
 const asStringArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
-
-const readRawValue = (): string | null => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  try {
-    const currentValue = window.localStorage.getItem(KANA_PROGRESS_STORAGE_KEY);
-
-    if (currentValue !== null) {
-      return currentValue;
-    }
-
-    const legacyValue = window.localStorage.getItem(LEGACY_KANA_PROGRESS_STORAGE_KEY);
-
-    if (legacyValue !== null) {
-      window.localStorage.setItem(KANA_PROGRESS_STORAGE_KEY, legacyValue);
-    }
-
-    return legacyValue;
-  } catch {
-    return null;
-  }
-};
-
-const writeRawValue = (payload: ProgressStoragePayload) => {
-  memoryPayload = payload;
-
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(KANA_PROGRESS_STORAGE_KEY, JSON.stringify(payload));
-  } catch {
-    // Keep the in-memory fallback usable when storage writes fail.
-  }
-};
 
 const normalizeEntry = (value: unknown): KanaProgress | null => {
   if (!value || typeof value !== 'object') {
@@ -107,54 +70,6 @@ const normalizeEntry = (value: unknown): KanaProgress | null => {
   };
 };
 
-const normalizePayload = (value: unknown): ProgressStoragePayload => {
-  if (!value || typeof value !== 'object') {
-    return memoryPayload;
-  }
-
-  const raw = value as Partial<ProgressStoragePayload>;
-  const normalizedEntries = Array.isArray(raw.entries)
-    ? raw.entries
-        .map(normalizeEntry)
-        .filter((entry): entry is KanaProgress => entry !== null)
-        .sort((left, right) => left.kanaId.localeCompare(right.kanaId))
-    : memoryPayload.entries;
-
-  return {
-    version: 1,
-    entries: normalizedEntries,
-    updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString()
-  };
-};
-
-const readPayload = (): ProgressStoragePayload => {
-  const rawValue = readRawValue();
-
-  if (!rawValue) {
-    return memoryPayload;
-  }
-
-  try {
-    const parsed = JSON.parse(rawValue);
-    const payload = normalizePayload(parsed);
-    memoryPayload = payload;
-    return payload;
-  } catch {
-    return memoryPayload;
-  }
-};
-
-const writeEntries = (entries: KanaProgress[]): KanaProgress[] => {
-  const payload: ProgressStoragePayload = {
-    version: 1,
-    entries: [...entries].sort((left, right) => left.kanaId.localeCompare(right.kanaId)),
-    updatedAt: new Date().toISOString()
-  };
-
-  writeRawValue(payload);
-  return payload.entries;
-};
-
 const mergeEntries = (entries: KanaProgress[], nextEntries: KanaProgress[]): KanaProgress[] => {
   const merged = new Map(entries.map((entry) => [entry.kanaId, entry]));
 
@@ -163,6 +78,120 @@ const mergeEntries = (entries: KanaProgress[], nextEntries: KanaProgress[]): Kan
   });
 
   return [...merged.values()];
+};
+
+const parseIsoTimestamp = (value: string | null) => {
+  if (!value) {
+    return null;
+  }
+
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? null : timestamp;
+};
+
+const pickLatestIso = (left: string | null, right: string | null): string | null => {
+  if (!left) {
+    return right;
+  }
+
+  if (!right) {
+    return left;
+  }
+
+  const leftTimestamp = parseIsoTimestamp(left);
+  const rightTimestamp = parseIsoTimestamp(right);
+
+  if (leftTimestamp === null && rightTimestamp === null) {
+    return left > right ? left : right;
+  }
+
+  if (leftTimestamp === null) {
+    return right;
+  }
+
+  if (rightTimestamp === null) {
+    return left;
+  }
+
+  return rightTimestamp > leftTimestamp ? right : left;
+};
+
+const pickEarliestIso = (left: string | null, right: string | null): string | null => {
+  if (!left) {
+    return right;
+  }
+
+  if (!right) {
+    return left;
+  }
+
+  const leftTimestamp = parseIsoTimestamp(left);
+  const rightTimestamp = parseIsoTimestamp(right);
+
+  if (leftTimestamp === null && rightTimestamp === null) {
+    return left < right ? left : right;
+  }
+
+  if (leftTimestamp === null) {
+    return right;
+  }
+
+  if (rightTimestamp === null) {
+    return left;
+  }
+
+  return rightTimestamp < leftTimestamp ? right : left;
+};
+
+const mergeConfusedWith = (left: string[], right: string[]) =>
+  Array.from(new Set([...left, ...right])).slice(0, 6);
+
+const mergeProgressEntriesDeterministically = (
+  left: KanaProgress,
+  right: KanaProgress
+): KanaProgress => {
+  const leftUpdatedAt = parseIsoTimestamp(left.updatedAt) ?? Number.NEGATIVE_INFINITY;
+  const rightUpdatedAt = parseIsoTimestamp(right.updatedAt) ?? Number.NEGATIVE_INFINITY;
+  const base = rightUpdatedAt > leftUpdatedAt ? right : left;
+
+  return {
+    ...base,
+    masteryScore: Math.max(left.masteryScore, right.masteryScore),
+    recognitionScore: Math.max(left.recognitionScore, right.recognitionScore),
+    typingScore: Math.max(left.typingScore, right.typingScore),
+    drawingScore: Math.max(left.drawingScore, right.drawingScore),
+    listeningScore: Math.max(left.listeningScore, right.listeningScore),
+    timesSeen: Math.max(left.timesSeen, right.timesSeen),
+    timesCorrect: Math.max(left.timesCorrect, right.timesCorrect),
+    timesWrong: Math.max(left.timesWrong, right.timesWrong),
+    lastSeenAt: pickLatestIso(left.lastSeenAt, right.lastSeenAt),
+    lastCorrectAt: pickLatestIso(left.lastCorrectAt, right.lastCorrectAt),
+    lastWrongAt: pickLatestIso(left.lastWrongAt, right.lastWrongAt),
+    nextReviewAt: pickEarliestIso(left.nextReviewAt, right.nextReviewAt),
+    confusedWith: mergeConfusedWith(left.confusedWith, right.confusedWith),
+    createdAt: pickEarliestIso(left.createdAt, right.createdAt) ?? base.createdAt,
+    updatedAt: pickLatestIso(left.updatedAt, right.updatedAt) ?? base.updatedAt
+  };
+};
+
+const mergeEntriesDeterministically = (
+  entries: KanaProgress[],
+  nextEntries: KanaProgress[]
+) => {
+  const merged = new Map(entries.map((entry) => [entry.kanaId, entry]));
+
+  nextEntries.forEach((entry) => {
+    const current = merged.get(entry.kanaId);
+
+    if (!current) {
+      merged.set(entry.kanaId, entry);
+      return;
+    }
+
+    merged.set(entry.kanaId, mergeProgressEntriesDeterministically(current, entry));
+  });
+
+  return [...merged.values()].sort((left, right) => left.kanaId.localeCompare(right.kanaId));
 };
 
 const seedEntries = (entries: KanaProgress[], items: KanaItem[]): KanaProgress[] => {
@@ -177,55 +206,223 @@ const seedEntries = (entries: KanaProgress[], items: KanaItem[]): KanaProgress[]
   return [...seededMap.values()];
 };
 
-export const localProgressRepository: ProgressRepository = {
-  list() {
-    return readPayload().entries;
-  },
+export const createLocalProgressRepository = (
+  storageKeys: ProgressStorageKeys
+): ProgressRepository => {
+  const defaultPayload = createDefaultPayload();
+  let memoryPayload: ProgressStoragePayload = defaultPayload;
 
-  listByScript(script) {
-    return readPayload().entries.filter((entry) => entry.script === script);
-  },
+  const readRawValue = (): string | null => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
 
-  get(kanaId) {
-    return readPayload().entries.find((entry) => entry.kanaId === kanaId) ?? null;
-  },
+    try {
+      const currentValue = window.localStorage.getItem(storageKeys.storageKey);
 
-  save(entry) {
-    return writeEntries(mergeEntries(readPayload().entries, [normalizeEntry(entry) ?? entry]));
-  },
+      if (currentValue !== null) {
+        return currentValue;
+      }
 
-  saveMany(entries) {
-    const normalizedEntries = entries
-      .map(normalizeEntry)
-      .filter((entry): entry is KanaProgress => entry !== null);
+      for (const legacyKey of storageKeys.legacyStorageKeys) {
+        const legacyValue = window.localStorage.getItem(legacyKey);
 
-    return writeEntries(mergeEntries(readPayload().entries, normalizedEntries));
-  },
+        if (legacyValue !== null) {
+          window.localStorage.setItem(storageKeys.storageKey, legacyValue);
+          return legacyValue;
+        }
+      }
 
-  replaceAll(entries) {
-    const normalizedEntries = entries
-      .map(normalizeEntry)
-      .filter((entry): entry is KanaProgress => entry !== null);
+      return null;
+    } catch {
+      return null;
+    }
+  };
 
-    return writeEntries(normalizedEntries);
-  },
-
-  seedFromInventory(items = kanaInventory) {
-    return writeEntries(seedEntries(readPayload().entries, items));
-  },
-
-  clear() {
-    memoryPayload = DEFAULT_PAYLOAD;
+  const writeRawValue = (payload: ProgressStoragePayload) => {
+    memoryPayload = payload;
 
     if (typeof window === 'undefined') {
       return;
     }
 
     try {
-      window.localStorage.removeItem(KANA_PROGRESS_STORAGE_KEY);
-      window.localStorage.removeItem(LEGACY_KANA_PROGRESS_STORAGE_KEY);
+      window.localStorage.setItem(storageKeys.storageKey, JSON.stringify(payload));
     } catch {
-      // Ignore storage clear failures and keep the memory payload reset.
+      // Keep the in-memory fallback usable when storage writes fail.
     }
-  }
+  };
+
+  const readPayloadFromStorageKey = (storageKey: string): ProgressStoragePayload | null => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const rawValue = window.localStorage.getItem(storageKey);
+
+    if (rawValue === null) {
+      return null;
+    }
+
+    try {
+      return normalizePayload(JSON.parse(rawValue));
+    } catch {
+      return null;
+    }
+  };
+
+  const normalizePayload = (value: unknown): ProgressStoragePayload => {
+    if (!value || typeof value !== 'object') {
+      return memoryPayload;
+    }
+
+    const raw = value as Partial<ProgressStoragePayload>;
+    const normalizedEntries = Array.isArray(raw.entries)
+      ? raw.entries
+          .map(normalizeEntry)
+          .filter((entry): entry is KanaProgress => entry !== null)
+          .sort((left, right) => left.kanaId.localeCompare(right.kanaId))
+      : memoryPayload.entries;
+
+    return {
+      version: 1,
+      entries: normalizedEntries,
+      updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString()
+    };
+  };
+
+  const migrateLegacyPlayProgressIfNeeded = () => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (storageKeys.storageKey !== KANA_PROGRESS_STORAGE_KEY) {
+      return;
+    }
+
+    const playPayload = readPayloadFromStorageKey(KANA_PLAY_PROGRESS_STORAGE_KEY);
+    const legacyPlayPayload = readPayloadFromStorageKey(LEGACY_KANA_PLAY_PROGRESS_STORAGE_KEY);
+
+    if (!playPayload && !legacyPlayPayload) {
+      return;
+    }
+
+    const canonicalPayload =
+      readPayloadFromStorageKey(storageKeys.storageKey) ?? memoryPayload;
+
+    let mergedEntries = canonicalPayload.entries;
+
+    if (playPayload) {
+      mergedEntries = mergeEntriesDeterministically(mergedEntries, playPayload.entries);
+    }
+
+    if (legacyPlayPayload) {
+      mergedEntries = mergeEntriesDeterministically(mergedEntries, legacyPlayPayload.entries);
+    }
+
+    writeRawValue({
+      version: 1,
+      entries: mergedEntries,
+      updatedAt: new Date().toISOString()
+    });
+
+    try {
+      window.localStorage.removeItem(KANA_PLAY_PROGRESS_STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_KANA_PLAY_PROGRESS_STORAGE_KEY);
+    } catch {
+      // Ignore remove failures and keep canonical payload as source of truth.
+    }
+  };
+
+  const readPayload = (): ProgressStoragePayload => {
+    migrateLegacyPlayProgressIfNeeded();
+
+    const rawValue = readRawValue();
+
+    if (!rawValue) {
+      return memoryPayload;
+    }
+
+    try {
+      const parsed = JSON.parse(rawValue);
+      const payload = normalizePayload(parsed);
+      memoryPayload = payload;
+      return payload;
+    } catch {
+      return memoryPayload;
+    }
+  };
+
+  const writeEntries = (entries: KanaProgress[]): KanaProgress[] => {
+    const payload: ProgressStoragePayload = {
+      version: 1,
+      entries: [...entries].sort((left, right) => left.kanaId.localeCompare(right.kanaId)),
+      updatedAt: new Date().toISOString()
+    };
+
+    writeRawValue(payload);
+    return payload.entries;
+  };
+
+  return {
+    list() {
+      return readPayload().entries;
+    },
+
+    listByScript(script) {
+      return readPayload().entries.filter((entry) => entry.script === script);
+    },
+
+    get(kanaId) {
+      return readPayload().entries.find((entry) => entry.kanaId === kanaId) ?? null;
+    },
+
+    save(entry) {
+      return writeEntries(mergeEntries(readPayload().entries, [normalizeEntry(entry) ?? entry]));
+    },
+
+    saveMany(entries) {
+      const normalizedEntries = entries
+        .map(normalizeEntry)
+        .filter((entry): entry is KanaProgress => entry !== null);
+
+      return writeEntries(mergeEntries(readPayload().entries, normalizedEntries));
+    },
+
+    replaceAll(entries) {
+      const normalizedEntries = entries
+        .map(normalizeEntry)
+        .filter((entry): entry is KanaProgress => entry !== null);
+
+      return writeEntries(
+        [...normalizedEntries].sort((left, right) => left.kanaId.localeCompare(right.kanaId))
+      );
+    },
+
+    seedFromInventory(items = kanaInventory) {
+      return writeEntries(seedEntries(readPayload().entries, items));
+    },
+
+    clear() {
+      memoryPayload = createDefaultPayload();
+
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      try {
+        window.localStorage.removeItem(storageKeys.storageKey);
+
+        storageKeys.legacyStorageKeys.forEach((legacyKey) => {
+          window.localStorage.removeItem(legacyKey);
+        });
+      } catch {
+        // Ignore storage clear failures and keep the memory payload reset.
+      }
+    }
+  };
 };
+
+export const localProgressRepository = createLocalProgressRepository(
+  getProgressStorageKeys('study')
+);

@@ -1,12 +1,18 @@
-import React, { useMemo, useState } from 'react';
-import { ArrowLeft, AudioLines, Keyboard, PenTool, Route, ShieldAlert, Sparkles, Target } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, AudioLines, BookMarked, Gamepad2, Keyboard, PenTool, Route, ShieldAlert, Sparkles, Target } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
 import { StudyContainer } from '../components/StudyContainer';
+import { WordStudyContainer } from '../components/WordStudyContainer';
 import { ListeningStudyContainer } from '../components/listening/ListeningStudyContainer';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
+import {
+  appShellRoutes,
+  getKanaItemRoute,
+  getKanaStatsRoute,
+  KanaAppScope
+} from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
 import { useDictionaryWordSearch } from '../data/words';
 import { getKanaItemById } from '../features/kana/data/kanaInventory';
@@ -21,38 +27,16 @@ import {
 } from '../features/kana/review/reviewSelectors';
 import { KanaScript } from '../features/kana/domain/kanaItem';
 
-type KanaPathVariant = 'learn' | 'review' | 'weak' | 'confusable';
-type ActiveView = 'overview' | 'typing' | 'drawing' | 'listening';
+type KanaPathVariant = 'learn' | 'review' | 'weak' | 'confusable' | 'play';
+type ActiveView = 'overview' | 'typing' | 'drawing' | 'listening' | 'dictionary';
+type PlayViewQuery = 'overview' | 'typing' | 'drawing' | 'listening' | 'flashcards' | 'dictionary';
 
 interface KanaPathPageProps {
   script: KanaScript;
   language: AppLanguage;
   variant: KanaPathVariant;
+  scope?: KanaAppScope;
 }
-
-const routeByVariant: Record<KanaPathVariant, Record<KanaScript, string>> = {
-  learn: {
-    hiragana: appShellRoutes.hiraganaLearn,
-    katakana: appShellRoutes.katakanaLearn
-  },
-  review: {
-    hiragana: appShellRoutes.hiraganaReview,
-    katakana: appShellRoutes.katakanaReview
-  },
-  weak: {
-    hiragana: appShellRoutes.hiraganaWeak,
-    katakana: appShellRoutes.katakanaWeak
-  },
-  confusable: {
-    hiragana: appShellRoutes.hiraganaConfusable,
-    katakana: appShellRoutes.katakanaConfusable
-  }
-};
-
-const statsRouteByScript: Record<KanaScript, string> = {
-  hiragana: appShellRoutes.hiraganaStats,
-  katakana: appShellRoutes.katakanaStats
-};
 
 const overviewRouteByScript: Record<KanaScript, string> = {
   hiragana: appShellRoutes.hiraganaOverview,
@@ -68,14 +52,16 @@ const variantToneMap: Record<KanaPathVariant, string> = {
   learn: 'from-indigo-50 to-white border-indigo-100',
   review: 'from-amber-50 to-white border-amber-100',
   weak: 'from-rose-50 to-white border-rose-100',
-  confusable: 'from-sky-50 to-white border-sky-100'
+  confusable: 'from-sky-50 to-white border-sky-100',
+  play: 'from-emerald-50 to-white border-emerald-100'
 };
 
 const variantIconMap = {
   learn: Route,
   review: Target,
   weak: ShieldAlert,
-  confusable: Sparkles
+  confusable: Sparkles,
+  play: Gamepad2
 } as const;
 
 const pageCopy = {
@@ -84,8 +70,8 @@ const pageCopy = {
     stats: 'Stats ekrani',
     openMode: 'Modu ac',
     backToFlow: 'Akisa don',
-    focusItems: 'Odak itemler',
-    focusItemsDescription: 'Bu akista oncelikli calisilacak karakterler.',
+    modeDetailsTitle: 'Mode detaylari',
+    modeDetailsDescription: 'Her mode tek bir kartta odak, olcum ve calisma bicimi ile gosterilir.',
     queueTitle: 'Calisma ozeti',
     queueDescription: 'Bu rota gercek progress verisine gore hesaplanir.',
     emptyTitle: 'Su anda hazir item yok',
@@ -101,12 +87,36 @@ const pageCopy = {
       learn: 'Siradaki grup',
       review: 'Due queue',
       weak: 'Weak items',
-      confusable: 'Confusable setler'
+      confusable: 'Confusable setler',
+      play: 'Serbest havuz'
     },
     modeDescriptions: {
       typing: 'Romaji recall ve hiz kontrolu.',
       drawing: 'Form ve stroke tekrarini guclendir.',
-      listening: 'Ses -> karakter bagini kontrol et.'
+      listening: 'Ses -> karakter bagini kontrol et.',
+      dictionary: 'Kelime havuzunda script odakli orneklerle baglam kur.'
+    },
+    modeDetails: {
+      typing: [
+        'Girdi: Romaji -> kana eslesmesi.',
+        'Olcum: typing skoru ve dogru hizli recall.',
+        'Kullanim: Kisa sureli hizli tekrar seanslari.'
+      ],
+      drawing: [
+        'Girdi: Karakteri cizerek hatirlama.',
+        'Olcum: drawing skoru ve form tutarliligi.',
+        'Kullanim: El yazisi ve sekil pekistirme.'
+      ],
+      listening: [
+        'Girdi: Ses kaydi -> dogru karakter secimi.',
+        'Olcum: listening skoru ve isitsel ayrim.',
+        'Kullanim: Benzer sesleri ayirt etme calismasi.'
+      ],
+      dictionary: [
+        'Girdi: Script odakli kelime ornekleri.',
+        'Odak: Karakteri kelime icinde baglama oturtma.',
+        'Kullanim: Flashcards benzeri baglamsal tekrar.'
+      ]
     },
     variants: {
       learn: {
@@ -128,6 +138,11 @@ const pageCopy = {
         eyebrow: 'Confusable Kana',
         title: (scriptTitle: string) => `${scriptTitle} karisan karakter drill'i`,
         description: 'Seed setler ve gercek karisma verisi birlikte kullaniliyor.'
+      },
+      play: {
+        eyebrow: 'Play',
+        title: (scriptTitle: string) => `${scriptTitle} serbest calisma alani`,
+        description: 'Learn path kisiti olmadan istedigin gruptan baslayip istedigin sirada calis.'
       }
     }
   },
@@ -136,8 +151,8 @@ const pageCopy = {
     stats: 'Open stats',
     openMode: 'Open mode',
     backToFlow: 'Back to flow',
-    focusItems: 'Focus items',
-    focusItemsDescription: 'Characters prioritized for this route.',
+    modeDetailsTitle: 'Mode details',
+    modeDetailsDescription: 'Each mode is shown in a single card with focus, measurement, and study style.',
     queueTitle: 'Flow summary',
     queueDescription: 'This route is derived from live progress data.',
     emptyTitle: 'No items are ready yet',
@@ -153,12 +168,36 @@ const pageCopy = {
       learn: 'Next group',
       review: 'Due queue',
       weak: 'Weak items',
-      confusable: 'Confusable sets'
+      confusable: 'Confusable sets',
+      play: 'Free-form pool'
     },
     modeDescriptions: {
       typing: 'Romaji recall and speed control.',
       drawing: 'Reinforce form and stroke recall.',
-      listening: 'Check the sound-to-character link.'
+      listening: 'Check the sound-to-character link.',
+      dictionary: 'Build context from script-focused vocabulary pools.'
+    },
+    modeDetails: {
+      typing: [
+        'Input: Romaji -> kana mapping.',
+        'Measured by typing score and quick recall accuracy.',
+        'Best for short, high-frequency repetition bursts.'
+      ],
+      drawing: [
+        'Input: Draw the character from memory.',
+        'Measured by drawing score and shape consistency.',
+        'Best for handwriting and visual form reinforcement.'
+      ],
+      listening: [
+        'Input: Audio cue -> correct character match.',
+        'Measured by listening score and auditory discrimination.',
+        'Best for separating similar-sounding kana.'
+      ],
+      dictionary: [
+        'Input: Script-focused vocabulary examples.',
+        'Focus: Build character meaning in context.',
+        'Best for flashcard-like contextual reinforcement.'
+      ]
     },
     variants: {
       learn: {
@@ -180,6 +219,11 @@ const pageCopy = {
         eyebrow: 'Confusable Kana',
         title: (scriptTitle: string) => `${scriptTitle} confusion drill`,
         description: 'Seed sets and real confusion data are combined here.'
+      },
+      play: {
+        eyebrow: 'Play',
+        title: (scriptTitle: string) => `${scriptTitle} free-form area`,
+        description: 'Start from any group and study in any order without learn-path gating.'
       }
     }
   }
@@ -190,6 +234,8 @@ const modeCards = {
     label: 'Typing',
     descriptionKey: 'typing',
     Icon: Keyboard,
+    gifSrc: 'gifs/typing-demo.gif',
+    gifAlt: 'Typing mode preview gif',
     shell: 'border-indigo-200 bg-white',
     icon: 'bg-indigo-100 text-indigo-600',
     button: 'bg-indigo-600 hover:bg-indigo-700'
@@ -198,6 +244,8 @@ const modeCards = {
     label: 'Drawing',
     descriptionKey: 'drawing',
     Icon: PenTool,
+    gifSrc: 'gifs/drawing-demo.gif',
+    gifAlt: 'Drawing mode preview gif',
     shell: 'border-emerald-200 bg-white',
     icon: 'bg-emerald-100 text-emerald-600',
     button: 'bg-emerald-600 hover:bg-emerald-700'
@@ -206,18 +254,64 @@ const modeCards = {
     label: 'Listening',
     descriptionKey: 'listening',
     Icon: AudioLines,
+    gifSrc: 'gifs/listening-demo.gif',
+    gifAlt: 'Listening mode preview gif',
     shell: 'border-rose-200 bg-white',
     icon: 'bg-rose-100 text-rose-600',
     button: 'bg-rose-600 hover:bg-rose-700'
+  },
+  dictionary: {
+    label: 'Dictionary',
+    descriptionKey: 'dictionary',
+    Icon: BookMarked,
+    gifSrc: 'gifs/dictionary-demo.gif',
+    gifAlt: 'Dictionary mode preview gif',
+    shell: 'border-amber-200 bg-white',
+    icon: 'bg-amber-100 text-amber-600',
+    button: 'bg-amber-600 hover:bg-amber-700'
   }
 } as const;
+
+const getPublicAssetPath = (assetPath: string) => {
+  const basePath = import.meta.env.BASE_URL ?? '/';
+  return `${basePath.replace(/\/$/, '')}/${assetPath.replace(/^\/+/, '')}`;
+};
 
 const getSectionsForScript = (script: KanaScript, language: AppLanguage) =>
   script === 'hiragana'
     ? getLocalizedHiraganaSections(language)
     : getLocalizedKatakanaSections(language);
 
-export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, variant }) => {
+const resolveActiveViewFromQuery = (value: string | null): ActiveView => {
+  const normalizedValue = (value ?? '').toLowerCase() as PlayViewQuery;
+
+  if (normalizedValue === 'typing') {
+    return 'typing';
+  }
+
+  if (normalizedValue === 'drawing') {
+    return 'drawing';
+  }
+
+  if (normalizedValue === 'listening') {
+    return 'listening';
+  }
+
+  if (normalizedValue === 'dictionary' || normalizedValue === 'flashcards') {
+    return 'dictionary';
+  }
+
+  return 'overview';
+};
+
+export const KanaPathPage: React.FC<KanaPathPageProps> = ({
+  script,
+  language,
+  variant,
+  scope = 'study' as KanaAppScope
+}) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const resolvedScope: KanaAppScope = scope;
   const copy = pageCopy[language];
   const scriptTitle = scriptTitleMap[script];
   const sections = useMemo(() => getSectionsForScript(script, language), [language, script]);
@@ -233,7 +327,45 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
   const { listByScript, summaries } = useKanaProgressStore();
   const progressEntries = listByScript(script);
   const summary = summaries[script];
-  const [activeView, setActiveView] = useState<ActiveView>('overview');
+  const [failedModePreviews, setFailedModePreviews] = useState<Record<string, boolean>>({});
+  const [activeView, setActiveView] = useState<ActiveView>(() =>
+    variant === 'play' ? resolveActiveViewFromQuery(searchParams.get('view')) : 'overview'
+  );
+
+  useEffect(() => {
+    setFailedModePreviews({});
+  }, [language, script, variant]);
+
+  useEffect(() => {
+    if (variant !== 'play') {
+      return;
+    }
+
+    setActiveView(resolveActiveViewFromQuery(searchParams.get('view')));
+  }, [searchParams, variant]);
+
+  const setActiveViewWithRoute = useCallback(
+    (nextView: ActiveView) => {
+      setActiveView(nextView);
+
+      if (variant !== 'play') {
+        return;
+      }
+
+      const nextSearchParams = new URLSearchParams(searchParams);
+
+      if (nextView === 'overview') {
+        nextSearchParams.delete('view');
+      } else if (nextView === 'dictionary') {
+        nextSearchParams.set('view', 'flashcards');
+      } else {
+        nextSearchParams.set('view', nextView);
+      }
+
+      setSearchParams(nextSearchParams, { replace: true });
+    },
+    [searchParams, setSearchParams, variant]
+  );
 
   const nextGroup = useMemo(
     () => getNextKanaCurriculumGroup(script, sections, progressEntries),
@@ -255,6 +387,12 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
   const focusItemIds = useMemo(() => {
     if (variant === 'learn') {
       return nextGroup?.itemIds ?? [];
+    }
+
+    if (variant === 'play') {
+      return sections.flatMap((section) =>
+        section.groups.flatMap((group) => group.characters.map((character) => character.id))
+      );
     }
 
     if (variant === 'review') {
@@ -283,6 +421,10 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
   const variantCopy = copy.variants[variant];
   const HeroIcon = variantIconMap[variant];
   const hasUsableItems = scopedSections.length > 0 && focusItems.length > 0;
+  const modeEntries = useMemo(() => {
+    const entries = Object.entries(modeCards) as Array<[Exclude<ActiveView, 'overview'>, typeof modeCards.typing]>;
+    return variant === 'play' ? entries : entries.filter(([modeId]) => modeId !== 'dictionary');
+  }, [variant]);
 
   const renderFlowSummary = () => {
     if (variant === 'learn') {
@@ -293,6 +435,22 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
           </div>
           <h2 className="mt-3 text-2xl font-semibold text-slate-900">
             {nextGroup ? `${nextGroup.sectionTitle} / ${nextGroup.groupLabel}` : '--'}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{variantCopy.description}</p>
+        </div>
+      );
+    }
+
+    if (variant === 'play') {
+      const totalGroups = scopedSections.reduce((total, section) => total + section.groups.length, 0);
+
+      return (
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            {copy.queueLabels.play}
+          </div>
+          <h2 className="mt-3 text-2xl font-semibold text-slate-900">
+            {`${focusItems.length} ${language === 'tr' ? 'karakter /' : 'items /'} ${totalGroups} ${language === 'tr' ? 'grup' : 'groups'}`}
           </h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">{variantCopy.description}</p>
         </div>
@@ -312,7 +470,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
                     <div className="text-lg font-semibold text-slate-900">{item?.char ?? entry.kanaId}</div>
                     <div className="text-xs uppercase tracking-[0.16em] text-slate-500">{entry.reason}</div>
                   </div>
-                  <Link to={`/kana/item/${entry.kanaId}`} className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                  <Link to={getKanaItemRoute(script, entry.kanaId, resolvedScope)} className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
                     {copy.itemLink}
                   </Link>
                 </div>
@@ -336,7 +494,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
                     <div className="text-lg font-semibold text-slate-900">{item?.char ?? entry.kanaId}</div>
                     <div className="text-xs uppercase tracking-[0.16em] text-slate-500">{`${copy.mistakes}: ${entry.timesWrong}`}</div>
                   </div>
-                  <Link to={`/kana/item/${entry.kanaId}`} className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                  <Link to={getKanaItemRoute(script, entry.kanaId, resolvedScope)} className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
                     {copy.itemLink}
                   </Link>
                 </div>
@@ -357,7 +515,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
               <div className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">{`${copy.confusions}: ${set.count}`}</div>
               <div className="mt-3 flex gap-2">
                 {set.kanaIds.map((kanaId) => (
-                  <Link key={kanaId} to={`/kana/item/${kanaId}`} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                  <Link key={kanaId} to={getKanaItemRoute(script, kanaId, resolvedScope)} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100">
                     {getKanaItemById(kanaId)?.char ?? kanaId}
                   </Link>
                 ))}
@@ -418,74 +576,74 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
 
         {activeView === 'overview' && (
           <>
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)]">
-              <div className="space-y-6">{renderFlowSummary()}</div>
-              <SectionCard title={copy.focusItems} description={copy.focusItemsDescription}>
-                <div className="space-y-4">
-                  {focusItems.length === 0 && <p className="text-sm text-slate-500">{copy.emptyDescription}</p>}
-                  {focusItems.map((item) => {
-                    const progressEntry = progressEntries.find((entry) => entry.kanaId === item.id);
-                    return (
-                      <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="font-japanese text-3xl text-slate-900" style={{ fontFamily: 'var(--font-jp-current)' }}>{item.char}</div>
-                            <div className="mt-2 text-xs uppercase tracking-[0.16em] text-slate-500">{item.romaji.join(', ')}</div>
-                          </div>
-                          <Link to={`/kana/item/${item.id}`} className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
-                            {copy.itemLink}
-                          </Link>
-                        </div>
-                        <div className="mt-4 grid gap-2 text-xs text-slate-600 sm:grid-cols-3">
-                          <div>
-                            <div className="font-semibold text-slate-500">{copy.itemState}</div>
-                            <div className="mt-1">{progressEntry?.state ?? 'new'}</div>
-                          </div>
-                          <div>
-                            <div className="font-semibold text-slate-500">{copy.itemGroup}</div>
-                            <div className="mt-1">{item.groupLabel}</div>
-                          </div>
-                          <div>
-                            <div className="font-semibold text-slate-500">{copy.itemScores}</div>
-                            <div className="mt-1">T {progressEntry?.typingScore ?? 0} / D {progressEntry?.drawingScore ?? 0} / L {progressEntry?.listeningScore ?? 0}</div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </SectionCard>
-            </div>
+            <div className="space-y-6">{renderFlowSummary()}</div>
 
             <section className="space-y-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-semibold text-slate-900">Start a focused run</h2>
-                  <p className="mt-2 text-sm leading-7 text-slate-600">Only the characters in this flow are loaded into the study containers below.</p>
+                  <h2 className="text-2xl font-semibold text-slate-900">{copy.modeDetailsTitle}</h2>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">{copy.modeDetailsDescription}</p>
                 </div>
-                <Link to={statsRouteByScript[script]} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
+                <Link to={getKanaStatsRoute(script, resolvedScope)} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
                   {copy.stats}
                 </Link>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-3">
-                {(Object.entries(modeCards) as Array<[Exclude<ActiveView, 'overview'>, typeof modeCards.typing]>).map(([modeId, modeCard]) => {
+              <div className="flex flex-col gap-5">
+                {modeEntries.map(([modeId, modeCard]) => {
                   const Icon = modeCard.Icon;
+                  const previewPath = getPublicAssetPath(modeCard.gifSrc);
+                  const hasPreviewError = Boolean(failedModePreviews[modeId]);
+
                   return (
-                    <div key={modeId} className={`rounded-3xl border p-5 shadow-sm ${modeCard.shell}`}>
-                      <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${modeCard.icon}`}>
-                        <Icon size={22} />
+                    <div key={modeId} className={`overflow-hidden rounded-3xl border shadow-sm ${modeCard.shell}`}>
+                      <div className="flex flex-col gap-5 p-5 md:flex-row md:items-stretch md:justify-between md:gap-6">
+                        <div className="min-w-0 flex-1">
+                          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${modeCard.icon}`}>
+                            <Icon size={22} />
+                          </div>
+                          <h3 className="mt-5 text-xl font-semibold text-slate-900">{modeCard.label}</h3>
+                          <p className="mt-2 text-sm leading-7 text-slate-600">{copy.modeDescriptions[modeCard.descriptionKey]}</p>
+
+                          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs leading-6 text-slate-600">
+                            {copy.modeDetails[modeId].map((detail) => (
+                              <li key={detail}>{detail}</li>
+                            ))}
+                          </ul>
+
+                          <button
+                            type="button"
+                            onClick={() => setActiveViewWithRoute(modeId)}
+                            disabled={!hasUsableItems}
+                            className={`mt-6 inline-flex w-fit min-w-40 items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${modeCard.button}`}
+                          >
+                            {copy.openMode}
+                          </button>
+                        </div>
+
+                        <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 md:w-72 lg:w-80">
+                          <div className="relative aspect-[16/10]">
+                            {hasPreviewError ? (
+                              <div className="flex h-full w-full items-center justify-center bg-slate-100 px-4 text-center text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                {modeCard.label} preview
+                              </div>
+                            ) : (
+                              <img
+                                src={previewPath}
+                                alt={modeCard.gifAlt}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                                onError={() => {
+                                  setFailedModePreviews((current) => ({
+                                    ...current,
+                                    [modeId]: true
+                                  }));
+                                }}
+                              />
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="mt-5 text-xl font-semibold text-slate-900">{modeCard.label}</h3>
-                      <p className="mt-2 text-sm leading-7 text-slate-600">{copy.modeDescriptions[modeCard.descriptionKey]}</p>
-                      <button
-                        type="button"
-                        onClick={() => setActiveView(modeId)}
-                        disabled={!hasUsableItems}
-                        className={`mt-6 inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${modeCard.button}`}
-                      >
-                        {copy.openMode}
-                      </button>
                     </div>
                   );
                 })}
@@ -498,7 +656,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
           <SectionCard title={copy.emptyTitle} description={copy.emptyDescription}>
             <button
               type="button"
-              onClick={() => setActiveView('overview')}
+              onClick={() => setActiveViewWithRoute('overview')}
               className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
               <ArrowLeft size={16} className="mr-2" />
@@ -511,7 +669,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
           <div className="space-y-4">
             <button
               type="button"
-              onClick={() => setActiveView('overview')}
+              onClick={() => setActiveViewWithRoute('overview')}
               className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
               <ArrowLeft size={16} className="mr-2" />
@@ -531,7 +689,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
           <div className="space-y-4">
             <button
               type="button"
-              onClick={() => setActiveView('overview')}
+              onClick={() => setActiveViewWithRoute('overview')}
               className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
               <ArrowLeft size={16} className="mr-2" />
@@ -551,7 +709,7 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
           <div className="space-y-4">
             <button
               type="button"
-              onClick={() => setActiveView('overview')}
+              onClick={() => setActiveViewWithRoute('overview')}
               className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
               <ArrowLeft size={16} className="mr-2" />
@@ -574,6 +732,20 @@ export const KanaPathPage: React.FC<KanaPathPageProps> = ({ script, language, va
               words={scopedWords}
               script={script}
             />
+          </div>
+        )}
+
+        {activeView === 'dictionary' && hasUsableItems && variant === 'play' && (
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={() => setActiveViewWithRoute('overview')}
+              className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              <ArrowLeft size={16} className="mr-2" />
+              {copy.backToFlow}
+            </button>
+            <WordStudyContainer title={`${scriptTitle} Dictionary`} language={language} script={script} />
           </div>
         )}
       </div>

@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -21,6 +23,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true
         }
       }
+    },
+    test: {
+      environment: 'happy-dom',
+      globals: false,
+      clearMocks: true,
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx']
     }
   };
 });

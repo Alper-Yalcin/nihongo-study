@@ -86,6 +86,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
 }) => {
   const copy = studyContent[language];
   const {
+    scope,
     activeSession,
     getProgress,
     saveProgress,
@@ -140,7 +141,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
   const isTestMode = drawingMode === 'test';
   const isSpeedMode = drawingMode === 'speed';
   const isMemoryMode = drawingMode === 'memory';
-  const sessionKey = `kana:${script}:drawing:${drawingMode}`;
+  const sessionKey = `kana:${scope}:${script}:drawing:${drawingMode}`;
   const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
 
   useEffect(() => {

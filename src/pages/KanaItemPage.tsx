@@ -4,7 +4,13 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
+import {
+  appShellRoutes,
+  getKanaEntryRoute,
+  getKanaItemRoute,
+  getKanaStatsRoute,
+  KanaAppScope
+} from '../data/appShellContent';
 import { useDictionaryWordSearch } from '../data/words';
 import { getGoogleTranslateKanaAudioSrc } from '../data/kanaAudio';
 import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
@@ -13,26 +19,14 @@ import { useKanaProgressStore } from '../features/kana/progress/progressStore';
 
 interface KanaItemPageProps {
   language: AppLanguage;
+  scope?: KanaAppScope;
 }
 
-const routeMap = {
-  hiragana: {
-    overview: appShellRoutes.hiraganaOverview,
-    learn: appShellRoutes.hiraganaLearn,
-    review: appShellRoutes.hiraganaReview,
-    weak: appShellRoutes.hiraganaWeak,
-    confusable: appShellRoutes.hiraganaConfusable
-  },
-  katakana: {
-    overview: appShellRoutes.katakanaOverview,
-    learn: appShellRoutes.katakanaLearn,
-    review: appShellRoutes.katakanaReview,
-    weak: appShellRoutes.katakanaWeak,
-    confusable: appShellRoutes.katakanaConfusable
-  }
-} as const;
-
-export const KanaItemPage: React.FC<KanaItemPageProps> = ({ language }) => {
+export const KanaItemPage: React.FC<KanaItemPageProps> = ({
+  language,
+  scope = 'study' as KanaAppScope
+}) => {
+  const resolvedScope: KanaAppScope = scope;
   const { kanaId } = useParams<{ kanaId: string }>();
   const item = kanaId ? getKanaItemById(kanaId) : null;
   const resolvedScript = item?.script ?? 'hiragana';
@@ -64,15 +58,13 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({ language }) => {
     return <Navigate to={appShellRoutes.home} replace />;
   }
 
-  const routes = routeMap[item.script];
-
   return (
     <PageContainer>
       <div className="space-y-8">
         <section className="rounded-[2rem] border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-8 shadow-sm md:p-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl space-y-4">
-              <Link to={routes.overview} className="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
+              <Link to={getKanaEntryRoute(item.script, resolvedScope)} className="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
                 <ArrowLeft size={16} className="mr-2" />
                 {language === 'tr' ? 'Overview sayfasina don' : 'Back to overview'}
               </Link>
@@ -165,7 +157,7 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({ language }) => {
               {confusedItems.map((confusedItem) => (
                 <Link
                   key={confusedItem.id}
-                  to={`/kana/item/${confusedItem.id}`}
+                  to={getKanaItemRoute(item.script, confusedItem.id, resolvedScope)}
                   className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-center transition-colors hover:bg-slate-100"
                 >
                   <div className="font-japanese text-3xl text-slate-900" style={{ fontFamily: 'var(--font-jp-current)' }}>{confusedItem.char}</div>
@@ -174,18 +166,33 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({ language }) => {
               ))}
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to={routes.review} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                <Route size={16} className="mr-2" />
-                {language === 'tr' ? 'Review akisini ac' : 'Open review flow'}
-              </Link>
-              <Link to={routes.weak} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                <Target size={16} className="mr-2" />
-                {language === 'tr' ? 'Weak akisini ac' : 'Open weak flow'}
-              </Link>
-              <Link to={routes.confusable} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                <Route size={16} className="mr-2" />
-                {language === 'tr' ? 'Confusable akisini ac' : 'Open confusable flow'}
-              </Link>
+              {resolvedScope === 'play' ? (
+                <>
+                  <Link to={getKanaEntryRoute(item.script, 'play')} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <Route size={16} className="mr-2" />
+                    {language === 'tr' ? 'Play akisini ac' : 'Open play flow'}
+                  </Link>
+                  <Link to={getKanaStatsRoute(item.script, 'play')} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <Target size={16} className="mr-2" />
+                    {language === 'tr' ? 'Play stats ac' : 'Open play stats'}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to={item.script === 'hiragana' ? appShellRoutes.hiraganaReview : appShellRoutes.katakanaReview} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <Route size={16} className="mr-2" />
+                    {language === 'tr' ? 'Review akisini ac' : 'Open review flow'}
+                  </Link>
+                  <Link to={item.script === 'hiragana' ? appShellRoutes.hiraganaWeak : appShellRoutes.katakanaWeak} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <Target size={16} className="mr-2" />
+                    {language === 'tr' ? 'Weak akisini ac' : 'Open weak flow'}
+                  </Link>
+                  <Link to={item.script === 'hiragana' ? appShellRoutes.hiraganaConfusable : appShellRoutes.katakanaConfusable} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <Route size={16} className="mr-2" />
+                    {language === 'tr' ? 'Confusable akisini ac' : 'Open confusable flow'}
+                  </Link>
+                </>
+              )}
             </div>
           </SectionCard>
 

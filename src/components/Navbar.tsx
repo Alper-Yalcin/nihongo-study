@@ -57,6 +57,10 @@ const getActiveShellItemId = (pathname: string): AppShellNavItemId => {
     const segments = pathname.split('/').filter(Boolean);
     const routeKind = segments[2];
 
+      if (routeKind === 'play') {
+        return 'play';
+      }
+
     if (routeKind === 'weak' || routeKind === 'confusable' || routeKind === 'stats') {
       return 'test';
     }

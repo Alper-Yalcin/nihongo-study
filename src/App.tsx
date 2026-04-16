@@ -13,8 +13,10 @@ import { Katakana } from './pages/Katakana';
 import { Kanji } from './pages/Kanji';
 import { KanaItemPage } from './pages/KanaItemPage';
 import { KanaPathPage } from './pages/KanaPathPage';
+import { KanaPlayPage } from './pages/KanaPlayPage';
 import { KanaSessionPage } from './pages/KanaSessionPage';
 import { KanaStatsPage } from './pages/KanaStatsPage';
+import { KanaStudyRoadmapPage } from './pages/KanaStudyRoadmapPage';
 import { Settings } from './pages/Settings';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
@@ -119,6 +121,10 @@ export default function App() {
     navigate(getPathForTab(tab));
   };
 
+  const wrapPlayScope = (element: React.ReactElement) => (
+    <KanaProgressProvider scope="play">{element}</KanaProgressProvider>
+  );
+
   return (
     <KanaProgressProvider>
       <div
@@ -148,59 +154,95 @@ export default function App() {
           <Route path={appShellRoutes.hiraganaOverview} element={<Hiragana language={language} />} />
           <Route
             path={appShellRoutes.hiraganaLearn}
-            element={<KanaPathPage script="hiragana" language={language} variant="learn" />}
+            element={<KanaStudyRoadmapPage script="hiragana" language={language} />}
+          />
+          <Route
+            path={appShellRoutes.hiraganaPlay}
+            element={wrapPlayScope(<KanaPlayPage script="hiragana" language={language} />)}
           />
           <Route
             path={appShellRoutes.hiraganaReview}
-            element={<KanaPathPage script="hiragana" language={language} variant="review" />}
+            element={<KanaPathPage script="hiragana" language={language} variant="review" scope="study" />}
           />
           <Route
             path={appShellRoutes.hiraganaWeak}
-            element={<KanaPathPage script="hiragana" language={language} variant="weak" />}
+            element={<KanaPathPage script="hiragana" language={language} variant="weak" scope="study" />}
           />
           <Route
             path={appShellRoutes.hiraganaConfusable}
-            element={<KanaPathPage script="hiragana" language={language} variant="confusable" />}
+            element={<KanaPathPage script="hiragana" language={language} variant="confusable" scope="study" />}
           />
           <Route
             path={appShellRoutes.hiraganaStats}
-            element={<KanaStatsPage script="hiragana" language={language} />}
+            element={<KanaStatsPage script="hiragana" language={language} scope="study" />}
+          />
+          <Route
+            path={appShellRoutes.hiraganaPlayStats}
+            element={wrapPlayScope(
+              <KanaStatsPage script="hiragana" language={language} scope="play" />
+            )}
           />
           <Route
             path={appShellRoutes.hiraganaWords}
             element={<Hiragana language={language} initialView="dictionary" />}
+          />
+          <Route
+            path={`${appShellRoutes.hiraganaPlayItemBase}/:kanaId`}
+            element={wrapPlayScope(<KanaItemPage language={language} scope="play" />)}
+          />
+          <Route
+            path={`${appShellRoutes.hiraganaPlaySessionBase}/:sessionId`}
+            element={wrapPlayScope(<KanaSessionPage language={language} scope="play" />)}
           />
 
           <Route path="/kana/katakana" element={<Navigate to={appShellRoutes.katakanaOverview} replace />} />
           <Route path={appShellRoutes.katakanaOverview} element={<Katakana language={language} />} />
           <Route
             path={appShellRoutes.katakanaLearn}
-            element={<KanaPathPage script="katakana" language={language} variant="learn" />}
+            element={<KanaStudyRoadmapPage script="katakana" language={language} />}
+          />
+          <Route
+            path={appShellRoutes.katakanaPlay}
+            element={wrapPlayScope(<KanaPlayPage script="katakana" language={language} />)}
           />
           <Route
             path={appShellRoutes.katakanaReview}
-            element={<KanaPathPage script="katakana" language={language} variant="review" />}
+            element={<KanaPathPage script="katakana" language={language} variant="review" scope="study" />}
           />
           <Route
             path={appShellRoutes.katakanaWeak}
-            element={<KanaPathPage script="katakana" language={language} variant="weak" />}
+            element={<KanaPathPage script="katakana" language={language} variant="weak" scope="study" />}
           />
           <Route
             path={appShellRoutes.katakanaConfusable}
-            element={<KanaPathPage script="katakana" language={language} variant="confusable" />}
+            element={<KanaPathPage script="katakana" language={language} variant="confusable" scope="study" />}
           />
           <Route
             path={appShellRoutes.katakanaStats}
-            element={<KanaStatsPage script="katakana" language={language} />}
+            element={<KanaStatsPage script="katakana" language={language} scope="study" />}
+          />
+          <Route
+            path={appShellRoutes.katakanaPlayStats}
+            element={wrapPlayScope(
+              <KanaStatsPage script="katakana" language={language} scope="play" />
+            )}
           />
           <Route
             path={appShellRoutes.katakanaWords}
             element={<Katakana language={language} initialView="dictionary" />}
           />
+          <Route
+            path={`${appShellRoutes.katakanaPlayItemBase}/:kanaId`}
+            element={wrapPlayScope(<KanaItemPage language={language} scope="play" />)}
+          />
+          <Route
+            path={`${appShellRoutes.katakanaPlaySessionBase}/:sessionId`}
+            element={wrapPlayScope(<KanaSessionPage language={language} scope="play" />)}
+          />
 
           <Route path={appShellRoutes.kanjiOverview} element={<Kanji language={language} />} />
-          <Route path="/kana/item/:kanaId" element={<KanaItemPage language={language} />} />
-          <Route path="/kana/session/:sessionId" element={<KanaSessionPage language={language} />} />
+          <Route path="/kana/item/:kanaId" element={<KanaItemPage language={language} scope="study" />} />
+          <Route path="/kana/session/:sessionId" element={<KanaSessionPage language={language} scope="study" />} />
 
           <Route
             path={appShellRoutes.search}

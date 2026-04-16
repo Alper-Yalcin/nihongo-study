@@ -58,8 +58,8 @@ export const ListeningTypingPanel: React.FC<Props> = ({
   onCancel
 }) => {
   const copy = studyContent[language];
-  const { activeSession, getProgress, saveProgress, saveSession, setActiveSession } = useKanaProgressStore();
-  const sessionKey = `kana:${script}:listening:${datasetType}:typing`;
+  const { scope, activeSession, getProgress, saveProgress, saveSession, setActiveSession } = useKanaProgressStore();
+  const sessionKey = `kana:${scope}:${script}:listening:${datasetType}:typing`;
   const activeRunSession = isSessionKeyMatch(activeSession, sessionKey) ? activeSession : null;
 
   const [currentIndex, setCurrentIndex] = useState(0);

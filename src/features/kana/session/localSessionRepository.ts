@@ -5,9 +5,9 @@ import {
   StudySessionSummary
 } from '../domain/studySession';
 import {
-  KANA_SESSION_STORAGE_KEY,
-  LEGACY_KANA_SESSION_STORAGE_KEY,
-  SessionRepository
+  getSessionStorageKeys,
+  SessionRepository,
+  SessionStorageKeys
 } from './sessionRepository';
 
 interface SessionStoragePayload {
@@ -17,14 +17,12 @@ interface SessionStoragePayload {
   updatedAt: string;
 }
 
-const DEFAULT_PAYLOAD: SessionStoragePayload = {
+const createDefaultPayload = (): SessionStoragePayload => ({
   version: 1,
   sessions: [],
   activeSessionId: null,
   updatedAt: new Date(0).toISOString()
-};
-
-let memoryPayload: SessionStoragePayload = DEFAULT_PAYLOAD;
+});
 
 const DEFAULT_RESULTS_SUMMARY: StudySessionSummary = {
   total: 0,
@@ -119,44 +117,6 @@ const normalizeResultsSummary = (value: unknown): StudySessionSummary => {
   };
 };
 
-const readRawValue = (): string | null => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  try {
-    const currentValue = window.localStorage.getItem(KANA_SESSION_STORAGE_KEY);
-
-    if (currentValue !== null) {
-      return currentValue;
-    }
-
-    const legacyValue = window.localStorage.getItem(LEGACY_KANA_SESSION_STORAGE_KEY);
-
-    if (legacyValue !== null) {
-      window.localStorage.setItem(KANA_SESSION_STORAGE_KEY, legacyValue);
-    }
-
-    return legacyValue;
-  } catch {
-    return null;
-  }
-};
-
-const writeRawValue = (payload: SessionStoragePayload) => {
-  memoryPayload = payload;
-
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(KANA_SESSION_STORAGE_KEY, JSON.stringify(payload));
-  } catch {
-    // Keep the in-memory fallback usable when storage writes fail.
-  }
-};
-
 const normalizeStudySession = (value: unknown): StudySession | null => {
   if (!value || typeof value !== 'object') {
     return null;
@@ -193,121 +153,176 @@ const normalizeStudySession = (value: unknown): StudySession | null => {
   };
 };
 
-const normalizePayload = (value: unknown): SessionStoragePayload => {
-  if (!value || typeof value !== 'object') {
-    return memoryPayload;
-  }
+export const createLocalSessionRepository = (
+  storageKeys: SessionStorageKeys
+): SessionRepository => {
+  const defaultPayload = createDefaultPayload();
+  let memoryPayload: SessionStoragePayload = defaultPayload;
 
-  const raw = value as Partial<SessionStoragePayload>;
-  const sessions = Array.isArray(raw.sessions)
-    ? raw.sessions
-        .map(normalizeStudySession)
-        .filter((session): session is StudySession => session !== null)
-        .sort((left, right) => right.startedAt.localeCompare(left.startedAt))
-    : memoryPayload.sessions;
-
-  const activeSessionId =
-    typeof raw.activeSessionId === 'string' || raw.activeSessionId === null
-      ? raw.activeSessionId
-      : memoryPayload.activeSessionId;
-
-  return {
-    version: 1,
-    sessions,
-    activeSessionId,
-    updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString()
-  };
-};
-
-const readPayload = (): SessionStoragePayload => {
-  const rawValue = readRawValue();
-
-  if (!rawValue) {
-    return memoryPayload;
-  }
-
-  try {
-    const parsed = JSON.parse(rawValue);
-    const payload = normalizePayload(parsed);
-    memoryPayload = payload;
-    return payload;
-  } catch {
-    return memoryPayload;
-  }
-};
-
-const writePayload = (payload: SessionStoragePayload) => {
-  writeRawValue({
-    ...payload,
-    sessions: [...payload.sessions].sort((left, right) => right.startedAt.localeCompare(left.startedAt)),
-    updatedAt: new Date().toISOString()
-  });
-};
-
-export const localSessionRepository: SessionRepository = {
-  list() {
-    return readPayload().sessions;
-  },
-
-  get(id) {
-    return readPayload().sessions.find((session) => session.id === id) ?? null;
-  },
-
-  getActive() {
-    const payload = readPayload();
-
-    if (!payload.activeSessionId) {
+  const readRawValue = (): string | null => {
+    if (typeof window === 'undefined') {
       return null;
     }
 
-    return payload.sessions.find((session) => session.id === payload.activeSessionId) ?? null;
-  },
+    try {
+      const currentValue = window.localStorage.getItem(storageKeys.storageKey);
 
-  save(session, options) {
-    const normalizedSession = normalizeStudySession(session);
+      if (currentValue !== null) {
+        return currentValue;
+      }
 
-    if (!normalizedSession) {
-      return readPayload().sessions;
+      for (const legacyKey of storageKeys.legacyStorageKeys) {
+        const legacyValue = window.localStorage.getItem(legacyKey);
+
+        if (legacyValue !== null) {
+          window.localStorage.setItem(storageKeys.storageKey, legacyValue);
+          return legacyValue;
+        }
+      }
+
+      return null;
+    } catch {
+      return null;
     }
+  };
 
-    const payload = readPayload();
-    const sessions = payload.sessions.filter((entry) => entry.id !== normalizedSession.id);
-    sessions.unshift(normalizedSession);
-
-    writePayload({
-      ...payload,
-      sessions,
-      activeSessionId: options?.active ? normalizedSession.id : payload.activeSessionId
-    });
-
-    return readPayload().sessions;
-  },
-
-  setActive(sessionId) {
-    const payload = readPayload();
-    const nextActiveId =
-      sessionId && payload.sessions.some((session) => session.id === sessionId)
-        ? sessionId
-        : null;
-
-    writePayload({
-      ...payload,
-      activeSessionId: nextActiveId
-    });
-  },
-
-  clear() {
-    memoryPayload = DEFAULT_PAYLOAD;
+  const writeRawValue = (payload: SessionStoragePayload) => {
+    memoryPayload = payload;
 
     if (typeof window === 'undefined') {
       return;
     }
 
     try {
-      window.localStorage.removeItem(KANA_SESSION_STORAGE_KEY);
-      window.localStorage.removeItem(LEGACY_KANA_SESSION_STORAGE_KEY);
+      window.localStorage.setItem(storageKeys.storageKey, JSON.stringify(payload));
     } catch {
-      // Ignore storage clear failures and keep the memory payload reset.
+      // Keep the in-memory fallback usable when storage writes fail.
     }
-  }
+  };
+
+  const normalizePayload = (value: unknown): SessionStoragePayload => {
+    if (!value || typeof value !== 'object') {
+      return memoryPayload;
+    }
+
+    const raw = value as Partial<SessionStoragePayload>;
+    const sessions = Array.isArray(raw.sessions)
+      ? raw.sessions
+          .map(normalizeStudySession)
+          .filter((session): session is StudySession => session !== null)
+          .sort((left, right) => right.startedAt.localeCompare(left.startedAt))
+      : memoryPayload.sessions;
+
+    const activeSessionId =
+      typeof raw.activeSessionId === 'string' || raw.activeSessionId === null
+        ? raw.activeSessionId
+        : memoryPayload.activeSessionId;
+
+    return {
+      version: 1,
+      sessions,
+      activeSessionId,
+      updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString()
+    };
+  };
+
+  const readPayload = (): SessionStoragePayload => {
+    const rawValue = readRawValue();
+
+    if (!rawValue) {
+      return memoryPayload;
+    }
+
+    try {
+      const parsed = JSON.parse(rawValue);
+      const payload = normalizePayload(parsed);
+      memoryPayload = payload;
+      return payload;
+    } catch {
+      return memoryPayload;
+    }
+  };
+
+  const writePayload = (payload: SessionStoragePayload) => {
+    writeRawValue({
+      ...payload,
+      sessions: [...payload.sessions].sort((left, right) => right.startedAt.localeCompare(left.startedAt)),
+      updatedAt: new Date().toISOString()
+    });
+  };
+
+  return {
+    list() {
+      return readPayload().sessions;
+    },
+
+    get(id) {
+      return readPayload().sessions.find((session) => session.id === id) ?? null;
+    },
+
+    getActive() {
+      const payload = readPayload();
+
+      if (!payload.activeSessionId) {
+        return null;
+      }
+
+      return payload.sessions.find((session) => session.id === payload.activeSessionId) ?? null;
+    },
+
+    save(session, options) {
+      const normalizedSession = normalizeStudySession(session);
+
+      if (!normalizedSession) {
+        return readPayload().sessions;
+      }
+
+      const payload = readPayload();
+      const sessions = payload.sessions.filter((entry) => entry.id !== normalizedSession.id);
+      sessions.unshift(normalizedSession);
+
+      writePayload({
+        ...payload,
+        sessions,
+        activeSessionId: options?.active ? normalizedSession.id : payload.activeSessionId
+      });
+
+      return readPayload().sessions;
+    },
+
+    setActive(sessionId) {
+      const payload = readPayload();
+      const nextActiveId =
+        sessionId && payload.sessions.some((session) => session.id === sessionId)
+          ? sessionId
+          : null;
+
+      writePayload({
+        ...payload,
+        activeSessionId: nextActiveId
+      });
+    },
+
+    clear() {
+      memoryPayload = createDefaultPayload();
+
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      try {
+        window.localStorage.removeItem(storageKeys.storageKey);
+
+        storageKeys.legacyStorageKeys.forEach((legacyKey) => {
+          window.localStorage.removeItem(legacyKey);
+        });
+      } catch {
+        // Ignore storage clear failures and keep the memory payload reset.
+      }
+    }
+  };
 };
+
+export const localSessionRepository = createLocalSessionRepository(
+  getSessionStorageKeys('study')
+);

@@ -4,15 +4,23 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
 import { SectionCard } from '../components/SectionCard';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
+import { appShellRoutes, getKanaEntryRoute, KanaAppScope } from '../data/appShellContent';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
-import { localSessionRepository } from '../features/kana/session/localSessionRepository';
 
 interface KanaSessionPageProps {
   language: AppLanguage;
+  scope?: KanaAppScope;
 }
 
-const getFlowRoute = (script: 'hiragana' | 'katakana', type: string) => {
+const getFlowRoute = (
+  script: 'hiragana' | 'katakana',
+  type: string,
+  scope: KanaAppScope
+) => {
+  if (scope === 'play') {
+    return getKanaEntryRoute(script, 'play');
+  }
+
   if (script === 'hiragana') {
     if (type === 'review') return appShellRoutes.hiraganaReview;
     if (type === 'weak_drill') return appShellRoutes.hiraganaWeak;
@@ -26,17 +34,21 @@ const getFlowRoute = (script: 'hiragana' | 'katakana', type: string) => {
   return appShellRoutes.katakanaLearn;
 };
 
-export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({ language }) => {
+export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({
+  language,
+  scope = 'study' as KanaAppScope
+}) => {
+  const resolvedScope: KanaAppScope = scope;
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { activeSession } = useKanaProgressStore();
-  const session = sessionId ? localSessionRepository.get(sessionId) : activeSession;
+  const { activeSession, getSession } = useKanaProgressStore();
+  const session = sessionId ? getSession(sessionId) : activeSession;
 
   if (!session) {
     return <Navigate to={appShellRoutes.home} replace />;
   }
 
-  const flowRoute = getFlowRoute(session.script, session.type);
-  const overviewRoute = session.script === 'hiragana' ? appShellRoutes.hiraganaOverview : appShellRoutes.katakanaOverview;
+  const flowRoute = getFlowRoute(session.script, session.type, resolvedScope);
+  const overviewRoute = getKanaEntryRoute(session.script, resolvedScope);
 
   return (
     <PageContainer>

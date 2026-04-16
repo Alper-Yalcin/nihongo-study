@@ -13,7 +13,7 @@ import {
   Target
 } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
+import { appShellRoutes, getKanaEntryRoute } from '../data/appShellContent';
 import { scriptLandingContent } from '../content/scriptLandingContent';
 import { studyContent } from '../data/studyContent';
 import { KanaSection, ScriptStudyView } from '../types';
@@ -310,7 +310,8 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
       title: copy.summary.cards.quickStart.title,
       description: copy.summary.cards.quickStart.description,
       value: copy.quickStartValue(availableViews.length),
-      Icon: ArrowRight
+      Icon: ArrowRight,
+      href: getKanaEntryRoute(script, 'play')
     },
     {
       id: 'overallMastery',
