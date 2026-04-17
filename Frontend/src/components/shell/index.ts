@@ -3,6 +3,7 @@ export { DailyQuestsCard } from './DailyQuestsCard';
 export { LeftNav } from './LeftNav';
 export { MobileBottomBar } from './MobileBottomBar';
 export { RightRail } from './RightRail';
+export { TopNav } from './TopNav';
 export { ScriptSwitcher } from './ScriptSwitcher';
 export { StatsStrip } from './StatsStrip';
 export { StatPill } from './StatPill';
