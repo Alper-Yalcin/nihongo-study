@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
+  BookOpenText,
   CircleHelp,
   Gamepad2,
   Home,
@@ -29,6 +30,7 @@ interface LeftNavProps {
 
 const labels = {
   tr: {
+    home: 'Home',
     learn: 'Ogren',
     letters: 'Harfler',
     practice: 'Alistirma',
@@ -43,6 +45,7 @@ const labels = {
     language: 'Dil'
   },
   en: {
+    home: 'Home',
     learn: 'Learn',
     letters: 'Letters',
     practice: 'Practice',
@@ -72,7 +75,8 @@ export const LeftNav: React.FC<LeftNavProps> = ({
 
   const navItems = useMemo(
     () => [
-      { id: 'learn', label: copy.learn, href: appShellRoutes.home, icon: Home },
+      { id: 'home', label: copy.home, href: appShellRoutes.home, icon: Home },
+      { id: 'learn', label: copy.learn, href: appShellRoutes.learn, icon: BookOpenText },
       {
         id: 'letters',
         label: copy.letters,
@@ -107,8 +111,10 @@ export const LeftNav: React.FC<LeftNavProps> = ({
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            item.id === 'learn'
-              ? location.pathname === appShellRoutes.home || location.pathname.includes('/learn')
+            item.id === 'home'
+              ? location.pathname === appShellRoutes.home
+              : item.id === 'learn'
+              ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase)
               : item.id === 'letters'
                 ? location.pathname.startsWith(appShellRoutes.letters)
                 : item.id === 'practice'

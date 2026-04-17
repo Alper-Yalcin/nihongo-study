@@ -11,6 +11,8 @@ type KanaPlayNavView =
 
 export const appShellRoutes = {
   home: '/',
+  learn: '/learn',
+  learnUnitBase: '/learn/unit',
   letters: '/letters',
   practice: '/practice',
   quests: '/quests',
@@ -41,6 +43,8 @@ export const appShellRoutes = {
   account: '/account',
   settings: '/account/settings'
 } as const;
+
+export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnitBase}/${unitId}`;
 
 const studyLearnRouteByScript: Record<KanaRouteScript, string> = {
   hiragana: appShellRoutes.hiraganaLearn,

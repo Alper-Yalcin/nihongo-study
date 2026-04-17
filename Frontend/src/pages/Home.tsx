@@ -1,15 +1,22 @@
-import React, { useMemo } from 'react';
-import { ArrowRight, Flame, Gem, Sparkles, Swords, Target } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { ArrowRight, BookOpenText, Languages, Layers3, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Card, StatCard } from '../shared/ui';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes, getPracticeRoute } from '../data/appShellContent';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
-import { useKanaProgressSummary } from '../features/kana/progress/progressStore';
+import {
+  appShellRoutes,
+  getLearnUnitRoute
+} from '../data/appShellContent';
+import {
+  flattenLearnCourseUnits,
+  getLearnCourseSections
+} from '../data/learnCourseContent';
+import { useLearnCourseProgress } from '../hooks/useLearnCourseProgress';
 import { KanaScript } from '../features/kana/domain/kanaItem';
-import { buildKanaRoadmapTrack, findTrackLessonById, getTrackLessonOrder } from '../features/study-roadmap/content/roadmapDefinitions';
-import { useStudyRoadmapStore } from '../features/study-roadmap/progress/useStudyRoadmapStore';
-import { usePlayProgressStore } from '../features/play/progress/usePlayProgressStore';
+import { JumpHereButton } from '../components/path/JumpHereButton';
+import { PathNode } from '../components/path/PathNode';
+import { PathNodePopover } from '../components/path/PathNodePopover';
+import { SectionBanner } from '../components/path/SectionBanner';
 import { MascotFigure } from '../components/mascot/MascotFigure';
 import { SpeechBubble } from '../components/mascot/SpeechBubble';
 import { ProgressRing } from '../components/shared/ProgressRing';
@@ -19,335 +26,258 @@ interface HomeProps {
   activeScript: KanaScript;
 }
 
-const localUserId = 'local-user';
+const pathOffsetPattern = [0, 18, -12, 16, -8];
 
-const scriptMeta = {
-  hiragana: {
-    symbol: 'あ',
-    title: 'Hiragana',
-    learnHref: appShellRoutes.hiraganaLearn,
-    overviewHref: appShellRoutes.hiraganaOverview,
-    accentClassName: 'from-[var(--kt-brand)] to-[var(--kt-accent-info)]'
+const pageCopy = {
+  tr: {
+    eyebrow: 'Japonca kurs yolu',
+    title: 'Ogren kismi artik unite tabanli',
+    description:
+      'Kelime, konu ve gramer akisi artik Harfler den tamamen ayrildi. Burasi artik gercek ders yolun.',
+    currentUnit: 'Siradaki unite',
+    openUnit: 'Uniteyi ac',
+    lettersCta: 'Harfler tarafina gec',
+    units: 'Unite',
+    words: 'Kelime',
+    grammar: 'Kalip',
+    lettersTitle: 'Harfler artik ayri bir modul',
+    lettersDescription:
+      'Hiragana ve katakana hece/alfabe ogretimi Harfler sekmesine tasindi. Ogren tarafi artik dil yapilarina odakli.',
+    pathTitle: 'Kurs yolu',
+    pathDescription: 'Aktif dugume tikla ve unite detayina gir.',
+    activeLabel: 'Baslat',
+    openLabel: 'Detayi ac',
+    partLabel: (partNumber: number) => `${partNumber}. Kisim`,
+    unitLabel: (unitNumber: number) => `${unitNumber}. Unite`,
+    jumpLabel: 'Buraya atla',
+    lockedHint: 'Onceki unite tamamlanmadan acilmaz.',
+    mascotMessage: 'Once harfleri, sonra yapilari. Bu ayrim artik net.'
   },
-  katakana: {
-    symbol: 'ア',
-    title: 'Katakana',
-    learnHref: appShellRoutes.katakanaLearn,
-    overviewHref: appShellRoutes.katakanaOverview,
-    accentClassName: 'from-[var(--kt-accent-info)] to-[var(--kt-accent-plum)]'
+  en: {
+    eyebrow: 'Japanese course path',
+    title: 'Learn is now unit-based',
+    description:
+      'Vocabulary, topics, and grammar now live in a dedicated course flow separate from Letters.',
+    currentUnit: 'Current unit',
+    openUnit: 'Open unit',
+    lettersCta: 'Open letters',
+    units: 'Units',
+    words: 'Words',
+    grammar: 'Patterns',
+    lettersTitle: 'Letters now lives in its own module',
+    lettersDescription:
+      'Hiragana and katakana syllable teaching moved into Letters. Learn now focuses on language structure.',
+    pathTitle: 'Course path',
+    pathDescription: 'Click the active node and open the unit detail.',
+    activeLabel: 'Start',
+    openLabel: 'Open detail',
+    partLabel: (partNumber: number) => `Part ${partNumber}`,
+    unitLabel: (unitNumber: number) => `Unit ${unitNumber}`,
+    jumpLabel: 'Jump here',
+    lockedHint: 'Finish the previous unit first.',
+    mascotMessage: 'Letters first, structure second. The split is clean now.'
   }
 } as const;
 
-const pathOffsetPattern = [0, 18, -12, 16, -8];
-
 export const Home: React.FC<HomeProps> = ({ language, activeScript }) => {
-  const { summary: playSummary } = usePlayProgressStore(localUserId);
-  const hiraganaSummary = useKanaProgressSummary('hiragana');
-  const katakanaSummary = useKanaProgressSummary('katakana');
-  const activeSummary = activeScript === 'hiragana' ? hiraganaSummary : katakanaSummary;
-  const activeSections = useMemo(
-    () => (activeScript === 'hiragana' ? getLocalizedHiraganaSections(language) : getLocalizedKatakanaSections(language)),
-    [activeScript, language]
-  );
-  const activeTrack = useMemo(
-    () => buildKanaRoadmapTrack(activeScript, activeSections, language),
-    [activeScript, activeSections, language]
-  );
-  const lessonOrder = useMemo(() => getTrackLessonOrder(activeTrack), [activeTrack]);
-  const lessons = useMemo(() => activeTrack.levels.flatMap((level) => level.lessons), [activeTrack]);
+  const navigate = useNavigate();
+  const copy = pageCopy[language];
+  const [previewUnitId, setPreviewUnitId] = useState<string | null>(null);
+  const sections = useMemo(() => getLearnCourseSections(language), [language]);
+  const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const {
-    completionRatio,
-    getRecommendedLessonId,
-    getLessonStatus
-  } = useStudyRoadmapStore(activeScript, lessonOrder, lessons);
-  const recommendedLessonId = getRecommendedLessonId();
-  const recommendedLesson = recommendedLessonId ? findTrackLessonById(activeTrack, recommendedLessonId) : null;
-  const previewLessons = useMemo(
-    () => lessons.slice(0, Math.min(5, lessons.length)),
-    [lessons]
+    completedCount,
+    currentUnitId,
+    getUnitState,
+    progressPercent
+  } = useLearnCourseProgress(units.map((unit) => unit.id));
+
+  const currentUnit = useMemo(
+    () => units.find((unit) => unit.id === currentUnitId) ?? units[0] ?? null,
+    [currentUnitId, units]
   );
 
-  const suggestedAction = useMemo(() => {
-    if (activeSummary.dueCount > 0) {
-      return {
-        title: language === 'tr' ? 'Bugunun onceligi: review kuyruğu' : 'Priority today: review queue',
-        description:
-          language === 'tr'
-            ? `${activeSummary.dueCount} karakter bekliyor. Ritim bozulmadan once bunu temizle.`
-            : `${activeSummary.dueCount} characters are waiting. Clear this first to keep momentum.`,
-        href: getPracticeRoute(activeScript, 'review'),
-        icon: Target
-      };
-    }
+  const previewUnit = useMemo(
+    () => units.find((unit) => unit.id === previewUnitId) ?? null,
+    [previewUnitId, units]
+  );
 
-    if (activeSummary.weakCount > 0) {
-      return {
-        title: language === 'tr' ? 'Zayiflari toparla' : 'Recover your weak set',
-        description:
-          language === 'tr'
-            ? `${activeSummary.weakCount} karakter zayif. Kisa bir drill dogrudan fayda verir.`
-            : `${activeSummary.weakCount} characters are weak. A short drill will pay off quickly.`,
-        href: getPracticeRoute(activeScript, 'weak'),
-        icon: Swords
-      };
-    }
+  const learnedWordCount = useMemo(
+    () =>
+      units
+        .slice(0, completedCount)
+        .reduce((total, unit) => total + unit.vocabulary.length, 0),
+    [completedCount, units]
+  );
 
-    return {
-      title: language === 'tr' ? 'Yeni uniteye gec' : 'Move into the next unit',
-      description:
-        language === 'tr'
-          ? 'Akis temiz. Yeni karakterleri acmak icin ogrenme yoluna devam et.'
-          : 'The queue is clean. Continue the learning path to unlock more characters.',
-      href: activeScript === 'hiragana' ? appShellRoutes.hiraganaLearn : appShellRoutes.katakanaLearn,
-      icon: Sparkles
-    };
-  }, [activeScript, activeSummary.dueCount, activeSummary.weakCount, language]);
-
-  const SuggestedActionIcon = suggestedAction.icon;
+  const grammarCount = currentUnit?.grammarFocus.length ?? 0;
+  const lettersHref = `${appShellRoutes.letters}?script=${activeScript}`;
 
   return (
     <div className="space-y-8 pb-8">
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.85fr)]">
-        <div className="overflow-hidden rounded-[2rem] border border-[var(--kt-border)] bg-[linear-gradient(135deg,rgba(6,12,18,0.96)_0%,rgba(20,31,43,0.96)_48%,rgba(51,24,40,0.94)_100%)] p-7 shadow-[var(--kt-shadow-lg)]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)]">
+        <div className="overflow-hidden rounded-[2rem] border border-[var(--kt-border)] bg-[linear-gradient(135deg,rgba(6,12,18,0.96)_0%,rgba(20,31,43,0.96)_48%,rgba(24,43,39,0.94)_100%)] p-7 shadow-[var(--kt-shadow-lg)]">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="rounded-full bg-[rgba(255,255,255,0.08)] px-4 py-2 text-sm font-black uppercase tracking-[0.14em] text-white/72">
-              {language === 'tr' ? 'Aktif Track' : 'Active track'}
+              {copy.eyebrow}
             </div>
-            <Link
-              to={activeScript === 'hiragana' ? appShellRoutes.hiraganaOverview : appShellRoutes.katakanaOverview}
-              className="text-sm font-black uppercase tracking-[0.12em] text-white/74"
-            >
-              {language === 'tr' ? 'Rehber' : 'Guide'}
-            </Link>
+            <ProgressRing
+              value={progressPercent}
+              tone="success"
+              label={<span className="text-xs font-black text-white">{`${progressPercent}%`}</span>}
+            />
           </div>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_12rem] lg:items-center">
             <div>
-              <div className="text-sm font-black uppercase tracking-[0.14em] text-white/62">
-                {recommendedLesson
-                  ? `${language === 'tr' ? 'Siradaki unite' : 'Next unit'}`
-                  : `${language === 'tr' ? 'Hazir' : 'Ready'}`}
+              <div className="text-sm font-black uppercase tracking-[0.16em] text-white/62">
+                {copy.currentUnit}
               </div>
               <h1 className="mt-3 text-4xl font-black leading-tight text-white md:text-5xl">
-                {recommendedLesson?.title ?? (language === 'tr' ? 'Ogrenme yoluna geri don' : 'Return to the learning path')}
+                {currentUnit?.title ?? copy.title}
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-8 text-white/74 md:text-lg">
-                {recommendedLesson?.description ??
-                  (language === 'tr'
-                    ? 'Duolingo ilhamli yeni shell, Japonca calisma akisini tek bir yolda topluyor.'
-                    : 'The new Duolingo-inspired shell brings the Japanese study flow into one path.')}
+                {currentUnit?.summary ?? copy.description}
               </p>
-
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button as="link" to={scriptMeta[activeScript].learnHref} iconEnd={<ArrowRight size={16} />}>
-                  {language === 'tr' ? 'Devam et' : 'Continue'}
-                </Button>
-                <Button as="link" to={getPracticeRoute(activeScript)} variant="secondary">
-                  {language === 'tr' ? 'Alistirmaya gec' : 'Open practice'}
+                {currentUnit && (
+                  <Button
+                    as="link"
+                    to={getLearnUnitRoute(currentUnit.id)}
+                    iconEnd={<ArrowRight size={16} />}
+                  >
+                    {copy.openUnit}
+                  </Button>
+                )}
+                <Button as="link" to={lettersHref} variant="secondary">
+                  {copy.lettersCta}
                 </Button>
               </div>
             </div>
 
             <div className="justify-self-center">
-              <MascotFigure pose="wave" tone={activeScript === 'hiragana' ? 'brand' : 'info'} size={168} />
+              <MascotFigure
+                pose={currentUnit?.mascotPose ?? 'wave'}
+                tone={currentUnit?.tone ?? 'success'}
+                size={168}
+              />
             </div>
           </div>
         </div>
 
         <Card padding="lg" className="border-[var(--kt-border)] bg-[rgba(8,14,22,0.92)] text-white">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-white/52">
-                {language === 'tr' ? 'Bugunun yonlendirmesi' : 'Today’s direction'}
-              </div>
-              <h2 className="mt-3 text-2xl font-black leading-tight text-white">{suggestedAction.title}</h2>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[rgba(255,255,255,0.08)]">
-              <SuggestedActionIcon size={22} />
-            </div>
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-white/52">
+            {copy.lettersTitle}
           </div>
-          <p className="mt-4 text-sm leading-7 text-white/70">{suggestedAction.description}</p>
+          <h2 className="mt-3 text-2xl font-black leading-tight text-white">{copy.title}</h2>
+          <p className="mt-4 text-sm leading-7 text-white/70">{copy.lettersDescription}</p>
           <div className="mt-6">
-            <Button as="link" to={suggestedAction.href} fullWidth>
-              {language === 'tr' ? 'Basla' : 'Start'}
+            <SpeechBubble accent="success">{copy.mascotMessage}</SpeechBubble>
+          </div>
+          <div className="mt-6">
+            <Button as="link" to={lettersHref} fullWidth>
+              {copy.lettersCta}
             </Button>
           </div>
         </Card>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <Card padding="lg" className="border-[var(--kt-border)] bg-[rgba(8,14,22,0.78)]">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-[var(--kt-ink-subtle)]">
-                {language === 'tr' ? 'Path Preview' : 'Path preview'}
-              </div>
-              <h2 className="mt-2 text-2xl font-black text-[var(--kt-ink-strong)]">
-                {activeTrack.levels[0]?.title ?? scriptMeta[activeScript].title}
-              </h2>
-            </div>
-            <ProgressRing
-              value={Math.round(completionRatio * 100)}
-              tone="brand"
-              label={<span className="text-xs font-black text-[var(--kt-ink-strong)]">{`${Math.round(completionRatio * 100)}%`}</span>}
-            />
-          </div>
-
-          <div className="mt-8 flex min-h-[12rem] flex-col items-center justify-center gap-5">
-            {previewLessons.map((lesson, index) => {
-              const status = getLessonStatus(lesson.id);
-              const offset = pathOffsetPattern[index % pathOffsetPattern.length];
-
-              return (
-                <div key={lesson.id} className="flex w-full max-w-xl items-center justify-center gap-4" style={{ transform: `translateX(${offset}px)` }}>
-                  <div
-                    className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 text-xl font-black shadow-[var(--kt-shadow-sm)] ${
-                      status === 'completed'
-                        ? 'border-[color:var(--kt-accent-success)]/40 bg-[var(--kt-accent-success)] text-white'
-                        : status === 'available'
-                          ? 'border-[color:var(--kt-brand)]/40 bg-[var(--kt-brand)] text-white'
-                          : 'border-[var(--kt-border)] bg-[var(--kt-surface-sunken)] text-[var(--kt-ink-subtle)]'
-                    }`}
-                  >
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 rounded-[1.3rem] border border-[var(--kt-border-subtle)] bg-[rgba(255,255,255,0.04)] px-5 py-4">
-                    <div className="text-xs font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
-                      {status === 'completed' ? 'Tamamlandi' : status === 'available' ? 'Hazir' : 'Kilitli'}
-                    </div>
-                    <div className="mt-1 text-base font-bold text-[var(--kt-ink-strong)]">{lesson.title}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        <Card padding="lg">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-[var(--kt-ink-subtle)]">
-                {language === 'tr' ? 'Hanabi diyor ki' : 'Hanabi says'}
-              </div>
-              <h2 className="mt-2 text-2xl font-black text-[var(--kt-ink-strong)]">
-                {language === 'tr' ? 'Bugun hizli bir tur yap' : 'Do one quick run today'}
-              </h2>
-            </div>
-            <MascotFigure pose="study" tone="plum" size={120} />
-          </div>
-          <div className="mt-5">
-            <SpeechBubble accent="plum">
-              {language === 'tr' ? 'Bugun 10 dogru cevap ve bir mini oyun. Ritim yeter.' : 'Ten correct answers and one mini game. That is enough for today.'}
-            </SpeechBubble>
-          </div>
-          <div className="mt-6 grid gap-3">
-            <StatCard label="Streak" value={playSummary.currentStreakDays} tone="warning" icon={<Flame size={18} />} />
-            <StatCard label="Total XP" value={playSummary.totalXp} tone="info" icon={<Gem size={18} />} />
-          </div>
-        </Card>
+      <section className="grid gap-3 md:grid-cols-3">
+        <StatCard label={copy.units} value={`${completedCount}/${units.length}`} icon={<Layers3 size={18} />} />
+        <StatCard label={copy.words} value={learnedWordCount} tone="info" icon={<Languages size={18} />} />
+        <StatCard label={copy.grammar} value={grammarCount} tone="success" icon={<BookOpenText size={18} />} />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
-        <div className="space-y-6">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-[var(--kt-ink-subtle)]">
-                {language === 'tr' ? 'Script Secimi' : 'Script selector'}
-              </div>
-              <h2 className="mt-2 text-3xl font-black text-[var(--kt-ink-strong)]">
-                {language === 'tr' ? 'Bugun neye odaklaniyorsun?' : 'What are you focusing on today?'}
-              </h2>
+      <Card padding="lg">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.18em] text-[var(--kt-ink-subtle)]">
+              {copy.pathTitle}
             </div>
+            <h2 className="mt-2 text-3xl font-black text-[var(--kt-ink-strong)]">{copy.pathDescription}</h2>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {(['hiragana', 'katakana'] as KanaScript[]).map((script) => {
-              const summary = script === 'hiragana' ? hiraganaSummary : katakanaSummary;
-              const isActive = activeScript === script;
-              const trackedPercent = summary.totalCount > 0 ? Math.round((summary.tracked / summary.totalCount) * 100) : 0;
-
-              return (
-                <Card
-                  key={script}
-                  padding="lg"
-                  className={`border-[var(--kt-border)] ${isActive ? 'ring-2 ring-[var(--kt-brand)]/35' : ''}`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className={`inline-flex rounded-full bg-gradient-to-r px-3 py-1 text-sm font-black text-white ${scriptMeta[script].accentClassName}`}>
-                        {scriptMeta[script].symbol}
-                      </div>
-                      <h3 className="mt-4 text-2xl font-black text-[var(--kt-ink-strong)]">{scriptMeta[script].title}</h3>
-                      <p className="mt-2 text-sm leading-7 text-[var(--kt-ink-muted)]">
-                        {language === 'tr'
-                          ? `${summary.tracked} karakter izlendi, ${summary.masteredCount} mastered durumda.`
-                          : `${summary.tracked} characters tracked, ${summary.masteredCount} mastered so far.`}
-                      </p>
-                    </div>
-                    <ProgressRing
-                      value={trackedPercent}
-                      tone={script === 'hiragana' ? 'brand' : 'info'}
-                      label={<span className="text-xs font-black text-[var(--kt-ink-strong)]">{`${trackedPercent}%`}</span>}
-                    />
-                  </div>
-
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <Button as="link" to={scriptMeta[script].overviewHref}>
-                      {language === 'tr' ? 'Bolume git' : 'Open section'}
-                    </Button>
-                    <Button as="link" to={scriptMeta[script].learnHref} variant="secondary">
-                      {language === 'tr' ? 'Yola gir' : 'Enter the path'}
-                    </Button>
-                  </div>
-                </Card>
-              );
-            })}
-
-            <Card padding="lg" className="border-dashed border-[var(--kt-border)] bg-[rgba(255,255,255,0.03)]">
-              <div className="inline-flex rounded-full bg-[var(--kt-accent-warning)] px-3 py-1 text-sm font-black text-white">
-                漢
-              </div>
-              <h3 className="mt-4 text-2xl font-black text-[var(--kt-ink-strong)]">Kanji</h3>
-              <p className="mt-2 text-sm leading-7 text-[var(--kt-ink-muted)]">
-                {language === 'tr'
-                  ? 'Kanji track bu yeni kabukta yerini hazirladi. Kilit, mevcut kana mastery oranina gore acilacak.'
-                  : 'The kanji track already has its place in the new shell. It unlocks based on your kana mastery rate.'}
-              </p>
-              <div className="mt-6">
-                <Button as="link" to={appShellRoutes.kanjiOverview} variant="secondary">
-                  {language === 'tr' ? 'Onizlemeyi ac' : 'Open preview'}
-                </Button>
-              </div>
-            </Card>
-          </div>
+          {currentUnit && (
+            <Button
+              as="button"
+              type="button"
+              variant="secondary"
+              onClick={() => setPreviewUnitId(currentUnit.id)}
+              iconStart={<Sparkles size={16} />}
+            >
+              {copy.openLabel}
+            </Button>
+          )}
         </div>
+      </Card>
 
-        <Card padding="lg" className="border-[var(--kt-border)] bg-[rgba(8,14,22,0.82)]">
-          <div className="text-xs font-black uppercase tracking-[0.18em] text-[var(--kt-ink-subtle)]">
-            {language === 'tr' ? 'Hizli istatistikler' : 'Quick stats'}
-          </div>
-          <div className="mt-5 grid gap-3">
-            <StatCard label="Due" value={hiraganaSummary.dueCount + katakanaSummary.dueCount} tone="warning" />
-            <StatCard label="Weak" value={hiraganaSummary.weakCount + katakanaSummary.weakCount} tone="danger" />
-            <StatCard label="Mastered" value={hiraganaSummary.masteredCount + katakanaSummary.masteredCount} tone="success" />
-          </div>
-          <div className="mt-6 rounded-[1.4rem] border border-[var(--kt-border)] bg-[rgba(255,255,255,0.04)] p-5">
-            <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
-              {language === 'tr' ? 'Sakura shell notu' : 'Sakura shell note'}
-            </div>
-            <p className="mt-3 text-sm leading-7 text-[var(--kt-ink-muted)]">
-              {language === 'tr'
-                ? 'Eski tek kolon akisi yerine artik solda sabit navigasyon, ortada yol-bazli ilerleme, sagda motivasyon rayi var.'
-                : 'The old single-column flow is replaced with persistent navigation, a center path, and a motivation rail.'}
-            </p>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
-            <a href="#" className="hover:text-[var(--kt-ink)]">Hakkinda</a>
-            <a href="#" className="hover:text-[var(--kt-ink)]">Sartlar</a>
-            <a href="#" className="hover:text-[var(--kt-ink)]">Gizlilik</a>
-          </div>
-        </Card>
-      </section>
+      <div className="space-y-16">
+        {sections.map((section) => {
+          const availableUnit = section.units.find((unit) => getUnitState(unit.id) !== 'locked') ?? null;
+
+          return (
+            <section key={section.id} className="space-y-10">
+              <SectionBanner
+                eyebrow={copy.partLabel(section.partNumber)}
+                title={`${section.title} - ${section.description}`}
+                accentClassName={section.bannerClassName}
+                guideLabel={copy.openUnit}
+              />
+
+              <div className="flex flex-col items-center gap-10 pt-4">
+                {availableUnit && section.partNumber > 1 && (
+                  <JumpHereButton
+                    label={copy.jumpLabel}
+                    onClick={() => setPreviewUnitId(availableUnit.id)}
+                  />
+                )}
+
+                {section.units.map((unit, unitIndex) => {
+                  const state = getUnitState(unit.id);
+                  const isPreviewOpen = previewUnit?.id === unit.id;
+
+                  return (
+                    <div key={unit.id} className="flex w-full flex-col items-center gap-4">
+                      <PathNode
+                        title={unit.title}
+                        subtitle={copy.unitLabel(unit.unitNumber)}
+                        glyph={String(unit.unitNumber)}
+                        state={state}
+                        accent={unit.accentGlow}
+                        offset={pathOffsetPattern[unitIndex % pathOffsetPattern.length]}
+                        activeLabel={state === 'active' ? copy.activeLabel : undefined}
+                        onClick={
+                          state === 'locked'
+                            ? undefined
+                            : () => {
+                                setPreviewUnitId(unit.id);
+                              }
+                        }
+                      />
+
+                      {isPreviewOpen && (
+                        <PathNodePopover
+                          title={unit.title}
+                          description={unit.summary}
+                          actionLabel={copy.openUnit}
+                          secondaryLabel={copy.partLabel(unit.partNumber)}
+                          onClose={() => setPreviewUnitId(null)}
+                          onStart={() => navigate(getLearnUnitRoute(unit.id))}
+                        />
+                      )}
+
+                      {state === 'locked' && (
+                        <div className="w-full max-w-xl rounded-[1.3rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
+                          {copy.lockedHint}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -37,7 +37,7 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
     [language, runs]
   );
 
-  const isHome = location.pathname === appShellRoutes.home;
+  const isHome = location.pathname === appShellRoutes.learn;
   const isLetters = location.pathname.startsWith(appShellRoutes.letters);
   const isPractice = location.pathname.startsWith(appShellRoutes.practice);
   const isQuests = location.pathname.startsWith(appShellRoutes.quests);
@@ -63,7 +63,7 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
               ? `${scriptSummary.masteredCount} mastered karakterle ilerliyorsun. Bir sonraki odak, ${activeScriptLabel} tarafinda %${Math.max(65, masteredRatio)} mastery.`
               : `You are moving with ${scriptSummary.masteredCount} mastered characters. Next milestone: ${Math.max(65, masteredRatio)}% mastery on ${activeScriptLabel}.`
           }
-          actionLabel={language === 'tr' ? 'Ogrenme yoluna don' : 'Return to the path'}
+          actionLabel={language === 'tr' ? 'Harf yoluna don' : 'Return to letters path'}
           actionHref={activeScript === 'hiragana' ? appShellRoutes.hiraganaLearn : appShellRoutes.katakanaLearn}
         />
       )}

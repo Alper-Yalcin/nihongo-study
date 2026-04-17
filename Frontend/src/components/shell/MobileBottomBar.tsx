@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Gamepad2, Home, Languages, MoreHorizontal, Sword } from 'lucide-react';
+import { BookOpenText, Gamepad2, Languages, MoreHorizontal, Sword } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { appShellRoutes, getKanaEntryRoute } from '../../data/appShellContent';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
@@ -13,7 +13,7 @@ export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ activeScript }
 
   const items = useMemo(
     () => [
-      { id: 'home', href: appShellRoutes.home, icon: Home, label: 'Ogren' },
+      { id: 'home', href: appShellRoutes.learn, icon: BookOpenText, label: 'Ogren' },
       { id: 'letters', href: `${appShellRoutes.letters}?script=${activeScript}`, icon: Languages, label: 'Harfler' },
       { id: 'practice', href: `${appShellRoutes.practice}?script=${activeScript}`, icon: Sword, label: 'Pratik' },
       { id: 'play', href: getKanaEntryRoute(activeScript, 'play'), icon: Gamepad2, label: 'Oyun' },
@@ -28,7 +28,7 @@ export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ activeScript }
         const Icon = item.icon;
         const isActive =
           item.id === 'home'
-            ? location.pathname === appShellRoutes.home
+            ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase)
             : item.id === 'letters'
               ? location.pathname.startsWith(appShellRoutes.letters)
               : item.id === 'practice'
