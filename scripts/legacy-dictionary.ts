@@ -118,7 +118,7 @@ const sortRecords = (records: LegacyDictionaryWordRecord[]) =>
   });
 
 export const loadLegacyDictionaryRecords = (script: LegacyDictionaryScript): LegacyDictionaryWordRecord[] => {
-  const directory = path.join(ROOT, 'csv', script);
+  const directory = path.join(ROOT, 'Backend', 'csv', script);
   const fileNames = fs.readdirSync(directory).filter((fileName) => fileName.endsWith('.csv')).sort();
   const uniqueWords = new Map<string, LegacyDictionaryWordRecord>();
 

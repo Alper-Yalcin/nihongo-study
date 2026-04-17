@@ -6,13 +6,21 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
+  const frontendRoot = path.resolve(__dirname, 'Frontend');
   const env = loadEnv(mode, '.', '');
 
   return {
+    root: frontendRoot,
+    envDir: __dirname,
+    publicDir: path.resolve(__dirname, 'public'),
     plugins: [react(), tailwindcss()],
+    build: {
+      outDir: path.resolve(__dirname, 'dist'),
+      emptyOutDir: true
+    },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.')
+        '@': path.resolve(frontendRoot, 'src')
       }
     },
     server: {
@@ -28,7 +36,7 @@ export default defineConfig(({ mode }) => {
       environment: 'happy-dom',
       globals: false,
       clearMocks: true,
-      include: ['src/**/*.test.ts', 'src/**/*.test.tsx']
+      include: ['Frontend/src/**/*.test.ts', 'Frontend/src/**/*.test.tsx']
     }
   };
 });

@@ -2,6 +2,9 @@
 
 React + Vite frontend and Express + SQLite backend for kana, kanji, listening, drawing, and dictionary study flows.
 
+- `Frontend/`: React + Vite source tree
+- `Backend/`: Express server plus raw/normalized dictionary source files
+
 ## Local development
 
 1. Install dependencies with `npm install`.
@@ -18,10 +21,10 @@ React + Vite frontend and Express + SQLite backend for kana, kanji, listening, d
 - The old `dictionary_words` table is no longer created. Dictionary word data now lives in:
   `hiragana_words`, `katakana_words`, `kanji_words`, and `kanji_characters`
 - Source files imported:
-  `data-sources/normalized/hiragana_words.ndjson`
-  `data-sources/normalized/katakana_words.ndjson`
-  `data-sources/normalized/kanji_words.ndjson`
-  `data-sources/normalized/kanji_characters.ndjson`
+  `Backend/data-sources/normalized/hiragana_words.ndjson`
+  `Backend/data-sources/normalized/katakana_words.ndjson`
+  `Backend/data-sources/normalized/kanji_words.ndjson`
+  `Backend/data-sources/normalized/kanji_characters.ndjson`
 - Verification:
   After import, the command prints NDJSON line count, inserted/upserted count, duplicate count, skipped count, failed count, and final DB row count for each table.
 

@@ -1,0 +1,115 @@
+/*
+ * Kototsuna semantic design tokens.
+ *
+ * Primitives under src/shared/ui consume these via arbitrary-value
+ * Tailwind classes (e.g. bg-[var(--kt-surface)]) so that light/dark
+ * switching requires no per-class !important override. Legacy pages
+ * still rely on the override block in index.css; that block will be
+ * removed once the last legacy page migrates to these tokens.
+ */
+
+:root {
+  /* Surface layers */
+  --kt-surface-page: #fdfcfc;
+  --kt-surface: #ffffff;
+  --kt-surface-muted: #f6f3f4;
+  --kt-surface-raised: #ffffff;
+  --kt-surface-sunken: #ece5e7;
+
+  /* Ink (text) */
+  --kt-ink: #343432;
+  --kt-ink-strong: #242325;
+  --kt-ink-muted: #6f6368;
+  --kt-ink-subtle: #8a7f85;
+  --kt-ink-inverse: #fdfcfc;
+
+  /* Borders */
+  --kt-border-subtle: #ece5e7;
+  --kt-border: #dcd0d3;
+  --kt-border-strong: #b8a9ae;
+
+  /* Brand (sakura) */
+  --kt-brand: #d06070;
+  --kt-brand-hover: #c05060;
+  --kt-brand-soft: #ffe8ec;
+  --kt-brand-soft-strong: #ffd4dc;
+  --kt-brand-on: #ffffff;
+
+  /* Status */
+  --kt-accent-success: #a8616f;
+  --kt-accent-success-soft: #ffe6eb;
+  --kt-accent-warning: #c88874;
+  --kt-accent-warning-soft: #ffefe9;
+  --kt-accent-danger: #c24f69;
+  --kt-accent-danger-soft: #ffe6eb;
+  --kt-accent-plum: #8b5a7a;
+  --kt-accent-plum-soft: #f3e4ee;
+  --kt-accent-sunset: #d88a5a;
+  --kt-accent-sunset-soft: #ffe8dc;
+  --kt-accent-info: #c96e81;
+  --kt-accent-info-soft: #ffecef;
+
+  --kt-path-node-active: var(--kt-brand);
+  --kt-path-node-completed: var(--kt-accent-success);
+  --kt-path-node-locked: var(--kt-ink-subtle);
+  --kt-path-connector: var(--kt-border);
+
+  /* Effects */
+  --kt-focus-ring: rgba(208, 96, 112, 0.45);
+  --kt-shadow-sm: 0 1px 2px rgba(52, 52, 50, 0.05);
+  --kt-shadow: 0 4px 14px rgba(208, 96, 112, 0.08);
+  --kt-shadow-md: 0 12px 28px rgba(208, 96, 112, 0.16);
+  --kt-shadow-lg: 0 24px 60px rgba(208, 96, 112, 0.22);
+  --kt-radius-sm: 0.5rem;
+  --kt-radius: 0.875rem;
+  --kt-radius-md: 1.25rem;
+  --kt-radius-lg: 1.75rem;
+}
+
+.theme-dark {
+  --kt-surface-page: #1f1b20;
+  --kt-surface: #2a252b;
+  --kt-surface-muted: #352f37;
+  --kt-surface-raised: #352f37;
+  --kt-surface-sunken: #241f25;
+
+  --kt-ink: #f1f2f6;
+  --kt-ink-strong: #fff8f9;
+  --kt-ink-muted: #c8c1cb;
+  --kt-ink-subtle: #9a9099;
+  --kt-ink-inverse: #1f1b20;
+
+  --kt-border-subtle: #4a414c;
+  --kt-border: #5a4f5d;
+  --kt-border-strong: #7a6e7e;
+
+  --kt-brand: #e88b9c;
+  --kt-brand-hover: #f3b3bf;
+  --kt-brand-soft: rgba(208, 96, 112, 0.2);
+  --kt-brand-soft-strong: rgba(208, 96, 112, 0.32);
+  --kt-brand-on: #241f25;
+
+  --kt-accent-success: #d594a1;
+  --kt-accent-success-soft: rgba(168, 97, 111, 0.22);
+  --kt-accent-warning: #dda48f;
+  --kt-accent-warning-soft: rgba(224, 139, 151, 0.22);
+  --kt-accent-danger: #f0a5b4;
+  --kt-accent-danger-soft: rgba(216, 95, 121, 0.24);
+  --kt-accent-plum: #c49abb;
+  --kt-accent-plum-soft: rgba(139, 90, 122, 0.22);
+  --kt-accent-sunset: #f0b08c;
+  --kt-accent-sunset-soft: rgba(216, 138, 90, 0.22);
+  --kt-accent-info: #e8a4b5;
+  --kt-accent-info-soft: rgba(201, 110, 129, 0.22);
+
+  --kt-path-node-active: var(--kt-brand);
+  --kt-path-node-completed: var(--kt-accent-success);
+  --kt-path-node-locked: var(--kt-ink-subtle);
+  --kt-path-connector: var(--kt-border);
+
+  --kt-focus-ring: rgba(232, 139, 156, 0.55);
+  --kt-shadow-sm: 0 2px 4px rgba(13, 8, 14, 0.4);
+  --kt-shadow: 0 10px 24px rgba(13, 8, 14, 0.45);
+  --kt-shadow-md: 0 16px 34px rgba(13, 8, 14, 0.55);
+  --kt-shadow-lg: 0 28px 70px rgba(13, 8, 14, 0.6);
+}

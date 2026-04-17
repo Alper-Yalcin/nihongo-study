@@ -11,11 +11,11 @@ from typing import Any, Iterable, Iterator
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = ROOT / "scripts"
-RAW_DIR = ROOT / "data-sources" / "raw"
-INTERMEDIATE_DIR = ROOT / "data-sources" / "intermediate"
-OUTPUT_DIR = ROOT / "data-sources" / "normalized"
+RAW_DIR = ROOT / "Backend" / "data-sources" / "raw"
+INTERMEDIATE_DIR = ROOT / "Backend" / "data-sources" / "intermediate"
+OUTPUT_DIR = ROOT / "Backend" / "data-sources" / "normalized"
 REPORTS_DIR = ROOT / "reports"
-FIXTURES_DIR = ROOT / "data-sources" / "fixtures"
+FIXTURES_DIR = ROOT / "Backend" / "data-sources" / "fixtures"
 JLPT_LEVEL_ORDER = ["N5", "N4", "N3", "N2", "N1"]
 JLPT_LEVEL_RANK = {level: index for index, level in enumerate(JLPT_LEVEL_ORDER)}
 VALID_JLPT_LEVELS = set(JLPT_LEVEL_ORDER)

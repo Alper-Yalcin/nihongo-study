@@ -1,0 +1,101 @@
+import React from 'react';
+import { ArrowLeft, Play } from 'lucide-react';
+import { Navigate, useParams } from 'react-router-dom';
+import { AppLanguage } from '../data/appPreferences';
+import { appShellRoutes, getKanaEntryRoute, KanaAppScope } from '../data/appShellContent';
+import { useKanaProgressStore } from '../features/kana/progress/progressStore';
+import {
+  Button,
+  Card,
+  CardHeader,
+  StatCard
+} from '../shared/ui';
+
+interface KanaSessionPageProps {
+  language: AppLanguage;
+  scope?: KanaAppScope;
+}
+
+const getFlowRoute = (
+  script: 'hiragana' | 'katakana',
+  type: string,
+  scope: KanaAppScope
+) => {
+  if (scope === 'play') {
+    return getKanaEntryRoute(script, 'play');
+  }
+
+  if (script === 'hiragana') {
+    if (type === 'review') return appShellRoutes.hiraganaReview;
+    if (type === 'weak_drill') return appShellRoutes.hiraganaWeak;
+    if (type === 'confusable_drill') return appShellRoutes.hiraganaConfusable;
+    return appShellRoutes.hiraganaLearn;
+  }
+
+  if (type === 'review') return appShellRoutes.katakanaReview;
+  if (type === 'weak_drill') return appShellRoutes.katakanaWeak;
+  if (type === 'confusable_drill') return appShellRoutes.katakanaConfusable;
+  return appShellRoutes.katakanaLearn;
+};
+
+export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({
+  language,
+  scope = 'study' as KanaAppScope
+}) => {
+  const resolvedScope: KanaAppScope = scope;
+  const { sessionId } = useParams<{ sessionId: string }>();
+  const { activeSession, getSession } = useKanaProgressStore();
+  const session = sessionId ? getSession(sessionId) : activeSession;
+
+  if (!session) {
+    return <Navigate to={appShellRoutes.home} replace />;
+  }
+
+  const flowRoute = getFlowRoute(session.script, session.type, resolvedScope);
+  const overviewRoute = getKanaEntryRoute(session.script, resolvedScope);
+
+  return (
+    <div className="space-y-8 pb-8">
+      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.88)] p-7 shadow-[var(--kt-shadow-lg)]">
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
+              {language === 'tr' ? 'Kayitli oturum' : 'Saved session'}
+            </div>
+            <h1 className="mt-3 text-4xl font-black text-white">
+              {language === 'tr' ? 'Devam etmeye hazir' : 'Ready to resume'}
+            </h1>
+            <p className="mt-3 max-w-2xl text-base leading-8 text-white/72">
+              {language === 'tr'
+                ? 'Bu oturum ilgili akis icinde tekrar acilabilir. Shell artik bu kayitlari da kendi panel diline tasiyor.'
+                : 'This session can be reopened inside the matching flow. The shell now surfaces saved runs with the same visual language.'}
+            </p>
+          </div>
+          <Button as="link" to={overviewRoute} variant="secondary" size="sm">
+            <ArrowLeft size={16} className="mr-2" />
+            {language === 'tr' ? 'Overview sayfasina don' : 'Back to overview'}
+          </Button>
+        </div>
+      </section>
+
+      <section>
+        <Card padding="lg">
+          <CardHeader title={language === 'tr' ? 'Session ozeti' : 'Session summary'} />
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Script" value={session.script} />
+            <StatCard label="Type" value={session.type} />
+            <StatCard label="Status" value={session.status} />
+            <StatCard label="Items" value={session.itemIds.length} />
+          </div>
+
+          <div className="mt-6">
+            <Button as="link" to={flowRoute} variant="primary" size="md">
+              <Play size={16} className="mr-2" />
+              {language === 'tr' ? 'Ilgili akisa git' : 'Open matching flow'}
+            </Button>
+          </div>
+        </Card>
+      </section>
+    </div>
+  );
+};

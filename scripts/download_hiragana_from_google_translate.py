@@ -86,7 +86,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--kana-file",
-        default="src/data/kana.ts",
+        default="Frontend/src/data/kana.ts",
         help="Relative path to kana TypeScript source file.",
     )
     parser.add_argument(

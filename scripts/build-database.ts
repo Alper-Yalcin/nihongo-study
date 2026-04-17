@@ -98,7 +98,7 @@ const rebuildDatabase = async () => {
 
   console.log(`SQLite database created at ${DATABASE_PATH}`);
   console.log(`- tr translations: ${Object.keys(turkishMeaningTranslations).length}`);
-  console.log(`- legacy dictionary records merged from csv/: ${legacyWords.length}`);
+  console.log(`- legacy dictionary records merged from Backend/csv/: ${legacyWords.length}`);
   printNormalizedImportReport(normalizedImportSummary);
 };
 

@@ -322,7 +322,7 @@ PUNCTUATION = {
     "~": "~",
 }
 VOWELS = set("aeiou")
-TARGET_DIRECTORIES = ("csv/hiragana", "csv/katakana", "csv/kanji")
+TARGET_DIRECTORIES = ("Backend/csv/hiragana", "Backend/csv/katakana", "Backend/csv/kanji")
 
 
 def discover_files() -> list[Path]:

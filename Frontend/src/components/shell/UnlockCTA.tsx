@@ -1,0 +1,26 @@
+import React from 'react';
+import { Button } from '../../shared/ui';
+
+interface UnlockCTAProps {
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+}
+
+export const UnlockCTA: React.FC<UnlockCTAProps> = ({
+  title,
+  description,
+  actionLabel,
+  actionHref
+}) => (
+  <section className="rounded-[1.7rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
+    <h3 className="text-2xl font-black leading-tight text-[var(--kt-ink-strong)]">{title}</h3>
+    <p className="mt-3 text-sm leading-7 text-[var(--kt-ink-muted)]">{description}</p>
+    <div className="mt-5">
+      <Button as="link" to={actionHref} fullWidth>
+        {actionLabel}
+      </Button>
+    </div>
+  </section>
+);

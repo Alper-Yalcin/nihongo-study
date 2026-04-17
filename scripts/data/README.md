@@ -24,16 +24,16 @@ Orchestrated by:
 
 ## Default Inputs
 
-- `data-sources/raw/jmdict/JMdict_b.gz`
-- `data-sources/raw/kanjidic2/kanjidic2.xml.gz`
-- `data-sources/raw/jlpt/n5.csv` ... `n1.csv`
+- `Backend/data-sources/raw/jmdict/JMdict_b.gz`
+- `Backend/data-sources/raw/kanjidic2/kanjidic2.xml.gz`
+- `Backend/data-sources/raw/jlpt/n5.csv` ... `n1.csv`
 
 ## Default Outputs
 
-- `data-sources/normalized/hiragana_words.ndjson`
-- `data-sources/normalized/katakana_words.ndjson`
-- `data-sources/normalized/kanji_words.ndjson`
-- `data-sources/normalized/kanji_characters.ndjson`
+- `Backend/data-sources/normalized/hiragana_words.ndjson`
+- `Backend/data-sources/normalized/katakana_words.ndjson`
+- `Backend/data-sources/normalized/kanji_words.ndjson`
+- `Backend/data-sources/normalized/kanji_characters.ndjson`
 
 ## Default Reports
 
