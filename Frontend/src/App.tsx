@@ -11,7 +11,6 @@ import { Kanji } from './pages/Kanji';
 import { KanaItemPage } from './pages/KanaItemPage';
 import { KanaPlayPage } from './pages/KanaPlayPage';
 import { KanaSessionPage } from './pages/KanaSessionPage';
-import { KanaStudyRoadmapPage } from './pages/KanaStudyRoadmapPage';
 import { Settings } from './pages/Settings';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LettersPage } from './pages/LettersPage';
@@ -122,10 +121,7 @@ export default function App() {
 
       <Route path="/kana/hiragana" element={<Navigate to={`${appShellRoutes.letters}?script=hiragana`} replace />} />
       <Route path={appShellRoutes.hiraganaOverview} element={<Navigate to={`${appShellRoutes.letters}?script=hiragana`} replace />} />
-      <Route
-        path={appShellRoutes.hiraganaLearn}
-        element={<KanaStudyRoadmapPage script="hiragana" language={language} />}
-      />
+      <Route path={appShellRoutes.hiraganaLearn} element={<Navigate to={`${appShellRoutes.letters}?script=hiragana`} replace />} />
       <Route
         path={appShellRoutes.hiraganaPlay}
         element={wrapPlayScope(<KanaPlayPage script="hiragana" language={language} />)}
@@ -148,10 +144,7 @@ export default function App() {
 
       <Route path="/kana/katakana" element={<Navigate to={`${appShellRoutes.letters}?script=katakana`} replace />} />
       <Route path={appShellRoutes.katakanaOverview} element={<Navigate to={`${appShellRoutes.letters}?script=katakana`} replace />} />
-      <Route
-        path={appShellRoutes.katakanaLearn}
-        element={<KanaStudyRoadmapPage script="katakana" language={language} />}
-      />
+      <Route path={appShellRoutes.katakanaLearn} element={<Navigate to={`${appShellRoutes.letters}?script=katakana`} replace />} />
       <Route
         path={appShellRoutes.katakanaPlay}
         element={wrapPlayScope(<KanaPlayPage script="katakana" language={language} />)}
@@ -172,7 +165,7 @@ export default function App() {
       />
 
       <Route path={appShellRoutes.kanjiOverview} element={<Kanji language={language} />} />
-      <Route path="/kana/item/:kanaId" element={<KanaItemPage language={language} scope="study" />} />
+      <Route path="/kana/item/:kanaId" element={<Navigate to={appShellRoutes.letters} replace />} />
       <Route path="/kana/session/:sessionId" element={<KanaSessionPage language={language} scope="study" />} />
 
       <Route

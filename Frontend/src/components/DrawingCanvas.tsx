@@ -44,9 +44,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
   const hasGuideImage = Boolean(guideImageSrc);
   const shouldRenderOverlay = Boolean(
     drawingData &&
-      (!hasGuideImage
-        ? showTemplate || showStrokeOrder || showDirectionArrows
-        : !showTemplate && (showStrokeOrder || showDirectionArrows))
+      (showTemplate || showStrokeOrder || showDirectionArrows)
   );
 
   useImperativeHandle(ref, () => ({

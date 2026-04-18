@@ -1,11 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Volume2, X } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { getKanaEntryRoute, getKanaItemRoute } from '../data/appShellContent';
+import { appShellRoutes } from '../data/appShellContent';
 import { hiraganaSections, katakanaSections } from '../data/kana';
+import { getGoogleTranslateKanaAudioSrc } from '../data/kanaAudio';
+import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
 import { KanaScript } from '../features/kana/domain/kanaItem';
 import { Character, KanaSection } from '../types';
+import { DrawingCanvas } from '../components/DrawingCanvas';
 
 interface LettersPageProps {
   language: AppLanguage;
@@ -135,13 +139,20 @@ const toTileMetaRows = (rows: (Character | null)[][]): (TileMeta | null)[][] =>
   rows.map((row) => row.map((cell) => (cell ? { id: cell.id, symbol: cell.symbol, label: cell.label } : null)));
 
 interface KanaTileProps {
-  script: KanaScript;
   tile: TileMeta | null;
+  character: Character | null;
   getProgress: (id: string) => { masteryScore: number; timesSeen: number; state: string } | null;
   clickable?: boolean;
+  onCharacterSelect?: (character: Character) => void;
 }
 
-const KanaTile: React.FC<KanaTileProps> = ({ script, tile, getProgress, clickable = true }) => {
+const KanaTile: React.FC<KanaTileProps> = ({
+  tile,
+  character,
+  getProgress,
+  clickable = true,
+  onCharacterSelect
+}) => {
   if (!tile) {
     return <div className="h-14 rounded-[0.7rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] opacity-30" />;
   }
@@ -177,31 +188,48 @@ const KanaTile: React.FC<KanaTileProps> = ({ script, tile, getProgress, clickabl
   }
 
   return (
-    <Link to={getKanaItemRoute(script, tile.id)} className={className}>
+    <button
+      type="button"
+      className={className}
+      onClick={() => {
+        if (character && onCharacterSelect) {
+          onCharacterSelect(character);
+        }
+      }}
+    >
       {content}
-    </Link>
+    </button>
   );
 };
 
 interface KanaRowGridProps {
-  script: KanaScript;
   rows: (TileMeta | null)[][];
   columns: number;
   getProgress: (id: string) => { masteryScore: number; timesSeen: number; state: string } | null;
+  characterById: Map<string, Character>;
   clickable?: boolean;
+  onCharacterSelect?: (character: Character) => void;
 }
 
-const KanaRowGrid: React.FC<KanaRowGridProps> = ({ script, rows, columns, getProgress, clickable = true }) => (
+const KanaRowGrid: React.FC<KanaRowGridProps> = ({
+  rows,
+  columns,
+  getProgress,
+  characterById,
+  clickable = true,
+  onCharacterSelect
+}) => (
   <div className="space-y-2">
     {rows.map((row, rowIndex) => (
       <div key={rowIndex} className="grid gap-2" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
         {row.map((tile, cellIndex) => (
           <KanaTile
             key={tile?.id ?? `empty-${rowIndex}-${cellIndex}`}
-            script={script}
             tile={tile}
+            character={tile ? characterById.get(tile.id) ?? null : null}
             getProgress={getProgress}
             clickable={clickable}
+            onCharacterSelect={onCharacterSelect}
           />
         ))}
       </div>
@@ -223,9 +251,156 @@ const Block: React.FC<BlockProps> = ({ title, subtitle, children }) => (
   </section>
 );
 
+interface KanaDetailModalProps {
+  language: AppLanguage;
+  script: KanaScript;
+  character: Character;
+  onPrev: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}
+
+const modalCopy = {
+  tr: {
+    drawing: 'Cizim rehberi',
+    strokes: 'Vurus sayisi'
+  },
+  en: {
+    drawing: 'Drawing guide',
+    strokes: 'Stroke count'
+  }
+} as const;
+
+const KanaDetailModal: React.FC<KanaDetailModalProps> = ({
+  language,
+  script,
+  character,
+  onPrev,
+  onNext,
+  onClose
+}) => {
+  const copy = modalCopy[language];
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioSrc = getGoogleTranslateKanaAudioSrc(character.id) ?? `/audio/${script}/${character.id}.mp3`;
+  const guideImageSrc = getNhkKanaGuideImageSrc(character.id);
+
+  const playAudio = () => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch(() => undefined);
+  };
+
+  useEffect(() => {
+    playAudio();
+  }, [character.id]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (event.key === 'ArrowLeft') {
+        onPrev();
+        return;
+      }
+
+      if (event.key === 'ArrowRight') {
+        onNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, onNext, onPrev]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.56)] px-4 py-6 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <article
+        className="relative w-full max-w-md rounded-[1.6rem] border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] p-4 shadow-[var(--kt-shadow-lg)]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-[var(--kt-ink-muted)] transition hover:bg-[var(--kt-surface)] hover:text-[var(--kt-ink)]"
+          aria-label="Close"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="mt-8 flex items-center justify-center">
+          <audio ref={audioRef} src={audioSrc} preload="auto" />
+          <div className="w-full rounded-[1.2rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-3">
+            <div className="mb-2 flex items-center justify-between text-[11px] font-black uppercase tracking-[0.1em] text-[var(--kt-ink-subtle)]">
+              <span>{copy.drawing}</span>
+              <span>
+                {copy.strokes}: {character.drawingData?.strokeCount ?? '-'}
+              </span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={onPrev}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-transparent text-[var(--kt-ink)] transition hover:-translate-y-0.5 hover:text-[var(--kt-accent-info)]"
+                aria-label="Previous character"
+              >
+                <ChevronLeft size={22} />
+              </button>
+
+              <div className="flex justify-center">
+                <DrawingCanvas
+                  guideSymbol={character.symbol}
+                  guideImageSrc={guideImageSrc}
+                  drawingData={character.drawingData}
+                  showTemplate={true}
+                  showStrokeOrder={false}
+                  showDirectionArrows={false}
+                  width={260}
+                  height={260}
+                  disabled={true}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={onNext}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-transparent text-[var(--kt-ink)] transition hover:-translate-y-0.5 hover:text-[var(--kt-accent-info)]"
+                aria-label="Next character"
+              >
+                <ChevronRight size={22} />
+              </button>
+            </div>
+
+            <div className="mt-3 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={playAudio}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[var(--kt-border)] bg-transparent text-[var(--kt-ink)] transition hover:-translate-y-0.5 hover:shadow-[var(--kt-shadow-sm)]"
+                aria-label="Replay audio"
+              >
+                <Volume2 size={22} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+};
+
 export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
   const copy = pageCopy[language];
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
   const script: KanaScript = searchParams.get('script') === 'katakana' ? 'katakana' : 'hiragana';
   const { getProgress } = useKanaProgressStore();
 
@@ -257,6 +432,74 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
     return toTileMetaRows(ids.map((id) => getColumnCells(doubleSection, id)));
   }, [doubleSection]);
 
+  const characterById = useMemo(
+    () =>
+      new Map(
+        sections.flatMap((section) =>
+          section.matrix.flatMap((row) =>
+            row
+              .filter((item): item is Character => item !== null)
+              .map((character) => [character.id, character] as const)
+          )
+        )
+      ),
+    [sections]
+  );
+
+  const browseableCharacters = useMemo(
+    () =>
+      [...baseRows, ...voicedRows, ...comboRows]
+        .flatMap((row) => row)
+        .filter((tile): tile is TileMeta => tile !== null)
+        .map((tile) => characterById.get(tile.id))
+        .filter((item): item is Character => Boolean(item)),
+    [baseRows, voicedRows, comboRows, characterById]
+  );
+
+  const selectedCharacterIndex = useMemo(
+    () => browseableCharacters.findIndex((item) => item.id === selectedCharacterId),
+    [browseableCharacters, selectedCharacterId]
+  );
+
+  const selectedCharacter =
+    selectedCharacterIndex >= 0 ? browseableCharacters[selectedCharacterIndex] : null;
+
+  const selectPrevCharacter = () => {
+    if (!browseableCharacters.length || selectedCharacterIndex < 0) {
+      return;
+    }
+
+    const nextIndex =
+      selectedCharacterIndex === 0
+        ? browseableCharacters.length - 1
+        : selectedCharacterIndex - 1;
+
+    setSelectedCharacterId(browseableCharacters[nextIndex].id);
+  };
+
+  const selectNextCharacter = () => {
+    if (!browseableCharacters.length || selectedCharacterIndex < 0) {
+      return;
+    }
+
+    const nextIndex =
+      selectedCharacterIndex === browseableCharacters.length - 1
+        ? 0
+        : selectedCharacterIndex + 1;
+
+    setSelectedCharacterId(browseableCharacters[nextIndex].id);
+  };
+
+  useEffect(() => {
+    if (!selectedCharacterId) {
+      return;
+    }
+
+    if (!browseableCharacters.some((item) => item.id === selectedCharacterId)) {
+      setSelectedCharacterId(null);
+    }
+  }, [browseableCharacters, selectedCharacterId]);
+
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-10">
       <div className="flex items-center justify-center gap-2 border-b border-[var(--kt-border-subtle)] pb-4">
@@ -283,7 +526,7 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
             <p className="mt-1 text-sm font-semibold text-[var(--kt-ink-subtle)]">{copy.subtitle[script]}</p>
           </div>
           <Link
-            to={getKanaEntryRoute(script, 'study')}
+            to={`${appShellRoutes.letters}?script=${script}`}
             className="inline-flex shrink-0 items-center rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink)] transition hover:-translate-y-0.5 hover:shadow-[var(--kt-shadow-sm)]"
           >
             {copy.cta}
@@ -292,24 +535,65 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
       </section>
 
       <Block title={copy.basicsTitle} subtitle={copy.basicsSubtitle}>
-        <KanaRowGrid script={script} rows={baseRows} columns={5} getProgress={getProgress} />
+        <KanaRowGrid
+          rows={baseRows}
+          columns={5}
+          getProgress={getProgress}
+          characterById={characterById}
+          onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
+        />
       </Block>
 
       <Block title={copy.voicedTitle} subtitle={copy.voicedSubtitle}>
-        <KanaRowGrid script={script} rows={voicedRows} columns={5} getProgress={getProgress} />
+        <KanaRowGrid
+          rows={voicedRows}
+          columns={5}
+          getProgress={getProgress}
+          characterById={characterById}
+          onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
+        />
       </Block>
 
       <Block title={copy.comboTitle} subtitle={copy.comboSubtitle}>
-        <KanaRowGrid script={script} rows={comboRows} columns={3} getProgress={getProgress} />
+        <KanaRowGrid
+          rows={comboRows}
+          columns={3}
+          getProgress={getProgress}
+          characterById={characterById}
+          onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
+        />
       </Block>
 
       <Block title={copy.smallTsuTitle} subtitle={copy.smallTsuSubtitle}>
-        <KanaRowGrid script={script} rows={smallTsuRows[script]} columns={4} getProgress={getProgress} clickable={false} />
+        <KanaRowGrid
+          rows={smallTsuRows[script]}
+          columns={4}
+          getProgress={getProgress}
+          characterById={characterById}
+          clickable={false}
+        />
       </Block>
 
       <Block title={copy.longTitle} subtitle={copy.longSubtitle}>
-        <KanaRowGrid script={script} rows={longVowelRows[script]} columns={5} getProgress={getProgress} clickable={false} />
+        <KanaRowGrid
+          rows={longVowelRows[script]}
+          columns={5}
+          getProgress={getProgress}
+          characterById={characterById}
+          clickable={false}
+        />
       </Block>
+
+      {selectedCharacter ? (
+        <KanaDetailModal
+          language={language}
+          script={script}
+          character={selectedCharacter}
+          onPrev={selectPrevCharacter}
+          onNext={selectNextCharacter}
+          onClose={() => setSelectedCharacterId(null)}
+        />
+      ) : null}
     </div>
   );
 };
