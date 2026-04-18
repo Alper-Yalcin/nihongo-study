@@ -12,7 +12,7 @@ const scriptMeta: Record<KanaScript, { label: string; symbol: string }> = {
 };
 
 export const ScriptSwitcher: React.FC<ScriptSwitcherProps> = ({ activeScript, onChange }) => (
-  <div className="rounded-[1.3rem] border border-[var(--kt-border-subtle)] bg-[rgba(255,255,255,0.03)] p-2">
+  <div className="rounded-[1.3rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-2">
     <div className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.18em] text-[var(--kt-ink-subtle)]">
       Aktif Script
     </div>
@@ -28,7 +28,7 @@ export const ScriptSwitcher: React.FC<ScriptSwitcherProps> = ({ activeScript, on
             className={`rounded-[1rem] px-3 py-2 text-left transition ${
               isActive
                 ? 'bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]'
-                : 'bg-transparent text-[var(--kt-ink-muted)] hover:bg-[rgba(255,255,255,0.04)]'
+                : 'bg-transparent text-[var(--kt-ink-muted)] hover:bg-[var(--kt-nav-item-hover)]'
             }`}
           >
             <div className="font-jp text-xl font-black">{meta.symbol}</div>

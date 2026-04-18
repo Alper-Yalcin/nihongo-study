@@ -23,7 +23,7 @@ export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ activeScript }
   );
 
   return (
-    <nav className="fixed bottom-4 left-1/2 z-40 flex w-[min(92vw,28rem)] -translate-x-1/2 justify-between rounded-[1.6rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.96)] px-4 py-3 shadow-[var(--kt-shadow-lg)] xl:hidden">
+    <nav className="fixed bottom-4 left-1/2 z-40 flex w-[min(92vw,28rem)] -translate-x-1/2 justify-between rounded-[1.6rem] border border-[var(--kt-border)] bg-[var(--kt-nav-bg)] px-4 py-3 shadow-[var(--kt-shadow-lg)] backdrop-blur xl:hidden">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive =
@@ -42,7 +42,7 @@ export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ activeScript }
             key={item.id}
             to={item.href}
             className={`flex min-w-[3.8rem] flex-col items-center gap-1 rounded-[1rem] px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${
-              isActive ? 'text-[var(--kt-accent-info)]' : 'text-white/70'
+              isActive ? 'text-[var(--kt-accent-info)]' : 'text-[var(--kt-nav-text-muted)]'
             }`}
           >
             <Icon size={20} />

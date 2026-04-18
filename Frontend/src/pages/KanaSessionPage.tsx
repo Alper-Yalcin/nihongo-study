@@ -56,7 +56,7 @@ export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({
 
   return (
     <div className="space-y-8 pb-8">
-      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.88)] p-7 shadow-[var(--kt-shadow-lg)]">
+      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-7 shadow-[var(--kt-shadow-lg)]">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div>
             <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
@@ -65,7 +65,7 @@ export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({
             <h1 className="mt-3 text-4xl font-black text-white">
               {language === 'tr' ? 'Devam etmeye hazir' : 'Ready to resume'}
             </h1>
-            <p className="mt-3 max-w-2xl text-base leading-8 text-white/72">
+            <p className="mt-3 max-w-2xl text-base leading-8 text-[var(--kt-ink-muted)]">
               {language === 'tr'
                 ? 'Bu oturum ilgili akis icinde tekrar acilabilir. Shell artik bu kayitlari da kendi panel diline tasiyor.'
                 : 'This session can be reopened inside the matching flow. The shell now surfaces saved runs with the same visual language.'}

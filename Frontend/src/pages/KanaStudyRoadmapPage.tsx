@@ -567,7 +567,7 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
 
   if (initialQuestions.length === 0) {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+      <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 text-sm text-[var(--kt-ink-muted)]">
         {copy.noItems}
       </div>
     );
@@ -580,22 +580,22 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
   const answeredCount = Math.min(questionIndex + 1, questions.length);
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
-          <p className="mt-1 text-sm text-slate-600">{description}</p>
+          <h3 className="text-xl font-semibold text-[var(--kt-ink-strong)]">{title}</h3>
+          <p className="mt-1 text-sm text-[var(--kt-ink-muted)]">{description}</p>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+        <span className="rounded-full bg-[var(--kt-surface-muted)] px-3 py-1 text-xs font-semibold text-[var(--kt-ink-muted)]">
           {copy.questionLabel(answeredCount, questions.length)}
         </span>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-slate-100 bg-slate-50 p-6">
+      <div className="mt-6 rounded-2xl border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-6">
         {currentQuestion.mode === 'recognition' && (
           <>
-            <div className="text-sm font-semibold text-slate-500">{copy.chooseAnswer}</div>
-            <div className="mt-3 text-5xl font-bold text-slate-900">{currentQuestion.item.char}</div>
+            <div className="text-sm font-semibold text-[var(--kt-ink-muted)]">{copy.chooseAnswer}</div>
+            <div className="mt-3 text-5xl font-bold text-[var(--kt-ink-strong)]">{currentQuestion.item.char}</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {currentQuestion.options.map((option) => (
                 <button
@@ -608,10 +608,10 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
                   }}
                   className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${
                     feedback && option.id === currentQuestion.item.id
-                      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                      ? 'border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
                       : selectedOptionId === option.id
-                        ? 'border-blue-400 bg-blue-50 text-blue-700'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                        ? 'border-[var(--kt-brand)] bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]'
+                        : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink)] hover:border-[var(--kt-border-strong)]'
                   }`}
                 >
                   {option.romaji[0]}
@@ -623,8 +623,8 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
 
         {currentQuestion.mode === 'reading' && (
           <>
-            <div className="text-sm font-semibold text-slate-500">{copy.chooseAnswer}</div>
-            <div className="mt-3 text-4xl font-bold text-slate-900">{currentQuestion.item.romaji[0]}</div>
+            <div className="text-sm font-semibold text-[var(--kt-ink-muted)]">{copy.chooseAnswer}</div>
+            <div className="mt-3 text-4xl font-bold text-[var(--kt-ink-strong)]">{currentQuestion.item.romaji[0]}</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {currentQuestion.options.map((option) => (
                 <button
@@ -637,14 +637,14 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
                   }}
                   className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${
                     feedback && option.id === currentQuestion.item.id
-                      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                      ? 'border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
                       : selectedOptionId === option.id
-                        ? 'border-blue-400 bg-blue-50 text-blue-700'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                        ? 'border-[var(--kt-brand)] bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]'
+                        : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink)] hover:border-[var(--kt-border-strong)]'
                   }`}
                 >
                   <span className="text-2xl font-bold">{option.char}</span>
-                  <span className="ml-2 text-xs text-slate-500">{option.romaji[0]}</span>
+                  <span className="ml-2 text-xs text-[var(--kt-ink-subtle)]">{option.romaji[0]}</span>
                 </button>
               ))}
             </div>
@@ -653,8 +653,8 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
 
         {currentQuestion.mode === 'typing' && (
           <>
-            <div className="text-sm font-semibold text-slate-500">{copy.typeAnswer}</div>
-            <div className="mt-3 text-5xl font-bold text-slate-900">{currentQuestion.item.char}</div>
+            <div className="text-sm font-semibold text-[var(--kt-ink-muted)]">{copy.typeAnswer}</div>
+            <div className="mt-3 text-5xl font-bold text-[var(--kt-ink-strong)]">{currentQuestion.item.char}</div>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               <input
                 value={typedAnswer}
@@ -665,14 +665,14 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
                     submitAnswer({ typedValue: typedAnswer });
                   }
                 }}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-400"
+                className="w-full rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 text-sm font-semibold text-[var(--kt-ink)] outline-none transition focus:border-[var(--kt-brand)]"
                 placeholder="romaji"
               />
               <button
                 type="button"
                 disabled={Boolean(feedback)}
                 onClick={() => submitAnswer({ typedValue: typedAnswer })}
-                className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-[var(--kt-brand)] px-4 py-3 text-sm font-semibold text-[var(--kt-brand-on)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {copy.submit}
               </button>
@@ -685,8 +685,8 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
         <div
           className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-semibold ${
             feedback.correct
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-              : 'border-rose-200 bg-rose-50 text-rose-700'
+              ? 'border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
+              : 'border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)]'
           }`}
         >
           <div>{feedback.correct ? copy.correct : copy.wrong}</div>
@@ -698,7 +698,7 @@ export const QuizStepPanel: React.FC<QuizStepPanelProps> = ({
         <button
           type="button"
           onClick={goToNextQuestion}
-          className="mt-5 inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+          className="mt-5 inline-flex items-center justify-center rounded-xl bg-[var(--kt-ink-strong)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink-inverse)] transition hover:opacity-90"
         >
           {copy.nextStep}
         </button>
@@ -791,32 +791,32 @@ const LessonRunner: React.FC<LessonRunnerProps> = ({
 
   if (attemptResult) {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
         <div className="flex items-center gap-3">
           {attemptResult.passed ? (
-            <CheckCircle2 className="text-emerald-600" />
+            <CheckCircle2 className="text-[var(--kt-accent-success)]" />
           ) : (
-            <RefreshCw className="text-amber-600" />
+            <RefreshCw className="text-[var(--kt-accent-warning)]" />
           )}
-          <h3 className="text-2xl font-semibold text-slate-900">
+          <h3 className="text-2xl font-semibold text-[var(--kt-ink-strong)]">
             {attemptResult.passed ? copy.lessonPassed : copy.lessonFailed}
           </h3>
         </div>
 
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-[var(--kt-ink-muted)]">
           {attemptResult.passed ? copy.lessonPassHint : copy.lessonFailHint}
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {steps.map((step) => (
-            <div key={step} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{step}</div>
-              <div className="mt-1 text-xl font-bold text-slate-900">{stepScores[step]}%</div>
+            <div key={step} className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-4 py-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-[var(--kt-ink-subtle)]">{step}</div>
+              <div className="mt-1 text-xl font-bold text-[var(--kt-ink-strong)]">{stepScores[step]}%</div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+        <div className="mt-6 rounded-2xl border border-[var(--kt-brand)] bg-[var(--kt-brand-soft)] px-4 py-3 text-sm text-[var(--kt-brand)]">
           {copy.scoreLabel}: <span className="font-bold">{attemptResult.score}%</span>
         </div>
 
@@ -824,14 +824,14 @@ const LessonRunner: React.FC<LessonRunnerProps> = ({
           <button
             type="button"
             onClick={onBack}
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="rounded-xl bg-[var(--kt-ink-strong)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink-inverse)] transition hover:opacity-90"
           >
             {copy.completeLesson}
           </button>
           <button
             type="button"
             onClick={restartLesson}
-            className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink)] transition hover:bg-[var(--kt-surface-muted)]"
           >
             {copy.retryLesson}
           </button>
@@ -842,21 +842,21 @@ const LessonRunner: React.FC<LessonRunnerProps> = ({
 
   if (currentStep === 'introduction') {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-2xl font-semibold text-slate-900">{copy.introTitle}</h3>
-        <p className="mt-2 text-sm text-slate-600">{copy.introSubtitle}</p>
+      <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
+        <h3 className="text-2xl font-semibold text-[var(--kt-ink-strong)]">{copy.introTitle}</h3>
+        <p className="mt-2 text-sm text-[var(--kt-ink-muted)]">{copy.introSubtitle}</p>
 
         {weakCarryoverItems.length > 0 && (
-          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mt-4 rounded-2xl border border-[var(--kt-accent-warning)] bg-[var(--kt-accent-warning-soft)] px-4 py-3 text-sm text-[var(--kt-accent-warning)]">
             {copy.introWeakCarryover}
           </div>
         )}
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {lessonItems.map((item) => (
-            <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <div className="text-3xl font-bold text-slate-900">{item.char}</div>
-              <div className="mt-1 text-sm font-semibold text-slate-600">{item.romaji[0]}</div>
+            <div key={item.id} className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-4 py-3">
+              <div className="text-3xl font-bold text-[var(--kt-ink-strong)]">{item.char}</div>
+              <div className="mt-1 text-sm font-semibold text-[var(--kt-ink-muted)]">{item.romaji[0]}</div>
             </div>
           ))}
         </div>
@@ -864,7 +864,7 @@ const LessonRunner: React.FC<LessonRunnerProps> = ({
         <button
           type="button"
           onClick={() => setStepIndex(1)}
-          className="mt-6 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="mt-6 rounded-xl bg-[var(--kt-brand)] px-4 py-2 text-sm font-semibold text-[var(--kt-brand-on)] transition hover:opacity-90"
         >
           {copy.startStep}
         </button>

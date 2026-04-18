@@ -22,12 +22,12 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
 }) => (
   <div className={`relative inline-flex ${className}`}>
     <div
-      className={`rounded-[1.4rem] border bg-[rgba(10,16,24,0.72)] px-5 py-4 text-sm font-semibold text-white shadow-[var(--kt-shadow-sm)] ${accentClass[accent]}`}
+      className={`rounded-[1.4rem] border bg-[var(--kt-surface-muted)] px-5 py-4 text-sm font-semibold text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)] ${accentClass[accent]}`}
     >
       {children}
     </div>
     <span
-      className={`absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 border-b border-l bg-[rgba(10,16,24,0.72)] ${accentClass[accent]}`}
+      className={`absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 border-b border-l bg-[var(--kt-surface-muted)] ${accentClass[accent]}`}
     />
   </div>
 );

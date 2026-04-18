@@ -290,17 +290,17 @@ const kanjiMvpCopy = {
 
 const featureCardStyles = [
   {
-    wrapper: 'bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all',
+    wrapper: 'bg-[var(--kt-surface)] p-8 rounded-2xl shadow-sm border border-[var(--kt-border)] hover:border-emerald-300 hover:shadow-md transition-all',
     icon: 'w-14 h-14 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6',
     IconComponent: Layers3
   },
   {
-    wrapper: 'bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all',
+    wrapper: 'bg-[var(--kt-surface)] p-8 rounded-2xl shadow-sm border border-[var(--kt-border)] hover:border-emerald-300 hover:shadow-md transition-all',
     icon: 'w-14 h-14 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6',
     IconComponent: BookOpenText
   },
   {
-    wrapper: 'bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all',
+    wrapper: 'bg-[var(--kt-surface)] p-8 rounded-2xl shadow-sm border border-[var(--kt-border)] hover:border-emerald-300 hover:shadow-md transition-all',
     icon: 'w-14 h-14 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6',
     IconComponent: ArrowLeft
   }
@@ -499,7 +499,7 @@ export const Kanji: React.FC<Props> = ({ language }) => {
               />
 
               {kanjiWordState.loading && (
-                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                <div className="mt-4 rounded-xl border border-[var(--kt-border)] bg-slate-50 px-4 py-3 text-sm text-[var(--kt-ink-muted)]">
                   {mvpCopy.loading}
                 </div>
               )}
@@ -519,11 +519,11 @@ export const Kanji: React.FC<Props> = ({ language }) => {
               {sectionTrackItems.length > 0 && (
                 <div className="mt-6 space-y-6">
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="rounded-2xl border border-[var(--kt-border)] bg-slate-50 p-4">
                       <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                         {mvpCopy.stats.track}
                       </div>
-                      <div className="mt-2 text-2xl font-bold text-slate-900">{sectionTrackItems.length}</div>
+                      <div className="mt-2 text-2xl font-bold text-[var(--kt-ink-strong)]">{sectionTrackItems.length}</div>
                     </div>
                     <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
                       <div className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
@@ -546,17 +546,17 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                   </div>
 
                   {activeTrackItem && (
-                    <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <article className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-5 shadow-sm">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-4">
-                          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 text-5xl font-bold text-slate-900">
+                          <div className="rounded-2xl border border-[var(--kt-border)] bg-slate-50 px-5 py-3 text-5xl font-bold text-[var(--kt-ink-strong)]">
                             {activeTrackItem.char}
                           </div>
                           <div>
                             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                               {mvpCopy.labels.frequency}
                             </div>
-                            <div className="mt-1 text-sm font-semibold text-slate-700">
+                            <div className="mt-1 text-sm font-semibold text-[var(--kt-ink)]">
                               {`${activeTrackItem.frequency}x`}
                             </div>
                           </div>
@@ -566,7 +566,7 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                             ? 'bg-emerald-100 text-emerald-700'
                             : mvpProgress.statusByChar[activeTrackItem.char] === 'review'
                               ? 'bg-amber-100 text-amber-700'
-                              : 'bg-slate-100 text-slate-600'
+                              : 'bg-slate-100 text-[var(--kt-ink-muted)]'
                         }`}>
                           {mvpProgress.statusByChar[activeTrackItem.char]
                             ? mvpCopy.statuses[mvpProgress.statusByChar[activeTrackItem.char]]
@@ -575,31 +575,31 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                       </div>
 
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div className="rounded-2xl border border-[var(--kt-border)] bg-slate-50 p-4">
                           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                             {mvpCopy.labels.reading}
                           </div>
-                          <div className="mt-2 text-sm text-slate-700">
+                          <div className="mt-2 text-sm text-[var(--kt-ink)]">
                             {activeTrackItem.readings.join(', ') || '-'}
                           </div>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div className="rounded-2xl border border-[var(--kt-border)] bg-slate-50 p-4">
                           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                             {mvpCopy.labels.meaning}
                           </div>
-                          <div className="mt-2 text-sm text-slate-700">
+                          <div className="mt-2 text-sm text-[var(--kt-ink)]">
                             {activeTrackItem.meanings.join(', ') || '-'}
                           </div>
                         </div>
                       </div>
 
-                      <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <div className="mt-4 space-y-2 rounded-2xl border border-[var(--kt-border)] bg-slate-50 p-4">
                         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                           {mvpCopy.labels.example}
                         </div>
                         {activeTrackItem.examples.length > 0 ? (
                           activeTrackItem.examples.map((example) => (
-                            <p key={example.id} className="text-sm text-slate-700">
+                            <p key={example.id} className="text-sm text-[var(--kt-ink)]">
                               {`${example.surface} (${example.reading}) - ${example.meaning}`}
                             </p>
                           ))
@@ -607,7 +607,7 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                           <p className="text-sm text-slate-500">-</p>
                         )}
                         <div className="pt-1 text-xs text-slate-500">
-                          <span className="font-semibold text-slate-600">{`${mvpCopy.labels.context}: `}</span>
+                          <span className="font-semibold text-[var(--kt-ink-muted)]">{`${mvpCopy.labels.context}: `}</span>
                           {activeTrackItem.examples[1]
                             ? mvpCopy.contextWithExample(activeTrackItem.examples[1].surface)
                             : mvpCopy.fallbackContext}
@@ -632,7 +632,7 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                         <button
                           type="button"
                           onClick={() => clearCharacterStatus(activeTrackItem.char)}
-                          className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                          className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:bg-[var(--kt-surface-muted)]"
                         >
                           {mvpCopy.actions.markNew}
                         </button>
@@ -656,16 +656,16 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                                 ? 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100'
                                 : status === 'review'
                                   ? 'border-amber-200 bg-amber-50 hover:bg-amber-100'
-                                  : 'border-slate-200 bg-white hover:bg-slate-50'
+                                  : 'border-[var(--kt-border)] bg-[var(--kt-surface)] hover:bg-[var(--kt-surface-muted)]'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-3xl font-bold text-slate-900">{item.char}</div>
-                            <span className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+                            <div className="text-3xl font-bold text-[var(--kt-ink-strong)]">{item.char}</div>
+                            <span className="rounded-full bg-[var(--kt-surface-muted)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">
                               {mvpCopy.statuses[status]}
                             </span>
                           </div>
-                          <div className="mt-2 text-xs text-slate-600">{item.readings[0] ?? '-'}</div>
+                          <div className="mt-2 text-xs text-[var(--kt-ink-muted)]">{item.readings[0] ?? '-'}</div>
                           <div className="mt-1 line-clamp-1 text-xs text-slate-500">{item.meanings[0] ?? '-'}</div>
                         </button>
                       );

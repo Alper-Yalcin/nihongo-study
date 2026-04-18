@@ -65,10 +65,10 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({
 
   return (
     <div className="space-y-8 pb-8">
-      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.88)] p-7 shadow-[var(--kt-shadow-lg)]">
+      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-7 shadow-[var(--kt-shadow-lg)]">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            <div className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(255,255,255,0.04)] px-8 py-6">
+            <div className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-8 py-6">
               <div className="font-jp text-[120px] leading-none text-white">{item.char}</div>
             </div>
             <div>
@@ -76,7 +76,7 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({
                 {item.script}
               </div>
               <h1 className="mt-3 text-5xl font-black text-white">{item.romaji.join(', ')}</h1>
-              <p className="mt-3 text-base leading-8 text-white/72">
+              <p className="mt-3 text-base leading-8 text-[var(--kt-ink-muted)]">
                 {language === 'tr'
                   ? 'Karakter vitrini, mastery ve ilgili baglam kartlari artik tek bir detay sayfasinda.'
                   : 'The character spotlight, mastery, and related context now live in one detail screen.'}

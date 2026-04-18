@@ -103,10 +103,9 @@ export default function App() {
     <KanaProgressProvider scope="play">{element}</KanaProgressProvider>
   );
 
-  const isLandingRoute = location.pathname === appShellRoutes.home;
-
   const shellRoutes = (
     <Routes>
+      <Route path={appShellRoutes.home} element={<LandingPage language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.learn} element={<Home language={language} activeScript={activeScript} />} />
       <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
@@ -215,22 +214,16 @@ export default function App() {
         className={`${themeMode === 'dark' ? 'theme-dark' : 'theme-light'} min-h-screen bg-[var(--kt-surface-page)] text-[var(--kt-ink)]`}
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
-        {isLandingRoute ? (
-          <Routes>
-            <Route path={appShellRoutes.home} element={<LandingPage language={language} activeScript={activeScript} />} />
-          </Routes>
-        ) : (
-          <AppShell
-            language={language}
-            themeMode={themeMode}
-            activeScript={activeScript}
-            onActiveScriptChange={setActiveScript}
-            onLanguageChange={setLanguage}
-            onThemeModeChange={setThemeMode}
-          >
-            {shellRoutes}
-          </AppShell>
-        )}
+        <AppShell
+          language={language}
+          themeMode={themeMode}
+          activeScript={activeScript}
+          onActiveScriptChange={setActiveScript}
+          onLanguageChange={setLanguage}
+          onThemeModeChange={setThemeMode}
+        >
+          {shellRoutes}
+        </AppShell>
       </div>
     </KanaProgressProvider>
   );

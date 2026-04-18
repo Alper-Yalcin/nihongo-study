@@ -1,17 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import {
-  BookOpenText,
-  CircleHelp,
-  Gamepad2,
-  Home,
-  Languages,
-  MoonStar,
-  MoreHorizontal,
-  Search,
-  Settings2,
-  Sword,
-  Trophy,
-  UserRound
+  BookOpenText, CircleHelp, Gamepad2, Home, Languages,
+  MoonStar, MoreHorizontal, Search, Settings2, Sword, Trophy, UserRound
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { appShellRoutes, getKanaEntryRoute } from '../../data/appShellContent';
@@ -30,79 +20,37 @@ interface LeftNavProps {
 
 const labels = {
   tr: {
-    home: 'Home',
-    learn: 'Ogren',
-    letters: 'Harfler',
-    practice: 'Alistirma',
-    play: 'Oyun',
-    quests: 'Gorevler',
-    profile: 'Profil',
-    more: 'Daha Fazla',
-    settings: 'Ayarlar',
-    search: 'Ara',
-    help: 'Yardim',
-    theme: 'Tema',
-    language: 'Dil'
+    home: 'Home', learn: 'Ogren', letters: 'Harfler', practice: 'Alistirma',
+    play: 'Oyun', quests: 'Gorevler', profile: 'Profil', more: 'Daha Fazla',
+    settings: 'Ayarlar', search: 'Ara', help: 'Yardim', theme: 'Tema', language: 'Dil'
   },
   en: {
-    home: 'Home',
-    learn: 'Learn',
-    letters: 'Letters',
-    practice: 'Practice',
-    play: 'Play',
-    quests: 'Quests',
-    profile: 'Profile',
-    more: 'More',
-    settings: 'Settings',
-    search: 'Search',
-    help: 'Help',
-    theme: 'Theme',
-    language: 'Language'
+    home: 'Home', learn: 'Learn', letters: 'Letters', practice: 'Practice',
+    play: 'Play', quests: 'Quests', profile: 'Profile', more: 'More',
+    settings: 'Settings', search: 'Search', help: 'Help', theme: 'Theme', language: 'Language'
   }
 } as const;
 
 export const LeftNav: React.FC<LeftNavProps> = ({
-  language,
-  themeMode,
-  activeScript,
-  onActiveScriptChange,
-  onLanguageChange,
-  onThemeModeChange
+  language, themeMode, activeScript,
+  onActiveScriptChange, onLanguageChange, onThemeModeChange
 }) => {
   const location = useLocation();
   const copy = labels[language];
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const navItems = useMemo(
-    () => [
-      { id: 'home', label: copy.home, href: appShellRoutes.home, icon: Home },
-      { id: 'learn', label: copy.learn, href: appShellRoutes.learn, icon: BookOpenText },
-      {
-        id: 'letters',
-        label: copy.letters,
-        href: `${appShellRoutes.letters}?script=${activeScript}`,
-        icon: Languages
-      },
-      {
-        id: 'practice',
-        label: copy.practice,
-        href: `${appShellRoutes.practice}?script=${activeScript}`,
-        icon: Sword
-      },
-      {
-        id: 'play',
-        label: copy.play,
-        href: getKanaEntryRoute(activeScript, 'play'),
-        icon: Gamepad2
-      },
-      { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
-      { id: 'profile', label: copy.profile, href: appShellRoutes.account, icon: UserRound }
-    ],
-    [activeScript, copy]
-  );
+  const navItems = useMemo(() => [
+    { id: 'home', label: copy.home, href: appShellRoutes.home, icon: Home },
+    { id: 'learn', label: copy.learn, href: appShellRoutes.learn, icon: BookOpenText },
+    { id: 'letters', label: copy.letters, href: `${appShellRoutes.letters}?script=${activeScript}`, icon: Languages },
+    { id: 'practice', label: copy.practice, href: `${appShellRoutes.practice}?script=${activeScript}`, icon: Sword },
+    { id: 'play', label: copy.play, href: getKanaEntryRoute(activeScript, 'play'), icon: Gamepad2 },
+    { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
+    { id: 'profile', label: copy.profile, href: appShellRoutes.account, icon: UserRound }
+  ], [activeScript, copy]);
 
   return (
-    <aside className="hidden xl:flex xl:min-h-screen xl:flex-col xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[rgba(8,14,22,0.92)] xl:px-5 xl:py-6">
+    <aside className="hidden xl:flex xl:min-h-screen xl:flex-col xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[var(--kt-nav-bg)] xl:px-5 xl:py-6">
       <Link to={appShellRoutes.home} className="px-3 pb-6 pt-2">
         <img src="/logo/kototsuna-logo-light.png" alt="Kototsuna" className="h-10 w-auto" />
       </Link>
@@ -111,19 +59,13 @@ export const LeftNav: React.FC<LeftNavProps> = ({
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            item.id === 'home'
-              ? location.pathname === appShellRoutes.home
-              : item.id === 'learn'
-              ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase)
-              : item.id === 'letters'
-                ? location.pathname.startsWith(appShellRoutes.letters)
-                : item.id === 'practice'
-                  ? location.pathname.startsWith(appShellRoutes.practice)
-                  : item.id === 'play'
-                    ? location.pathname.includes('/play')
-                    : item.id === 'quests'
-                      ? location.pathname.startsWith(appShellRoutes.quests)
-                      : location.pathname === appShellRoutes.account;
+            item.id === 'home' ? location.pathname === appShellRoutes.home
+            : item.id === 'learn' ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase)
+            : item.id === 'letters' ? location.pathname.startsWith(appShellRoutes.letters)
+            : item.id === 'practice' ? location.pathname.startsWith(appShellRoutes.practice)
+            : item.id === 'play' ? location.pathname.includes('/play')
+            : item.id === 'quests' ? location.pathname.startsWith(appShellRoutes.quests)
+            : location.pathname === appShellRoutes.account;
 
           return (
             <Link
@@ -131,8 +73,8 @@ export const LeftNav: React.FC<LeftNavProps> = ({
               to={item.href}
               className={`flex items-center gap-4 rounded-[1.2rem] border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] transition ${
                 isActive
-                  ? 'border-[color:var(--kt-accent-info)] bg-[rgba(54,160,255,0.12)] text-[var(--kt-accent-info)]'
-                  : 'border-transparent text-white/84 hover:border-[var(--kt-border)] hover:bg-[rgba(255,255,255,0.04)]'
+                  ? 'border-[color:var(--kt-accent-info)] bg-[var(--kt-nav-item-active-bg)] text-[var(--kt-accent-info)]'
+                  : 'border-transparent text-[var(--kt-nav-text)] hover:border-[var(--kt-border)] hover:bg-[var(--kt-nav-item-hover)]'
               }`}
             >
               <Icon size={24} />
@@ -144,11 +86,11 @@ export const LeftNav: React.FC<LeftNavProps> = ({
         <div className="relative">
           <button
             type="button"
-            onClick={() => setMoreOpen((current) => !current)}
+            onClick={() => setMoreOpen((c) => !c)}
             className={`flex w-full items-center gap-4 rounded-[1.2rem] border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] transition ${
               moreOpen
-                ? 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.05)] text-white'
-                : 'border-transparent text-white/84 hover:border-[var(--kt-border)] hover:bg-[rgba(255,255,255,0.04)]'
+                ? 'border-[var(--kt-border)] bg-[var(--kt-nav-item-hover)] text-[var(--kt-ink-strong)]'
+                : 'border-transparent text-[var(--kt-nav-text)] hover:border-[var(--kt-border)] hover:bg-[var(--kt-nav-item-hover)]'
             }`}
           >
             <MoreHorizontal size={24} />
@@ -156,43 +98,21 @@ export const LeftNav: React.FC<LeftNavProps> = ({
           </button>
 
           {moreOpen && (
-            <div className="mt-3 rounded-[1.4rem] border border-[var(--kt-border)] bg-[rgba(12,18,26,0.97)] p-3 shadow-[var(--kt-shadow-lg)]">
-              <Link
-                to={appShellRoutes.settings}
-                className="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-white/86 transition hover:bg-[rgba(255,255,255,0.05)]"
-              >
-                <Settings2 size={18} />
-                {copy.settings}
+            <div className="mt-3 rounded-[1.4rem] border border-[var(--kt-border)] bg-[var(--kt-dropdown-bg)] p-3 shadow-[var(--kt-shadow-lg)] backdrop-blur">
+              <Link to={appShellRoutes.settings} className="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-[var(--kt-ink)] transition hover:bg-[var(--kt-nav-item-hover)]">
+                <Settings2 size={18} />{copy.settings}
               </Link>
-              <Link
-                to={appShellRoutes.search}
-                className="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-white/86 transition hover:bg-[rgba(255,255,255,0.05)]"
-              >
-                <Search size={18} />
-                {copy.search}
+              <Link to={appShellRoutes.search} className="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-[var(--kt-ink)] transition hover:bg-[var(--kt-nav-item-hover)]">
+                <Search size={18} />{copy.search}
               </Link>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-white/86 transition hover:bg-[rgba(255,255,255,0.05)]"
-              >
-                <CircleHelp size={18} />
-                {copy.help}
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-[var(--kt-ink)] transition hover:bg-[var(--kt-nav-item-hover)]">
+                <CircleHelp size={18} />{copy.help}
               </a>
-              <button
-                type="button"
-                onClick={() => onThemeModeChange(themeMode === 'dark' ? 'light' : 'dark')}
-                className="flex w-full items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-white/86 transition hover:bg-[rgba(255,255,255,0.05)]"
-              >
+              <button type="button" onClick={() => onThemeModeChange(themeMode === 'dark' ? 'light' : 'dark')} className="flex w-full items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-[var(--kt-ink)] transition hover:bg-[var(--kt-nav-item-hover)]">
                 <MoonStar size={18} />
                 {`${copy.theme}: ${themeMode === 'dark' ? 'Gece' : 'Gun'}`}
               </button>
-              <button
-                type="button"
-                onClick={() => onLanguageChange(language === 'tr' ? 'en' : 'tr')}
-                className="flex w-full items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-white/86 transition hover:bg-[rgba(255,255,255,0.05)]"
-              >
+              <button type="button" onClick={() => onLanguageChange(language === 'tr' ? 'en' : 'tr')} className="flex w-full items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-semibold text-[var(--kt-ink)] transition hover:bg-[var(--kt-nav-item-hover)]">
                 <Languages size={18} />
                 {`${copy.language}: ${language.toUpperCase()}`}
               </button>
@@ -203,10 +123,10 @@ export const LeftNav: React.FC<LeftNavProps> = ({
 
       <div className="mt-6 space-y-4">
         <ScriptSwitcher activeScript={activeScript} onChange={onActiveScriptChange} />
-        <div className="grid grid-cols-3 gap-2 px-3 text-[11px] font-black uppercase tracking-[0.14em] text-white/30">
-          <a href="#" className="hover:text-white/60">Hakkinda</a>
-          <a href="#" className="hover:text-white/60">Sartlar</a>
-          <a href="#" className="hover:text-white/60">Gizlilik</a>
+        <div className="grid grid-cols-3 gap-2 px-3 text-[11px] font-black uppercase tracking-[0.14em] text-[var(--kt-nav-text-muted)]">
+          <a href="#" className="hover:text-[var(--kt-nav-text)]">Hakkinda</a>
+          <a href="#" className="hover:text-[var(--kt-nav-text)]">Sartlar</a>
+          <a href="#" className="hover:text-[var(--kt-nav-text)]">Gizlilik</a>
         </div>
       </div>
     </aside>

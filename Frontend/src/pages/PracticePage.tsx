@@ -104,7 +104,7 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
 
   return (
     <div className="space-y-8 pb-8">
-      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.88)] p-7 shadow-[var(--kt-shadow-lg)]">
+      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-7 shadow-[var(--kt-shadow-lg)]">
         <div className="flex flex-wrap items-center gap-3">
           {(['hiragana', 'katakana'] as KanaScript[]).map((tabScript) => {
             const isActive = script === tabScript;
@@ -115,7 +115,7 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
                 type="button"
                 onClick={() => setSearchParams({ script: tabScript, ...(tab !== 'overview' ? { tab } : {}) })}
                 className={`rounded-full px-5 py-2 text-sm font-black uppercase tracking-[0.14em] ${
-                  isActive ? 'bg-[var(--kt-accent-info)] text-[var(--kt-brand-on)]' : 'bg-[rgba(255,255,255,0.05)] text-white/70'
+                  isActive ? 'bg-[var(--kt-accent-info)] text-[var(--kt-brand-on)]' : 'bg-[var(--kt-surface-muted)] text-[var(--kt-ink-muted)]'
                 }`}
               >
                 {tabScript === 'hiragana' ? 'Hiragana' : 'Katakana'}
@@ -123,10 +123,10 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
             );
           })}
         </div>
-        <h1 className="mt-6 text-5xl font-black text-white">
+        <h1 className="mt-6 text-5xl font-black text-[var(--kt-ink-strong)]">
           {language === 'tr' ? 'Alistirma merkezi' : 'Practice hub'}
         </h1>
-        <p className="mt-4 max-w-3xl text-base leading-8 text-white/72">
+        <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--kt-ink-muted)]">
           {language === 'tr'
             ? 'Review, weak, confusable ve stats artik tek bir hub icinde. Her akistan istedigin moda inline girebilirsin.'
             : 'Review, weak, confusable, and stats now live in one hub. You can jump into each mode inline from here.'}
@@ -153,7 +153,7 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
               onClick={() => setSearchParams({ script, tab: tileKey })}
               className={`overflow-hidden rounded-[1.8rem] border p-6 text-left shadow-[var(--kt-shadow)] ${
                 tab === tileKey ? 'border-[var(--kt-accent-info)] ring-2 ring-[var(--kt-accent-info)]/28' : 'border-[var(--kt-border)]'
-              } bg-[rgba(8,14,22,0.82)]`}
+              } bg-[var(--kt-surface-raised)]`}
             >
               <div className={`inline-flex rounded-[1rem] bg-gradient-to-r p-3 text-white ${tile.accent}`}>
                 <Icon size={22} />

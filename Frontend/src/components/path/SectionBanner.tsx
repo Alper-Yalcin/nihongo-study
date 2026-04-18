@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '../../shared/ui';
 
 interface SectionBannerProps {
   eyebrow: string;
@@ -14,15 +13,20 @@ export const SectionBanner: React.FC<SectionBannerProps> = ({
   accentClassName,
   guideLabel
 }) => (
-  <div className={`sticky top-0 z-20 rounded-[1.7rem] p-6 shadow-[var(--kt-shadow)] ${accentClassName}`}>
-    <div className="flex items-center justify-between gap-4">
-      <div className="text-white">
-        <div className="text-sm font-black uppercase tracking-[0.12em] text-white/70">{eyebrow}</div>
-        <h2 className="mt-2 text-3xl font-black leading-tight">{title}</h2>
+  <div className={`sticky top-0 z-20 rounded-[1rem] ${accentClassName}`}>
+    <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <div className="min-w-0 text-white">
+        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-white/65">
+          {eyebrow}
+        </div>
+        <div className="mt-0.5 truncate text-sm font-black leading-tight">{title}</div>
       </div>
-      <Button as="button" type="button" variant="secondary" size="sm">
+      <button
+        type="button"
+        className="shrink-0 rounded-[0.65rem] border border-white/30 bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-white transition hover:bg-white/20"
+      >
         {guideLabel}
-      </Button>
+      </button>
     </div>
   </div>
 );

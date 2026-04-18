@@ -62,14 +62,14 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
       </div>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <div className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.88)] p-7 shadow-[var(--kt-shadow-lg)]">
+        <div className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-7 shadow-[var(--kt-shadow-lg)]">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
                 {script === 'hiragana' ? 'あ Hiragana' : 'ア Katakana'}
               </div>
               <h1 className="mt-3 text-5xl font-black text-white">{title}</h1>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-white/72">
+              <p className="mt-4 max-w-2xl text-base leading-8 text-[var(--kt-ink-muted)]">
                 {language === 'tr'
                   ? 'Her kisim artik kart-stack yapisinda. Ilerleme, aktif unite ve bir sonraki acilacak alan tek ekranda gorunuyor.'
                   : 'Each section now uses a card stack. Progress, the active unit, and the next unlock all surface in one place.'}
@@ -84,7 +84,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] border border-[var(--kt-border)] bg-[rgba(255,255,255,0.04)] p-4">
+            <div className="rounded-[1.5rem] border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] p-4">
               <ProgressRing
                 value={Math.round(completionRatio * 100)}
                 size={96}
@@ -123,17 +123,17 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({
           return (
             <article
               key={level.id}
-              className="overflow-hidden rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.82)] shadow-[var(--kt-shadow)]"
+              className="overflow-hidden rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] shadow-[var(--kt-shadow)]"
             >
               <div className={`px-6 py-5 text-white ${accentBands[index % accentBands.length] ?? accentBands[0]}`}>
-                <div className="text-sm font-black uppercase tracking-[0.14em] text-white/72">{`${index + 1}. Kisim`}</div>
+                <div className="text-sm font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">{`${index + 1}. Kisim`}</div>
                 <h2 className="mt-2 text-3xl font-black">{level.title}</h2>
               </div>
 
               <div className="grid gap-6 px-6 py-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-center">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-[rgba(255,255,255,0.08)] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
+                    <span className="rounded-full bg-[var(--kt-surface-muted)] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
                       {isLocked ? (language === 'tr' ? 'Kilitli' : 'Locked') : `${completedCount}/${level.lessons.length}`}
                     </span>
                     <span className="text-sm font-semibold text-[var(--kt-ink-muted)]">

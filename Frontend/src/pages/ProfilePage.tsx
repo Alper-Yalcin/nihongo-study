@@ -30,7 +30,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ language }) => {
 
   return (
     <div className="space-y-8 pb-8">
-      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[rgba(8,14,22,0.88)] p-7 shadow-[var(--kt-shadow-lg)]">
+      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-7 shadow-[var(--kt-shadow-lg)]">
         <div className="flex flex-wrap items-center gap-5">
           <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--kt-brand)] text-4xl font-black text-[var(--kt-brand-on)]">
             K
@@ -39,8 +39,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ language }) => {
             <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
               {language === 'tr' ? 'Local profil' : 'Local profile'}
             </div>
-            <h1 className="mt-2 text-5xl font-black text-white">Kototsuna Learner</h1>
-            <p className="mt-3 text-base leading-8 text-white/72">
+            <h1 className="mt-2 text-5xl font-black text-[var(--kt-ink-strong)]">Kototsuna Learner</h1>
+            <p className="mt-3 text-base leading-8 text-[var(--kt-ink-muted)]">
               {language === 'tr'
                 ? 'Auth sistemi hazir degil, ama bu ekran yeni shell icindeki profil omurgasini ve tum local ilerleme ozetini veriyor.'
                 : 'Auth is not live yet, but this screen already acts as the profile backbone and surfaces your local progress.'}

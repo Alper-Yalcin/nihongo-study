@@ -124,11 +124,11 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language, activeSc
       <section className={`overflow-hidden rounded-[2rem] border border-[var(--kt-border)] p-7 text-white shadow-[var(--kt-shadow-lg)] ${unit.bannerClassName}`}>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-center">
           <div>
-            <div className="text-sm font-black uppercase tracking-[0.16em] text-white/72">
+            <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">
               {`${unit.partNumber}. Kisim, ${unit.unitNumber}. Unite`}
             </div>
             <h1 className="mt-3 text-4xl font-black leading-tight md:text-5xl">{unit.title}</h1>
-            <p className="mt-4 max-w-3xl text-base leading-8 text-white/82">{unit.summary}</p>
+            <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--kt-ink)]">{unit.summary}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button
                 as="button"
@@ -178,14 +178,14 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language, activeSc
           </div>
         </Card>
 
-        <Card padding="lg" className="bg-[rgba(8,14,22,0.88)] text-white">
-          <h2 className="text-2xl font-black text-white">{copy.dialogue}</h2>
+        <Card padding="lg" className="bg-[var(--kt-surface-raised)]">
+          <h2 className="text-2xl font-black text-[var(--kt-ink-strong)]">{copy.dialogue}</h2>
           <div className="mt-5 space-y-4">
             {unit.dialogue.map((line, index) => (
-              <div key={`${line.speaker}-${index}`} className="rounded-[1.3rem] border border-white/12 bg-[rgba(255,255,255,0.05)] px-4 py-4">
-                <div className="text-xs font-black uppercase tracking-[0.14em] text-white/54">{line.speaker}</div>
+              <div key={`${line.speaker}-${index}`} className="rounded-[1.3rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{line.speaker}</div>
                 <div className="mt-2 text-lg font-black">{line.text}</div>
-                <div className="mt-2 text-sm leading-7 text-white/72">{line.translation}</div>
+                <div className="mt-2 text-sm leading-7 text-[var(--kt-ink-muted)]">{line.translation}</div>
               </div>
             ))}
           </div>

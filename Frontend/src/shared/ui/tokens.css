@@ -64,6 +64,15 @@
   --kt-radius: 0.875rem;
   --kt-radius-md: 1.25rem;
   --kt-radius-lg: 1.75rem;
+
+  /* Navigation / shell */
+  --kt-nav-bg: #ffffff;
+  --kt-nav-item-hover: #f6f3f4;
+  --kt-nav-item-active-bg: var(--kt-accent-info-soft);
+  --kt-nav-text: #343432;
+  --kt-nav-text-muted: #8a7f85;
+  --kt-dropdown-bg: #ffffff;
+  --kt-progress-track: #ece5e7;
 }
 
 .theme-dark {
@@ -112,4 +121,13 @@
   --kt-shadow: 0 10px 24px rgba(13, 8, 14, 0.45);
   --kt-shadow-md: 0 16px 34px rgba(13, 8, 14, 0.55);
   --kt-shadow-lg: 0 28px 70px rgba(13, 8, 14, 0.6);
+
+  /* Navigation / shell */
+  --kt-nav-bg: rgba(8, 14, 22, 0.92);
+  --kt-nav-item-hover: rgba(255, 255, 255, 0.06);
+  --kt-nav-item-active-bg: var(--kt-accent-info-soft);
+  --kt-nav-text: rgba(255, 255, 255, 0.84);
+  --kt-nav-text-muted: rgba(255, 255, 255, 0.55);
+  --kt-dropdown-bg: rgba(12, 18, 26, 0.98);
+  --kt-progress-track: rgba(255, 255, 255, 0.10);
 }
