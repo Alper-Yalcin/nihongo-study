@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Volume2, X } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { CheckCircle2, ChevronLeft, ChevronRight, Heart, Volume2, X } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
 import { hiraganaSections, katakanaSections } from '../data/kana';
 import { getGoogleTranslateKanaAudioSrc } from '../data/kanaAudio';
 import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
 import { KanaScript } from '../features/kana/domain/kanaItem';
 import { Character, KanaSection } from '../types';
-import { DrawingCanvas } from '../components/DrawingCanvas';
+import { DrawingCanvas, DrawingCanvasRef } from '../components/DrawingCanvas';
+import { evaluateDrawing } from '../utils/DrawingEvaluator';
+import { isAcceptedKanaAnswer, isAcceptedRomajiAnswer } from '../utils/typing';
 
 interface LettersPageProps {
   language: AppLanguage;
@@ -251,6 +252,836 @@ const Block: React.FC<BlockProps> = ({ title, subtitle, children }) => (
   </section>
 );
 
+type LearnPhase = 'watch' | 'quiz' | 'listenWrite' | 'match' | 'matrixKana' | 'matrixRomaji' | 'summary';
+
+const shuffleArray = <T,>(items: T[]) => {
+  const cloned = [...items];
+  for (let i = cloned.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+  }
+  return cloned;
+};
+
+const lessonCopy = {
+  tr: {
+    watchTitle: 'Karakteri izle',
+    drawTitle: 'Karakteri ciz',
+    quizTitle: 'Bu karakter nasil okunur?',
+    listenWriteTitle: 'Dinledigini yaz',
+    listenWriteHint: 'Sesi dinle ve dogru cevabi yaz',
+    matchTitle: 'Eslestirme',
+    matchHint: 'Romaji ve kana kartlarini eslestir',
+    matrixKanaTitle: '5x5 yazma alistirmasi',
+    matrixKanaSubtitle: 'Romaji gorup dogru kanayi yaz',
+    matrixRomajiTitle: '5x5 okuma alistirmasi',
+    matrixRomajiSubtitle: 'Kana gorup dogru romajiyi yaz',
+    check: 'Kontrol et',
+    next: 'Devam et',
+    close: 'Kapat',
+    clear: 'Temizle',
+    answerPlaceholder: 'Cevap yaz',
+    correct: 'Dogru',
+    summaryTitle: 'Dersi bitirdin!',
+    summaryScore: 'Dogru',
+    summaryLives: 'Can',
+    summaryRestart: 'Tekrar baslat',
+    summaryDone: 'Bitir',
+    wrong: 'Tekrar dene',
+    replayAudio: 'Sesi tekrar oynat'
+  },
+  en: {
+    watchTitle: 'Watch the character',
+    drawTitle: 'Draw the character',
+    quizTitle: 'How is this character read?',
+    listenWriteTitle: 'Type what you hear',
+    listenWriteHint: 'Play the sound and type the answer',
+    matchTitle: 'Matching',
+    matchHint: 'Match romaji and kana cards',
+    matrixKanaTitle: '5x5 writing drill',
+    matrixKanaSubtitle: 'See romaji and type the correct kana',
+    matrixRomajiTitle: '5x5 reading drill',
+    matrixRomajiSubtitle: 'See kana and type the correct romaji',
+    check: 'Check',
+    next: 'Continue',
+    close: 'Close',
+    clear: 'Clear',
+    answerPlaceholder: 'Type answer',
+    correct: 'Correct',
+    summaryTitle: 'Lesson complete!',
+    summaryScore: 'Correct',
+    summaryLives: 'Lives',
+    summaryRestart: 'Restart',
+    summaryDone: 'Finish',
+    wrong: 'Try again',
+    replayAudio: 'Replay audio'
+  }
+} as const;
+
+interface LearningSessionOverlayProps {
+  language: AppLanguage;
+  script: KanaScript;
+  lessonCharacters: Character[];
+  matrixCharacters: Character[][];
+  onClose: () => void;
+}
+
+const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
+  language,
+  script,
+  lessonCharacters,
+  matrixCharacters,
+  onClose
+}) => {
+  const copy = lessonCopy[language];
+  const [sessionSeed, setSessionSeed] = useState(0);
+  const [phase, setPhase] = useState<LearnPhase>('watch');
+  const [lessonIndex, setLessonIndex] = useState(0);
+  const [lives, setLives] = useState(5);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [drawChecked, setDrawChecked] = useState(false);
+  const [drawCorrect, setDrawCorrect] = useState(false);
+  const [quizSelection, setQuizSelection] = useState<string | null>(null);
+  const [quizChecked, setQuizChecked] = useState(false);
+  const [quizCorrect, setQuizCorrect] = useState(false);
+  const [listenWriteInput, setListenWriteInput] = useState('');
+  const [listenWriteChecked, setListenWriteChecked] = useState(false);
+  const [listenWriteCorrect, setListenWriteCorrect] = useState(false);
+  const [matchRound, setMatchRound] = useState<Character[]>([]);
+  const [matchedIds, setMatchedIds] = useState<string[]>([]);
+  const [leftSelection, setLeftSelection] = useState<string | null>(null);
+  const [rightSelection, setRightSelection] = useState<string | null>(null);
+  const [kanaInputs, setKanaInputs] = useState<Record<string, string>>({});
+  const [romajiInputs, setRomajiInputs] = useState<Record<string, string>>({});
+  const [matrixChecked, setMatrixChecked] = useState(false);
+  const [matrixResults, setMatrixResults] = useState<Record<string, boolean>>({});
+  const drawCanvasRef = useRef<DrawingCanvasRef | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const sessionCharacters = useMemo(() => {
+    if (lessonCharacters.length <= 15) {
+      return lessonCharacters;
+    }
+    return shuffleArray(lessonCharacters).slice(0, 15);
+  }, [lessonCharacters, sessionSeed]);
+
+  const activeCharacter = sessionCharacters[lessonIndex] ?? sessionCharacters[0];
+  const allMatrixCharacters = matrixCharacters.flat();
+  const totalSteps = sessionCharacters.length * 4 + 2;
+  const currentStep =
+    phase === 'watch'
+      ? lessonIndex * 4 + 1
+      : phase === 'quiz'
+        ? lessonIndex * 4 + 2
+        : phase === 'listenWrite'
+          ? lessonIndex * 4 + 3
+          : phase === 'match'
+            ? lessonIndex * 4 + 4
+        : phase === 'matrixKana'
+          ? totalSteps - 1
+        : phase === 'matrixRomaji'
+            ? totalSteps
+            : totalSteps;
+  const progress = Math.max(0, Math.min(100, Math.round((currentStep / totalSteps) * 100)));
+
+  const quizOptions = useMemo(() => {
+    if (!activeCharacter) {
+      return [];
+    }
+
+    const distractors = shuffleArray(
+      [...new Set(sessionCharacters.map((item) => item.label))]
+        .filter((label) => label !== activeCharacter.label)
+    ).slice(0, 2);
+
+    return shuffleArray([activeCharacter.label, ...distractors]);
+  }, [activeCharacter, sessionCharacters, lessonIndex]);
+
+  const matchLeftItems = useMemo(
+    () => shuffleArray(matchRound.map((character) => ({ id: character.id, text: character.label }))),
+    [matchRound]
+  );
+
+  const matchRightItems = useMemo(
+    () => shuffleArray(matchRound.map((character) => ({ id: character.id, text: character.symbol }))),
+    [matchRound]
+  );
+
+  useEffect(() => {
+    setQuizSelection(null);
+    setQuizChecked(false);
+    setQuizCorrect(false);
+    setListenWriteInput('');
+    setListenWriteChecked(false);
+    setListenWriteCorrect(false);
+    setDrawChecked(false);
+    setDrawCorrect(false);
+    setLeftSelection(null);
+    setRightSelection(null);
+    setMatchedIds([]);
+    if (phase === 'watch') {
+      drawCanvasRef.current?.clear();
+    }
+  }, [lessonIndex, phase]);
+
+  useEffect(() => {
+    if (!activeCharacter) {
+      return;
+    }
+
+    if (phase !== 'watch' && phase !== 'quiz' && phase !== 'listenWrite') {
+      return;
+    }
+
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch(() => undefined);
+  }, [activeCharacter, phase]);
+
+  useEffect(() => {
+    if (!activeCharacter || phase !== 'match') {
+      return;
+    }
+
+    const distractors = shuffleArray(
+      sessionCharacters.filter((character) => character.id !== activeCharacter.id)
+    ).slice(0, 3);
+
+    setMatchRound([activeCharacter, ...distractors]);
+    setLeftSelection(null);
+    setRightSelection(null);
+    setMatchedIds([]);
+  }, [activeCharacter, phase, sessionCharacters]);
+
+  useEffect(() => {
+    if (!leftSelection || !rightSelection || phase !== 'match') {
+      return;
+    }
+
+    if (leftSelection === rightSelection) {
+      setMatchedIds((prev) => [...prev, leftSelection]);
+      setLeftSelection(null);
+      setRightSelection(null);
+      return;
+    }
+
+    loseLife();
+    setLeftSelection(null);
+    setRightSelection(null);
+  }, [leftSelection, rightSelection, phase]);
+
+  const loseLife = () => {
+    setLives((prev) => Math.max(0, prev - 1));
+  };
+
+  const moveToNextCharacter = () => {
+    if (lessonIndex < sessionCharacters.length - 1) {
+      setLessonIndex((prev) => prev + 1);
+      setPhase('watch');
+      return;
+    }
+
+    setPhase('matrixKana');
+    setMatrixChecked(false);
+    setMatrixResults({});
+  };
+
+  const checkQuiz = () => {
+    if (!activeCharacter || !quizSelection) {
+      return;
+    }
+
+    const correct = quizSelection === activeCharacter.label;
+    setQuizChecked(true);
+    setQuizCorrect(correct);
+    if (correct) {
+      setCorrectCount((prev) => prev + 1);
+      return;
+    }
+    loseLife();
+  };
+
+  const checkDraw = () => {
+    if (!activeCharacter) {
+      return;
+    }
+
+    const strokes = drawCanvasRef.current?.getStrokes() ?? [];
+    const guideImageLayout = drawCanvasRef.current?.getGuideImageLayout() ?? undefined;
+    const correct = evaluateDrawing(strokes, activeCharacter, {
+      tolerance: 'practice',
+      guideImageLayout
+    });
+    setDrawChecked(true);
+    setDrawCorrect(correct);
+    if (correct) {
+      setCorrectCount((prev) => prev + 1);
+      return;
+    }
+    loseLife();
+  };
+
+  const checkListenWrite = () => {
+    if (!activeCharacter) {
+      return;
+    }
+
+    const answer = listenWriteInput.trim();
+    const correct =
+      isAcceptedRomajiAnswer(answer, activeCharacter.label) ||
+      isAcceptedKanaAnswer(answer, activeCharacter.symbol);
+    setListenWriteChecked(true);
+    setListenWriteCorrect(correct);
+    if (correct) {
+      setCorrectCount((prev) => prev + 1);
+      return;
+    }
+    loseLife();
+  };
+
+  const checkMatrixKana = () => {
+    const results: Record<string, boolean> = {};
+    allMatrixCharacters.forEach((item) => {
+      const answer = kanaInputs[item.id] ?? '';
+      results[item.id] = isAcceptedKanaAnswer(answer, item.symbol);
+    });
+    setMatrixResults(results);
+    setMatrixChecked(true);
+
+    const wrongCount = Object.values(results).filter((isCorrect) => !isCorrect).length;
+    if (wrongCount === 0) {
+      setCorrectCount((prev) => prev + allMatrixCharacters.length);
+    } else {
+      loseLife();
+    }
+  };
+
+  const checkMatrixRomaji = () => {
+    const results: Record<string, boolean> = {};
+    allMatrixCharacters.forEach((item) => {
+      const answer = romajiInputs[item.id] ?? '';
+      results[item.id] = isAcceptedRomajiAnswer(answer, item.label);
+    });
+    setMatrixResults(results);
+    setMatrixChecked(true);
+
+    const wrongCount = Object.values(results).filter((isCorrect) => !isCorrect).length;
+    if (wrongCount === 0) {
+      setCorrectCount((prev) => prev + allMatrixCharacters.length);
+    } else {
+      loseLife();
+    }
+  };
+
+  const resetSession = () => {
+    setPhase('watch');
+    setLessonIndex(0);
+    setLives(5);
+    setCorrectCount(0);
+    setDrawChecked(false);
+    setDrawCorrect(false);
+    setQuizSelection(null);
+    setQuizChecked(false);
+    setQuizCorrect(false);
+    setListenWriteInput('');
+    setListenWriteChecked(false);
+    setListenWriteCorrect(false);
+    setMatchRound([]);
+    setMatchedIds([]);
+    setLeftSelection(null);
+    setRightSelection(null);
+    setKanaInputs({});
+    setRomajiInputs({});
+    setMatrixChecked(false);
+    setMatrixResults({});
+    setSessionSeed((prev) => prev + 1);
+  };
+
+  const renderWatchPhase = () => {
+    if (!activeCharacter) {
+      return null;
+    }
+    const audioSrc = getGoogleTranslateKanaAudioSrc(activeCharacter.id) ?? `/audio/${script}/${activeCharacter.id}.mp3`;
+    const imageSrc = getNhkKanaGuideImageSrc(activeCharacter.id);
+
+    return (
+      <div className="mx-auto w-full max-w-3xl">
+        <h2 className="text-4xl font-black text-white">{copy.drawTitle}</h2>
+        <div className="mt-6 flex items-center gap-4">
+          <audio ref={audioRef} src={audioSrc} preload="auto" />
+          <button
+            type="button"
+            onClick={() => {
+              const audio = audioRef.current;
+              if (!audio) return;
+              audio.currentTime = 0;
+              audio.play().catch(() => undefined);
+            }}
+            className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500 text-slate-900 transition hover:brightness-110"
+            aria-label={copy.replayAudio}
+          >
+            <Volume2 size={24} />
+          </button>
+          <div>
+            <div className="text-sm font-black uppercase tracking-[0.08em] text-slate-400">{copy.watchTitle}</div>
+            <div className="font-jp text-4xl font-bold text-white">{activeCharacter.symbol}</div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid place-items-center rounded-3xl border border-slate-700/80 bg-[#071926] p-5">
+          <DrawingCanvas
+            ref={drawCanvasRef}
+            guideSymbol={activeCharacter.symbol}
+            guideImageSrc={imageSrc}
+            drawingData={activeCharacter.drawingData}
+            showTemplate={true}
+            showStrokeOrder={false}
+            showDirectionArrows={false}
+            width={320}
+            height={320}
+            disabled={drawChecked}
+          />
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <span className={`text-sm font-black ${drawChecked && !drawCorrect ? 'text-rose-300' : 'text-transparent'}`}>
+            {copy.wrong}
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                drawCanvasRef.current?.clear();
+                setDrawChecked(false);
+                setDrawCorrect(false);
+              }}
+              className="rounded-2xl border border-slate-600 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-slate-200 transition hover:bg-slate-700/30"
+            >
+              {copy.clear}
+            </button>
+            {!drawChecked ? (
+              <button
+                type="button"
+                onClick={checkDraw}
+                className="rounded-2xl bg-sky-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#062032] transition hover:brightness-110"
+              >
+                {copy.check}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPhase('quiz')}
+                className="rounded-2xl bg-lime-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+              >
+                {copy.next}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderQuizPhase = () => {
+    if (!activeCharacter) {
+      return null;
+    }
+    const audioSrc = getGoogleTranslateKanaAudioSrc(activeCharacter.id) ?? `/audio/${script}/${activeCharacter.id}.mp3`;
+
+    return (
+      <div className="mx-auto w-full max-w-3xl">
+        <h2 className="text-4xl font-black text-white">{copy.quizTitle}</h2>
+        <div className="mt-8 grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
+          <div className="rounded-3xl border border-slate-700/80 bg-[#071926] p-5 text-center">
+            <audio ref={audioRef} src={audioSrc} preload="auto" />
+            <button
+              type="button"
+              onClick={() => {
+                const audio = audioRef.current;
+                if (!audio) return;
+                audio.currentTime = 0;
+                audio.play().catch(() => undefined);
+              }}
+              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-slate-900"
+              aria-label={copy.replayAudio}
+            >
+              <Volume2 size={18} />
+            </button>
+            <div className="mt-8 font-jp text-7xl font-bold text-white">{activeCharacter.symbol}</div>
+          </div>
+
+          <div className="space-y-3">
+            {quizOptions.map((option, index) => {
+              const isPicked = quizSelection === option;
+              const isCorrect = quizChecked && option === activeCharacter.label;
+              const isWrong = quizChecked && isPicked && option !== activeCharacter.label;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  disabled={quizChecked}
+                  onClick={() => setQuizSelection(option)}
+                  className={`flex w-full items-center gap-4 rounded-2xl border px-4 py-4 text-left transition ${
+                    isCorrect
+                      ? 'border-lime-400 bg-lime-500/15 text-lime-300'
+                      : isWrong
+                        ? 'border-rose-400 bg-rose-500/15 text-rose-300'
+                        : isPicked
+                          ? 'border-sky-400 bg-sky-500/15 text-sky-300'
+                          : 'border-slate-700 bg-[#071926] text-white hover:border-slate-500'
+                  }`}
+                >
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-current text-xs font-black">
+                    {index + 1}
+                  </span>
+                  <span className="text-2xl font-black">{option}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <span className={`text-sm font-black ${quizChecked && !quizCorrect ? 'text-rose-300' : 'text-transparent'}`}>
+            {copy.wrong}
+          </span>
+          {!quizChecked ? (
+            <button
+              type="button"
+              onClick={checkQuiz}
+              disabled={!quizSelection}
+              className="rounded-2xl bg-sky-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#062032] transition enabled:hover:brightness-110 disabled:opacity-40"
+            >
+              {copy.check}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPhase('listenWrite')}
+              className="rounded-2xl bg-lime-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+            >
+              {copy.next}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderListenWritePhase = () => {
+    if (!activeCharacter) {
+      return null;
+    }
+    const audioSrc = getGoogleTranslateKanaAudioSrc(activeCharacter.id) ?? `/audio/${script}/${activeCharacter.id}.mp3`;
+
+    return (
+      <div className="mx-auto w-full max-w-3xl">
+        <h2 className="text-4xl font-black text-white">{copy.listenWriteTitle}</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-300">{copy.listenWriteHint}</p>
+
+        <div className="mt-8 rounded-3xl border border-slate-700/80 bg-[#071926] p-6">
+          <audio ref={audioRef} src={audioSrc} preload="auto" />
+          <div className="flex flex-col items-center gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                const audio = audioRef.current;
+                if (!audio) return;
+                audio.currentTime = 0;
+                audio.play().catch(() => undefined);
+              }}
+              className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-500 text-slate-900 transition hover:brightness-110"
+              aria-label={copy.replayAudio}
+            >
+              <Volume2 size={28} />
+            </button>
+            <input
+              value={listenWriteInput}
+              onChange={(event) => setListenWriteInput(event.target.value)}
+              placeholder={copy.answerPlaceholder}
+              className="w-full max-w-sm rounded-xl border border-slate-700 bg-[#0b2436] px-4 py-3 text-center text-lg font-bold text-white outline-none focus:border-sky-400"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <span className={`text-sm font-black ${listenWriteChecked && !listenWriteCorrect ? 'text-rose-300' : 'text-transparent'}`}>
+            {copy.wrong}
+          </span>
+          {!listenWriteChecked ? (
+            <button
+              type="button"
+              onClick={checkListenWrite}
+              disabled={!listenWriteInput.trim()}
+              className="rounded-2xl bg-sky-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#062032] transition enabled:hover:brightness-110 disabled:opacity-40"
+            >
+              {copy.check}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPhase('match')}
+              className="rounded-2xl bg-lime-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+            >
+              {copy.next}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMatchPhase = () => {
+    const matchDone = matchRound.length > 0 && matchedIds.length === matchRound.length;
+
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        <h2 className="text-4xl font-black text-white">{copy.matchTitle}</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-300">{copy.matchHint}</p>
+
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          <div className="space-y-3">
+            {matchLeftItems.map((item) => {
+              const selected = leftSelection === item.id;
+              const done = matchedIds.includes(item.id);
+              return (
+                <button
+                  key={`left-${item.id}`}
+                  type="button"
+                  onClick={() => {
+                    if (done) return;
+                    setLeftSelection(item.id);
+                  }}
+                  className={`w-full rounded-2xl border px-4 py-3 text-left text-lg font-black transition ${
+                    done
+                      ? 'border-lime-400 bg-lime-500/15 text-lime-300'
+                      : selected
+                        ? 'border-sky-400 bg-sky-500/15 text-sky-300'
+                        : 'border-slate-700 bg-[#071926] text-white hover:border-slate-500'
+                  }`}
+                >
+                  {item.text}
+                </button>
+              );
+            })}
+          </div>
+          <div className="space-y-3">
+            {matchRightItems.map((item) => {
+              const selected = rightSelection === item.id;
+              const done = matchedIds.includes(item.id);
+              return (
+                <button
+                  key={`right-${item.id}`}
+                  type="button"
+                  onClick={() => {
+                    if (done) return;
+                    setRightSelection(item.id);
+                  }}
+                  className={`w-full rounded-2xl border px-4 py-2 text-center transition ${
+                    done
+                      ? 'border-lime-400 bg-lime-500/15 text-lime-300'
+                      : selected
+                        ? 'border-sky-400 bg-sky-500/15 text-sky-300'
+                        : 'border-slate-700 bg-[#071926] text-white hover:border-slate-500'
+                  }`}
+                >
+                  <span className="font-jp text-4xl font-bold">{item.text}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <span className={`text-sm font-black ${matchDone ? 'text-lime-300' : 'text-slate-400'}`}>
+            {matchDone ? copy.correct : `${matchedIds.length}/${matchRound.length}`}
+          </span>
+          {matchDone ? (
+            <button
+              type="button"
+              onClick={() => {
+                setCorrectCount((prev) => prev + 1);
+                moveToNextCharacter();
+              }}
+              className="rounded-2xl bg-lime-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+            >
+              {copy.next}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setMatchRound(shuffleArray(matchRound));
+                setLeftSelection(null);
+                setRightSelection(null);
+                setMatchedIds([]);
+              }}
+              className="rounded-2xl border border-slate-600 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-slate-200 transition hover:bg-slate-700/30"
+            >
+              {copy.clear}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMatrix = (mode: 'kana' | 'romaji') => {
+    const isKana = mode === 'kana';
+    const title = isKana ? copy.matrixKanaTitle : copy.matrixRomajiTitle;
+    const subtitle = isKana ? copy.matrixKanaSubtitle : copy.matrixRomajiSubtitle;
+
+    const onCheck = () => {
+      if (isKana) {
+        checkMatrixKana();
+        return;
+      }
+      checkMatrixRomaji();
+    };
+
+    const onContinue = () => {
+      if (isKana) {
+        setMatrixChecked(false);
+        setMatrixResults({});
+        setPhase('matrixRomaji');
+        return;
+      }
+      setPhase('summary');
+    };
+
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        <h2 className="text-4xl font-black text-white">{title}</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-300">{subtitle}</p>
+
+        <div className="mt-6 rounded-3xl border border-slate-700/80 bg-[#071926] p-5">
+          <div className="grid grid-cols-5 gap-3">
+            {allMatrixCharacters.map((character) => {
+              const prompt = isKana ? character.label : character.symbol;
+              const inputValue = isKana ? kanaInputs[character.id] ?? '' : romajiInputs[character.id] ?? '';
+              const isCorrect = matrixResults[character.id];
+              const isWrong = matrixChecked && isCorrect === false;
+              return (
+                <label
+                  key={`${mode}-${character.id}`}
+                  className={`rounded-xl border p-3 text-center ${isWrong ? 'border-rose-400' : 'border-slate-700'}`}
+                >
+                  <div className={`mb-2 ${isKana ? 'text-sm font-black text-sky-300' : 'font-jp text-2xl font-bold text-white'}`}>
+                    {prompt}
+                  </div>
+                  <input
+                    value={inputValue}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (isKana) {
+                        setKanaInputs((prev) => ({ ...prev, [character.id]: value }));
+                        return;
+                      }
+                      setRomajiInputs((prev) => ({ ...prev, [character.id]: value }));
+                    }}
+                    className="w-full rounded-lg border border-slate-700 bg-[#0b2436] px-2 py-1 text-center text-sm font-bold text-white outline-none focus:border-sky-400"
+                  />
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          {!matrixChecked ? (
+            <button
+              type="button"
+              onClick={onCheck}
+              className="rounded-2xl bg-sky-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#062032] transition hover:brightness-110"
+            >
+              {copy.check}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onContinue}
+              className="rounded-2xl bg-lime-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+            >
+              {copy.next}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderSummary = () => (
+    <div className="mx-auto w-full max-w-2xl text-center">
+      <CheckCircle2 className="mx-auto text-lime-400" size={56} />
+      <h2 className="mt-5 text-5xl font-black text-white">{copy.summaryTitle}</h2>
+      <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="rounded-2xl border border-slate-700 bg-[#071926] p-4 text-left">
+          <p className="text-xs font-black uppercase tracking-[0.08em] text-slate-400">{copy.summaryScore}</p>
+          <p className="mt-1 text-3xl font-black text-lime-300">{correctCount}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-700 bg-[#071926] p-4 text-left">
+          <p className="text-xs font-black uppercase tracking-[0.08em] text-slate-400">{copy.summaryLives}</p>
+          <p className="mt-1 text-3xl font-black text-rose-300">{lives}</p>
+        </div>
+      </div>
+      <div className="mt-8 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={resetSession}
+          className="rounded-2xl border border-slate-600 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-slate-200 transition hover:bg-slate-700/30"
+        >
+          {copy.summaryRestart}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-2xl bg-lime-500 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+        >
+          {copy.summaryDone}
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[70] bg-[#051722] text-white">
+      <div className="mx-auto flex h-full max-w-[1200px] flex-col px-6 py-6">
+        <header className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-slate-300 transition hover:bg-slate-800/60"
+            aria-label={copy.close}
+          >
+            <X size={20} />
+          </button>
+          <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-700">
+            <div className="h-full rounded-full bg-lime-400 transition-[width]" style={{ width: `${progress}%` }} />
+          </div>
+          <div className="inline-flex items-center gap-1 text-rose-400">
+            <Heart size={16} fill="currentColor" />
+            <span className="text-sm font-black">{lives}</span>
+          </div>
+        </header>
+
+        <main className="flex flex-1 items-center py-6">
+          {phase === 'watch' && renderWatchPhase()}
+          {phase === 'quiz' && renderQuizPhase()}
+          {phase === 'listenWrite' && renderListenWritePhase()}
+          {phase === 'match' && renderMatchPhase()}
+          {phase === 'matrixKana' && renderMatrix('kana')}
+          {phase === 'matrixRomaji' && renderMatrix('romaji')}
+          {phase === 'summary' && renderSummary()}
+        </main>
+      </div>
+    </div>
+  );
+};
+
 interface KanaDetailModalProps {
   language: AppLanguage;
   script: KanaScript;
@@ -401,6 +1232,7 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
   const copy = pageCopy[language];
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+  const [learningOpen, setLearningOpen] = useState(false);
   const script: KanaScript = searchParams.get('script') === 'katakana' ? 'katakana' : 'hiragana';
   const { getProgress } = useKanaProgressStore();
 
@@ -431,6 +1263,28 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
     const ids = (doubleSection.columnGroupIds ?? []).filter((id): id is string => Boolean(id));
     return toTileMetaRows(ids.map((id) => getColumnCells(doubleSection, id)));
   }, [doubleSection]);
+
+  const matrixCharacters = useMemo<Character[][]>(() => {
+    if (!singleSection) {
+      return [];
+    }
+
+    const colIndices = baseColumnIds
+      .slice(0, 5)
+      .map((columnId) => getColumnIndex(singleSection, columnId))
+      .filter((index) => index >= 0);
+
+    return singleSection.matrix
+      .slice(0, 5)
+      .map((row) =>
+        colIndices
+          .map((index) => row[index] ?? null)
+          .filter((item): item is Character => item !== null)
+      )
+      .filter((row) => row.length > 0);
+  }, [singleSection]);
+
+  const lessonCharacters = useMemo(() => matrixCharacters.flat(), [matrixCharacters]);
 
   const characterById = useMemo(
     () =>
@@ -500,6 +1354,14 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
     }
   }, [browseableCharacters, selectedCharacterId]);
 
+  useEffect(() => {
+    if (!learningOpen) {
+      return;
+    }
+
+    setSelectedCharacterId(null);
+  }, [learningOpen]);
+
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-10">
       <div className="flex items-center justify-center gap-2 border-b border-[var(--kt-border-subtle)] pb-4">
@@ -525,12 +1387,13 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
             <h1 className="text-xl font-black text-[var(--kt-ink-strong)]">{copy.title[script]}</h1>
             <p className="mt-1 text-sm font-semibold text-[var(--kt-ink-subtle)]">{copy.subtitle[script]}</p>
           </div>
-          <Link
-            to={`${appShellRoutes.letters}?script=${script}`}
+          <button
+            type="button"
+            onClick={() => setLearningOpen(true)}
             className="inline-flex shrink-0 items-center rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink)] transition hover:-translate-y-0.5 hover:shadow-[var(--kt-shadow-sm)]"
           >
             {copy.cta}
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -592,6 +1455,16 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
           onPrev={selectPrevCharacter}
           onNext={selectNextCharacter}
           onClose={() => setSelectedCharacterId(null)}
+        />
+      ) : null}
+
+      {learningOpen && lessonCharacters.length > 0 ? (
+        <LearningSessionOverlay
+          language={language}
+          script={script}
+          lessonCharacters={lessonCharacters}
+          matrixCharacters={matrixCharacters}
+          onClose={() => setLearningOpen(false)}
         />
       ) : null}
     </div>
