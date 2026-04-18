@@ -7,13 +7,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { appShellRoutes, getKanaEntryRoute } from '../../data/appShellContent';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
-import { ScriptSwitcher } from './ScriptSwitcher';
 
 interface LeftNavProps {
   language: AppLanguage;
   themeMode: ThemeMode;
   activeScript: KanaScript;
-  onActiveScriptChange: (script: KanaScript) => void;
   onLanguageChange: (language: AppLanguage) => void;
   onThemeModeChange: (theme: ThemeMode) => void;
 }
@@ -33,7 +31,7 @@ const labels = {
 
 export const LeftNav: React.FC<LeftNavProps> = ({
   language, themeMode, activeScript,
-  onActiveScriptChange, onLanguageChange, onThemeModeChange
+  onLanguageChange, onThemeModeChange
 }) => {
   const location = useLocation();
   const copy = labels[language];
@@ -50,7 +48,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({
   ], [activeScript, copy]);
 
   return (
-    <aside className="hidden xl:flex xl:min-h-screen xl:flex-col xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[var(--kt-nav-bg)] xl:px-5 xl:py-6">
+    <aside className="hidden xl:sticky xl:top-0 xl:flex xl:h-screen xl:flex-col xl:overflow-y-auto xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[var(--kt-nav-bg)] xl:px-5 xl:py-6">
       <Link to={appShellRoutes.home} className="px-3 pb-6 pt-2">
         <img src="/logo/kototsuna-logo-light.png" alt="Kototsuna" className="h-10 w-auto" />
       </Link>
@@ -122,7 +120,6 @@ export const LeftNav: React.FC<LeftNavProps> = ({
       </nav>
 
       <div className="mt-6 space-y-4">
-        <ScriptSwitcher activeScript={activeScript} onChange={onActiveScriptChange} />
         <div className="grid grid-cols-3 gap-2 px-3 text-[11px] font-black uppercase tracking-[0.14em] text-[var(--kt-nav-text-muted)]">
           <a href="#" className="hover:text-[var(--kt-nav-text)]">Hakkinda</a>
           <a href="#" className="hover:text-[var(--kt-nav-text)]">Sartlar</a>

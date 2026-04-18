@@ -44,7 +44,6 @@ export const AppShell: React.FC<AppShellProps> = ({
         language={language}
         themeMode={themeMode}
         activeScript={activeScript}
-        onActiveScriptChange={onActiveScriptChange}
         onLanguageChange={onLanguageChange}
         onThemeModeChange={onThemeModeChange}
       />
