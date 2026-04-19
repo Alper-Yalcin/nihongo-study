@@ -289,7 +289,7 @@ export const jlearnLevel1: JLearnLevel = {
               id: 'q-L1-U1-M1-1',
               type: 'sentence-build',
               prompt: 'Build the phrase you say when entering a Japanese home.',
-              correctAnswer: 'おじゃまします',
+              correctAnswer: 'おじゃま します',
               targetVocabId: v.ojamaShimasu.id
             },
             {
@@ -377,8 +377,8 @@ export const jlearnLevel1: JLearnLevel = {
             }
           ],
           questions: [
-            { id: 'q-L1-U1-M2-1', type: 'sentence-build', prompt: 'Build the phrase said before eating.', correctAnswer: 'いただきます' },
-            { id: 'q-L1-U1-M2-2', type: 'sentence-build', prompt: 'Build the phrase said after a meal.', correctAnswer: 'ごちそうさまでした' },
+            { id: 'q-L1-U1-M2-1', type: 'sentence-build', prompt: 'Build the phrase said before eating.', correctAnswer: 'いただき ます' },
+            { id: 'q-L1-U1-M2-2', type: 'sentence-build', prompt: 'Build the phrase said after a meal.', correctAnswer: 'ごちそうさま でした' },
             { id: 'q-L1-U1-M2-3', type: 'translation-jp-en', prompt: 'What does いただきます mean?', options: ['Good evening', 'Thank you for the meal', 'Ritual phrase said before eating', 'Excuse my intrusion'], correctAnswer: 'Ritual phrase said before eating' },
             { id: 'q-L1-U1-M2-4', type: 'context-select', prompt: 'You just finished dinner. What do you say?', options: ['いただきます', 'ごちそうさまでした', 'おじゃまします'], correctAnswer: 'ごちそうさまでした' },
             { id: 'q-L1-U1-M2-5', type: 'dialogue-complete', prompt: 'Mr. Tanaka: いただきます！ → You: ___', correctAnswer: 'いただきます' }
@@ -479,7 +479,7 @@ export const jlearnLevel1: JLearnLevel = {
             }
           ],
           questions: [
-            { id: 'q-L1-U2-M4-1', type: 'sentence-build', prompt: 'Build the formal morning greeting.', correctAnswer: 'おはようございます' },
+            { id: 'q-L1-U2-M4-1', type: 'sentence-build', prompt: 'Build the formal morning greeting.', correctAnswer: 'おはよう ございます' },
             { id: 'q-L1-U2-M4-2', type: 'context-select', prompt: 'You greet your teacher at 8 AM.', options: ['おはよう', 'おはようございます', 'こんにちは'], correctAnswer: 'おはようございます' },
             { id: 'q-L1-U2-M4-3', type: 'context-select', prompt: 'You greet a close friend at 8 AM.', options: ['おはよう', 'おはようございます', 'さようなら'], correctAnswer: 'おはよう' },
             { id: 'q-L1-U2-M4-4', type: 'translation-en-jp', prompt: 'Translate: "Good morning (formal)."', correctAnswer: 'おはようございます' },
@@ -528,7 +528,7 @@ export const jlearnLevel1: JLearnLevel = {
             }
           ],
           questions: [
-            { id: 'q-L1-U2-M5-1', type: 'sentence-build', prompt: 'Build the polite "nice to meet you" phrase.', correctAnswer: 'よろしくおねがいします' },
+            { id: 'q-L1-U2-M5-1', type: 'sentence-build', prompt: 'Build the polite "nice to meet you" phrase.', correctAnswer: 'よろしく おねがいします' },
             { id: 'q-L1-U2-M5-2', type: 'context-select', prompt: 'Yuki, your new friend, says おはよう！ Your best reply:', options: ['おはようございます', 'おはよう', 'さようなら'], correctAnswer: 'おはよう' },
             { id: 'q-L1-U2-M5-3', type: 'translation-jp-en', prompt: 'What does こんにちは mean?', options: ['Good morning', 'Hello / Good afternoon', 'Good night'], correctAnswer: 'Hello / Good afternoon' },
             { id: 'q-L1-U2-M5-4', type: 'translation-en-jp', prompt: 'Translate: "Goodbye (formal)."', correctAnswer: 'さようなら' },
@@ -651,7 +651,7 @@ export const jlearnLevel1: JLearnLevel = {
             { id: 'q-L1-U3-M7-2', type: 'context-select', prompt: 'A friend hands you an eraser. Casual thanks:', options: ['ありがとうございます', 'ありがとう', 'ごめんなさい'], correctAnswer: 'ありがとう' },
             { id: 'q-L1-U3-M7-3', type: 'translation-jp-en', prompt: 'What does ごめんなさい mean?', options: ['Thank you', "I'm sorry (sincere)", "You're welcome"], correctAnswer: "I'm sorry (sincere)" },
             { id: 'q-L1-U3-M7-4', type: 'translation-en-jp', prompt: 'Translate: "You\'re welcome."', correctAnswer: 'どういたしまして' },
-            { id: 'q-L1-U3-M7-5', type: 'sentence-build', prompt: 'Build: "Excuse me / Sorry (mild)."', correctAnswer: 'すみません' },
+            { id: 'q-L1-U3-M7-5', type: 'fill-in-blank', prompt: 'Complete: "___ ！" (Excuse me / Sorry — mild)', correctAnswer: 'すみません' },
             { id: 'q-L1-U3-M7-6', type: 'dialogue-complete', prompt: 'Stranger: だいじょうぶですよ。→ You: ___', correctAnswer: 'ありがとうございます', acceptedAnswers: ['ありがとう', 'ありがとうございます。'] }
           ],
           successMessage: 'You can handle real social situations — apologies and thanks — in Japanese.',
@@ -683,8 +683,8 @@ export const jlearnLevel1: JLearnLevel = {
             { id: 'q-L1-U3-M8-6', type: 'context-select', prompt: 'Winding down for bed, formal.', options: ['おやすみ', 'おやすみなさい', 'さようなら'], correctAnswer: 'おやすみなさい' },
             { id: 'q-L1-U3-M8-7', type: 'dialogue-complete', prompt: 'Tanaka-sensei: きょうもがんばりましょう。→ You: ___', correctAnswer: 'はい！よろしくおねがいします', acceptedAnswers: ['よろしくおねがいします', 'はい、よろしくおねがいします'] },
             { id: 'q-L1-U3-M8-8', type: 'dialogue-complete', prompt: 'Yuki: よろしくね！→ You: ___', correctAnswer: 'よろしくおねがいします', acceptedAnswers: ['よろしく', 'よろしく！'] },
-            { id: 'q-L1-U3-M8-9', type: 'sentence-build', prompt: 'Build: "Thank you for the meal."', correctAnswer: 'ごちそうさまでした' },
-            { id: 'q-L1-U3-M8-10', type: 'sentence-build', prompt: 'Build: "Excuse my intrusion."', correctAnswer: 'おじゃまします' },
+            { id: 'q-L1-U3-M8-9', type: 'sentence-build', prompt: 'Build: "Thank you for the meal."', correctAnswer: 'ごちそうさま でした' },
+            { id: 'q-L1-U3-M8-10', type: 'sentence-build', prompt: 'Build: "Excuse my intrusion."', correctAnswer: 'おじゃま します' },
             { id: 'q-L1-U3-M8-11', type: 'translation-en-jp', prompt: 'Translate: "Thank you (formal)."', correctAnswer: 'ありがとうございます' },
             { id: 'q-L1-U3-M8-12', type: 'translation-jp-en', prompt: 'What does いただきます mean?', options: ['Thank you for the meal', 'Ritual phrase said before eating', 'Goodnight'], correctAnswer: 'Ritual phrase said before eating' }
           ],

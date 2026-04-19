@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { jlearnTrack, getAllJLearnSteps } from '../../../data/jlearn/jlearnContent';
+import { readProgress, writeProgress, readVocab, writeVocab } from '../../../data/jlearn/jlearnStorage';
 import {
   getJLearnUserState,
   setJLearnUserState,
@@ -203,6 +204,37 @@ export const DebugPanel: React.FC = () => {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="mb-3">
+        <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Storage</div>
+        <button
+          type="button"
+          onClick={() => {
+            const fixture = readProgress();
+            writeProgress(fixture);
+            const roundTrip = readProgress();
+            const ok = JSON.stringify(fixture) === JSON.stringify(roundTrip);
+            console.log('[jlearnStorage] progress round-trip:', ok ? 'PASS' : 'FAIL', roundTrip);
+            refresh();
+          }}
+          className="mb-1 w-full rounded-md border border-[var(--kt-border)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]"
+        >
+          Test progress round-trip (console)
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const fixture = readVocab();
+            writeVocab(fixture);
+            const roundTrip = readVocab();
+            const ok = JSON.stringify(fixture) === JSON.stringify(roundTrip);
+            console.log('[jlearnStorage] vocab round-trip:', ok ? 'PASS' : 'FAIL', roundTrip);
+          }}
+          className="w-full rounded-md border border-[var(--kt-border)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]"
+        >
+          Test vocab round-trip (console)
+        </button>
       </section>
 
       <section className="text-[10px] text-[var(--kt-ink-muted)]">

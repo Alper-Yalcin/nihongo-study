@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLanguage } from '../data/appPreferences';
 import { jlearnTrack } from '../data/jlearn/jlearnContent';
+import { appShellRoutes } from '../data/appShellContent';
+import { readProgress } from '../data/jlearn/jlearnStorage';
+import { isStepUnlocked } from '../data/jlearn/jlearnGating';
 import { DebugPanel } from '../features/jlearn/debug/DebugPanel';
 
 interface LearnJapanesePageProps {
@@ -33,6 +36,8 @@ const copy = {
 
 export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }) => {
   const t = copy[language];
+  const [progress, setProgress] = useState(() => readProgress());
+  const refreshProgress = useCallback(() => setProgress(readProgress()), []);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-10">
@@ -73,26 +78,49 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }
                     <p className="mt-1 text-sm text-[var(--kt-ink-muted)]">{unit.summary}</p>
                   </div>
                   <ul className="grid gap-2 sm:grid-cols-2">
-                    {unit.steps.map((step) => (
-                      <li
-                        key={step.id}
-                        className="rounded-[1rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-raised)] p-3 text-sm"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-black text-[var(--kt-ink-strong)]">{step.title}</span>
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">
-                            {step.estimatedMinutes} {t.minutes}
-                          </span>
-                        </div>
-                        <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--kt-accent-info)]">
-                          {step.isCheckpoint ? t.checkpoint : (step.kind ?? t.missionHeader)}
-                        </div>
-                        {step.goal && (
-                          <p className="mt-2 text-xs leading-5 text-[var(--kt-ink-muted)]">{step.goal}</p>
-                        )}
-                        <div className="mt-2 text-[10px] font-mono text-[var(--kt-ink-muted)]">{step.id}</div>
-                      </li>
-                    ))}
+                    {unit.steps.map((step) => {
+                      const unlocked = isStepUnlocked(step.id, progress, jlearnTrack);
+                      const done = progress.completedStepIds.includes(step.id);
+                      return (
+                        <li key={step.id}>
+                          {unlocked ? (
+                            <Link
+                              to={`${appShellRoutes.learnJapaneseMissionBase}/${step.id}`}
+                              onClick={refreshProgress}
+                              className={`block rounded-[1rem] border p-3 text-sm transition hover:border-[var(--kt-accent-info)] hover:bg-[var(--kt-nav-item-hover)] ${
+                                done
+                                  ? 'border-[var(--kt-accent-info)] bg-[var(--kt-accent-info)] bg-opacity-5'
+                                  : 'border-[var(--kt-border-subtle)] bg-[var(--kt-surface-raised)]'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-black text-[var(--kt-ink-strong)]">{step.title}</span>
+                                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">
+                                  {done ? '✓' : `${step.estimatedMinutes} ${t.minutes}`}
+                                </span>
+                              </div>
+                              <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--kt-accent-info)]">
+                                {step.isCheckpoint ? t.checkpoint : (step.kind ?? t.missionHeader)}
+                              </div>
+                              {step.goal && (
+                                <p className="mt-2 text-xs leading-5 text-[var(--kt-ink-muted)]">{step.goal}</p>
+                              )}
+                              <div className="mt-2 text-[10px] font-mono text-[var(--kt-ink-muted)]">{step.id}</div>
+                            </Link>
+                          ) : (
+                            <div className="block rounded-[1rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-raised)] p-3 text-sm opacity-40">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-black text-[var(--kt-ink-muted)]">{step.title}</span>
+                                <span className="text-[10px]">🔒</span>
+                              </div>
+                              <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">
+                                {step.isCheckpoint ? t.checkpoint : (step.kind ?? t.missionHeader)}
+                              </div>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}

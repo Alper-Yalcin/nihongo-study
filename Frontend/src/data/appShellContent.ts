@@ -13,6 +13,7 @@ export const appShellRoutes = {
   home: '/',
   learn: '/learn',
   learnJapanese: '/learn/japanese',
+  learnJapaneseMissionBase: '/learn/japanese/mission',
   learnUnitBase: '/learn/unit',
   letters: '/letters',
   practice: '/practice',

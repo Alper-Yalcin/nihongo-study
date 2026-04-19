@@ -16,6 +16,7 @@ import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LettersPage } from './pages/LettersPage';
 import { PracticePage } from './pages/PracticePage';
 import { PracticeRunPage } from './pages/PracticeRunPage';
+import { MissionPage } from './pages/MissionPage';
 import { QuestsPage } from './pages/QuestsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LearnUnitPage } from './pages/LearnUnitPage';
@@ -125,6 +126,7 @@ export default function App() {
       />
       <Route path={appShellRoutes.learn} element={<Home language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.learnJapanese} element={<LearnJapanesePage language={language} />} />
+      <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
       <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
       <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />
