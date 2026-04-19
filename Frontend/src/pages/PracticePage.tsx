@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart3, BookMarked, Brain, Headphones, PenTool, RefreshCcw, ShieldAlert, Shuffle, Sparkles, Type } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Card, StatCard } from '../shared/ui';
 import { AppLanguage } from '../data/appPreferences';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
-import { useDictionaryWordSearch } from '../data/words';
+import { appShellRoutes } from '../data/appShellContent';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
 import { KanaScript } from '../features/kana/domain/kanaItem';
 import { getKanaItemById } from '../features/kana/data/kanaInventory';
@@ -16,15 +16,12 @@ import {
   getKanaGroupProgressStats,
   getWeakKanaProgressEntries
 } from '../features/kana/review/reviewSelectors';
-import { StudyContainer } from '../components/StudyContainer';
-import { ListeningStudyContainer } from '../components/listening/ListeningStudyContainer';
-import { WordStudyContainer } from '../components/WordStudyContainer';
 
 interface PracticePageProps {
   language: AppLanguage;
 }
 
-type PracticeTab = 'overview' | 'review' | 'weak' | 'confusable' | 'stats';
+type PracticeTab = 'review' | 'weak' | 'confusable' | 'free' | 'stats';
 type PracticeMode = 'typing' | 'drawing' | 'listening' | 'dictionary' | null;
 
 const tileMeta = {
@@ -43,6 +40,11 @@ const tileMeta = {
     title: 'Confusables',
     accent: 'from-[var(--kt-accent-plum)] to-[var(--kt-accent-info)]'
   },
+  free: {
+    icon: Sparkles,
+    title: 'Free Practice',
+    accent: 'from-[var(--kt-accent-info)] to-[var(--kt-brand)]'
+  },
   stats: {
     icon: BarChart3,
     title: 'Stats',
@@ -52,29 +54,34 @@ const tileMeta = {
 
 export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const requestedScript = searchParams.get('script');
   const script: KanaScript = requestedScript === 'katakana' ? 'katakana' : 'hiragana';
   const requestedTab = searchParams.get('tab');
   const tab: PracticeTab =
-    requestedTab === 'review' || requestedTab === 'weak' || requestedTab === 'confusable' || requestedTab === 'stats'
+    requestedTab === 'review' || requestedTab === 'weak' || requestedTab === 'confusable' || requestedTab === 'free' || requestedTab === 'stats'
       ? requestedTab
-      : 'overview';
+      : 'free';
 
   const [activeMode, setActiveMode] = useState<PracticeMode>(null);
+  const [manualSelectedIds, setManualSelectedIds] = useState<string[]>([]);
 
   useEffect(() => {
     setActiveMode(null);
   }, [script, tab]);
 
+  useEffect(() => {
+    if (tab === 'free') {
+      setManualSelectedIds(allSectionCharacterIds);
+      return;
+    }
+    setManualSelectedIds([]);
+  }, [tab, script]);
+
   const sections = useMemo(
     () => (script === 'hiragana' ? getLocalizedHiraganaSections(language) : getLocalizedKatakanaSections(language)),
     [language, script]
   );
-  const { words, loading: wordsLoading, error: wordsError } = useDictionaryWordSearch({
-    script,
-    limit: 220,
-    offset: 0
-  });
   const { listByScript, summaries } = useKanaProgressStore();
   const summary = summaries[script];
   const progressEntries = listByScript(script);
@@ -83,24 +90,52 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
   const confusableSets = useMemo(() => getKanaConfusableSets(script, progressEntries).slice(0, 6), [progressEntries, script]);
   const groupStats = useMemo(() => getKanaGroupProgressStats(sections, progressEntries).slice(0, 8), [progressEntries, sections]);
 
+  const allSectionCharacterIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          sections.flatMap((section) =>
+            section.matrix.flatMap((row) => row.filter((item): item is NonNullable<typeof item> => item !== null).map((item) => item.id))
+          )
+        )
+      ),
+    [sections]
+  );
+
+  useEffect(() => {
+    if (tab === 'free') {
+      setManualSelectedIds((prev) => (prev.length > 0 ? prev : allSectionCharacterIds));
+    }
+  }, [allSectionCharacterIds, tab]);
+
   const focusItemIds = useMemo(() => {
+    if (tab === 'free') {
+      return manualSelectedIds;
+    }
     if (tab === 'review') {
       return reviewQueue.map((entry) => entry.kanaId);
     }
-
     if (tab === 'weak') {
       return weakEntries.map((entry) => entry.kanaId);
     }
+    return Array.from(new Set(confusableSets.flatMap((set) => set.kanaIds)));
+  }, [confusableSets, manualSelectedIds, reviewQueue, tab, weakEntries]);
 
-    if (tab === 'confusable') {
-      return Array.from(new Set(confusableSets.flatMap((set) => set.kanaIds)));
+  const modeIntro = useMemo(() => {
+    if (!activeMode) {
+      return null;
     }
-
-    return [];
-  }, [confusableSets, reviewQueue, tab, weakEntries]);
-
-  const scopedSections = useMemo(() => buildScopedSectionsFromKanaIds(sections, focusItemIds), [focusItemIds, sections]);
-  const scopedWords = useMemo(() => filterWordsForKanaIds(words, focusItemIds), [focusItemIds, words]);
+    if (language === 'tr') {
+      if (activeMode === 'typing') return { title: 'Typing alıştırması', text: 'Seçili karakterler için romaji yazma alıştırması.' };
+      if (activeMode === 'drawing') return { title: 'Drawing alıştırması', text: 'Seçili karakterler için çizim ve stroke pratikleri.' };
+      if (activeMode === 'listening') return { title: 'Listening alıştırması', text: 'Seçili karakter/kelimeler için dinleme odaklı alıştırmalar.' };
+      return { title: 'Dictionary çalışması', text: 'Sözlük tabanlı çalışma ve test ekranı.' };
+    }
+    if (activeMode === 'typing') return { title: 'Typing practice', text: 'Romaji input drills for selected characters.' };
+    if (activeMode === 'drawing') return { title: 'Drawing practice', text: 'Stroke and shape drills for selected characters.' };
+    if (activeMode === 'listening') return { title: 'Listening practice', text: 'Listening drills for selected characters/words.' };
+    return { title: 'Dictionary study', text: 'Dictionary based study and test flow.' };
+  }, [activeMode, language]);
 
   return (
     <div className="space-y-8 pb-8">
@@ -113,7 +148,7 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
               <button
                 key={tabScript}
                 type="button"
-                onClick={() => setSearchParams({ script: tabScript, ...(tab !== 'overview' ? { tab } : {}) })}
+                onClick={() => setSearchParams({ script: tabScript, tab })}
                 className={`rounded-full px-5 py-2 text-sm font-black uppercase tracking-[0.14em] ${
                   isActive ? 'bg-[var(--kt-accent-info)] text-[var(--kt-brand-on)]' : 'bg-[var(--kt-surface-muted)] text-[var(--kt-ink-muted)]'
                 }`}
@@ -133,8 +168,8 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
         </p>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {(Object.keys(tileMeta) as Array<Exclude<PracticeTab, 'overview'>>).map((tileKey) => {
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {(Object.keys(tileMeta) as PracticeTab[]).map((tileKey) => {
           const tile = tileMeta[tileKey];
           const Icon = tile.icon;
           const value =
@@ -158,14 +193,14 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
               <div className={`inline-flex rounded-[1rem] bg-gradient-to-r p-3 text-white ${tile.accent}`}>
                 <Icon size={22} />
               </div>
-              <div className="mt-5 text-2xl font-black text-white">{tile.title}</div>
-              <div className="mt-2 text-sm text-white/70">{value}</div>
+              <div className="mt-5 text-2xl font-black text-[var(--kt-ink-strong)]">{tile.title}</div>
+              <div className="mt-2 text-sm text-[var(--kt-ink-muted)]">{value}</div>
             </button>
           );
         })}
       </section>
 
-      {tab === 'overview' && (
+      {tab === 'free' && (
         <section className="grid gap-4 md:grid-cols-3">
           <StatCard label="Tracked" value={summary.tracked} />
           <StatCard label="Due" value={summary.dueCount} tone="warning" />
@@ -173,7 +208,7 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
         </section>
       )}
 
-      {tab !== 'overview' && tab !== 'stats' && (
+      {tab !== 'stats' && (
         <>
           <section className="rounded-[1.8rem] border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -183,83 +218,162 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
                 </div>
                 <h2 className="mt-2 text-3xl font-black text-[var(--kt-ink-strong)]">{tileMeta[tab].title}</h2>
               </div>
-              <Button as="button" type="button" variant="secondary" onClick={() => setSearchParams({ script })}>
-                {language === 'tr' ? 'Huba don' : 'Back to hub'}
-              </Button>
+              {tab !== 'free' && (
+                <Button as="button" type="button" variant="secondary" onClick={() => setSearchParams({ script })}>
+                  {language === 'tr' ? 'Huba don' : 'Back to hub'}
+                </Button>
+              )}
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button as="button" type="button" onClick={() => setActiveMode('typing')} iconStart={<Type size={15} />}>
+              <Button
+                as="button"
+                type="button"
+                variant={activeMode === 'typing' ? 'primary' : 'secondary'}
+                onClick={() => setActiveMode('typing')}
+                iconStart={<Type size={15} />}
+              >
                 Typing
               </Button>
-              <Button as="button" type="button" variant="secondary" onClick={() => setActiveMode('drawing')} iconStart={<PenTool size={15} />}>
+              <Button
+                as="button"
+                type="button"
+                variant={activeMode === 'drawing' ? 'primary' : 'secondary'}
+                onClick={() => setActiveMode('drawing')}
+                iconStart={<PenTool size={15} />}
+              >
                 Drawing
               </Button>
-              <Button as="button" type="button" variant="secondary" onClick={() => setActiveMode('listening')} iconStart={<Headphones size={15} />}>
+              <Button
+                as="button"
+                type="button"
+                variant={activeMode === 'listening' ? 'primary' : 'secondary'}
+                onClick={() => setActiveMode('listening')}
+                iconStart={<Headphones size={15} />}
+              >
                 Listening
               </Button>
-              <Button as="button" type="button" variant="secondary" onClick={() => setActiveMode('dictionary')} iconStart={<BookMarked size={15} />}>
+              <Button
+                as="button"
+                type="button"
+                variant={activeMode === 'dictionary' ? 'primary' : 'secondary'}
+                onClick={() => setActiveMode('dictionary')}
+                iconStart={<BookMarked size={15} />}
+              >
                 Dictionary
               </Button>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              {focusItemIds.slice(0, 18).map((itemId) => {
-                const item = getKanaItemById(itemId);
-
-                return (
-                  <div
-                    key={itemId}
-                    className="rounded-full border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink)]"
-                  >
-                    {item?.char ?? itemId}
+            {tab === 'free' && (
+              <div className="mt-6 rounded-2xl border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-4">
+                <div className="mt-4">
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    <Button
+                      as="button"
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setManualSelectedIds(allSectionCharacterIds)}
+                    >
+                      {language === 'tr' ? 'Tumunu sec' : 'Select all'}
+                    </Button>
+                    <Button
+                      as="button"
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setManualSelectedIds([])}
+                    >
+                      {language === 'tr' ? 'Temizle' : 'Clear'}
+                    </Button>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="space-y-4">
+                    {sections.map((section) => (
+                      <div key={section.id} className="space-y-2">
+                        <div className="text-xs font-black uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
+                          {section.title}
+                        </div>
+                        {section.matrix.map((row, rowIndex) => (
+                          <div
+                            key={`${section.id}-${rowIndex}`}
+                            className="grid gap-2"
+                            style={{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }}
+                          >
+                            {row.map((cell, columnIndex) => {
+                              if (!cell) {
+                                return (
+                                  <div
+                                    key={`empty-${section.id}-${rowIndex}-${columnIndex}`}
+                                    className="rounded-lg border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] opacity-35"
+                                  />
+                                );
+                              }
+
+                              const itemId = cell.id;
+                              const item = getKanaItemById(itemId);
+                              const selected = manualSelectedIds.includes(itemId);
+
+                              return (
+                                <button
+                                  key={itemId}
+                                  type="button"
+                                  onClick={() =>
+                                    setManualSelectedIds((prev) =>
+                                      selected ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+                                    )
+                                  }
+                                  className={`rounded-lg border px-2 py-2 text-center transition ${
+                                    selected
+                                      ? 'border-[var(--kt-accent-info)] bg-[var(--kt-accent-info-soft)]'
+                                      : 'border-[var(--kt-border-subtle)] bg-[var(--kt-surface)]'
+                                  }`}
+                                >
+                                  <div className="font-jp text-xl font-black text-[var(--kt-ink-strong)]">{item?.char ?? '?'}</div>
+                                  <div className="text-[10px] font-black uppercase text-[var(--kt-ink-subtle)]">{item?.romaji ?? itemId}</div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeMode && modeIntro && (
+              <div className="mt-6 rounded-2xl border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <div className="text-lg font-black text-[var(--kt-ink-strong)]">{modeIntro.title}</div>
+                    <p className="mt-1 text-sm text-[var(--kt-ink-muted)]">{modeIntro.text}</p>
+                    <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
+                      {language === 'tr' ? 'Secili karakter' : 'Selected characters'}: {focusItemIds.length}
+                    </p>
+                  </div>
+                  <Button
+                    as="button"
+                    type="button"
+                    onClick={() => {
+                      if (!activeMode || focusItemIds.length === 0) {
+                        return;
+                      }
+                      const params = new URLSearchParams();
+                      params.set('script', script);
+                      params.set('tab', tab);
+                      params.set('mode', activeMode);
+                      if (tab === 'free') {
+                        params.set('ids', focusItemIds.join(','));
+                      }
+                      navigate(`${appShellRoutes.practiceRun}?${params.toString()}`);
+                    }}
+                    disabled={focusItemIds.length === 0 || !activeMode}
+                  >
+                    {language === 'tr' ? 'Basla' : 'Start'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </section>
-
-          {activeMode === 'typing' && scopedSections.length > 0 && (
-            <StudyContainer
-              title={`${script === 'hiragana' ? 'Hiragana' : 'Katakana'} ${tileMeta[tab].title}`}
-              language={language}
-              script={script}
-              sections={scopedSections}
-              mode="typing"
-            />
-          )}
-
-          {activeMode === 'drawing' && scopedSections.length > 0 && (
-            <StudyContainer
-              title={`${script === 'hiragana' ? 'Hiragana' : 'Katakana'} ${tileMeta[tab].title}`}
-              language={language}
-              script={script}
-              sections={scopedSections}
-              mode="drawing"
-            />
-          )}
-
-          {activeMode === 'listening' && scopedSections.length > 0 && (
-            <div className="space-y-4">
-              {wordsLoading && <Card padding="md">Kelime havuzu yukleniyor...</Card>}
-              {wordsError && <Card padding="md">{wordsError}</Card>}
-              <ListeningStudyContainer
-                title={`${script === 'hiragana' ? 'Hiragana' : 'Katakana'} ${tileMeta[tab].title}`}
-                language={language}
-                sections={scopedSections}
-                words={scopedWords}
-                script={script}
-              />
-            </div>
-          )}
-
-          {activeMode === 'dictionary' && (
-            <WordStudyContainer
-              title={`${script === 'hiragana' ? 'Hiragana' : 'Katakana'} Dictionary`}
-              language={language}
-              script={script}
-            />
-          )}
         </>
       )}
 

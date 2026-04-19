@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-  BookOpenText, CircleHelp, Gamepad2, Home, Languages,
+  BookOpenText, CircleHelp, Gamepad2, GraduationCap, Home, Languages,
   MoonStar, MoreHorizontal, Search, Settings2, Sword, Trophy, UserRound
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -18,12 +18,12 @@ interface LeftNavProps {
 
 const labels = {
   tr: {
-    home: 'Home', learn: 'Ogren', letters: 'Harfler', practice: 'Alistirma',
+    home: 'Home', learn: 'Ogren', japanese: 'Japonca', letters: 'Harfler', practice: 'Alistirma',
     play: 'Oyun', quests: 'Gorevler', profile: 'Profil', more: 'Daha Fazla',
     settings: 'Ayarlar', search: 'Ara', help: 'Yardim', theme: 'Tema', language: 'Dil'
   },
   en: {
-    home: 'Home', learn: 'Learn', letters: 'Letters', practice: 'Practice',
+    home: 'Home', learn: 'Learn', japanese: 'Japanese', letters: 'Letters', practice: 'Practice',
     play: 'Play', quests: 'Quests', profile: 'Profile', more: 'More',
     settings: 'Settings', search: 'Search', help: 'Help', theme: 'Theme', language: 'Language'
   }
@@ -36,10 +36,12 @@ export const LeftNav: React.FC<LeftNavProps> = ({
   const location = useLocation();
   const copy = labels[language];
   const [moreOpen, setMoreOpen] = useState(false);
+  const logoSrc = themeMode === 'dark' ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
 
   const navItems = useMemo(() => [
     { id: 'home', label: copy.home, href: appShellRoutes.home, icon: Home },
     { id: 'learn', label: copy.learn, href: appShellRoutes.learn, icon: BookOpenText },
+    { id: 'japanese', label: copy.japanese, href: appShellRoutes.learnJapanese, icon: GraduationCap },
     { id: 'letters', label: copy.letters, href: `${appShellRoutes.letters}?script=${activeScript}`, icon: Languages },
     { id: 'practice', label: copy.practice, href: `${appShellRoutes.practice}?script=${activeScript}`, icon: Sword },
     { id: 'play', label: copy.play, href: getKanaEntryRoute(activeScript, 'play'), icon: Gamepad2 },
@@ -50,7 +52,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({
   return (
     <aside className="hidden xl:sticky xl:top-0 xl:flex xl:h-screen xl:flex-col xl:overflow-y-auto xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[var(--kt-nav-bg)] xl:px-5 xl:py-6">
       <Link to={appShellRoutes.home} className="px-3 pb-6 pt-2">
-        <img src="/logo/kototsuna-logo-light.png" alt="Kototsuna" className="h-10 w-auto" />
+        <img src={logoSrc} alt="Kototsuna" className="h-10 w-auto" />
       </Link>
 
       <nav className="flex flex-1 flex-col gap-3">
@@ -59,6 +61,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({
           const isActive =
             item.id === 'home' ? location.pathname === appShellRoutes.home
             : item.id === 'learn' ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase)
+            : item.id === 'japanese' ? location.pathname.startsWith(appShellRoutes.learnJapanese)
             : item.id === 'letters' ? location.pathname.startsWith(appShellRoutes.letters)
             : item.id === 'practice' ? location.pathname.startsWith(appShellRoutes.practice)
             : item.id === 'play' ? location.pathname.includes('/play')

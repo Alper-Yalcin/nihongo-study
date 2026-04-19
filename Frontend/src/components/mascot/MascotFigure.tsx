@@ -58,6 +58,9 @@ export const MascotFigure: React.FC<MascotFigureProps> = ({
 }) => {
   const palette = tonePalette[tone];
   const arms = armByPose[pose];
+  const lineColor = 'var(--kt-ink-strong)';
+  const eyeHighlightColor = 'var(--kt-surface-page)';
+  const beakColor = 'var(--kt-accent-warning)';
 
   return (
     <svg
@@ -68,19 +71,19 @@ export const MascotFigure: React.FC<MascotFigureProps> = ({
       role="img"
       aria-label="Hanabi mascot"
     >
-      <ellipse cx="70" cy="118" rx="34" ry="10" fill="rgba(0,0,0,0.18)" />
+      <ellipse cx="70" cy="118" rx="34" ry="10" fill="var(--kt-ink-subtle)" opacity={0.32} />
       <path d="M43 34l18-18 10 24z" fill={palette.primary} />
       <path d="M97 34L79 16 69 40z" fill={palette.primary} />
       <path d="M48 40c0-18 15-32 34-32s34 14 34 32v24c0 23-16 42-40 42S36 87 36 64V54c0-8 5-14 12-14z" fill={palette.primary} />
       <path d="M47 66c5 16 16 28 29 28 18 0 29-13 34-29-6 7-12 10-21 10-15 0-27-3-42-9z" fill={palette.secondary} />
       <circle cx="58" cy="56" r="12" fill={palette.detail} />
       <circle cx="89" cy="56" r="12" fill={palette.detail} />
-      <circle cx="62" cy="58" r="5" fill="#3b3840" />
-      <circle cx="85" cy="58" r="5" fill="#3b3840" />
-      <circle cx="59" cy="56" r="2" fill="#ffffff" />
-      <circle cx="82" cy="56" r="2" fill="#ffffff" />
-      <path d="M70 62l7 5-7 8-7-8z" fill="#f5b02d" />
-      <path d="M60 81c7 6 18 6 26 0" fill="none" stroke="#3b3840" strokeLinecap="round" strokeWidth="4" />
+      <circle cx="62" cy="58" r="5" fill={lineColor} />
+      <circle cx="85" cy="58" r="5" fill={lineColor} />
+      <circle cx="59" cy="56" r="2" fill={eyeHighlightColor} />
+      <circle cx="82" cy="56" r="2" fill={eyeHighlightColor} />
+      <path d="M70 62l7 5-7 8-7-8z" fill={beakColor} />
+      <path d="M60 81c7 6 18 6 26 0" fill="none" stroke={lineColor} strokeLinecap="round" strokeWidth="4" />
       <path d={arms.left} fill="none" stroke={palette.primary} strokeLinecap="round" strokeWidth="9" />
       <path d={arms.right} fill="none" stroke={palette.primary} strokeLinecap="round" strokeWidth="9" />
       <path d="M62 97c-8 10-11 20-9 29" fill="none" stroke={palette.primary} strokeLinecap="round" strokeWidth="9" />

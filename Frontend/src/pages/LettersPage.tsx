@@ -252,7 +252,7 @@ const Block: React.FC<BlockProps> = ({ title, subtitle, children }) => (
   </section>
 );
 
-type LearnPhase = 'watch' | 'quiz' | 'listenWrite' | 'match' | 'matrixKana' | 'matrixRomaji' | 'summary';
+type LearnPhase = 'watch' | 'quiz' | 'listenWrite' | 'listenTouch' | 'match' | 'matrixKana' | 'matrixRomaji' | 'summary';
 
 const shuffleArray = <T,>(items: T[]) => {
   const cloned = [...items];
@@ -270,6 +270,8 @@ const lessonCopy = {
     quizTitle: 'Bu karakter nasil okunur?',
     listenWriteTitle: 'Dinledigini yaz',
     listenWriteHint: 'Sesi dinle ve dogru cevabi yaz',
+    listenTouchTitle: 'Isittigine dokun',
+    hardExercise: 'Zor egzersiz',
     matchTitle: 'Eslestirme',
     matchHint: 'Romaji ve kana kartlarini eslestir',
     matrixKanaTitle: '5x5 yazma alistirmasi',
@@ -296,6 +298,8 @@ const lessonCopy = {
     quizTitle: 'How is this character read?',
     listenWriteTitle: 'Type what you hear',
     listenWriteHint: 'Play the sound and type the answer',
+    listenTouchTitle: 'Tap what you hear',
+    hardExercise: 'Hard exercise',
     matchTitle: 'Matching',
     matchHint: 'Match romaji and kana cards',
     matrixKanaTitle: '5x5 writing drill',
@@ -347,6 +351,10 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
   const [listenWriteInput, setListenWriteInput] = useState('');
   const [listenWriteChecked, setListenWriteChecked] = useState(false);
   const [listenWriteCorrect, setListenWriteCorrect] = useState(false);
+  const [listenTouchOptions, setListenTouchOptions] = useState<string[]>([]);
+  const [listenTouchSelections, setListenTouchSelections] = useState<string[]>([]);
+  const [listenTouchChecked, setListenTouchChecked] = useState(false);
+  const [listenTouchCorrect, setListenTouchCorrect] = useState(false);
   const [matchRound, setMatchRound] = useState<Character[]>([]);
   const [matchedIds, setMatchedIds] = useState<string[]>([]);
   const [leftSelection, setLeftSelection] = useState<string | null>(null);
@@ -366,17 +374,40 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
   }, [lessonCharacters, sessionSeed]);
 
   const activeCharacter = sessionCharacters[lessonIndex] ?? sessionCharacters[0];
+  const listenWordCharacters = useMemo(() => {
+    if (!activeCharacter) {
+      return [];
+    }
+
+    const alternatives = sessionCharacters.filter((character) => character.id !== activeCharacter.id);
+    if (alternatives.length === 0) {
+      return [activeCharacter];
+    }
+
+    const second = alternatives[(lessonIndex * 3) % alternatives.length];
+    return [activeCharacter, second];
+  }, [activeCharacter, sessionCharacters, lessonIndex]);
+  const listenWordKana = useMemo(
+    () => listenWordCharacters.map((character) => character.symbol).join(''),
+    [listenWordCharacters]
+  );
+  const listenWordRomaji = useMemo(
+    () => listenWordCharacters.map((character) => character.label).join(''),
+    [listenWordCharacters]
+  );
   const allMatrixCharacters = matrixCharacters.flat();
-  const totalSteps = sessionCharacters.length * 4 + 2;
+  const totalSteps = sessionCharacters.length * 5 + 2;
   const currentStep =
     phase === 'watch'
-      ? lessonIndex * 4 + 1
+      ? lessonIndex * 5 + 1
       : phase === 'quiz'
-        ? lessonIndex * 4 + 2
+        ? lessonIndex * 5 + 2
         : phase === 'listenWrite'
-          ? lessonIndex * 4 + 3
+          ? lessonIndex * 5 + 3
+          : phase === 'listenTouch'
+            ? lessonIndex * 5 + 4
           : phase === 'match'
-            ? lessonIndex * 4 + 4
+            ? lessonIndex * 5 + 5
         : phase === 'matrixKana'
           ? totalSteps - 1
         : phase === 'matrixRomaji'
@@ -414,6 +445,9 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
     setListenWriteInput('');
     setListenWriteChecked(false);
     setListenWriteCorrect(false);
+    setListenTouchSelections([]);
+    setListenTouchChecked(false);
+    setListenTouchCorrect(false);
     setDrawChecked(false);
     setDrawCorrect(false);
     setLeftSelection(null);
@@ -429,7 +463,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
       return;
     }
 
-    if (phase !== 'watch' && phase !== 'quiz' && phase !== 'listenWrite') {
+    if (phase !== 'watch' && phase !== 'quiz' && phase !== 'listenWrite' && phase !== 'listenTouch') {
       return;
     }
 
@@ -437,10 +471,36 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
     if (!audio) {
       return;
     }
-
-    audio.currentTime = 0;
-    audio.play().catch(() => undefined);
-  }, [activeCharacter, phase]);
+    const sequence = phase === 'listenWrite' || phase === 'listenTouch' ? listenWordCharacters : activeCharacter ? [activeCharacter] : [];
+    if (!sequence.length) {
+      return;
+    }
+    let cancelled = false;
+    let pointer = 0;
+    const playNext = () => {
+      if (cancelled || pointer >= sequence.length) {
+        audio.onended = null;
+        audio.playbackRate = 1;
+        return;
+      }
+      const current = sequence[pointer];
+      const src = getGoogleTranslateKanaAudioSrc(current.id) ?? `/audio/${script}/${current.id}.mp3`;
+      audio.src = src;
+      audio.currentTime = 0;
+      audio.play().catch(() => undefined);
+    };
+    audio.onended = () => {
+      pointer += 1;
+      playNext();
+    };
+    playNext();
+    return () => {
+      cancelled = true;
+      audio.onended = null;
+      audio.pause();
+      audio.playbackRate = 1;
+    };
+  }, [activeCharacter, phase, listenWordCharacters, script]);
 
   useEffect(() => {
     if (!activeCharacter || phase !== 'match') {
@@ -456,6 +516,22 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
     setRightSelection(null);
     setMatchedIds([]);
   }, [activeCharacter, phase, sessionCharacters]);
+
+  useEffect(() => {
+    if (!activeCharacter || phase !== 'listenTouch') {
+      return;
+    }
+
+    const distractors = shuffleArray(
+      [...new Set(sessionCharacters.map((character) => character.symbol))]
+        .filter((symbol) => !listenWordCharacters.some((target) => target.symbol === symbol))
+    ).slice(0, 2);
+
+    setListenTouchOptions(shuffleArray([...listenWordCharacters.map((item) => item.symbol), ...distractors]));
+    setListenTouchSelections([]);
+    setListenTouchChecked(false);
+    setListenTouchCorrect(false);
+  }, [activeCharacter, phase, sessionCharacters, listenWordCharacters]);
 
   useEffect(() => {
     if (!leftSelection || !rightSelection || phase !== 'match') {
@@ -526,14 +602,14 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
   };
 
   const checkListenWrite = () => {
-    if (!activeCharacter) {
+    if (!listenWordCharacters.length) {
       return;
     }
 
     const answer = listenWriteInput.trim();
     const correct =
-      isAcceptedRomajiAnswer(answer, activeCharacter.label) ||
-      isAcceptedKanaAnswer(answer, activeCharacter.symbol);
+      isAcceptedRomajiAnswer(answer, listenWordRomaji) ||
+      isAcceptedKanaAnswer(answer, listenWordKana);
     setListenWriteChecked(true);
     setListenWriteCorrect(correct);
     if (correct) {
@@ -541,6 +617,52 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
       return;
     }
     loseLife();
+  };
+
+  const checkListenTouch = () => {
+    if (!listenWordCharacters.length || listenTouchSelections.length !== listenWordCharacters.length) {
+      return;
+    }
+
+    const expected = listenWordCharacters.map((character) => character.symbol);
+    const correct = expected.every((symbol, index) => symbol === listenTouchSelections[index]);
+    setListenTouchChecked(true);
+    setListenTouchCorrect(correct);
+    if (correct) {
+      setCorrectCount((prev) => prev + 1);
+      return;
+    }
+    loseLife();
+  };
+
+  const playListenSequence = (slow = false) => {
+    const audio = audioRef.current;
+    if (!audio || !listenWordCharacters.length) {
+      return;
+    }
+
+    let pointer = 0;
+    audio.playbackRate = slow ? 0.85 : 1;
+    const playNext = () => {
+      if (pointer >= listenWordCharacters.length) {
+        audio.onended = null;
+        audio.playbackRate = 1;
+        return;
+      }
+
+      const current = listenWordCharacters[pointer];
+      const src = getGoogleTranslateKanaAudioSrc(current.id) ?? `/audio/${script}/${current.id}.mp3`;
+      audio.src = src;
+      audio.currentTime = 0;
+      audio.play().catch(() => undefined);
+    };
+
+    audio.onended = () => {
+      pointer += 1;
+      playNext();
+    };
+
+    playNext();
   };
 
   const checkMatrixKana = () => {
@@ -590,6 +712,10 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
     setListenWriteInput('');
     setListenWriteChecked(false);
     setListenWriteCorrect(false);
+    setListenTouchOptions([]);
+    setListenTouchSelections([]);
+    setListenTouchChecked(false);
+    setListenTouchCorrect(false);
     setMatchRound([]);
     setMatchedIds([]);
     setLeftSelection(null);
@@ -610,7 +736,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
 
     return (
       <div className="mx-auto w-full max-w-3xl">
-        <h2 className="text-4xl font-black text-white">{copy.drawTitle}</h2>
+        <h2 className="text-4xl font-black text-[var(--kt-ink-strong)]">{copy.drawTitle}</h2>
         <div className="mt-6 flex items-center gap-4">
           <audio ref={audioRef} src={audioSrc} preload="auto" />
           <button
@@ -627,12 +753,12 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
             <Volume2 size={24} />
           </button>
           <div>
-            <div className="text-sm font-black uppercase tracking-[0.08em] text-slate-400">{copy.watchTitle}</div>
-            <div className="font-jp text-4xl font-bold text-white">{activeCharacter.symbol}</div>
+            <div className="text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-ink-subtle)]">{copy.watchTitle}</div>
+            <div className="font-jp text-4xl font-bold text-[var(--kt-ink-strong)]">{activeCharacter.symbol}</div>
           </div>
         </div>
 
-        <div className="mt-6 grid place-items-center rounded-3xl border border-slate-700/80 bg-[#071926] p-5">
+        <div className="mt-6 grid place-items-center rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-5">
           <DrawingCanvas
             ref={drawCanvasRef}
             guideSymbol={activeCharacter.symbol}
@@ -659,7 +785,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
                 setDrawChecked(false);
                 setDrawCorrect(false);
               }}
-              className="rounded-2xl border border-slate-600 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-slate-200 transition hover:bg-slate-700/30"
+              className="rounded-2xl border border-[var(--kt-border)] px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-ink-muted)] transition hover:bg-[var(--kt-surface-muted)]"
             >
               {copy.clear}
             </button>
@@ -694,9 +820,9 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
 
     return (
       <div className="mx-auto w-full max-w-3xl">
-        <h2 className="text-4xl font-black text-white">{copy.quizTitle}</h2>
+        <h2 className="text-4xl font-black text-[var(--kt-ink-strong)]">{copy.quizTitle}</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
-          <div className="rounded-3xl border border-slate-700/80 bg-[#071926] p-5 text-center">
+          <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-5 text-center">
             <audio ref={audioRef} src={audioSrc} preload="auto" />
             <button
               type="button"
@@ -711,7 +837,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
             >
               <Volume2 size={18} />
             </button>
-            <div className="mt-8 font-jp text-7xl font-bold text-white">{activeCharacter.symbol}</div>
+            <div className="mt-8 font-jp text-7xl font-bold text-[var(--kt-ink-strong)]">{activeCharacter.symbol}</div>
           </div>
 
           <div className="space-y-3">
@@ -732,7 +858,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
                         ? 'border-rose-400 bg-rose-500/15 text-rose-300'
                         : isPicked
                           ? 'border-sky-400 bg-sky-500/15 text-sky-300'
-                          : 'border-slate-700 bg-[#071926] text-white hover:border-slate-500'
+                          : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:border-[var(--kt-border-strong)]'
                   }`}
                 >
                   <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-current text-xs font-black">
@@ -776,24 +902,18 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
     if (!activeCharacter) {
       return null;
     }
-    const audioSrc = getGoogleTranslateKanaAudioSrc(activeCharacter.id) ?? `/audio/${script}/${activeCharacter.id}.mp3`;
 
     return (
       <div className="mx-auto w-full max-w-3xl">
-        <h2 className="text-4xl font-black text-white">{copy.listenWriteTitle}</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-300">{copy.listenWriteHint}</p>
+        <h2 className="text-4xl font-black text-[var(--kt-ink-strong)]">{copy.listenWriteTitle}</h2>
+        <p className="mt-2 text-sm font-semibold text-[var(--kt-ink-muted)]">{copy.listenWriteHint}</p>
 
-        <div className="mt-8 rounded-3xl border border-slate-700/80 bg-[#071926] p-6">
-          <audio ref={audioRef} src={audioSrc} preload="auto" />
+        <div className="mt-8 rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6">
+          <audio ref={audioRef} preload="auto" />
           <div className="flex flex-col items-center gap-4">
             <button
               type="button"
-              onClick={() => {
-                const audio = audioRef.current;
-                if (!audio) return;
-                audio.currentTime = 0;
-                audio.play().catch(() => undefined);
-              }}
+              onClick={() => playListenSequence(false)}
               className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-500 text-slate-900 transition hover:brightness-110"
               aria-label={copy.replayAudio}
             >
@@ -803,7 +923,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
               value={listenWriteInput}
               onChange={(event) => setListenWriteInput(event.target.value)}
               placeholder={copy.answerPlaceholder}
-              className="w-full max-w-sm rounded-xl border border-slate-700 bg-[#0b2436] px-4 py-3 text-center text-lg font-bold text-white outline-none focus:border-sky-400"
+              className="w-full max-w-sm rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-sunken)] px-4 py-3 text-center text-lg font-bold text-[var(--kt-ink-strong)] outline-none focus:border-sky-400"
             />
           </div>
         </div>
@@ -818,6 +938,119 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
               onClick={checkListenWrite}
               disabled={!listenWriteInput.trim()}
               className="rounded-2xl bg-sky-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#062032] transition enabled:hover:brightness-110 disabled:opacity-40"
+            >
+              {copy.check}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPhase('listenTouch')}
+              className="rounded-2xl bg-lime-500 px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#08220f] transition hover:brightness-110"
+            >
+              {copy.next}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderListenTouchPhase = () => {
+    if (!activeCharacter) {
+      return null;
+    }
+
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        <p className="text-sm font-black uppercase tracking-[0.1em] text-rose-400">{copy.hardExercise}</p>
+        <h2 className="mt-1 text-5xl font-black text-[var(--kt-ink-strong)]">{copy.listenTouchTitle}</h2>
+
+        <div className="mt-8 flex items-center gap-3">
+          <audio ref={audioRef} preload="auto" />
+          <button
+            type="button"
+            onClick={() => playListenSequence(false)}
+            className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-rose-400 text-[#102330] transition hover:brightness-110"
+            aria-label={copy.replayAudio}
+          >
+            <Volume2 size={34} />
+          </button>
+          <button
+            type="button"
+            onClick={() => playListenSequence(true)}
+            className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-400 text-[#102330] transition hover:brightness-110"
+            aria-label={copy.replayAudio}
+          >
+            <Volume2 size={24} />
+          </button>
+        </div>
+
+        <div className="mt-8 border-t border-[var(--kt-border)] pt-6">
+          <div className="flex min-h-[56px] items-center gap-3">
+            {listenTouchSelections.length > 0 ? (
+              listenTouchSelections.map((selected, index) => (
+                <button
+                  type="button"
+                  key={`sel-${selected}-${index}`}
+                  onClick={() =>
+                    setListenTouchSelections((prev) => prev.filter((_, prevIndex) => prevIndex !== index))
+                  }
+                  className="inline-flex h-12 min-w-12 items-center justify-center rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-sunken)] px-4 font-jp text-3xl font-bold text-[var(--kt-ink-strong)]"
+                >
+                  {selected}
+                </button>
+              ))
+            ) : (
+              <span className="text-sm font-semibold text-[var(--kt-ink-subtle)]">{copy.answerPlaceholder}</span>
+            )}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3 border-t border-[var(--kt-border)] pt-6">
+            {listenTouchOptions.map((symbol) => {
+              const used = listenTouchSelections.includes(symbol);
+              return (
+                <button
+                  key={symbol}
+                  type="button"
+                  disabled={listenTouchChecked || used}
+                  onClick={() =>
+                    setListenTouchSelections((prev) => {
+                      if (prev.length >= listenWordCharacters.length) {
+                        return prev;
+                      }
+                      return [...prev, symbol];
+                    })
+                  }
+                  className={`inline-flex h-12 min-w-12 items-center justify-center rounded-xl border px-4 font-jp text-3xl font-bold transition ${
+                    used
+                      ? 'opacity-0'
+                      : 'border-[var(--kt-border)] bg-[var(--kt-surface-sunken)] text-[var(--kt-ink-strong)] hover:border-sky-400'
+                  }`}
+                >
+                  {symbol}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-8 flex items-center justify-between border-t border-[var(--kt-border)] pt-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="rounded-2xl border border-[var(--kt-border)] px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-ink-subtle)]"
+            >
+              Simdi dinleyemem
+            </button>
+            <span className={`text-sm font-black ${listenTouchChecked && !listenTouchCorrect ? 'text-rose-300' : 'text-transparent'}`}>
+              {copy.wrong}
+            </span>
+          </div>
+          {!listenTouchChecked ? (
+            <button
+              type="button"
+              onClick={checkListenTouch}
+              disabled={listenTouchSelections.length !== listenWordCharacters.length}
+              className="rounded-2xl bg-[var(--kt-surface-muted)] px-8 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-ink-muted)] transition enabled:bg-rose-400 enabled:text-[#102330] enabled:hover:brightness-110 disabled:opacity-40"
             >
               {copy.check}
             </button>
@@ -840,8 +1073,8 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
 
     return (
       <div className="mx-auto w-full max-w-4xl">
-        <h2 className="text-4xl font-black text-white">{copy.matchTitle}</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-300">{copy.matchHint}</p>
+        <h2 className="text-4xl font-black text-[var(--kt-ink-strong)]">{copy.matchTitle}</h2>
+        <p className="mt-2 text-sm font-semibold text-[var(--kt-ink-muted)]">{copy.matchHint}</p>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           <div className="space-y-3">
@@ -861,7 +1094,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
                       ? 'border-lime-400 bg-lime-500/15 text-lime-300'
                       : selected
                         ? 'border-sky-400 bg-sky-500/15 text-sky-300'
-                        : 'border-slate-700 bg-[#071926] text-white hover:border-slate-500'
+                        : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:border-[var(--kt-border-strong)]'
                   }`}
                 >
                   {item.text}
@@ -886,7 +1119,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
                       ? 'border-lime-400 bg-lime-500/15 text-lime-300'
                       : selected
                         ? 'border-sky-400 bg-sky-500/15 text-sky-300'
-                        : 'border-slate-700 bg-[#071926] text-white hover:border-slate-500'
+                        : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:border-[var(--kt-border-strong)]'
                   }`}
                 >
                   <span className="font-jp text-4xl font-bold">{item.text}</span>
@@ -897,7 +1130,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <span className={`text-sm font-black ${matchDone ? 'text-lime-300' : 'text-slate-400'}`}>
+          <span className={`text-sm font-black ${matchDone ? 'text-lime-300' : 'text-[var(--kt-ink-subtle)]'}`}>
             {matchDone ? copy.correct : `${matchedIds.length}/${matchRound.length}`}
           </span>
           {matchDone ? (
@@ -920,7 +1153,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
                 setRightSelection(null);
                 setMatchedIds([]);
               }}
-              className="rounded-2xl border border-slate-600 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-slate-200 transition hover:bg-slate-700/30"
+              className="rounded-2xl border border-[var(--kt-border)] px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-ink-muted)] transition hover:bg-[var(--kt-surface-muted)]"
             >
               {copy.clear}
             </button>
@@ -955,10 +1188,10 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
 
     return (
       <div className="mx-auto w-full max-w-4xl">
-        <h2 className="text-4xl font-black text-white">{title}</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-300">{subtitle}</p>
+        <h2 className="text-4xl font-black text-[var(--kt-ink-strong)]">{title}</h2>
+        <p className="mt-2 text-sm font-semibold text-[var(--kt-ink-muted)]">{subtitle}</p>
 
-        <div className="mt-6 rounded-3xl border border-slate-700/80 bg-[#071926] p-5">
+        <div className="mt-6 rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-5">
           <div className="grid grid-cols-5 gap-3">
             {allMatrixCharacters.map((character) => {
               const prompt = isKana ? character.label : character.symbol;
@@ -968,9 +1201,9 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
               return (
                 <label
                   key={`${mode}-${character.id}`}
-                  className={`rounded-xl border p-3 text-center ${isWrong ? 'border-rose-400' : 'border-slate-700'}`}
+                  className={`rounded-xl border p-3 text-center ${isWrong ? 'border-rose-400' : 'border-[var(--kt-border)]'}`}
                 >
-                  <div className={`mb-2 ${isKana ? 'text-sm font-black text-sky-300' : 'font-jp text-2xl font-bold text-white'}`}>
+                  <div className={`mb-2 ${isKana ? 'text-sm font-black text-sky-300' : 'font-jp text-2xl font-bold text-[var(--kt-ink-strong)]'}`}>
                     {prompt}
                   </div>
                   <input
@@ -983,7 +1216,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
                       }
                       setRomajiInputs((prev) => ({ ...prev, [character.id]: value }));
                     }}
-                    className="w-full rounded-lg border border-slate-700 bg-[#0b2436] px-2 py-1 text-center text-sm font-bold text-white outline-none focus:border-sky-400"
+                    className="w-full rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-sunken)] px-2 py-1 text-center text-sm font-bold text-[var(--kt-ink-strong)] outline-none focus:border-sky-400"
                   />
                 </label>
               );
@@ -1017,14 +1250,14 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
   const renderSummary = () => (
     <div className="mx-auto w-full max-w-2xl text-center">
       <CheckCircle2 className="mx-auto text-lime-400" size={56} />
-      <h2 className="mt-5 text-5xl font-black text-white">{copy.summaryTitle}</h2>
+      <h2 className="mt-5 text-5xl font-black text-[var(--kt-ink-strong)]">{copy.summaryTitle}</h2>
       <div className="mt-6 grid grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-slate-700 bg-[#071926] p-4 text-left">
-          <p className="text-xs font-black uppercase tracking-[0.08em] text-slate-400">{copy.summaryScore}</p>
+        <div className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-4 text-left">
+          <p className="text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink-subtle)]">{copy.summaryScore}</p>
           <p className="mt-1 text-3xl font-black text-lime-300">{correctCount}</p>
         </div>
-        <div className="rounded-2xl border border-slate-700 bg-[#071926] p-4 text-left">
-          <p className="text-xs font-black uppercase tracking-[0.08em] text-slate-400">{copy.summaryLives}</p>
+        <div className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-4 text-left">
+          <p className="text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink-subtle)]">{copy.summaryLives}</p>
           <p className="mt-1 text-3xl font-black text-rose-300">{lives}</p>
         </div>
       </div>
@@ -1032,7 +1265,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
         <button
           type="button"
           onClick={resetSession}
-          className="rounded-2xl border border-slate-600 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-slate-200 transition hover:bg-slate-700/30"
+          className="rounded-2xl border border-[var(--kt-border)] px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-ink-muted)] transition hover:bg-[var(--kt-surface-muted)]"
         >
           {copy.summaryRestart}
         </button>
@@ -1048,18 +1281,18 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-[70] bg-[#051722] text-white">
+    <div className="fixed inset-0 z-[70] bg-[var(--kt-surface-page)] text-[var(--kt-ink)]">
       <div className="mx-auto flex h-full max-w-[1200px] flex-col px-6 py-6">
         <header className="flex items-center gap-4">
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-slate-300 transition hover:bg-slate-800/60"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--kt-border)] text-[var(--kt-ink-muted)] transition hover:bg-[var(--kt-surface-muted)]"
             aria-label={copy.close}
           >
             <X size={20} />
           </button>
-          <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-700">
+          <div className="h-3 flex-1 overflow-hidden rounded-full bg-[var(--kt-progress-track)]">
             <div className="h-full rounded-full bg-lime-400 transition-[width]" style={{ width: `${progress}%` }} />
           </div>
           <div className="inline-flex items-center gap-1 text-rose-400">
@@ -1072,6 +1305,7 @@ const LearningSessionOverlay: React.FC<LearningSessionOverlayProps> = ({
           {phase === 'watch' && renderWatchPhase()}
           {phase === 'quiz' && renderQuizPhase()}
           {phase === 'listenWrite' && renderListenWritePhase()}
+          {phase === 'listenTouch' && renderListenTouchPhase()}
           {phase === 'match' && renderMatchPhase()}
           {phase === 'matrixKana' && renderMatrix('kana')}
           {phase === 'matrixRomaji' && renderMatrix('romaji')}

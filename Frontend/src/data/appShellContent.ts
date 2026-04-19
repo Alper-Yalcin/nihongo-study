@@ -12,9 +12,11 @@ type KanaPlayNavView =
 export const appShellRoutes = {
   home: '/',
   learn: '/learn',
+  learnJapanese: '/learn/japanese',
   learnUnitBase: '/learn/unit',
   letters: '/letters',
   practice: '/practice',
+  practiceRun: '/practice/run',
   quests: '/quests',
   hiraganaOverview: '/kana/hiragana/overview',
   hiraganaLearn: '/kana/hiragana/learn',
@@ -73,7 +75,7 @@ const studyStatsRouteByScript: Record<KanaRouteScript, string> = {
 
 export const getPracticeRoute = (
   script: KanaRouteScript,
-  tab?: 'overview' | 'review' | 'weak' | 'confusable' | 'stats'
+  tab?: 'overview' | 'review' | 'weak' | 'confusable' | 'free' | 'stats'
 ) => {
   const searchParams = new URLSearchParams();
   searchParams.set('script', script);

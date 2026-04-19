@@ -47,6 +47,15 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
       (showTemplate || showStrokeOrder || showDirectionArrows)
   );
 
+  const resolveStrokeColor = (canvas: HTMLCanvasElement) => {
+    const computedStrokeColor = window
+      .getComputedStyle(canvas)
+      .getPropertyValue('--kt-ink-muted')
+      .trim();
+
+    return computedStrokeColor || '#564C51';
+  };
+
   useImperativeHandle(ref, () => ({
     clear: () => {
       setStrokes([]);
@@ -100,7 +109,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, Props>(({
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.lineWidth = 10;
-      ctx.strokeStyle = '#564C51';
+      ctx.strokeStyle = resolveStrokeColor(canvas);
     }
     canvas.setPointerCapture(e.pointerId);
   };

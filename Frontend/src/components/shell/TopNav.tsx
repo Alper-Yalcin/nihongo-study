@@ -46,6 +46,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   const location = useLocation();
   const copy = labels[language];
   const [moreOpen, setMoreOpen] = useState(false);
+  const logoSrc = themeMode === 'dark' ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
 
   useEffect(() => { setMoreOpen(false); }, [location.pathname]);
 
@@ -73,7 +74,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     <header className="sticky top-0 z-40 border-b border-[var(--kt-border-subtle)] bg-[var(--kt-nav-bg)] backdrop-blur">
       <div className="mx-auto flex max-w-[1800px] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to={appShellRoutes.home} className="shrink-0">
-          <img src="/logo/kototsuna-logo-light.png" alt="Kototsuna" className="h-9 w-auto" />
+          <img src={logoSrc} alt="Kototsuna" className="h-9 w-auto" />
         </Link>
 
         <nav className="scrollbar-hide flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">

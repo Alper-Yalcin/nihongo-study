@@ -15,9 +15,11 @@ import { Settings } from './pages/Settings';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LettersPage } from './pages/LettersPage';
 import { PracticePage } from './pages/PracticePage';
+import { PracticeRunPage } from './pages/PracticeRunPage';
 import { QuestsPage } from './pages/QuestsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LearnUnitPage } from './pages/LearnUnitPage';
+import { LearnJapanesePage } from './pages/LearnJapanesePage';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
 import { AppLanguage, ThemeMode } from './data/appPreferences';
 import { usePersistentState } from './hooks/usePersistentState';
@@ -42,6 +44,13 @@ const deserializeKanaFontStyle = (value: string): KanaFontStyleId =>
     ? (value as KanaFontStyleId)
     : defaultKanaFontStyleId;
 const deserializeActiveScript = (value: string): KanaScript => (isKanaScript(value) ? value : 'hiragana');
+const resolveDefaultThemeMode = (): ThemeMode => {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return 'dark';
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
 
 export default function App() {
   const location = useLocation();
@@ -56,7 +65,7 @@ export default function App() {
   );
   const [themeMode, setThemeMode] = usePersistentState<ThemeMode>(
     THEME_MODE_STORAGE_KEY,
-    'dark',
+    resolveDefaultThemeMode,
     {
       serialize: serializeString,
       deserialize: deserializeThemeMode,
@@ -91,6 +100,12 @@ export default function App() {
   }, [language]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('theme-light', 'theme-dark');
+    root.classList.add(themeMode === 'dark' ? 'theme-dark' : 'theme-light');
+  }, [themeMode]);
+
+  useEffect(() => {
     const routeScript = resolveActiveScript(location.pathname, location.search, activeScript);
 
     if (routeScript !== activeScript) {
@@ -104,11 +119,16 @@ export default function App() {
 
   const shellRoutes = (
     <Routes>
-      <Route path={appShellRoutes.home} element={<LandingPage language={language} activeScript={activeScript} />} />
+      <Route
+        path={appShellRoutes.home}
+        element={<LandingPage language={language} activeScript={activeScript} themeMode={themeMode} />}
+      />
       <Route path={appShellRoutes.learn} element={<Home language={language} activeScript={activeScript} />} />
+      <Route path={appShellRoutes.learnJapanese} element={<LearnJapanesePage language={language} />} />
       <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
       <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />
+      <Route path={appShellRoutes.practiceRun} element={<PracticeRunPage language={language} />} />
       <Route path={appShellRoutes.quests} element={<QuestsPage language={language} />} />
 
       <Route path="/overview" element={<Navigate to={appShellRoutes.learn} replace />} />
@@ -204,7 +224,7 @@ export default function App() {
   return (
     <KanaProgressProvider>
       <div
-        className={`${themeMode === 'dark' ? 'theme-dark' : 'theme-light'} min-h-screen bg-[var(--kt-surface-page)] text-[var(--kt-ink)]`}
+        className="min-h-screen bg-[var(--kt-surface-page)] text-[var(--kt-ink)]"
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
         <AppShell

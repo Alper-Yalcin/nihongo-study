@@ -99,7 +99,7 @@ export const StrokeGuideOverlay: React.FC<Props> = ({
         <g
           transform={`scale(${scaleX} ${scaleY})`}
           fill="none"
-          stroke="#475569"
+          stroke="var(--kt-ink-muted)"
           strokeWidth={Math.round(Math.min(viewBoxWidth, viewBoxHeight) * 0.08)}
           strokeLinecap="round"
           strokeLinejoin="round"

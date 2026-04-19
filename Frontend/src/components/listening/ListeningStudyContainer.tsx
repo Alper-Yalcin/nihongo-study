@@ -37,6 +37,7 @@ interface Props {
   sections: KanaSection[];
   words?: WordItem[];
   script: 'hiragana' | 'katakana';
+  autoStart?: boolean;
 }
 
 type View = 'table' | 'run' | 'result';
@@ -47,7 +48,8 @@ export const ListeningStudyContainer: React.FC<Props> = ({
   language,
   sections,
   words,
-  script
+  script,
+  autoStart = false
 }) => {
   const copy = studyContent[language];
   const { activeSession } = useKanaProgressStore();
@@ -194,6 +196,13 @@ export const ListeningStudyContainer: React.FC<Props> = ({
     setLastRunDatasetType(datasetType);
     setView('run');
   };
+
+  useEffect(() => {
+    if (!autoStart || view !== 'table' || activePool.length === 0) {
+      return;
+    }
+    handleStart();
+  }, [activePool.length, autoStart, view]);
 
   const handleResumeSession = () => {
     if (!matchingActiveSession) {

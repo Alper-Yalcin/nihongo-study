@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, BookOpenText, Languages, PlayCircle, Sparkles, Swords, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button, Card } from '../shared/ui';
-import { AppLanguage } from '../data/appPreferences';
+import { AppLanguage, ThemeMode } from '../data/appPreferences';
 import { appShellRoutes, getPracticeRoute } from '../data/appShellContent';
 import { KanaScript } from '../features/kana/domain/kanaItem';
 import { MascotFigure } from '../components/mascot/MascotFigure';
@@ -10,6 +10,7 @@ import { MascotFigure } from '../components/mascot/MascotFigure';
 interface LandingPageProps {
   language: AppLanguage;
   activeScript: KanaScript;
+  themeMode: ThemeMode;
 }
 
 const copy = {
@@ -115,17 +116,53 @@ const landingCards = [
   }
 ] as const;
 
-export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript, themeMode }) => {
   const text = copy[language];
   const lettersHref = `${appShellRoutes.letters}?script=${activeScript}`;
   const practiceHref = getPracticeRoute(activeScript);
+  const logoSrc = themeMode === 'dark' ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
+  const isDark = themeMode === 'dark';
+
+  const pageClassName = isDark
+    ? 'min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(54,160,255,0.16),transparent_34%),radial-gradient(circle_at_top_right,rgba(208,96,112,0.14),transparent_28%),linear-gradient(180deg,#071017_0%,#0d1822_52%,#111d28_100%)] text-white'
+    : 'min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(54,160,255,0.10),transparent_34%),radial-gradient(circle_at_top_right,rgba(208,96,112,0.10),transparent_28%),linear-gradient(180deg,#f9fbfd_0%,#f7f3f6_52%,#fdf7f6_100%)] text-[var(--kt-ink)]';
+
+  const headerSurfaceClassName = isDark
+    ? 'border-white/10 bg-[rgba(10,18,26,0.72)]'
+    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.86)] shadow-[var(--kt-shadow-sm)]';
+
+  const heroSurfaceClassName = isDark
+    ? 'border-white/10 bg-[rgba(10,18,26,0.76)] shadow-[0_30px_80px_rgba(0,0,0,0.28)]'
+    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.90)] shadow-[var(--kt-shadow-lg)]';
+
+  const railSurfaceClassName = isDark
+    ? 'border-white/10 bg-[rgba(10,18,26,0.76)] shadow-[0_20px_50px_rgba(0,0,0,0.24)]'
+    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.92)] shadow-[var(--kt-shadow)]';
+
+  const featureSurfaceClassName = isDark
+    ? 'border-white/10 bg-[rgba(10,18,26,0.68)]'
+    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.94)] shadow-[var(--kt-shadow-sm)]';
+
+  const featureCardClassName = isDark
+    ? 'border-white/10 bg-[rgba(255,255,255,0.04)] text-white'
+    : 'border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] text-[var(--kt-ink)]';
+
+  const headingTextClassName = isDark ? 'text-white' : 'text-[var(--kt-ink-strong)]';
+  const mutedTextClassName = isDark ? 'text-white/72' : 'text-[var(--kt-ink-muted)]';
+  const subtleTextClassName = isDark ? 'text-white/52' : 'text-[var(--kt-ink-subtle)]';
+  const featureEyebrowTextClassName = isDark ? 'text-white/48' : 'text-[var(--kt-ink-subtle)]';
+  const featureIconClassName = isDark
+    ? 'bg-[rgba(255,255,255,0.08)] text-white'
+    : 'bg-[var(--kt-surface-muted)] text-[var(--kt-ink-strong)]';
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(54,160,255,0.16),transparent_34%),radial-gradient(circle_at_top_right,rgba(208,96,112,0.14),transparent_28%),linear-gradient(180deg,#071017_0%,#0d1822_52%,#111d28_100%)] text-white">
+    <div className={pageClassName}>
       <div className="mx-auto flex min-h-screen max-w-[1500px] flex-col px-5 py-6 sm:px-8 lg:px-10">
-        <header className="flex flex-wrap items-center justify-between gap-4 rounded-[1.8rem] border border-white/10 bg-[rgba(10,18,26,0.72)] px-5 py-4 backdrop-blur">
+        <header
+          className={`flex flex-wrap items-center justify-between gap-4 rounded-[1.8rem] border px-5 py-4 backdrop-blur ${headerSurfaceClassName}`}
+        >
           <Link to={appShellRoutes.home} className="flex items-center gap-3">
-            <img src="/logo/kototsuna-logo-light.png" alt="Kototsuna" className="h-10 w-auto" />
+            <img src={logoSrc} alt="Kototsuna" className="h-10 w-auto" />
           </Link>
           <div className="flex flex-wrap items-center gap-2">
             <Button as="link" to={appShellRoutes.learn} variant="secondary" size="sm">
@@ -145,14 +182,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
             <div className="relative">
               <div className="absolute -left-12 top-6 h-36 w-36 rounded-full bg-[rgba(208,96,112,0.18)] blur-3xl" />
               <div className="absolute left-44 top-28 h-44 w-44 rounded-full bg-[rgba(54,160,255,0.16)] blur-3xl" />
-              <div className="relative rounded-[2.3rem] border border-white/10 bg-[rgba(10,18,26,0.76)] p-7 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur md:p-10">
-                <div className="text-xs font-black uppercase tracking-[0.28em] text-white/52">
+                <div
+                  className={`relative rounded-[2.3rem] border p-7 backdrop-blur md:p-10 ${heroSurfaceClassName}`}
+                >
+                  <div className={`text-xs font-black uppercase tracking-[0.28em] ${subtleTextClassName}`}>
                   {text.eyebrow}
                 </div>
-                <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[1.04] text-white md:text-6xl xl:text-7xl">
+                  <h1 className={`mt-5 max-w-4xl text-5xl font-black leading-[1.04] md:text-6xl xl:text-7xl ${headingTextClassName}`}>
                   {text.title}
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-white/72 md:text-xl">
+                  <p className={`mt-6 max-w-3xl text-lg leading-8 md:text-xl ${mutedTextClassName}`}>
                   {text.lead}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -199,14 +238,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
               </div>
 
               <article
-                className="rounded-[2rem] border border-white/10 bg-[rgba(10,18,26,0.76)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.24)] backdrop-blur"
+                className={`rounded-[2rem] border p-6 backdrop-blur ${railSurfaceClassName}`}
               >
                 <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_12rem] md:items-center">
                   <div>
-                    <div className="text-xs font-black uppercase tracking-[0.2em] text-white/50">
+                    <div className={`text-xs font-black uppercase tracking-[0.2em] ${featureEyebrowTextClassName}`}>
                       {text.railTitle}
                     </div>
-                    <p className="mt-4 text-base leading-8 text-white/72">{text.railCopy}</p>
+                    <p className={`mt-4 text-base leading-8 ${mutedTextClassName}`}>{text.railCopy}</p>
                     <div className="mt-6 flex flex-wrap gap-3">
                       <Button as="link" to={appShellRoutes.quests} variant="secondary" size="sm" iconStart={<Trophy size={16} />}>
                         {text.questsCta}
@@ -224,11 +263,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
             </div>
           </section>
 
-          <section className="mt-16 rounded-[2.2rem] border border-white/10 bg-[rgba(10,18,26,0.68)] p-7 backdrop-blur md:p-9">
-            <div className="text-xs font-black uppercase tracking-[0.22em] text-white/48">
+          <section className={`mt-16 rounded-[2.2rem] border p-7 backdrop-blur md:p-9 ${featureSurfaceClassName}`}>
+            <div className={`text-xs font-black uppercase tracking-[0.22em] ${featureEyebrowTextClassName}`}>
               {text.featureEyebrow}
             </div>
-            <h2 className="mt-4 text-4xl font-black text-white md:text-5xl">{text.featureTitle}</h2>
+            <h2 className={`mt-4 text-4xl font-black md:text-5xl ${headingTextClassName}`}>{text.featureTitle}</h2>
 
             <div className="mt-8 grid gap-4 lg:grid-cols-3">
               {text.cards.map((card, index) => {
@@ -245,15 +284,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
                   <Card
                     key={card.title}
                     padding="lg"
-                    className="border-white/10 bg-[rgba(255,255,255,0.04)] text-white"
+                    className={featureCardClassName}
                   >
                     <div className="flex items-center justify-between gap-4">
-                      <h3 className="text-2xl font-black text-white">{card.title}</h3>
-                      <span className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[rgba(255,255,255,0.08)] text-white">
+                      <h3 className={`text-2xl font-black ${headingTextClassName}`}>{card.title}</h3>
+                      <span
+                        className={`flex h-11 w-11 items-center justify-center rounded-[1rem] ${featureIconClassName}`}
+                      >
                         <Icon size={22} />
                       </span>
                     </div>
-                    <p className="mt-4 text-sm leading-7 text-white/72">{card.description}</p>
+                    <p className={`mt-4 text-sm leading-7 ${mutedTextClassName}`}>{card.description}</p>
                     <div className="mt-6">
                       <Button as="link" to={href} fullWidth variant={config.id === 'learn' ? 'primary' : 'secondary'}>
                         {card.cta}

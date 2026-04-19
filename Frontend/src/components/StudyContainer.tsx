@@ -16,6 +16,7 @@ interface StudyContainerProps {
   script: 'hiragana' | 'katakana';
   sections: KanaSection[];
   mode: 'typing' | 'drawing';
+  autoStart?: boolean;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
@@ -23,10 +24,11 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   language,
   script,
   sections,
-  mode
+  mode,
+  autoStart = false
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [view, setView] = useState<'selection' | 'run' | 'result'>('selection');
+  const [view, setView] = useState<'selection' | 'run' | 'result'>(autoStart ? 'run' : 'selection');
   const [selectedGroupsBySection, setSelectedGroupsBySection] = useState<Record<string, Set<string>>>({});
   const [runStats, setRunStats] = useState<RunStats | null>(null);
   const [typingMode, setTypingMode] = useState<TypingMode>('current');
@@ -52,7 +54,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
 
     sections.forEach(sec => {
       selectableGroups += sec.groups.length;
-      const selectedSet = selectedGroupsBySection[sec.id] || new Set<string>();
+      const selectedSet = autoStart ? new Set(sec.groups.map((group) => group.id)) : selectedGroupsBySection[sec.id] || new Set<string>();
       selectedGroups += selectedSet.size;
       
       sec.groups.forEach(g => {
@@ -80,7 +82,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       mergedSection: mergedSec,
       mergedSelectedGroupIds: mergedSelected
     };
-  }, [sections, selectedGroupsBySection, title]);
+  }, [autoStart, sections, selectedGroupsBySection, title]);
 
   const isAllSelected = totalSelectedGroups === totalSelectableGroups && totalSelectableGroups > 0;
   const isNoneSelected = totalSelectedGroups === 0;
@@ -163,7 +165,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
 
   return (
     <SectionCard title={title} description={currentSection.description}>
-      {view === 'selection' && (
+      {!autoStart && view === 'selection' && (
         <>
           <StudyNavigator
             title={currentSection.title}
@@ -221,7 +223,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             setRunStats(stats);
             setView('result');
           }}
-          onCancel={() => setView('selection')}
+          onCancel={() => setView(autoStart ? 'run' : 'selection')}
         />
       )}
       {view === 'run' && mode === 'drawing' && (
@@ -235,7 +237,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             setRunStats(stats);
             setView('result');
           }}
-          onCancel={() => setView('selection')}
+          onCancel={() => setView(autoStart ? 'run' : 'selection')}
         />
       )}
       {view === 'result' && runStats && (
@@ -244,7 +246,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           language={language}
           stats={runStats}
           onRestart={() => setView('run')}
-          onBack={() => setView('selection')}
+          onBack={() => setView(autoStart ? 'run' : 'selection')}
           variant={mode}
         />
       )}
