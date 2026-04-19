@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
+import { readVocab, updateVocabProgress, writeVocab } from '../../../data/jlearn/jlearnStorage';
 import { MultipleChoice } from './MultipleChoice';
 import { FillInBlank } from './FillInBlank';
 import { TranslationTask } from './TranslationTask';
@@ -15,6 +16,7 @@ export interface TaskSummary {
 }
 
 interface TaskRunnerProps {
+  missionId: string;
   questions: PracticeQuestion[];
   onComplete: (summary: TaskSummary) => void;
 }
@@ -29,10 +31,20 @@ const SUPPORTED_TYPES = new Set([
   'listening-recognition',
 ]);
 
-export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete }) => {
+export const TaskRunner: React.FC<TaskRunnerProps> = ({ missionId, questions, onComplete }) => {
   const eligible = questions.filter((q) => SUPPORTED_TYPES.has(q.type));
   const [idx, setIdx] = useState(0);
   const [retries, setRetries] = useState<Record<string, number>>({});
+
+  const recordVocabAttempt = (question: PracticeQuestion, wasCorrect: boolean) => {
+    if (!question.targetVocabId) return;
+    const next = updateVocabProgress(readVocab(), {
+      vocabId: question.targetVocabId,
+      missionId,
+      wasCorrect,
+    });
+    writeVocab(next);
+  };
 
   if (eligible.length === 0) {
     return (
@@ -61,9 +73,13 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
   const question = eligible[idx];
   const questionRetries = retries[question.id] ?? 0;
 
-  const handleCorrect = () => setIdx((i) => i + 1);
+  const handleCorrect = () => {
+    recordVocabAttempt(question, true);
+    setIdx((i) => i + 1);
+  };
 
-  const handleRetry = () => {
+  const handleIncorrect = () => {
+    recordVocabAttempt(question, false);
     setRetries((prev) => ({
       ...prev,
       [question.id]: (prev[question.id] ?? 0) + 1,
@@ -100,7 +116,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
           question={question}
           retryCount={questionRetries}
           onCorrect={handleCorrect}
-          onRetry={handleRetry}
+          onIncorrect={handleIncorrect}
         />
       )}
 
@@ -110,7 +126,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
           question={question}
           retryCount={questionRetries}
           onCorrect={handleCorrect}
-          onRetry={handleRetry}
+          onIncorrect={handleIncorrect}
         />
       )}
 
@@ -120,7 +136,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
           question={question}
           retryCount={questionRetries}
           onCorrect={handleCorrect}
-          onRetry={handleRetry}
+          onIncorrect={handleIncorrect}
         />
       )}
 
@@ -130,7 +146,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
           question={question}
           retryCount={questionRetries}
           onCorrect={handleCorrect}
-          onRetry={handleRetry}
+          onIncorrect={handleIncorrect}
         />
       )}
 
@@ -140,7 +156,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
           question={question}
           retryCount={questionRetries}
           onCorrect={handleCorrect}
-          onRetry={handleRetry}
+          onIncorrect={handleIncorrect}
         />
       )}
 
@@ -150,7 +166,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({ questions, onComplete })
           question={question}
           retryCount={questionRetries}
           onCorrect={handleCorrect}
-          onRetry={handleRetry}
+          onIncorrect={handleIncorrect}
         />
       )}
     </div>

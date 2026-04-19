@@ -2,13 +2,41 @@ export type ConfidenceLevel = 'low' | 'medium' | 'high';
 export type FormalityPreference = 'casual' | 'neutral' | 'polite';
 export type RelationshipStage = 0 | 1 | 2 | 3;
 
+export interface RecoveryFlag {
+  targetId: string;
+  missionsRemaining: number;
+  createdAt: string;
+}
+
+export const JLEARN_RELATIONSHIP_CHARACTER_IDS = [
+  'yuki',
+  'tanaka-sensei',
+  'yamada-sensei',
+  'mrs-tanaka',
+  'mr-tanaka',
+  'keita',
+  'sora',
+  'obaasan',
+] as const;
+
+export type JLearnRelationshipCharacterId = (typeof JLEARN_RELATIONSHIP_CHARACTER_IDS)[number];
+
+const buildDefaultRelationshipMap = <T,>(initialValue: T): Record<string, T> =>
+  Object.fromEntries(
+    JLEARN_RELATIONSHIP_CHARACTER_IDS.map((characterId) => [characterId, initialValue])
+  ) as Record<string, T>;
+
 export interface JLearnUserState {
   confidenceLevel: ConfidenceLevel;
   recentMistakes: string[];
   relationshipLevels: Record<string, RelationshipStage>;
+  relationshipMissionCounts: Record<string, number>;
+  recoveryFlags: RecoveryFlag[];
   formalityPreference: FormalityPreference;
+  formalityDriftScore: number;
   missedDays: number;
   streakDays: number;
+  lastSessionAt: string | null;
 }
 
 export const JLEARN_USER_STATE_KEY = 'kototsuna.jlearn.user-state';
@@ -17,16 +45,14 @@ export const JLEARN_ACTIVE_STEP_KEY = 'kototsuna.jlearn.active-step';
 export const defaultUserState: JLearnUserState = {
   confidenceLevel: 'medium',
   recentMistakes: [],
-  relationshipLevels: {
-    'yuki': 0,
-    'tanaka-sensei': 0,
-    'mrs-tanaka': 0,
-    'keita': 0,
-    'sora': 0
-  },
+  relationshipLevels: buildDefaultRelationshipMap<RelationshipStage>(0),
+  relationshipMissionCounts: buildDefaultRelationshipMap<number>(0),
+  recoveryFlags: [],
   formalityPreference: 'neutral',
+  formalityDriftScore: 0,
   missedDays: 0,
-  streakDays: 0
+  streakDays: 0,
+  lastSessionAt: null,
 };
 
 const safeParse = <T,>(raw: string | null, fallback: T): T => {
@@ -48,7 +74,11 @@ export const getJLearnUserState = (): JLearnUserState => {
     relationshipLevels: {
       ...defaultUserState.relationshipLevels,
       ...(parsed.relationshipLevels ?? {})
-    }
+    },
+    relationshipMissionCounts: {
+      ...defaultUserState.relationshipMissionCounts,
+      ...(parsed.relationshipMissionCounts ?? {})
+    },
   };
 };
 

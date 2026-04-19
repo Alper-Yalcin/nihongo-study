@@ -277,9 +277,25 @@ export const jlearnLevel1: JLearnLevel = {
             {
               id: 'dlg-L1-U1-M1-door',
               turns: [
-                { speaker: 'Mrs. Tanaka', line: 'こんばんは！', translation: 'Good evening!', isLearnerTurn: false },
+                {
+                  speaker: 'Mrs. Tanaka',
+                  line: {
+                    0: 'こんばんは！',
+                    2: 'こんばんは、おかえり！'
+                  },
+                  translation: 'Good evening!',
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'こんばんは！', acceptedAnswers: ['こんばんは', 'おじゃまします', 'こんばんは。おじゃまします。'], isLearnerTurn: true },
-                { speaker: 'Mrs. Tanaka', line: 'どうぞ、あがってください！', translation: 'Please, come in!', isLearnerTurn: false },
+                {
+                  speaker: 'Mrs. Tanaka',
+                  line: {
+                    0: 'どうぞ、あがってください！',
+                    2: 'どうぞ、あがってあがって！'
+                  },
+                  translation: 'Please, come in!',
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'ありがとうございます。', acceptedAnswers: ['ありがとうございます', 'ありがとう'], isLearnerTurn: true }
               ]
             }
@@ -416,7 +432,15 @@ export const jlearnLevel1: JLearnLevel = {
             {
               id: 'dlg-L1-U1-M3-night',
               turns: [
-                { speaker: 'Mrs. Tanaka', line: 'おやすみなさい。ゆっくりやすんでね。', translation: 'Good night. Rest well.', isLearnerTurn: false },
+                {
+                  speaker: 'Mrs. Tanaka',
+                  line: {
+                    0: 'おやすみなさい。ゆっくりやすんでね。',
+                    2: 'おやすみ。ゆっくりやすんでね。'
+                  },
+                  translation: 'Good night. Rest well.',
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'おやすみなさい', acceptedAnswers: ['おやすみなさい。'], isLearnerTurn: true }
               ]
             }
@@ -518,11 +542,33 @@ export const jlearnLevel1: JLearnLevel = {
             {
               id: 'dlg-L1-U2-M5-yuki',
               turns: [
-                { speaker: 'Yuki', line: 'おはよう！', isLearnerTurn: false },
+                {
+                  speaker: 'Yuki',
+                  line: {
+                    0: 'おはよう！',
+                    2: 'おはよ！'
+                  },
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'おはよう', acceptedAnswers: ['おはよう！'], isLearnerTurn: true },
-                { speaker: 'Yuki', line: 'きょう、たのしみだね！', translation: "I'm excited for today!", isLearnerTurn: false },
+                {
+                  speaker: 'Yuki',
+                  line: {
+                    0: 'きょう、たのしみだね！',
+                    2: 'きょう、めっちゃたのしみ！'
+                  },
+                  translation: "I'm excited for today!",
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'うん！', acceptedAnswers: ['うん', 'はい！'], isLearnerTurn: true },
-                { speaker: 'Yuki', line: 'よろしくね！', isLearnerTurn: false },
+                {
+                  speaker: 'Yuki',
+                  line: {
+                    0: 'よろしくね！',
+                    2: 'よろしくー！'
+                  },
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'よろしくおねがいします', acceptedAnswers: ['よろしく！', 'よろしくおねがいします。'], isLearnerTurn: true }
               ]
             }
@@ -640,9 +686,24 @@ export const jlearnLevel1: JLearnLevel = {
             {
               id: 'dlg-L1-U3-M7-yuki',
               turns: [
-                { speaker: 'Yuki', line: 'はい、どうぞ！', translation: '(hands you an eraser)', isLearnerTurn: false },
+                {
+                  speaker: 'Yuki',
+                  line: {
+                    0: 'はい、どうぞ！',
+                    2: 'はい、どうぞー！'
+                  },
+                  translation: '(hands you an eraser)',
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'ありがとう', acceptedAnswers: ['ありがとう！', 'ありがとうございます'], isLearnerTurn: true },
-                { speaker: 'Yuki', line: 'どういたしまして！', isLearnerTurn: false }
+                {
+                  speaker: 'Yuki',
+                  line: {
+                    0: 'どういたしまして！',
+                    2: 'いいよいいよ！'
+                  },
+                  isLearnerTurn: false
+                }
               ]
             }
           ],
@@ -693,11 +754,32 @@ export const jlearnLevel1: JLearnLevel = {
               id: 'dlg-L1-U3-M8-dinner',
               title: 'Dinner with Mrs. Tanaka',
               turns: [
-                { speaker: 'Mrs. Tanaka', line: 'いただきます！', isLearnerTurn: false },
+                {
+                  speaker: 'Mrs. Tanaka',
+                  line: {
+                    0: 'いただきます！',
+                    2: 'いただきます、さあ食べよ！'
+                  },
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'いただきます', acceptedAnswers: ['いただきます！'], isLearnerTurn: true },
-                { speaker: 'Mrs. Tanaka', line: 'ごちそうさまでした。', isLearnerTurn: false },
+                {
+                  speaker: 'Mrs. Tanaka',
+                  line: {
+                    0: 'ごちそうさまでした。',
+                    2: 'ごちそうさま。'
+                  },
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'ごちそうさまでした', acceptedAnswers: ['ごちそうさま'], isLearnerTurn: true },
-                { speaker: 'Mrs. Tanaka', line: 'おやすみなさい。', isLearnerTurn: false },
+                {
+                  speaker: 'Mrs. Tanaka',
+                  line: {
+                    0: 'おやすみなさい。',
+                    2: 'おやすみ。'
+                  },
+                  isLearnerTurn: false
+                },
                 { speaker: 'You', expectedAnswer: 'おやすみなさい', acceptedAnswers: ['おやすみなさい。'], isLearnerTurn: true }
               ]
             }

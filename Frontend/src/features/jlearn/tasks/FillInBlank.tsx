@@ -6,13 +6,13 @@ interface FillInBlankProps {
   question: PracticeQuestion;
   retryCount: number;
   onCorrect: () => void;
-  onRetry: () => void;
+  onIncorrect: () => void;
 }
 
 type State = 'idle' | 'wrong' | 'correct';
 
 export const FillInBlank: React.FC<FillInBlankProps> = ({
-  question, retryCount, onCorrect, onRetry,
+  question, retryCount, onCorrect, onIncorrect,
 }) => {
   const [value, setValue] = useState('');
   const [state, setState] = useState<State>('idle');
@@ -26,13 +26,13 @@ export const FillInBlank: React.FC<FillInBlankProps> = ({
       setTimeout(onCorrect, 600);
     } else {
       setState('wrong');
+      onIncorrect();
     }
   };
 
   const handleRetry = () => {
     setValue('');
     setState('idle');
-    onRetry();
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 

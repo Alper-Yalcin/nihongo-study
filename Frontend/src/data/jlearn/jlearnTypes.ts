@@ -85,9 +85,12 @@ export interface BranchingChoice {
   options: BranchingOption[];
 }
 
+export type DialogueRelationshipStage = 0 | 1 | 2 | 3;
+export type DialogueLineVariant = string | Partial<Record<DialogueRelationshipStage, string>>;
+
 export interface DialogueTurn {
   speaker: string;
-  line?: string;
+  line?: DialogueLineVariant;
   lineRomaji?: string;
   expectedAnswer?: string;
   acceptedAnswers?: string[];

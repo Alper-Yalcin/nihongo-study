@@ -5,7 +5,7 @@ interface SentenceBuildProps {
   question: PracticeQuestion;
   retryCount: number;
   onCorrect: () => void;
-  onRetry: () => void;
+  onIncorrect: () => void;
 }
 
 type State = 'idle' | 'wrong' | 'correct';
@@ -25,7 +25,7 @@ interface Token {
 }
 
 export const SentenceBuild: React.FC<SentenceBuildProps> = ({
-  question, retryCount, onCorrect, onRetry,
+  question, retryCount, onCorrect, onIncorrect,
 }) => {
   const sourceTokens = useMemo<Token[]>(
     () =>
@@ -63,6 +63,7 @@ export const SentenceBuild: React.FC<SentenceBuildProps> = ({
       setTimeout(onCorrect, 600);
     } else {
       setState('wrong');
+      onIncorrect();
     }
   };
 
@@ -70,7 +71,6 @@ export const SentenceBuild: React.FC<SentenceBuildProps> = ({
     setBank(sourceTokens);
     setAnswer([]);
     setState('idle');
-    onRetry();
   };
 
   return (

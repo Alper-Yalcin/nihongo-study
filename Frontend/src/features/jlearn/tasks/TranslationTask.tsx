@@ -6,7 +6,7 @@ interface TranslationTaskProps {
   question: PracticeQuestion;
   retryCount: number;
   onCorrect: () => void;
-  onRetry: () => void;
+  onIncorrect: () => void;
 }
 
 type State = 'idle' | 'wrong' | 'correct';
@@ -17,7 +17,7 @@ const DIRECTION_LABEL: Record<string, string> = {
 };
 
 export const TranslationTask: React.FC<TranslationTaskProps> = ({
-  question, retryCount, onCorrect, onRetry,
+  question, retryCount, onCorrect, onIncorrect,
 }) => {
   const [value, setValue] = useState('');
   const [state, setState] = useState<State>('idle');
@@ -34,13 +34,13 @@ export const TranslationTask: React.FC<TranslationTaskProps> = ({
       setTimeout(onCorrect, 600);
     } else {
       setState('wrong');
+      onIncorrect();
     }
   };
 
   const handleRetry = () => {
     setValue('');
     setState('idle');
-    onRetry();
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 

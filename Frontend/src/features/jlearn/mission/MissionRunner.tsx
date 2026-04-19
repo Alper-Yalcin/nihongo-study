@@ -5,9 +5,19 @@ import { appShellRoutes } from '../../../data/appShellContent';
 import { TaskRunner, TaskSummary } from '../tasks/TaskRunner';
 import { DialogueChainPlayer } from '../dialogue/DialogueChainPlayer';
 import { BranchingChoicePanel } from '../branching/BranchingChoicePanel';
-import { readProgress, writeProgress } from '../../../data/jlearn/jlearnStorage';
+import { readProgress, readUserState, writeProgress, writeUserState } from '../../../data/jlearn/jlearnStorage';
 import { completeStep } from '../../../data/jlearn/jlearnGating';
 import { jlearnTrack } from '../../../data/jlearn/jlearnContent';
+import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
+import { AdaptiveBranchPick, updateUserStateForMission } from '../adaptive/jlearnAdaptive';
+import { deriveEmotionalFeedbackTier, EmotionalFeedbackTier } from './emotionalFeedback';
+import {
+  buildRecoveryCallbackLine,
+  prepareRecoveryMission,
+  resolveRecoveryTarget,
+  upsertRecoveryFlag,
+} from '../failForward/failForward';
+import { RecoveryFlag } from '../debug/debugStore';
 
 type Phase = 'scenario' | 'vocab' | 'grammar' | 'examples' | 'branching' | 'dialogue' | 'tasks' | 'complete';
 
@@ -26,6 +36,30 @@ const PHASE_LABELS: Record<Phase, string> = {
   dialogue: 'Dialogue',
   tasks: 'Practice',
   complete: 'Complete',
+};
+
+const EMOTIONAL_FEEDBACK_STYLES: Record<
+  EmotionalFeedbackTier,
+  { border: string; bg: string; label: string; badge: string }
+> = {
+  perfect: {
+    border: 'border-[var(--kt-accent-info)]',
+    bg: 'bg-[var(--kt-accent-info)] bg-opacity-10',
+    label: 'text-[var(--kt-accent-info)]',
+    badge: 'Perfect',
+  },
+  good: {
+    border: 'border-amber-400',
+    bg: 'bg-amber-400 bg-opacity-10',
+    label: 'text-amber-500',
+    badge: 'Good',
+  },
+  struggle: {
+    border: 'border-[var(--kt-border)]',
+    bg: 'bg-[var(--kt-surface-raised)]',
+    label: 'text-[var(--kt-ink-muted)]',
+    badge: 'Kept Going',
+  },
 };
 
 function buildPhaseList(step: JLearnStep): Phase[] {
@@ -114,17 +148,62 @@ export const MissionRunner: React.FC<MissionRunnerProps> = ({ step }) => {
   type TaskPhaseState = 'running' | 'passed' | 'failed';
   const [taskPhaseState, setTaskPhaseState] = useState<TaskPhaseState>('running');
   const [lastSummary, setLastSummary] = useState<TaskSummary | null>(null);
+  const [branchPicks, setBranchPicks] = useState<AdaptiveBranchPick[]>([]);
+  const [matchedRecoveryFlags, setMatchedRecoveryFlags] = useState<RecoveryFlag[]>([]);
+  const [recoveryQuestions, setRecoveryQuestions] = useState<PracticeQuestion[]>([]);
+  const [recoveryCallbackLine, setRecoveryCallbackLine] = useState<string | null>(null);
+
+  useEffect(() => {
+    persistedRef.current = false;
+    setPhaseIdx(0);
+    setTasksDone(false);
+    setDialogueChainIdx(0);
+    setTaskPhaseState('running');
+    setLastSummary(null);
+    setBranchPicks([]);
+    setMatchedRecoveryFlags([]);
+    setRecoveryQuestions([]);
+    setRecoveryCallbackLine(null);
+
+    const state = readUserState();
+    const recoverySession = prepareRecoveryMission(step, state.recoveryFlags);
+    setMatchedRecoveryFlags(recoverySession.matchedFlags);
+    setRecoveryQuestions(recoverySession.injectedQuestions);
+
+    if (JSON.stringify(recoverySession.remainingFlags) !== JSON.stringify(state.recoveryFlags)) {
+      writeUserState({
+        ...state,
+        recoveryFlags: recoverySession.remainingFlags,
+      });
+    }
+  }, [step.id]);
 
   useEffect(() => {
     if (phase === 'complete' && !persistedRef.current) {
       persistedRef.current = true;
       const updated = completeStep(step.id, readProgress(), jlearnTrack);
       writeProgress(updated);
+      const userState = updateUserStateForMission(readUserState(), {
+        step,
+        taskSummary: lastSummary,
+        branchPicks,
+      });
+      writeUserState({
+        ...userState,
+        recoveryFlags: userState.recoveryFlags.filter(
+          (flag) => !matchedRecoveryFlags.some((matched) => matched.targetId === flag.targetId)
+        ),
+      });
     }
-  }, [phase, step.id]);
+  }, [branchPicks, lastSummary, matchedRecoveryFlags, phase, step]);
 
   const goNext = () => setPhaseIdx((i) => Math.min(i + 1, phases.length - 1));
   const goBack = () => setPhaseIdx((i) => Math.max(i - 1, 0));
+  const emotionalFeedbackTier = deriveEmotionalFeedbackTier(lastSummary);
+  const emotionalFeedbackCopy =
+    emotionalFeedbackTier && step.emotionalFeedback
+      ? step.emotionalFeedback[emotionalFeedbackTier]
+      : null;
 
   const header = (
     <div className="mb-6">
@@ -143,6 +222,31 @@ export const MissionRunner: React.FC<MissionRunnerProps> = ({ step }) => {
             ✓
           </div>
           <h2 className="text-2xl font-black text-[var(--kt-ink-strong)]">Mission Complete</h2>
+          {emotionalFeedbackTier && emotionalFeedbackCopy && (
+            <div
+              className={`w-full max-w-lg rounded-[1.2rem] border p-5 text-left ${EMOTIONAL_FEEDBACK_STYLES[emotionalFeedbackTier].border} ${EMOTIONAL_FEEDBACK_STYLES[emotionalFeedbackTier].bg}`}
+            >
+              <div
+                className={`mb-2 text-[11px] font-black uppercase tracking-[0.16em] ${EMOTIONAL_FEEDBACK_STYLES[emotionalFeedbackTier].label}`}
+              >
+                {EMOTIONAL_FEEDBACK_STYLES[emotionalFeedbackTier].badge}
+              </div>
+              <p className="text-base leading-7 text-[var(--kt-ink-strong)]">{emotionalFeedbackCopy}</p>
+              {recoveryCallbackLine && (
+                <p className="mt-3 border-t border-[var(--kt-border-subtle)] pt-3 text-sm leading-6 text-[var(--kt-ink-muted)]">
+                  {recoveryCallbackLine}
+                </p>
+              )}
+            </div>
+          )}
+          {!emotionalFeedbackCopy && recoveryCallbackLine && (
+            <div className="w-full max-w-lg rounded-[1.2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 text-left">
+              <div className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">
+                Callback
+              </div>
+              <p className="text-base leading-7 text-[var(--kt-ink-strong)]">{recoveryCallbackLine}</p>
+            </div>
+          )}
           {step.successMessage && (
             <p className="max-w-md text-base leading-7 text-[var(--kt-ink-muted)]">
               {step.successMessage}
@@ -276,6 +380,26 @@ export const MissionRunner: React.FC<MissionRunnerProps> = ({ step }) => {
         <BranchingChoicePanel
           branchingChoice={step.branchingChoice}
           onContinue={goNext}
+          onPicked={(pick) => {
+            setBranchPicks((current) => [
+              ...current,
+              { label: pick.option.label, result: pick.result },
+            ]);
+            if (pick.result === 'partial') {
+              const target = resolveRecoveryTarget(step, pick);
+              if (target) {
+                const state = readUserState();
+                writeUserState({
+                  ...state,
+                  recoveryFlags: upsertRecoveryFlag(
+                    state.recoveryFlags,
+                    target.targetId,
+                    new Date().toISOString()
+                  ),
+                });
+              }
+            }
+          }}
         />
       )}
 
@@ -302,10 +426,14 @@ export const MissionRunner: React.FC<MissionRunnerProps> = ({ step }) => {
 
       {phase === 'tasks' && taskPhaseState === 'running' && (
         <TaskRunner
-          questions={step.questions}
+          missionId={step.id}
+          questions={[...step.questions, ...recoveryQuestions]}
           onComplete={(summary: TaskSummary) => {
             setLastSummary(summary);
             setTasksDone(true);
+            if (matchedRecoveryFlags.length > 0) {
+              setRecoveryCallbackLine(buildRecoveryCallbackLine(step, matchedRecoveryFlags));
+            }
             if (step.isCheckpoint && summary.total > 0) {
               const pct = Math.round((summary.correctFirstTry / summary.total) * 100);
               if (pct >= passThreshold) {

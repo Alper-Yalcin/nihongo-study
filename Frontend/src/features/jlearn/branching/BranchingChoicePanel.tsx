@@ -1,10 +1,11 @@
 import React from 'react';
 import { BranchingChoice } from '../../../data/jlearn/jlearnTypes';
-import { useBranchingChoice } from './useBranchingChoice';
+import { BranchingPickResult, useBranchingChoice } from './useBranchingChoice';
 
 interface BranchingChoicePanelProps {
   branchingChoice: BranchingChoice;
   onContinue: () => void;
+  onPicked?: (pick: BranchingPickResult) => void;
 }
 
 const OUTCOME_STYLES = {
@@ -29,7 +30,7 @@ const OUTCOME_STYLES = {
 } as const;
 
 export const BranchingChoicePanel: React.FC<BranchingChoicePanelProps> = ({
-  branchingChoice, onContinue,
+  branchingChoice, onContinue, onPicked,
 }) => {
   const { picked, isPicked, onPick, reset } = useBranchingChoice(branchingChoice);
 
@@ -55,7 +56,12 @@ export const BranchingChoicePanel: React.FC<BranchingChoicePanelProps> = ({
             <button
               key={opt.id}
               type="button"
-              onClick={() => onPick(opt.id)}
+              onClick={() => {
+                const nextPick = onPick(opt.id);
+                if (nextPick) {
+                  onPicked?.(nextPick);
+                }
+              }}
               className="w-full rounded-[1rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-raised)] px-4 py-3.5 text-left font-jp text-base text-[var(--kt-ink)] transition hover:border-[var(--kt-accent-info)] hover:bg-[var(--kt-nav-item-hover)]"
             >
               {opt.label}

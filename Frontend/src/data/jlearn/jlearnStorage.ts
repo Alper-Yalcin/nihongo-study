@@ -39,6 +39,23 @@ export interface VocabProgressRecord {
 
 export type VocabProgressMap = Record<string, VocabProgressRecord>;
 
+interface VocabAttemptUpdate {
+  vocabId: string;
+  missionId: string;
+  wasCorrect: boolean;
+  seenAt?: string;
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const REVIEW_INTERVALS_BY_MASTERY: Record<MasteryLevel, number> = {
+  0: 0,
+  1: 1,
+  2: 3,
+  3: 7,
+  4: 30,
+};
+
 // ─── Safe parse helper ────────────────────────────────────────────────────────
 
 function safeParse<T>(key: string, fallback: T): T {
@@ -82,6 +99,77 @@ export function readVocab(): VocabProgressMap {
 
 export function writeVocab(v: VocabProgressMap): void {
   safeWrite(VOCAB_KEY, v);
+}
+
+export function deriveVocabNextReviewAt(
+  masteryLevel: MasteryLevel,
+  seenAt: string
+): string {
+  const baseMs = new Date(seenAt).getTime();
+  const offsetDays = REVIEW_INTERVALS_BY_MASTERY[masteryLevel];
+  return new Date(baseMs + offsetDays * DAY_MS).toISOString();
+}
+
+export function validateVocabProgress(vocab: VocabProgressMap): string[] {
+  const issues: string[] = [];
+
+  for (const [vocabId, entry] of Object.entries(vocab)) {
+    if (entry.vocabId !== vocabId) {
+      issues.push(`${vocabId}: key/vocabId mismatch`);
+    }
+
+    if (!Number.isInteger(entry.masteryLevel) || entry.masteryLevel < 0 || entry.masteryLevel > 4) {
+      issues.push(`${vocabId}: invalid masteryLevel ${entry.masteryLevel}`);
+    }
+
+    if (!Number.isInteger(entry.errorCount) || entry.errorCount < 0) {
+      issues.push(`${vocabId}: invalid errorCount ${entry.errorCount}`);
+    }
+
+    if (Number.isNaN(Date.parse(entry.lastSeenAt))) {
+      issues.push(`${vocabId}: invalid lastSeenAt ${entry.lastSeenAt}`);
+    }
+
+    if (Number.isNaN(Date.parse(entry.nextReviewAt))) {
+      issues.push(`${vocabId}: invalid nextReviewAt ${entry.nextReviewAt}`);
+    }
+
+    if (!Array.isArray(entry.seenInMissions)) {
+      issues.push(`${vocabId}: seenInMissions must be an array`);
+    }
+  }
+
+  return issues;
+}
+
+export function updateVocabProgress(
+  current: VocabProgressMap,
+  update: VocabAttemptUpdate
+): VocabProgressMap {
+  const seenAt = update.seenAt ?? new Date().toISOString();
+  const existing = current[update.vocabId];
+  const nextSeenInMissions = existing?.seenInMissions.includes(update.missionId)
+    ? existing.seenInMissions
+    : [...(existing?.seenInMissions ?? []), update.missionId];
+
+  const nextMastery = update.wasCorrect
+    ? Math.min(4, (existing?.masteryLevel ?? 0) + 1)
+    : Math.max(0, (existing?.masteryLevel ?? 0) - 1);
+
+  const nextRecord: VocabProgressRecord = {
+    vocabId: update.vocabId,
+    masteryLevel: nextMastery as MasteryLevel,
+    errorCount: (existing?.errorCount ?? 0) + (update.wasCorrect ? 0 : 1),
+    lastSeenAt: seenAt,
+    nextReviewAt: deriveVocabNextReviewAt(nextMastery as MasteryLevel, seenAt),
+    seenInMissions: nextSeenInMissions,
+    confusedWith: existing?.confusedWith,
+  };
+
+  return {
+    ...current,
+    [update.vocabId]: nextRecord,
+  };
 }
 
 // ─── User state helpers (delegates to debugStore) ────────────────────────────

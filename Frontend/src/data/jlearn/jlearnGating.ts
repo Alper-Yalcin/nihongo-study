@@ -32,6 +32,16 @@ function checkpointStepId(track: JLearnTrack, levelIdx: number, unitIdx: number)
   return cp?.id ?? unit.steps[unit.steps.length - 1]?.id ?? null;
 }
 
+function levelCheckpointStepId(track: JLearnTrack, levelIdx: number): string | null {
+  const level = track.levels[levelIdx];
+  if (!level) return null;
+
+  const checkpointUnitIdx = level.units.findIndex((unit) => unit.id === level.checkpointUnitId);
+  if (checkpointUnitIdx === -1) return null;
+
+  return checkpointStepId(track, levelIdx, checkpointUnitIdx);
+}
+
 export function isStepUnlocked(stepId: string, progress: MissionProgress, track: JLearnTrack): boolean {
   const loc = locateStep(stepId, track);
   if (!loc) return false;
@@ -88,8 +98,12 @@ export function completeStep(stepId: string, progress: MissionProgress, track: J
 
   // Mark level complete if all units are done
   const level = track.levels[levelIdx];
-  const allUnitsDone = level.units.every((u) => next.completedUnitIds.includes(u.id));
-  if (allUnitsDone && !next.completedLevelIds.includes(levelId)) {
+  const levelCheckpointId = levelCheckpointStepId(track, levelIdx);
+  const levelCheckpointDone = levelCheckpointId
+    ? next.completedStepIds.includes(levelCheckpointId)
+    : false;
+
+  if (levelCheckpointDone && !next.completedLevelIds.includes(levelId)) {
     next.completedLevelIds = [...next.completedLevelIds, levelId];
     if (level.badge && !next.earnedBadgeIds.includes(level.badge.id)) {
       next.earnedBadgeIds = [...next.earnedBadgeIds, level.badge.id];

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { DialogueChain } from '../../../data/jlearn/jlearnTypes';
+import { DialogueChain, DialogueLineVariant } from '../../../data/jlearn/jlearnTypes';
 import { useDialogueChain } from './useDialogueChain';
 import { isAnswerCorrect } from '../tasks/answerNormalizer';
+import { getJLearnUserState, RelationshipStage } from '../debug/debugStore';
 
 interface DialogueChainPlayerProps {
   chain: DialogueChain;
@@ -10,20 +11,47 @@ interface DialogueChainPlayerProps {
 
 const AVATAR_COLORS: Record<string, string> = {
   'mrs-tanaka': 'bg-rose-400',
+  'mr-tanaka': 'bg-cyan-500',
   'tanaka-sensei': 'bg-slate-500',
+  'yamada-sensei': 'bg-indigo-500',
   yuki: 'bg-violet-400',
   keita: 'bg-orange-400',
   sora: 'bg-teal-400',
   obaasan: 'bg-amber-400',
 };
 
+export function normalizeSpeakerCharacterId(speaker: string): string | null {
+  const normalized = speaker.trim().toLowerCase();
+  if (normalized === 'mrs. tanaka' || normalized === 'mrs tanaka') return 'mrs-tanaka';
+  if (normalized === 'mr. tanaka' || normalized === 'mr tanaka') return 'mr-tanaka';
+  if (normalized === 'tanaka-sensei') return 'tanaka-sensei';
+  if (normalized === 'yamada-sensei') return 'yamada-sensei';
+  if (normalized === 'yuki') return 'yuki';
+  if (normalized === 'keita') return 'keita';
+  if (normalized === 'sora') return 'sora';
+  if (normalized === 'obaasan') return 'obaasan';
+  return null;
+}
+
 function avatarColor(speaker: string): string {
-  const key = speaker.toLowerCase().replace(/\s+/g, '-');
-  return AVATAR_COLORS[key] ?? 'bg-[var(--kt-accent-info)]';
+  const key = normalizeSpeakerCharacterId(speaker);
+  return (key && AVATAR_COLORS[key]) ?? 'bg-[var(--kt-accent-info)]';
 }
 
 function speakerInitial(speaker: string): string {
   return speaker.charAt(0).toUpperCase();
+}
+
+export function resolveDialogueLineForStage(
+  line: DialogueLineVariant | undefined,
+  relationshipStage: RelationshipStage | null
+): string {
+  if (!line) return '';
+  if (typeof line === 'string') return line;
+  if (relationshipStage !== null && line[relationshipStage]) {
+    return line[relationshipStage] ?? '';
+  }
+  return line[0] ?? line[1] ?? line[2] ?? line[3] ?? '';
 }
 
 interface BubbleProps {
@@ -95,7 +123,7 @@ const LearnerInput: React.FC<LearnerInputProps> = ({ expectedAnswer, acceptedAns
               type="text"
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="Type your response…"
+              placeholder="Type your responseâ€¦"
               className="flex-1 rounded-[1rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] px-4 py-2.5 font-jp text-base text-[var(--kt-ink)] outline-none transition focus:border-[var(--kt-accent-info)] placeholder:text-[var(--kt-ink-muted)]"
             />
             <button
@@ -103,7 +131,7 @@ const LearnerInput: React.FC<LearnerInputProps> = ({ expectedAnswer, acceptedAns
               disabled={!value.trim()}
               className="rounded-[1rem] bg-[var(--kt-accent-info)] px-4 py-2.5 text-sm font-black text-white transition hover:opacity-90 disabled:opacity-40"
             >
-              →
+              â†’
             </button>
           </form>
         ) : (
@@ -117,7 +145,7 @@ const LearnerInput: React.FC<LearnerInputProps> = ({ expectedAnswer, acceptedAns
             <p className="font-jp text-lg text-[var(--kt-ink-strong)]">{value}</p>
             {!wasCorrect && (
               <p className="mt-1 text-xs text-[var(--kt-ink-muted)]">
-                ✓ {expectedAnswer}
+                âœ“ {expectedAnswer}
               </p>
             )}
           </div>
@@ -131,6 +159,15 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
   const { currentTurn, turnIndex, isDone, missedTurns, advance } = useDialogueChain(chain);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [history, setHistory] = useState<React.ReactNode[]>([]);
+  const relationshipLevels = getJLearnUserState().relationshipLevels;
+  const currentSpeakerCharacterId =
+    currentTurn && !currentTurn.isLearnerTurn
+      ? normalizeSpeakerCharacterId(currentTurn.speaker)
+      : null;
+  const currentSpeakerRelationshipStage =
+    currentSpeakerCharacterId !== null
+      ? (relationshipLevels[currentSpeakerCharacterId] ?? 0)
+      : null;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -145,11 +182,14 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
 
   const commitSpeakerTurn = () => {
     if (!currentTurn || currentTurn.isLearnerTurn) return;
+    const speakerCharacterId = normalizeSpeakerCharacterId(currentTurn.speaker);
+    const relationshipStage =
+      speakerCharacterId !== null ? (relationshipLevels[speakerCharacterId] ?? 0) : null;
     const node = (
       <SpeakerBubble
         key={`turn-${turnIndex}`}
         speaker={currentTurn.speaker}
-        line={currentTurn.line ?? ''}
+        line={resolveDialogueLineForStage(currentTurn.line, relationshipStage)}
         lineRomaji={currentTurn.lineRomaji}
         translation={currentTurn.translation}
       />
@@ -166,10 +206,12 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
     const node = (
       <div
         key={`turn-${turnIndex}`}
-        className={`flex justify-end`}
+        className="flex justify-end"
       >
         <div className="max-w-[80%]">
-          <div className="mb-1 text-right text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">You</div>
+          <div className="mb-1 text-right text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">
+            You
+          </div>
           <div
             className={`rounded-[1rem] rounded-tr-none border px-4 py-3 ${
               correct
@@ -179,7 +221,7 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
           >
             <p className="font-jp text-lg text-[var(--kt-ink-strong)]">{given}</p>
             {!correct && currentTurn.expectedAnswer && (
-              <p className="mt-1 text-xs text-[var(--kt-ink-muted)]">✓ {currentTurn.expectedAnswer}</p>
+              <p className="mt-1 text-xs text-[var(--kt-ink-muted)]">âœ“ {currentTurn.expectedAnswer}</p>
             )}
           </div>
         </div>
@@ -198,10 +240,8 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
       )}
 
       <div className="space-y-4 rounded-[1.4rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-page)] p-5">
-        {/* History */}
         {history}
 
-        {/* Current turn */}
         {!isDone && currentTurn && (
           <>
             {!currentTurn.isLearnerTurn && (
@@ -216,7 +256,9 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
                     {currentTurn.speaker}
                   </div>
                   <div className="rounded-[1rem] rounded-tl-none border border-[var(--kt-accent-info)] bg-[var(--kt-accent-info)] bg-opacity-5 px-4 py-3">
-                    <p className="font-jp text-lg text-[var(--kt-ink-strong)]">{currentTurn.line}</p>
+                    <p className="font-jp text-lg text-[var(--kt-ink-strong)]">
+                      {resolveDialogueLineForStage(currentTurn.line, currentSpeakerRelationshipStage)}
+                    </p>
                     {currentTurn.lineRomaji && (
                       <p className="mt-0.5 text-xs text-[var(--kt-ink-muted)]">{currentTurn.lineRomaji}</p>
                     )}
@@ -229,7 +271,7 @@ export const DialogueChainPlayer: React.FC<DialogueChainPlayerProps> = ({ chain,
                     onClick={commitSpeakerTurn}
                     className="mt-2 rounded-[0.8rem] border border-[var(--kt-border)] px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)] transition hover:bg-[var(--kt-nav-item-hover)]"
                   >
-                    Continue →
+                    Continue â†’
                   </button>
                 </div>
               </div>

@@ -6,7 +6,7 @@ interface ListeningRecognitionProps {
   question: PracticeQuestion;
   retryCount: number;
   onCorrect: () => void;
-  onRetry: () => void;
+  onIncorrect: () => void;
 }
 
 type State = 'idle' | 'wrong' | 'correct';
@@ -22,7 +22,7 @@ function getJaVoice(): SpeechSynthesisVoice | null {
 }
 
 export const ListeningRecognition: React.FC<ListeningRecognitionProps> = ({
-  question, retryCount, onCorrect, onRetry,
+  question, retryCount, onCorrect, onIncorrect,
 }) => {
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>('loading');
   const [selected, setSelected] = useState<string | null>(null);
@@ -74,13 +74,13 @@ export const ListeningRecognition: React.FC<ListeningRecognitionProps> = ({
       setTimeout(onCorrect, 600);
     } else {
       setAnswerState('wrong');
+      onIncorrect();
     }
   };
 
   const handleRetry = () => {
     setSelected(null);
     setAnswerState('idle');
-    onRetry();
   };
 
   const options = question.options ?? [];

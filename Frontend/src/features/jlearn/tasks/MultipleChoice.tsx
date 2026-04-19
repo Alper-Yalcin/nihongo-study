@@ -6,13 +6,13 @@ interface MultipleChoiceProps {
   question: PracticeQuestion;
   retryCount: number;
   onCorrect: () => void;
-  onRetry: () => void;
+  onIncorrect: () => void;
 }
 
 type State = 'idle' | 'wrong' | 'correct';
 
 export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
-  question, retryCount, onCorrect, onRetry,
+  question, retryCount, onCorrect, onIncorrect,
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
@@ -26,13 +26,13 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
       setTimeout(onCorrect, 600);
     } else {
       setState('wrong');
+      onIncorrect();
     }
   };
 
   const handleRetry = () => {
     setSelected(null);
     setState('idle');
-    onRetry();
   };
 
   return (

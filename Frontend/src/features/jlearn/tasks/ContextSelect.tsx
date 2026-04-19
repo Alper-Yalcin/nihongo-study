@@ -6,13 +6,13 @@ interface ContextSelectProps {
   question: PracticeQuestion;
   retryCount: number;
   onCorrect: () => void;
-  onRetry: () => void;
+  onIncorrect: () => void;
 }
 
 type State = 'idle' | 'wrong' | 'correct';
 
 export const ContextSelect: React.FC<ContextSelectProps> = ({
-  question, retryCount, onCorrect, onRetry,
+  question, retryCount, onCorrect, onIncorrect,
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
@@ -26,13 +26,13 @@ export const ContextSelect: React.FC<ContextSelectProps> = ({
       setTimeout(onCorrect, 600);
     } else {
       setState('wrong');
+      onIncorrect();
     }
   };
 
   const handleRetry = () => {
     setSelected(null);
     setState('idle');
-    onRetry();
   };
 
   return (

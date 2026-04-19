@@ -1,7 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { jlearnTrack, getAllJLearnSteps } from '../../../data/jlearn/jlearnContent';
-import { readProgress, writeProgress, readVocab, writeVocab } from '../../../data/jlearn/jlearnStorage';
+import {
+  jlearnTrack,
+  getAllJLearnGrammarPoints,
+  getAllJLearnSteps,
+  getAllJLearnVocabItems,
+} from '../../../data/jlearn/jlearnContent';
+import {
+  readProgress,
+  writeProgress,
+  readVocab,
+  writeVocab,
+  validateVocabProgress,
+} from '../../../data/jlearn/jlearnStorage';
 import {
   getJLearnUserState,
   setJLearnUserState,
@@ -12,6 +23,7 @@ import {
   forceMissedDays,
   JLEARN_USER_STATE_KEY,
   JLEARN_ACTIVE_STEP_KEY,
+  JLEARN_RELATIONSHIP_CHARACTER_IDS,
   JLearnUserState,
   defaultUserState
 } from './debugStore';
@@ -35,6 +47,14 @@ export const DebugPanel: React.FC = () => {
   }, [tick]);
 
   const allSteps = useMemo(() => getAllJLearnSteps(), []);
+  const vocabById = useMemo(
+    () => new Map(getAllJLearnVocabItems().map((item) => [item.id, item])),
+    []
+  );
+  const grammarById = useMemo(
+    () => new Map(getAllJLearnGrammarPoints().map((item) => [item.id, item])),
+    []
+  );
 
   if (!enabled) return null;
 
@@ -91,6 +111,13 @@ export const DebugPanel: React.FC = () => {
       </section>
 
       <section className="mb-3">
+        <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Vocab Progress</div>
+        <pre className="rounded-md bg-[var(--kt-surface-page)] p-2 text-[10px] leading-4 text-[var(--kt-ink)] whitespace-pre-wrap break-all">
+{JSON.stringify(readVocab(), null, 2)}
+        </pre>
+      </section>
+
+      <section className="mb-3">
         <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Jump to Mission</div>
         <select
           value={activeStepId ?? ''}
@@ -128,7 +155,7 @@ export const DebugPanel: React.FC = () => {
 
       <section className="mb-3">
         <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Relationships</div>
-        {(['yuki', 'tanaka-sensei', 'mrs-tanaka', 'keita', 'sora'] as const).map((charId) => (
+        {JLEARN_RELATIONSHIP_CHARACTER_IDS.map((charId) => (
           <div key={charId} className="mb-1 flex items-center justify-between gap-2">
             <span className="truncate text-[11px]">{charId}</span>
             <div className="flex gap-1">
@@ -207,6 +234,34 @@ export const DebugPanel: React.FC = () => {
       </section>
 
       <section className="mb-3">
+        <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Recovery Flags</div>
+        {state.recoveryFlags.length === 0 ? (
+          <div className="rounded-md bg-[var(--kt-surface-page)] p-2 text-[10px] text-[var(--kt-ink-muted)]">
+            none
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {state.recoveryFlags.map((flag) => {
+              const vocab = vocabById.get(flag.targetId);
+              const grammar = grammarById.get(flag.targetId);
+              const label = vocab?.japanese ?? grammar?.pattern ?? flag.targetId;
+
+              return (
+                <div
+                  key={`${flag.targetId}-${flag.createdAt}`}
+                  className="rounded-md bg-[var(--kt-surface-page)] p-2 text-[10px] leading-4 text-[var(--kt-ink)]"
+                >
+                  <div className="font-black text-[var(--kt-ink-strong)]">{label}</div>
+                  <div>ID: {flag.targetId}</div>
+                  <div>Missions left: {flag.missionsRemaining}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="mb-3">
         <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Storage</div>
         <button
           type="button"
@@ -234,6 +289,16 @@ export const DebugPanel: React.FC = () => {
           className="w-full rounded-md border border-[var(--kt-border)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]"
         >
           Test vocab round-trip (console)
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const issues = validateVocabProgress(readVocab());
+            console.log('[jlearnStorage] validateVocabProgress:', issues.length === 0 ? 'PASS' : 'FAIL', issues);
+          }}
+          className="mt-1 w-full rounded-md border border-[var(--kt-border)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]"
+        >
+          Validate vocab progress (console)
         </button>
       </section>
 
