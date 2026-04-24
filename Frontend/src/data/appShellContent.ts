@@ -14,6 +14,7 @@ export const appShellRoutes = {
   learn: '/learn',
   learnJapanese: '/learn/japanese',
   learnJapaneseMissionBase: '/learn/japanese/mission',
+  learnJapaneseChallengeBase: '/learn/japanese/challenge',
   learnUnitBase: '/learn/unit',
   letters: '/letters',
   practice: '/practice',

@@ -54,7 +54,10 @@ export type QuestionType =
   | 'sentence-build'
   | 'listening-recognition'
   | 'context-select'
-  | 'dialogue-complete';
+  | 'dialogue-complete'
+  | 'pronunciation-repeat'
+  | 'dialogue-speak'
+  | 'shadow-read';
 
 export interface PracticeQuestion {
   id: string;
@@ -110,6 +113,16 @@ export interface EmotionalFeedback {
   struggle: string;
 }
 
+export type StoryHookType = 'cliffhanger' | 'invitation-tease' | 'mystery-drop';
+
+export interface StoryHook {
+  type: StoryHookType;
+  speaker: string;
+  teaser: string;
+  japanese: string;
+  translation: string;
+}
+
 export type MissionKind = 'introduce' | 'expand' | 'review' | 'produce' | 'checkpoint';
 
 export interface JLearnStep {
@@ -130,6 +143,7 @@ export interface JLearnStep {
   isReviewStep?: boolean;
   isCheckpoint?: boolean;
   minPassScore?: number;
+  speakingVariant?: boolean;
 }
 
 export interface JLearnUnit {
@@ -154,6 +168,8 @@ export interface JLearnLevel {
     name: string;
     description: string;
   };
+  storyHook?: StoryHook;
+  challengeMission?: JLearnStep;
 }
 
 export interface JLearnTrack {

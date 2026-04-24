@@ -29,6 +29,10 @@ import { appShellRoutes, getPracticeRoute } from './data/appShellContent';
 import { KanaProgressProvider } from './features/kana/progress/progressStore';
 import { KanaScript } from './features/kana/domain/kanaItem';
 import { AppShell } from './components/shell';
+import { ReEntrySplash } from './features/jlearn/reentry/ReEntrySplash';
+import { ChallengeReadyPrompt } from './features/jlearn/challenge/ChallengeReadyPrompt';
+import { ChallengeMissionPage } from './pages/ChallengeMissionPage';
+import { SpeakingSuggestToast } from './features/jlearn/speaking/SpeakingSuggestToast';
 
 const KANA_FONT_STORAGE_KEY = 'kototsuna.kana-font-style';
 const APP_LANGUAGE_STORAGE_KEY = 'kototsuna.app-language';
@@ -127,6 +131,7 @@ export default function App() {
       <Route path={appShellRoutes.learn} element={<Home language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.learnJapanese} element={<LearnJapanesePage language={language} />} />
       <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
+      <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
       <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
       <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />
@@ -239,6 +244,9 @@ export default function App() {
         >
           {shellRoutes}
         </AppShell>
+        <ReEntrySplash />
+        <ChallengeReadyPrompt language={language} />
+        <SpeakingSuggestToast language={language} />
       </div>
     </KanaProgressProvider>
   );

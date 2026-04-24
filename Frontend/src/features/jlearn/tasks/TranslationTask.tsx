@@ -5,6 +5,7 @@ import { isAnswerCorrect } from './answerNormalizer';
 interface TranslationTaskProps {
   question: PracticeQuestion;
   retryCount: number;
+  lowConfidence?: boolean;
   onCorrect: () => void;
   onIncorrect: () => void;
 }
@@ -17,11 +18,13 @@ const DIRECTION_LABEL: Record<string, string> = {
 };
 
 export const TranslationTask: React.FC<TranslationTaskProps> = ({
-  question, retryCount, onCorrect, onIncorrect,
+  question, retryCount, lowConfidence = false, onCorrect, onIncorrect,
 }) => {
   const [value, setValue] = useState('');
   const [state, setState] = useState<State>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
+  const wrongBorder = lowConfidence ? 'border-[color:var(--kt-accent-warning)]/55' : 'border-red-500';
+  const wrongBg = lowConfidence ? 'bg-[var(--kt-accent-warning-soft)]' : 'bg-red-500 bg-opacity-10';
 
   const isJpTarget = question.type === 'translation-en-jp';
   const dirLabel = DIRECTION_LABEL[question.type] ?? 'Translate';
@@ -48,7 +51,7 @@ export const TranslationTask: React.FC<TranslationTaskProps> = ({
     state === 'correct'
       ? 'border-[var(--kt-accent-info)]'
       : state === 'wrong'
-      ? 'border-red-500'
+      ? wrongBorder
       : 'border-[var(--kt-border)]';
 
   return (
@@ -97,7 +100,7 @@ export const TranslationTask: React.FC<TranslationTaskProps> = ({
       )}
 
       {state === 'wrong' && (
-        <div className="mt-4 rounded-[1.2rem] border border-red-500 bg-red-500 bg-opacity-10 p-4">
+        <div className={`mt-4 rounded-[1.2rem] border p-4 ${wrongBorder} ${wrongBg}`}>
           {question.explanation ? (
             <p className="mb-3 text-sm text-[var(--kt-ink)]">{question.explanation}</p>
           ) : (

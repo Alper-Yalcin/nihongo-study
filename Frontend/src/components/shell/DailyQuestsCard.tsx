@@ -12,7 +12,7 @@ interface DailyQuestsCardProps {
 }
 
 export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ title, items, href }) => (
-  <section className="rounded-[1.7rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
+  <section className="rounded-[1.8rem] border border-[var(--kt-border-subtle)] bg-[linear-gradient(180deg,var(--kt-surface-raised),var(--kt-surface))] p-5 shadow-[var(--kt-shadow-sm)]">
     <div className="flex items-center justify-between gap-4">
       <h3 className="text-xl font-black text-[var(--kt-ink-strong)]">{title}</h3>
       <Link

@@ -37,10 +37,18 @@ export interface JLearnUserState {
   missedDays: number;
   streakDays: number;
   lastSessionAt: string | null;
+  highConfidenceClearCount: number;
 }
 
 export const JLEARN_USER_STATE_KEY = 'kototsuna.jlearn.user-state';
 export const JLEARN_ACTIVE_STEP_KEY = 'kototsuna.jlearn.active-step';
+export const JLEARN_FEATURE_FLAGS_KEY = 'kototsuna.jlearn.feature-flags';
+export const JLEARN_USER_STATE_EVENT = 'kototsuna:jlearn-user-state';
+
+export interface JLearnFeatureFlags {
+  challengeCta: boolean;
+  speakingMode: boolean;
+}
 
 export const defaultUserState: JLearnUserState = {
   confidenceLevel: 'medium',
@@ -53,6 +61,12 @@ export const defaultUserState: JLearnUserState = {
   missedDays: 0,
   streakDays: 0,
   lastSessionAt: null,
+  highConfidenceClearCount: 0,
+};
+
+export const defaultFeatureFlags: JLearnFeatureFlags = {
+  challengeCta: false,
+  speakingMode: false,
 };
 
 const safeParse = <T,>(raw: string | null, fallback: T): T => {
@@ -64,6 +78,36 @@ const safeParse = <T,>(raw: string | null, fallback: T): T => {
   }
 };
 
+export const normalizeConfidenceLevel = (value: unknown): ConfidenceLevel =>
+  value === 'low' || value === 'medium' || value === 'high' ? value : 'medium';
+
+const notifyUserStateChanged = (): void => {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(JLEARN_USER_STATE_EVENT));
+};
+
+export const subscribeJLearnUserState = (callback: () => void): (() => void) => {
+  if (typeof window === 'undefined') return () => undefined;
+
+  const onStorage = (event: StorageEvent) => {
+    if (
+      event.key === JLEARN_USER_STATE_KEY ||
+      event.key === JLEARN_FEATURE_FLAGS_KEY ||
+      event.key === null
+    ) {
+      callback();
+    }
+  };
+
+  window.addEventListener(JLEARN_USER_STATE_EVENT, callback);
+  window.addEventListener('storage', onStorage);
+
+  return () => {
+    window.removeEventListener(JLEARN_USER_STATE_EVENT, callback);
+    window.removeEventListener('storage', onStorage);
+  };
+};
+
 export const getJLearnUserState = (): JLearnUserState => {
   if (typeof window === 'undefined') return defaultUserState;
   const raw = window.localStorage.getItem(JLEARN_USER_STATE_KEY);
@@ -71,6 +115,7 @@ export const getJLearnUserState = (): JLearnUserState => {
   return {
     ...defaultUserState,
     ...parsed,
+    confidenceLevel: normalizeConfidenceLevel(parsed.confidenceLevel),
     relationshipLevels: {
       ...defaultUserState.relationshipLevels,
       ...(parsed.relationshipLevels ?? {})
@@ -84,22 +129,50 @@ export const getJLearnUserState = (): JLearnUserState => {
 
 export const setJLearnUserState = (next: JLearnUserState): void => {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(JLEARN_USER_STATE_KEY, JSON.stringify(next));
+  window.localStorage.setItem(
+    JLEARN_USER_STATE_KEY,
+    JSON.stringify({ ...next, confidenceLevel: normalizeConfidenceLevel(next.confidenceLevel) })
+  );
+  notifyUserStateChanged();
+};
+
+export const getJLearnFeatureFlags = (): JLearnFeatureFlags => {
+  if (typeof window === 'undefined') return defaultFeatureFlags;
+  const raw = window.localStorage.getItem(JLEARN_FEATURE_FLAGS_KEY);
+  const parsed = safeParse<Partial<JLearnFeatureFlags>>(raw, {});
+  return {
+    ...defaultFeatureFlags,
+    challengeCta: Boolean(parsed.challengeCta),
+    speakingMode: Boolean(parsed.speakingMode),
+  };
+};
+
+export const setJLearnFeatureFlags = (next: JLearnFeatureFlags): void => {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(
+    JLEARN_FEATURE_FLAGS_KEY,
+    JSON.stringify({ ...defaultFeatureFlags, ...next })
+  );
+  notifyUserStateChanged();
 };
 
 export const resetJLearnUserState = (): void => {
   if (typeof window === 'undefined') return;
   window.localStorage.removeItem(JLEARN_USER_STATE_KEY);
   window.localStorage.removeItem(JLEARN_ACTIVE_STEP_KEY);
+  window.localStorage.removeItem(JLEARN_FEATURE_FLAGS_KEY);
+  notifyUserStateChanged();
 };
 
 export const jumpToStep = (stepId: string): void => {
   if (typeof window === 'undefined') return;
   if (!stepId) {
     window.localStorage.removeItem(JLEARN_ACTIVE_STEP_KEY);
+    notifyUserStateChanged();
     return;
   }
   window.localStorage.setItem(JLEARN_ACTIVE_STEP_KEY, stepId);
+  notifyUserStateChanged();
 };
 
 export const forceConfidence = (value: ConfidenceLevel): void => {

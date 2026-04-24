@@ -13,8 +13,11 @@ import {
   writeVocab,
   validateVocabProgress,
 } from '../../../data/jlearn/jlearnStorage';
+import { completeStep } from '../../../data/jlearn/jlearnGating';
 import {
   getJLearnUserState,
+  getJLearnFeatureFlags,
+  setJLearnFeatureFlags,
   setJLearnUserState,
   resetJLearnUserState,
   jumpToStep,
@@ -38,6 +41,8 @@ export const DebugPanel: React.FC = () => {
   const refresh = () => setTick((n) => n + 1);
 
   const state = useMemo<JLearnUserState>(() => getJLearnUserState(), [tick]);
+  const featureFlags = useMemo(() => getJLearnFeatureFlags(), [tick]);
+  const progress = useMemo(() => readProgress(), [tick]);
   const activeStepId = useMemo<string | null>(() => {
     try {
       return window.localStorage.getItem(JLEARN_ACTIVE_STEP_KEY);
@@ -55,6 +60,11 @@ export const DebugPanel: React.FC = () => {
     () => new Map(getAllJLearnGrammarPoints().map((item) => [item.id, item])),
     []
   );
+  const l1CheckpointStep = useMemo(() => {
+    const level = jlearnTrack.levels.find((item) => item.id === 'JL1');
+    const checkpointUnit = level?.units.find((unit) => unit.id === level.checkpointUnitId);
+    return checkpointUnit?.steps.find((step) => step.isCheckpoint) ?? checkpointUnit?.steps.at(-1) ?? null;
+  }, []);
 
   if (!enabled) return null;
 
@@ -88,6 +98,27 @@ export const DebugPanel: React.FC = () => {
     refresh();
   };
 
+  const onFakeTomorrow = () => {
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    onRawEdit({
+      lastSessionAt: yesterday,
+      missedDays: 0,
+      streakDays: Math.max(1, state.streakDays),
+    });
+  };
+
+  const onChallengeFlag = (enabledFlag: boolean) => {
+    setJLearnFeatureFlags({ ...featureFlags, challengeCta: enabledFlag });
+    refresh();
+  };
+
+  const onMarkL1Checkpoint = () => {
+    if (!l1CheckpointStep) return;
+    writeProgress(completeStep(l1CheckpointStep.id, readProgress(), jlearnTrack));
+    setJLearnFeatureFlags(featureFlags);
+    refresh();
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-[9999] w-[22rem] max-h-[80vh] overflow-auto rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-4 text-xs shadow-[var(--kt-shadow-lg)]">
       <div className="mb-2 flex items-center justify-between">
@@ -108,6 +139,36 @@ export const DebugPanel: React.FC = () => {
         <pre className="rounded-md bg-[var(--kt-surface-page)] p-2 text-[10px] leading-4 text-[var(--kt-ink)] whitespace-pre-wrap break-all">
 {JSON.stringify({ activeStepId, ...state }, null, 2)}
         </pre>
+      </section>
+
+      <section className="mb-3">
+        <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Challenge CTA</div>
+        <div className="rounded-md bg-[var(--kt-surface-page)] p-2 text-[10px] leading-4 text-[var(--kt-ink)]">
+          <div>Flag: {featureFlags.challengeCta ? 'on' : 'off'}</div>
+          <div>L1 checkpoint: {l1CheckpointStep?.id ?? 'missing'}</div>
+          <div>L1 passed: {progress.completedLevelIds.includes('JL1') ? 'yes' : 'no'}</div>
+        </div>
+        <div className="mt-1 grid grid-cols-2 gap-1">
+          <button
+            type="button"
+            onClick={() => onChallengeFlag(!featureFlags.challengeCta)}
+            className={`rounded-md border px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${
+              featureFlags.challengeCta
+                ? 'border-[var(--kt-accent-warning)] text-[var(--kt-accent-warning)]'
+                : 'border-[var(--kt-border)] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]'
+            }`}
+          >
+            {featureFlags.challengeCta ? 'Flag on' : 'Flag off'}
+          </button>
+          <button
+            type="button"
+            onClick={onMarkL1Checkpoint}
+            disabled={!l1CheckpointStep}
+            className="rounded-md border border-[var(--kt-border)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)] disabled:opacity-40"
+          >
+            Pass L1 CP
+          </button>
+        </div>
       </section>
 
       <section className="mb-3">
@@ -134,23 +195,22 @@ export const DebugPanel: React.FC = () => {
       </section>
 
       <section className="mb-3">
-        <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Confidence</div>
-        <div className="flex gap-1">
-          {(['low', 'medium', 'high'] as const).map((lvl) => (
-            <button
-              key={lvl}
-              type="button"
-              onClick={() => onConfidence(lvl)}
-              className={`flex-1 rounded-md border px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${
-                state.confidenceLevel === lvl
-                  ? 'border-[var(--kt-accent-info)] text-[var(--kt-accent-info)]'
-                  : 'border-[var(--kt-border)] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]'
-              }`}
-            >
-              {lvl}
-            </button>
-          ))}
-        </div>
+        <label
+          htmlFor="jlearn-debug-confidence"
+          className="mb-1 block font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]"
+        >
+          Confidence
+        </label>
+        <select
+          id="jlearn-debug-confidence"
+          value={state.confidenceLevel}
+          onChange={(e) => onConfidence(e.target.value as JLearnUserState['confidenceLevel'])}
+          className="w-full rounded-md border border-[var(--kt-border)] bg-[var(--kt-surface-page)] p-1 text-[11px] font-black uppercase tracking-[0.12em] text-[var(--kt-ink)]"
+        >
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
       </section>
 
       <section className="mb-3">
@@ -211,6 +271,21 @@ export const DebugPanel: React.FC = () => {
             7
           </button>
         </div>
+      </section>
+
+      <section className="mb-3">
+        <div className="mb-1 font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">Session Timing</div>
+        <div className="rounded-md bg-[var(--kt-surface-page)] p-2 text-[10px] leading-4 text-[var(--kt-ink)]">
+          <div>Streak: {state.streakDays}</div>
+          <div>Last: {state.lastSessionAt ?? 'none'}</div>
+        </div>
+        <button
+          type="button"
+          onClick={onFakeTomorrow}
+          className="mt-1 w-full rounded-md border border-[var(--kt-border)] px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink)] hover:bg-[var(--kt-nav-item-hover)]"
+        >
+          Fake tomorrow for streak
+        </button>
       </section>
 
       <section className="mb-3">

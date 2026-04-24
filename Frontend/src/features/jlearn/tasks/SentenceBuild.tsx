@@ -4,6 +4,7 @@ import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
 interface SentenceBuildProps {
   question: PracticeQuestion;
   retryCount: number;
+  lowConfidence?: boolean;
   onCorrect: () => void;
   onIncorrect: () => void;
 }
@@ -25,8 +26,11 @@ interface Token {
 }
 
 export const SentenceBuild: React.FC<SentenceBuildProps> = ({
-  question, retryCount, onCorrect, onIncorrect,
+  question, retryCount, lowConfidence = false, onCorrect, onIncorrect,
 }) => {
+  const wrongStateClasses = lowConfidence
+    ? 'border-[color:var(--kt-accent-warning)]/55 bg-[var(--kt-accent-warning-soft)]'
+    : 'border-red-500 bg-red-500 bg-opacity-10';
   const sourceTokens = useMemo<Token[]>(
     () =>
       shuffle(
@@ -86,7 +90,7 @@ export const SentenceBuild: React.FC<SentenceBuildProps> = ({
           state === 'correct'
             ? 'border-[var(--kt-accent-info)] bg-[var(--kt-accent-info)] bg-opacity-10'
             : state === 'wrong'
-            ? 'border-red-500 bg-red-500 bg-opacity-10'
+            ? wrongStateClasses
             : answer.length > 0
             ? 'border-[var(--kt-border)]'
             : 'border-[var(--kt-border-subtle)]'
@@ -138,7 +142,7 @@ export const SentenceBuild: React.FC<SentenceBuildProps> = ({
       )}
 
       {state === 'wrong' && (
-        <div className="rounded-[1.2rem] border border-red-500 bg-red-500 bg-opacity-10 p-4">
+        <div className={`rounded-[1.2rem] border p-4 ${wrongStateClasses}`}>
           {question.explanation ? (
             <p className="mb-3 text-sm text-[var(--kt-ink)]">{question.explanation}</p>
           ) : (

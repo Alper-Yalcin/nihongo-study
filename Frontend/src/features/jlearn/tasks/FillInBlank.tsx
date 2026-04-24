@@ -5,6 +5,7 @@ import { isAnswerCorrect } from './answerNormalizer';
 interface FillInBlankProps {
   question: PracticeQuestion;
   retryCount: number;
+  lowConfidence?: boolean;
   onCorrect: () => void;
   onIncorrect: () => void;
 }
@@ -12,11 +13,13 @@ interface FillInBlankProps {
 type State = 'idle' | 'wrong' | 'correct';
 
 export const FillInBlank: React.FC<FillInBlankProps> = ({
-  question, retryCount, onCorrect, onIncorrect,
+  question, retryCount, lowConfidence = false, onCorrect, onIncorrect,
 }) => {
   const [value, setValue] = useState('');
   const [state, setState] = useState<State>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
+  const wrongBorder = lowConfidence ? 'border-[color:var(--kt-accent-warning)]/55' : 'border-red-500';
+  const wrongBg = lowConfidence ? 'bg-[var(--kt-accent-warning-soft)]' : 'bg-red-500 bg-opacity-10';
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -40,7 +43,7 @@ export const FillInBlank: React.FC<FillInBlankProps> = ({
     state === 'correct'
       ? 'border-[var(--kt-accent-info)]'
       : state === 'wrong'
-      ? 'border-red-500'
+      ? wrongBorder
       : 'border-[var(--kt-border)]';
 
   return (
@@ -74,7 +77,7 @@ export const FillInBlank: React.FC<FillInBlankProps> = ({
       </form>
 
       {state === 'wrong' && (
-        <div className="mt-4 rounded-[1.2rem] border border-red-500 bg-red-500 bg-opacity-10 p-4">
+        <div className={`mt-4 rounded-[1.2rem] border p-4 ${wrongBorder} ${wrongBg}`}>
           {question.explanation ? (
             <p className="mb-3 text-sm text-[var(--kt-ink)]">{question.explanation}</p>
           ) : (

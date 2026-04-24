@@ -499,6 +499,13 @@ export const jlearnLevel3: JLearnLevel = {
     name: 'Time Keeper',
     description: 'You can discuss time, dates, and numbers in conversation.'
   },
+  storyHook: {
+    type: 'mystery-drop',
+    speaker: 'Yuki',
+    teaser: 'Yuki points at a shop window. You realize you cannot name half the things you see.',
+    japanese: 'これ、なに？',
+    translation: 'What is this?'
+  },
   units: [
     {
       id: 'L3-U1',
@@ -1904,5 +1911,143 @@ export const jlearnLevel3: JLearnLevel = {
         }
       ]
     }
-  ]
+  ],
+  challengeMission: {
+    id: 'JL3-challenge',
+    title: 'Market Errand Challenge',
+    kind: 'checkpoint',
+    estimatedMinutes: 2,
+    scenario: "Obaasan asks you to handle a scheduling mix-up at the local café — a reservation was made for the wrong time and the wrong number of people. You need to fix it, ask prices, and arrange a new plan. All in Japanese.",
+    goal: 'Prove your Level 3 market, time, and planning Japanese. No hints. One shot per question.',
+    vocabulary: [],
+    grammar: [],
+    examples: [],
+    successMessage: "Obaasan pats your hand: 「上手になったね。」 The café owner looks impressed too.",
+    emotionalFeedback: {
+      perfect: "All 15 correct. Obaasan says you sound like a local now.",
+      good: "Strong performance. Obaasan books the table while you confirm the details.",
+      struggle: "The café owner steps in to help. Obaasan squeezes your arm: がんばったね。"
+    },
+    questions: [
+      {
+        id: 'JL3-ch-q1',
+        type: 'multiple-choice',
+        prompt: 'You need to ask the price of the daily set. You say:',
+        options: ['いくらですか', 'なんですか', 'どこですか', 'いつですか'],
+        correctAnswer: 'いくらですか',
+        explanation: 'いくらですか means "How much is it?"'
+      },
+      {
+        id: 'JL3-ch-q2',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "I would like two, please."',
+        correctAnswer: 'ふたつ　ください',
+        acceptedAnswers: ['ふたつください', 'にこ　ください', 'ふたつ　おねがいします'],
+        explanation: 'ふたつ is the native counter for two objects; ください means "please give me".'
+      },
+      {
+        id: 'JL3-ch-q3',
+        type: 'fill-in-blank',
+        prompt: 'The reservation is for 3 o\'clock: 「___じ　に　よやく　があります。」',
+        correctAnswer: 'さん',
+        acceptedAnswers: ['さん', '三', '3'],
+        explanation: 'さんじ means 3 o\'clock.'
+      },
+      {
+        id: 'JL3-ch-q4',
+        type: 'multiple-choice',
+        prompt: 'You want to change the reservation to 5 o\'clock. You say: 「ごじに___ですか。」',
+        options: ['できますか', 'いきますか', 'たべますか', 'わかりますか'],
+        correctAnswer: 'できますか',
+        explanation: 'できますか means "Is it possible / Can it be done?"'
+      },
+      {
+        id: 'JL3-ch-q5',
+        type: 'translation-jp-en',
+        prompt: 'What does 「よやく」 mean?',
+        correctAnswer: 'reservation',
+        acceptedAnswers: ['booking', 'a reservation', 'a booking'],
+        explanation: 'よやく means reservation or advance booking.'
+      },
+      {
+        id: 'JL3-ch-q6',
+        type: 'sentence-build',
+        prompt: 'Build: "Three people, please."',
+        correctAnswer: 'さんにん　ください',
+        explanation: 'さんにん is the counter for three people; ください = please.'
+      },
+      {
+        id: 'JL3-ch-q7',
+        type: 'multiple-choice',
+        prompt: 'Obaasan asks what day the reservation is. Today is Saturday: 「___ですか。」',
+        options: ['どようびです', 'にちようびです', 'きんようびです', 'もくようびです'],
+        correctAnswer: 'どようびです',
+        explanation: 'どようび means Saturday.'
+      },
+      {
+        id: 'JL3-ch-q8',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "What time does it open?"',
+        correctAnswer: 'なんじに　あきますか',
+        acceptedAnswers: ['なんじにあきますか', 'なんじから　ですか'],
+        explanation: 'なんじに〜ますか asks "At what time does 〜 happen?"'
+      },
+      {
+        id: 'JL3-ch-q9',
+        type: 'fill-in-blank',
+        prompt: 'You want to pay: 「おかいけい___　おねがいします。」',
+        correctAnswer: 'を',
+        acceptedAnswers: ['を'],
+        explanation: 'を is the object-marking particle; おかいけいを = the bill/check (as object).'
+      },
+      {
+        id: 'JL3-ch-q10',
+        type: 'multiple-choice',
+        prompt: 'The café owner says the set lunch costs 850 yen. You confirm: 「___えんですね。」',
+        options: ['はっぴゃくごじゅう', 'ごひゃく', 'せん', 'ろっぴゃく'],
+        correctAnswer: 'はっぴゃくごじゅう',
+        explanation: 'はっぴゃくごじゅう = 850 in Japanese number reading.'
+      },
+      {
+        id: 'JL3-ch-q11',
+        type: 'translation-jp-en',
+        prompt: 'What does 「ちょっとまってください」 mean?',
+        correctAnswer: 'Please wait a moment',
+        acceptedAnswers: ['Wait a moment please', 'Just a moment please', 'One moment please'],
+        explanation: 'ちょっとまってください is used to ask someone to wait briefly.'
+      },
+      {
+        id: 'JL3-ch-q12',
+        type: 'multiple-choice',
+        prompt: 'Obaasan wants to confirm the café is open tomorrow (Sunday). She asks: 「あした___ですか。」',
+        options: ['あいていますか', 'たべますか', 'できますか', 'きますか'],
+        correctAnswer: 'あいていますか',
+        explanation: 'あいていますか means "Is it open?" — the te-form + います construction for ongoing state.'
+      },
+      {
+        id: 'JL3-ch-q13',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "This one, please."',
+        correctAnswer: 'これを　ください',
+        acceptedAnswers: ['これください', 'これをください', 'これを　おねがいします'],
+        explanation: 'これを　ください = "please give me this one".'
+      },
+      {
+        id: 'JL3-ch-q14',
+        type: 'fill-in-blank',
+        prompt: 'After fixing the reservation you say: 「___ありがとうございました。」(Well then, thank you)',
+        correctAnswer: 'では',
+        acceptedAnswers: ['では', 'じゃ', 'それでは'],
+        explanation: 'では (or じゃ) is used as a soft "well then" before wrapping up.'
+      },
+      {
+        id: 'JL3-ch-q15',
+        type: 'multiple-choice',
+        prompt: 'Leaving the café, you say:',
+        options: ['しつれいします', 'おじゃまします', 'ただいま', 'いってきます'],
+        correctAnswer: 'しつれいします',
+        explanation: 'しつれいします is the polite phrase for excusing yourself when leaving a formal setting.'
+      }
+    ]
+  }
 };

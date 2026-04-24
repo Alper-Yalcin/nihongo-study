@@ -50,9 +50,12 @@ export const LeftNav: React.FC<LeftNavProps> = ({
   ], [activeScript, copy]);
 
   return (
-    <aside className="hidden xl:sticky xl:top-0 xl:flex xl:h-screen xl:flex-col xl:overflow-y-auto xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[var(--kt-nav-bg)] xl:px-5 xl:py-6">
-      <Link to={appShellRoutes.home} className="px-3 pb-6 pt-2">
+    <aside className="hidden xl:sticky xl:top-0 xl:flex xl:h-screen xl:flex-col xl:overflow-y-auto xl:border-r xl:border-[var(--kt-border-subtle)] xl:bg-[radial-gradient(circle_at_top,var(--kt-accent-info-soft),transparent_18rem),var(--kt-nav-bg)] xl:px-5 xl:py-6 xl:backdrop-blur">
+      <Link to={appShellRoutes.home} className="mb-6 block rounded-[1.5rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] px-4 py-4 shadow-[var(--kt-shadow-sm)]">
         <img src={logoSrc} alt="Kototsuna" className="h-10 w-auto" />
+        <div className="mt-3 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--kt-nav-text-muted)]">
+          Study cockpit
+        </div>
       </Link>
 
       <nav className="flex flex-1 flex-col gap-3">
@@ -72,12 +75,13 @@ export const LeftNav: React.FC<LeftNavProps> = ({
             <Link
               key={item.id}
               to={item.href}
-              className={`flex items-center gap-4 rounded-[1.2rem] border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] transition ${
+              className={`group relative flex items-center gap-4 rounded-[1.25rem] border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] shadow-[var(--kt-shadow-sm)] transition ${
                 isActive
                   ? 'border-[color:var(--kt-accent-info)] bg-[var(--kt-nav-item-active-bg)] text-[var(--kt-accent-info)]'
-                  : 'border-transparent text-[var(--kt-nav-text)] hover:border-[var(--kt-border)] hover:bg-[var(--kt-nav-item-hover)]'
+                  : 'border-transparent bg-transparent text-[var(--kt-nav-text)] hover:-translate-y-0.5 hover:border-[var(--kt-border)] hover:bg-[var(--kt-nav-item-hover)]'
               }`}
             >
+              {isActive && <span className="absolute left-2 h-8 w-1 rounded-full bg-[var(--kt-accent-info)]" />}
               <Icon size={24} />
               <span>{item.label}</span>
             </Link>
@@ -88,10 +92,10 @@ export const LeftNav: React.FC<LeftNavProps> = ({
           <button
             type="button"
             onClick={() => setMoreOpen((c) => !c)}
-            className={`flex w-full items-center gap-4 rounded-[1.2rem] border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] transition ${
+            className={`flex w-full items-center gap-4 rounded-[1.25rem] border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] shadow-[var(--kt-shadow-sm)] transition ${
               moreOpen
                 ? 'border-[var(--kt-border)] bg-[var(--kt-nav-item-hover)] text-[var(--kt-ink-strong)]'
-                : 'border-transparent text-[var(--kt-nav-text)] hover:border-[var(--kt-border)] hover:bg-[var(--kt-nav-item-hover)]'
+                : 'border-transparent text-[var(--kt-nav-text)] hover:-translate-y-0.5 hover:border-[var(--kt-border)] hover:bg-[var(--kt-nav-item-hover)]'
             }`}
           >
             <MoreHorizontal size={24} />
@@ -122,8 +126,8 @@ export const LeftNav: React.FC<LeftNavProps> = ({
         </div>
       </nav>
 
-      <div className="mt-6 space-y-4">
-        <div className="grid grid-cols-3 gap-2 px-3 text-[11px] font-black uppercase tracking-[0.14em] text-[var(--kt-nav-text-muted)]">
+      <div className="mt-6 space-y-4 rounded-[1.35rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-3 shadow-[var(--kt-shadow-sm)]">
+        <div className="grid grid-cols-3 gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-[var(--kt-nav-text-muted)]">
           <a href="#" className="hover:text-[var(--kt-nav-text)]">Hakkinda</a>
           <a href="#" className="hover:text-[var(--kt-nav-text)]">Sartlar</a>
           <a href="#" className="hover:text-[var(--kt-nav-text)]">Gizlilik</a>

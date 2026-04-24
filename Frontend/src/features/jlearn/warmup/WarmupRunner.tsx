@@ -15,6 +15,8 @@ interface DueVocabEntry {
   vocab: VocabItem;
   nextReviewAt: string;
   errorCount: number;
+  masteryLevel?: number;
+  source?: 'due' | 'weak' | 'recent' | 'fallback';
 }
 
 export interface WarmupSession {
@@ -55,7 +57,7 @@ function getDueVocabEntries(vocabProgress: VocabProgressMap, allVocab: VocabItem
 
   return Object.values(vocabProgress)
     .filter((entry) => Date.parse(entry.nextReviewAt) <= nowMs)
-    .map((entry) => {
+    .map((entry): DueVocabEntry | null => {
       const vocab = vocabById.get(entry.vocabId);
       if (!vocab) return null;
 
@@ -63,6 +65,8 @@ function getDueVocabEntries(vocabProgress: VocabProgressMap, allVocab: VocabItem
         vocab,
         nextReviewAt: entry.nextReviewAt,
         errorCount: entry.errorCount,
+        masteryLevel: entry.masteryLevel,
+        source: 'due',
       };
     })
     .filter((entry): entry is DueVocabEntry => entry !== null)
@@ -71,6 +75,72 @@ function getDueVocabEntries(vocabProgress: VocabProgressMap, allVocab: VocabItem
       if (dueDelta !== 0) return dueDelta;
       return right.errorCount - left.errorCount;
     });
+}
+
+function getReEntryVocabEntries(
+  vocabProgress: VocabProgressMap,
+  allVocab: VocabItem[],
+  recentMistakes: string[]
+): DueVocabEntry[] {
+  const vocabById = new Map(allVocab.map((item) => [item.id, item]));
+  const nowMs = Date.now();
+  const scored = new Map<string, DueVocabEntry & { score: number }>();
+
+  for (const entry of Object.values(vocabProgress)) {
+    const vocab = vocabById.get(entry.vocabId);
+    if (!vocab) continue;
+
+    const dueAtMs = Date.parse(entry.nextReviewAt);
+    const overdueDays = Number.isNaN(dueAtMs)
+      ? 0
+      : Math.max(0, Math.floor((nowMs - dueAtMs) / (24 * 60 * 60 * 1000)));
+    const weaknessScore = entry.errorCount * 12 + (4 - entry.masteryLevel) * 4 + overdueDays;
+
+    if (entry.errorCount > 0 || entry.masteryLevel < 4 || dueAtMs <= nowMs) {
+      scored.set(entry.vocabId, {
+        vocab,
+        nextReviewAt: entry.nextReviewAt,
+        errorCount: entry.errorCount,
+        masteryLevel: entry.masteryLevel,
+        source: dueAtMs <= nowMs ? 'due' : 'weak',
+        score: weaknessScore,
+      });
+    }
+  }
+
+  recentMistakes.forEach((vocabId, index) => {
+    const vocab = vocabById.get(vocabId);
+    if (!vocab) return;
+    const existing = scored.get(vocabId);
+    const recencyBoost = Math.max(1, recentMistakes.length - index);
+    scored.set(vocabId, {
+      vocab,
+      nextReviewAt: existing?.nextReviewAt ?? new Date(0).toISOString(),
+      errorCount: existing?.errorCount ?? 1,
+      masteryLevel: existing?.masteryLevel ?? 0,
+      source: existing?.source ?? 'recent',
+      score: (existing?.score ?? 0) + recencyBoost * 20,
+    });
+  });
+
+  const sorted = Array.from(scored.values())
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      const errorDelta = right.errorCount - left.errorCount;
+      if (errorDelta !== 0) return errorDelta;
+      return left.nextReviewAt.localeCompare(right.nextReviewAt);
+    })
+    .map(({ score: _score, ...entry }) => entry);
+
+  if (sorted.length > 0) return sorted;
+
+  return allVocab.slice(0, 10).map((vocab) => ({
+    vocab,
+    nextReviewAt: new Date(0).toISOString(),
+    errorCount: 0,
+    masteryLevel: 0,
+    source: 'fallback',
+  }));
 }
 
 export function buildWarmupQuestions(): PracticeQuestion[] {
@@ -144,6 +214,71 @@ export function buildWarmupSession(
     confidenceLevel: userState.confidenceLevel,
     targetCount,
     dueCount: dueEntries.length,
+    questions,
+  };
+}
+
+export function buildReEntryRefreshSession(
+  userState: Pick<JLearnUserState, 'confidenceLevel' | 'recentMistakes'> = readUserState(),
+  targetCount = 10
+): WarmupSession {
+  const allVocab = getAllJLearnVocabItems();
+  const reviewEntries = getReEntryVocabEntries(readVocab(), allVocab, userState.recentMistakes);
+
+  if (reviewEntries.length === 0 || targetCount <= 0) {
+    return {
+      confidenceLevel: userState.confidenceLevel,
+      targetCount: 0,
+      dueCount: 0,
+      questions: [],
+    };
+  }
+
+  const questions: PracticeQuestion[] = [];
+
+  for (let i = 0; i < targetCount; i++) {
+    const entry = reviewEntries[i % reviewEntries.length];
+    const variant = i % 3;
+
+    if (variant === 0) {
+      questions.push({
+        id: `reentry-${entry.vocab.id}-meaning-${i}`,
+        type: 'multiple-choice',
+        prompt: `Welcome-back check: what does ${entry.vocab.japanese} mean?`,
+        options: buildOptionPool(entry.vocab, allVocab, (item) => item.english),
+        correctAnswer: entry.vocab.english,
+        targetVocabId: entry.vocab.id,
+      });
+      continue;
+    }
+
+    if (variant === 1) {
+      questions.push({
+        id: `reentry-${entry.vocab.id}-listen-${i}`,
+        type: 'listening-recognition',
+        prompt: 'Listen and choose the meaning.',
+        promptJapanese: entry.vocab.japanese,
+        options: buildOptionPool(entry.vocab, allVocab, (item) => item.english),
+        correctAnswer: entry.vocab.english,
+        targetVocabId: entry.vocab.id,
+      });
+      continue;
+    }
+
+    questions.push({
+      id: `reentry-${entry.vocab.id}-jp-${i}`,
+      type: 'multiple-choice',
+      prompt: `Which Japanese matches "${entry.vocab.english}"?`,
+      options: buildOptionPool(entry.vocab, allVocab, (item) => item.japanese),
+      correctAnswer: entry.vocab.japanese,
+      targetVocabId: entry.vocab.id,
+    });
+  }
+
+  return {
+    confidenceLevel: userState.confidenceLevel,
+    targetCount,
+    dueCount: reviewEntries.length,
     questions,
   };
 }

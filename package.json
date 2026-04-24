@@ -21,7 +21,8 @@
     "data:download": "python scripts/data/download_sources.py",
     "data:normalize": "python scripts/data/build_normalized_dictionary.py",
     "data:validate": "python scripts/data/validate_normalized.py",
-    "data:fixture": "python scripts/data/run_fixture_pipeline.py"
+    "data:fixture": "python scripts/data/run_fixture_pipeline.py",
+    "validate:jlearn": "tsx scripts/validate-jlearn.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",

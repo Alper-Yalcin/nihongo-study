@@ -222,6 +222,13 @@ export const jlearnLevel1: JLearnLevel = {
     name: 'Social Starter',
     description: 'You can handle everyday social moments in Japan.'
   },
+  storyHook: {
+    type: 'cliffhanger',
+    speaker: 'Mrs. Tanaka',
+    teaser: 'Mrs. Tanaka puts a notebook on your desk. First real school day starts tomorrow.',
+    japanese: 'あした、がっこうで がんばって！',
+    translation: 'Tomorrow, do your best at school!'
+  },
   units: [
     // ---------------- UNIT 1-1 ----------------
     {
@@ -793,5 +800,142 @@ export const jlearnLevel1: JLearnLevel = {
         }
       ]
     }
-  ]
+  ],
+  challengeMission: {
+    id: 'JL1-challenge',
+    title: 'Social Starter Challenge',
+    kind: 'checkpoint',
+    estimatedMinutes: 2,
+    scenario: "You forgot your key. Mrs. Tanaka's neighbor — a retired teacher — opens the door and wants to make sure you really belong here. She tests you with rapid-fire social Japanese.",
+    goal: 'Prove your Level 1 social Japanese under pressure. No hints. No second chances.',
+    vocabulary: [],
+    grammar: [],
+    examples: [],
+    successMessage: "The neighbor nods slowly. 'この子は大丈夫ですね.' You can hear Mrs. Tanaka laugh from inside.",
+    emotionalFeedback: {
+      perfect: "Perfect score. The neighbor actually smiles — and hands you a spare key.",
+      good: "You held your own. The neighbor lets you in with a quiet nod.",
+      struggle: "A tough one. Mrs. Tanaka reassures the neighbor and waves you inside."
+    },
+    questions: [
+      {
+        id: 'JL1-ch-q1',
+        type: 'multiple-choice',
+        prompt: 'You step into the neighbor\'s genkan. What do you say?',
+        options: ['おじゃまします', 'いただきます', 'ごちそうさまでした', 'おやすみなさい'],
+        correctAnswer: 'おじゃまします',
+        explanation: 'おじゃまします is the polite phrase for entering someone\'s home.'
+      },
+      {
+        id: 'JL1-ch-q2',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "Good evening."',
+        correctAnswer: 'こんばんは',
+        acceptedAnswers: ['こんばんは。', 'konbanwa'],
+        explanation: 'こんばんは is the standard evening greeting.'
+      },
+      {
+        id: 'JL1-ch-q3',
+        type: 'fill-in-blank',
+        prompt: 'Before eating, you say: ___',
+        correctAnswer: 'いただきます',
+        acceptedAnswers: ['いただきます。'],
+        explanation: 'いただきます is the ritual phrase said before starting a meal.'
+      },
+      {
+        id: 'JL1-ch-q4',
+        type: 'multiple-choice',
+        prompt: 'The neighbor offers tea. You accept politely. Which phrase fits best?',
+        options: ['ありがとうございます', 'すみません', 'おやすみなさい', 'じゃあね'],
+        correctAnswer: 'ありがとうございます',
+        explanation: 'ありがとうございます is the formal thank you for receiving something.'
+      },
+      {
+        id: 'JL1-ch-q5',
+        type: 'sentence-build',
+        prompt: 'Build: "Good night, Mrs. Tanaka." (formal)',
+        correctAnswer: 'おやすみなさい',
+        explanation: 'おやすみなさい is the formal good-night phrase.'
+      },
+      {
+        id: 'JL1-ch-q6',
+        type: 'translation-jp-en',
+        prompt: 'What does ごちそうさまでした mean?',
+        correctAnswer: 'Thank you for the meal',
+        acceptedAnswers: ['Thank you for the food', 'That was delicious, thank you'],
+        explanation: 'Said after finishing a meal to express gratitude.'
+      },
+      {
+        id: 'JL1-ch-q7',
+        type: 'multiple-choice',
+        prompt: 'The neighbor asks your name. You say: 「___　ケンジです。」',
+        options: ['わたしは', 'あなたは', 'これは', 'それは'],
+        correctAnswer: 'わたしは',
+        explanation: 'わたしは means "I am" — the standard self-introduction opener.'
+      },
+      {
+        id: 'JL1-ch-q8',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "Nice to meet you."',
+        correctAnswer: 'よろしくおねがいします',
+        acceptedAnswers: ['よろしくおねがいします。', 'はじめまして', 'はじめまして。よろしくおねがいします。'],
+        explanation: 'よろしくおねがいします is the standard phrase for first meetings.'
+      },
+      {
+        id: 'JL1-ch-q9',
+        type: 'multiple-choice',
+        prompt: 'You bump into the neighbor in the hallway. She looks surprised. You say:',
+        options: ['すみません', 'おはようございます', 'こんにちは', 'いただきます'],
+        correctAnswer: 'すみません',
+        explanation: 'すみません is the polite apology/excuse-me for small social mishaps.'
+      },
+      {
+        id: 'JL1-ch-q10',
+        type: 'fill-in-blank',
+        prompt: 'You are leaving. You say: 「___ ください。」 (Please take care / goodbye for now)',
+        correctAnswer: 'おげんきで',
+        acceptedAnswers: ['おげんきで', 'お元気で'],
+        explanation: 'おげんきで means "please stay well" — a polite parting phrase.'
+      },
+      {
+        id: 'JL1-ch-q11',
+        type: 'translation-jp-en',
+        prompt: 'What does すみません mean in this context: accidentally blocking someone\'s path?',
+        correctAnswer: 'Excuse me',
+        acceptedAnswers: ['Sorry', 'I\'m sorry', 'Pardon me'],
+        explanation: 'すみません covers both excuse me and light apologies.'
+      },
+      {
+        id: 'JL1-ch-q12',
+        type: 'multiple-choice',
+        prompt: 'The neighbor says 「おかえり」. What is the correct response?',
+        options: ['ただいま', 'いってきます', 'おはようございます', 'おやすみ'],
+        correctAnswer: 'ただいま',
+        explanation: 'ただいま ("I\'m home") is the reply when someone says おかえり (welcome back).'
+      },
+      {
+        id: 'JL1-ch-q13',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "I\'m going now." (leaving home phrase)',
+        correctAnswer: 'いってきます',
+        acceptedAnswers: ['いってきます。'],
+        explanation: 'いってきます is said when leaving home, meaning "I\'m going and coming back."'
+      },
+      {
+        id: 'JL1-ch-q14',
+        type: 'sentence-build',
+        prompt: 'Build: "Thank you very much."',
+        correctAnswer: 'ありがとうございます',
+        explanation: 'The formal expression of gratitude.'
+      },
+      {
+        id: 'JL1-ch-q15',
+        type: 'multiple-choice',
+        prompt: 'You finish the tea the neighbor gave you. What do you say?',
+        options: ['ごちそうさまでした', 'いただきます', 'おじゃまします', 'ただいま'],
+        correctAnswer: 'ごちそうさまでした',
+        explanation: 'ごちそうさまでした is said after finishing a meal or drink to thank the host.'
+      }
+    ]
+  }
 };

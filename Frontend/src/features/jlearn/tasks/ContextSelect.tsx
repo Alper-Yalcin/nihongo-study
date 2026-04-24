@@ -5,6 +5,7 @@ import { isAnswerCorrect } from './answerNormalizer';
 interface ContextSelectProps {
   question: PracticeQuestion;
   retryCount: number;
+  lowConfidence?: boolean;
   onCorrect: () => void;
   onIncorrect: () => void;
 }
@@ -12,12 +13,15 @@ interface ContextSelectProps {
 type State = 'idle' | 'wrong' | 'correct';
 
 export const ContextSelect: React.FC<ContextSelectProps> = ({
-  question, retryCount, onCorrect, onIncorrect,
+  question, retryCount, lowConfidence = false, onCorrect, onIncorrect,
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
 
   const options = question.options ?? [];
+  const wrongBorder = lowConfidence ? 'border-[color:var(--kt-accent-warning)]/55' : 'border-red-500';
+  const wrongBg = lowConfidence ? 'bg-[var(--kt-accent-warning-soft)]' : 'bg-red-500 bg-opacity-10';
+  const wrongText = lowConfidence ? 'text-[var(--kt-accent-warning)]' : 'text-red-500';
 
   const handleSubmit = () => {
     if (!selected) return;
@@ -66,9 +70,9 @@ export const ContextSelect: React.FC<ContextSelectProps> = ({
             text = 'text-[var(--kt-accent-info)]';
           } else if (state === 'wrong') {
             if (isSelected) {
-              border = 'border-red-500';
-              bg = 'bg-red-500 bg-opacity-10';
-              text = 'text-red-500';
+              border = wrongBorder;
+              bg = wrongBg;
+              text = wrongText;
             } else if (isCorrectOpt) {
               border = 'border-[var(--kt-accent-info)]';
               bg = 'bg-[var(--kt-accent-info)] bg-opacity-10';
@@ -104,7 +108,7 @@ export const ContextSelect: React.FC<ContextSelectProps> = ({
       )}
 
       {state === 'wrong' && (
-        <div className="mt-5 rounded-[1.2rem] border border-red-500 bg-red-500 bg-opacity-10 p-4">
+        <div className={`mt-5 rounded-[1.2rem] border p-4 ${wrongBorder} ${wrongBg}`}>
           {question.explanation ? (
             <p className="mb-3 text-sm text-[var(--kt-ink)]">{question.explanation}</p>
           ) : (

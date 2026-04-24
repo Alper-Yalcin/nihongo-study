@@ -5,6 +5,7 @@ import { isAnswerCorrect } from './answerNormalizer';
 interface ListeningRecognitionProps {
   question: PracticeQuestion;
   retryCount: number;
+  lowConfidence?: boolean;
   onCorrect: () => void;
   onIncorrect: () => void;
 }
@@ -22,7 +23,7 @@ function getJaVoice(): SpeechSynthesisVoice | null {
 }
 
 export const ListeningRecognition: React.FC<ListeningRecognitionProps> = ({
-  question, retryCount, onCorrect, onIncorrect,
+  question, retryCount, lowConfidence = false, onCorrect, onIncorrect,
 }) => {
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>('loading');
   const [selected, setSelected] = useState<string | null>(null);
@@ -30,6 +31,9 @@ export const ListeningRecognition: React.FC<ListeningRecognitionProps> = ({
   const [playing, setPlaying] = useState(false);
   const spokenText = question.promptJapanese ?? question.correctAnswer;
   const hasSpokenOnce = useRef(false);
+  const wrongBorder = lowConfidence ? 'border-[color:var(--kt-accent-warning)]/55' : 'border-red-500';
+  const wrongBg = lowConfidence ? 'bg-[var(--kt-accent-warning-soft)]' : 'bg-red-500 bg-opacity-10';
+  const wrongText = lowConfidence ? 'text-[var(--kt-accent-warning)]' : 'text-red-500';
 
   const speak = useCallback(() => {
     if (!window.speechSynthesis) return;
@@ -129,7 +133,7 @@ export const ListeningRecognition: React.FC<ListeningRecognitionProps> = ({
             text = 'text-[var(--kt-accent-info)]';
           } else if (answerState === 'wrong') {
             if (isSelected) {
-              border = 'border-red-500'; bg = 'bg-red-500 bg-opacity-10'; text = 'text-red-500';
+              border = wrongBorder; bg = wrongBg; text = wrongText;
             } else if (isCorrectOpt) {
               border = 'border-[var(--kt-accent-info)]';
               bg = 'bg-[var(--kt-accent-info)] bg-opacity-10';
@@ -165,7 +169,7 @@ export const ListeningRecognition: React.FC<ListeningRecognitionProps> = ({
       )}
 
       {answerState === 'wrong' && (
-        <div className="mt-5 rounded-[1.2rem] border border-red-500 bg-red-500 bg-opacity-10 p-4">
+        <div className={`mt-5 rounded-[1.2rem] border p-4 ${wrongBorder} ${wrongBg}`}>
           {question.explanation ? (
             <p className="mb-3 text-sm text-[var(--kt-ink)]">{question.explanation}</p>
           ) : (

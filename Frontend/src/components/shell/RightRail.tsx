@@ -77,7 +77,7 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
       )}
 
       {!isProfile && (
-        <section className="rounded-[1.7rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
+        <section className="rounded-[1.8rem] border border-[var(--kt-border-subtle)] bg-[radial-gradient(circle_at_top_right,var(--kt-accent-info-soft),transparent_38%),var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
           <div className="flex items-center justify-between gap-4">
             <div>
               <h3 className="text-xl font-black text-[var(--kt-ink-strong)]">
@@ -100,7 +100,7 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
       )}
 
       {(isHome || isPractice || isLetters) && summary.lastSession && (
-        <section className="rounded-[1.7rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
+        <section className="rounded-[1.8rem] border border-[var(--kt-border-subtle)] bg-[linear-gradient(180deg,var(--kt-surface-raised),var(--kt-surface))] p-5 shadow-[var(--kt-shadow-sm)]">
           <h3 className="text-xl font-black text-[var(--kt-ink-strong)]">
             {language === 'tr' ? 'Son kazanclar' : 'Recent wins'}
           </h3>
@@ -126,7 +126,7 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
       )}
 
       {shouldShowAuthCard && (
-        <section className="rounded-[1.7rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
+        <section className="rounded-[1.8rem] border border-[var(--kt-border-subtle)] bg-[radial-gradient(circle_at_top_left,var(--kt-brand-soft),transparent_40%),var(--kt-surface)] p-5 shadow-[var(--kt-shadow-sm)]">
           <div className="flex items-center gap-3">
             <Sparkles size={18} className="text-[var(--kt-brand)]" />
             <h3 className="text-xl font-black text-[var(--kt-ink-strong)]">

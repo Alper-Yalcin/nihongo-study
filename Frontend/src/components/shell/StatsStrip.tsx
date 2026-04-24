@@ -10,7 +10,7 @@ interface StatsStripProps {
 }
 
 export const StatsStrip: React.FC<StatsStripProps> = ({ streak, xp, activeScriptLabel }) => (
-  <div className="flex flex-wrap gap-3">
+  <div className="flex flex-wrap gap-3 rounded-[1.6rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-3 shadow-[var(--kt-shadow-sm)]">
     <StatPill
       icon={<img src={jpFlag} alt="JP" className="h-4 w-6 rounded-sm object-cover" />}
       value="JP"

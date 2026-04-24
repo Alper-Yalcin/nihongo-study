@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { getJLearnLevelForStep, getJLearnStep } from '../data/jlearn/jlearnContent';
+import { DebugPanel } from '../features/jlearn/debug/DebugPanel';
 import { MissionRunner } from '../features/jlearn/mission/MissionRunner';
 import { WarmupRunner, buildWarmupSession } from '../features/jlearn/warmup/WarmupRunner';
 import { appShellRoutes } from '../data/appShellContent';
@@ -22,15 +23,23 @@ export const MissionPage: React.FC = () => {
 
   if (!warmupCompleted && level && warmupSession.questions.length > 0) {
     return (
-      <WarmupRunner
-        levelId={level.id}
-        session={warmupSession}
-        onComplete={() => setWarmupCompleted(true)}
-      />
+      <>
+        <WarmupRunner
+          levelId={level.id}
+          session={warmupSession}
+          onComplete={() => setWarmupCompleted(true)}
+        />
+        <DebugPanel />
+      </>
     );
   }
 
-  return <MissionRunner step={step} />;
+  return (
+    <>
+      <MissionRunner step={step} />
+      <DebugPanel />
+    </>
+  );
 };
 
 export default MissionPage;

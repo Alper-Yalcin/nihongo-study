@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "description": "Full N5 progression fixture — all 14 levels completed, all badges earned.",
+    "generatedAt": "2026-04-24T00:00:00.000Z",
+    "usedBy": "npm run validate:jlearn (S25b regression fixture)"
+  },
+  "kototsuna.jlearn.progress": {
+    "completedStepIds": [
+      "L1-U1-M1", "L1-U1-M2", "L1-U1-M3",
+      "L1-U2-M4", "L1-U2-M5",
+      "L1-U3-M6", "L1-U3-M7", "L1-U3-M8",
+      "L2-U1-M1", "L2-U1-M2", "L2-U1-M3", "L2-U1-M4", "L2-U1-M5",
+      "L2-U2-M1", "L2-U2-M2", "L2-U2-M3", "L2-U2-M4", "L2-U2-M5",
+      "L3-U1-M1", "L3-U1-M2", "L3-U1-M3", "L3-U1-M4", "L3-U1-M5",
+      "L3-U2-M1", "L3-U2-M2", "L3-U2-M3", "L3-U2-M4", "L3-U2-M5",
+      "L4-U1-M1", "L4-U1-M2", "L4-U1-M3", "L4-U1-M4",
+      "L4-U2-M1", "L4-U2-M2", "L4-U2-M3", "L4-U2-M4",
+      "L5-U1-M1", "L5-U1-M2", "L5-U1-M3", "L5-U1-M4",
+      "L5-U2-M1", "L5-U2-M2", "L5-U2-M3", "L5-U2-M4",
+      "L6-U1-M1", "L6-U1-M2", "L6-U1-M3", "L6-U1-M4",
+      "L6-U2-M1", "L6-U2-M2", "L6-U2-M3", "L6-U2-M4",
+      "L7-U1-M1", "L7-U1-M2", "L7-U1-M3", "L7-U1-M4",
+      "L7-U2-M1", "L7-U2-M2", "L7-U2-M3", "L7-U2-M4",
+      "L8-U1-M1", "L8-U1-M2", "L8-U1-M3", "L8-U1-M4",
+      "L8-U2-M1", "L8-U2-M2", "L8-U2-M3", "L8-U2-M4",
+      "L9-U1-M1", "L9-U1-M2", "L9-U1-M3", "L9-U1-M4",
+      "L9-U2-M1", "L9-U2-M2", "L9-U2-M3", "L9-U2-M4",
+      "L10-U1-M1", "L10-U1-M2", "L10-U1-M3", "L10-U1-M4",
+      "L10-U2-M1", "L10-U2-M2", "L10-U2-M3", "L10-U2-M4",
+      "L11-U1-M1", "L11-U1-M2", "L11-U1-M3", "L11-U1-M4",
+      "L11-U2-M1", "L11-U2-M2", "L11-U2-M3", "L11-U2-M4",
+      "L12-U1-M1", "L12-U1-M2", "L12-U1-M3", "L12-U1-M4",
+      "L12-U2-M1", "L12-U2-M2", "L12-U2-M3", "L12-U2-M4",
+      "L13-U1-M1", "L13-U1-M2", "L13-U1-M3", "L13-U1-M4",
+      "L13-U2-M1", "L13-U2-M2", "L13-U2-M3", "L13-U2-M4",
+      "L14-U1-M1", "L14-U1-M2", "L14-U1-M3", "L14-U1-M4",
+      "L14-U2-M1", "L14-U2-M2", "L14-U2-M3", "L14-U2-M4"
+    ],
+    "completedUnitIds": [
+      "L1-U1", "L1-U2", "L1-U3",
+      "L2-U1", "L2-U2",
+      "L3-U1", "L3-U2",
+      "L4-U1", "L4-U2",
+      "L5-U1", "L5-U2",
+      "L6-U1", "L6-U2",
+      "L7-U1", "L7-U2",
+      "L8-U1", "L8-U2",
+      "L9-U1", "L9-U2",
+      "L10-U1", "L10-U2",
+      "L11-U1", "L11-U2",
+      "L12-U1", "L12-U2",
+      "L13-U1", "L13-U2",
+      "L14-U1", "L14-U2"
+    ],
+    "completedLevelIds": [
+      "JL1", "JL2", "JL3", "JL4", "JL5", "JL6", "JL7",
+      "JL8", "JL9", "JL10", "JL11", "JL12", "JL13", "JL14"
+    ],
+    "earnedBadgeIds": [
+      "badge-social-starter",
+      "badge-self-introducer",
+      "badge-time-keeper",
+      "badge-pointer",
+      "badge-connector",
+      "badge-locator",
+      "badge-actor",
+      "badge-scheduler",
+      "badge-describer",
+      "badge-storyteller",
+      "badge-connector-pro",
+      "badge-diplomat",
+      "badge-reasoner",
+      "badge-n5-ready"
+    ],
+    "lastUpdatedAt": "2026-04-24T00:00:00.000Z"
+  },
+  "kototsuna.jlearn.vocab-progress": {
+    "v-ojama-shimasu": {
+      "vocabId": "v-ojama-shimasu",
+      "masteryLevel": 4,
+      "errorCount": 1,
+      "lastSeenAt": "2026-04-23T10:00:00.000Z",
+      "nextReviewAt": "2026-05-23T10:00:00.000Z",
+      "seenInMissions": ["L1-U1-M1", "L1-U3-M8"]
+    },
+    "v-arigatou-gozaimasu": {
+      "vocabId": "v-arigatou-gozaimasu",
+      "masteryLevel": 4,
+      "errorCount": 0,
+      "lastSeenAt": "2026-04-23T10:00:00.000Z",
+      "nextReviewAt": "2026-05-23T10:00:00.000Z",
+      "seenInMissions": ["L1-U1-M1", "L1-U3-M7"]
+    },
+    "v-konbanwa": {
+      "vocabId": "v-konbanwa",
+      "masteryLevel": 4,
+      "errorCount": 0,
+      "lastSeenAt": "2026-04-23T10:00:00.000Z",
+      "nextReviewAt": "2026-05-23T10:00:00.000Z",
+      "seenInMissions": ["L1-U1-M1"]
+    },
+    "v-ohayou-gozaimasu": {
+      "vocabId": "v-ohayou-gozaimasu",
+      "masteryLevel": 4,
+      "errorCount": 0,
+      "lastSeenAt": "2026-04-23T10:00:00.000Z",
+      "nextReviewAt": "2026-05-23T10:00:00.000Z",
+      "seenInMissions": ["L1-U2-M4"]
+    },
+    "v2-watashiwa": {
+      "vocabId": "v2-watashiwa",
+      "masteryLevel": 4,
+      "errorCount": 0,
+      "lastSeenAt": "2026-04-23T10:00:00.000Z",
+      "nextReviewAt": "2026-05-23T10:00:00.000Z",
+      "seenInMissions": ["L2-U1-M1"]
+    },
+    "v4-kore": {
+      "vocabId": "v4-kore",
+      "masteryLevel": 3,
+      "errorCount": 2,
+      "lastSeenAt": "2026-04-20T10:00:00.000Z",
+      "nextReviewAt": "2026-04-27T10:00:00.000Z",
+      "seenInMissions": ["L4-U1-M1", "L4-U1-M2"],
+      "confusedWith": ["v4-sore", "v4-are"]
+    },
+    "v5-no": {
+      "vocabId": "v5-no",
+      "masteryLevel": 4,
+      "errorCount": 0,
+      "lastSeenAt": "2026-04-21T10:00:00.000Z",
+      "nextReviewAt": "2026-05-21T10:00:00.000Z",
+      "seenInMissions": ["L5-U1-M1", "L5-U2-M3"]
+    },
+    "v10-mashita": {
+      "vocabId": "v10-mashita",
+      "masteryLevel": 3,
+      "errorCount": 3,
+      "lastSeenAt": "2026-04-22T10:00:00.000Z",
+      "nextReviewAt": "2026-04-29T10:00:00.000Z",
+      "seenInMissions": ["L10-U1-M1", "L10-U1-M2", "L10-U2-M3"],
+      "confusedWith": ["v10-masendeshita"]
+    }
+  },
+  "kototsuna.jlearn.user-state": {
+    "confidenceLevel": "high",
+    "recentMistakes": ["v4-kore", "v10-mashita"],
+    "relationshipLevels": {
+      "yuki": 3,
+      "tanaka-sensei": 2,
+      "yamada-sensei": 1,
+      "mrs-tanaka": 3,
+      "mr-tanaka": 1,
+      "keita": 1,
+      "sora": 0,
+      "obaasan": 2
+    },
+    "relationshipMissionCounts": {
+      "yuki": 24,
+      "tanaka-sensei": 8,
+      "yamada-sensei": 4,
+      "mrs-tanaka": 20,
+      "mr-tanaka": 3,
+      "keita": 2,
+      "sora": 0,
+      "obaasan": 10
+    },
+    "recoveryFlags": [],
+    "formalityPreference": "polite",
+    "formalityDriftScore": 12,
+    "missedDays": 0,
+    "streakDays": 30,
+    "lastSessionAt": "2026-04-24T00:00:00.000Z",
+    "highConfidenceClearCount": 8
+  }
+}

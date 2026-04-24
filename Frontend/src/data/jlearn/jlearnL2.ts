@@ -395,6 +395,13 @@ export const jlearnLevel2: JLearnLevel = {
     name: 'Self-Introducer',
     description: 'You can introduce yourself completely to anyone in Japanese.'
   },
+  storyHook: {
+    type: 'cliffhanger',
+    speaker: 'Yuki',
+    teaser: 'Yuki waves as you leave. You do not know how to answer yet. But you will.',
+    japanese: 'どようび、ひま？',
+    translation: 'Are you free Saturday?'
+  },
   units: [
     {
       id: 'L2-U1',
@@ -1781,5 +1788,143 @@ export const jlearnLevel2: JLearnLevel = {
         }
       ]
     }
-  ]
+  ],
+  challengeMission: {
+    id: 'JL2-challenge',
+    title: 'Transfer Student Challenge',
+    kind: 'checkpoint',
+    estimatedMinutes: 2,
+    scenario: "A transfer student from abroad arrives mid-term and sits next to Yuki. She asks you to help introduce the class, the schedule, and school customs — all in Japanese.",
+    goal: 'Prove your Level 2 school and introduction Japanese. No hints. One shot per question.',
+    vocabulary: [],
+    grammar: [],
+    examples: [],
+    successMessage: "Yuki leans over: 「すごい、ちゃんと説明できたね！」 The transfer student looks relieved.",
+    emotionalFeedback: {
+      perfect: "Flawless. Yuki tells you later that even Yamada-sensei noticed.",
+      good: "Solid performance. The transfer student settles in quickly thanks to you.",
+      struggle: "You stumbled on a few. Yuki fills in the gaps — and promises to drill you later."
+    },
+    questions: [
+      {
+        id: 'JL2-ch-q1',
+        type: 'multiple-choice',
+        prompt: 'How do you say "Nice to meet you" when introducing yourself formally?',
+        options: ['はじめまして', 'おはようございます', 'ありがとうございます', 'おやすみなさい'],
+        correctAnswer: 'はじめまして',
+        explanation: 'はじめまして is the standard opening for a first meeting.'
+      },
+      {
+        id: 'JL2-ch-q2',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "My name is Kenji."',
+        correctAnswer: 'わたしはケンジです',
+        acceptedAnswers: ['わたしの　なまえは　ケンジです', 'わたしの名前はケンジです', 'ケンジです'],
+        explanation: 'わたしは〜です is the basic self-introduction structure.'
+      },
+      {
+        id: 'JL2-ch-q3',
+        type: 'fill-in-blank',
+        prompt: 'I am from America: 「アメリカ___　きました。」',
+        correctAnswer: 'から',
+        acceptedAnswers: ['から'],
+        explanation: '〜から means "from" — used for origin places.'
+      },
+      {
+        id: 'JL2-ch-q4',
+        type: 'multiple-choice',
+        prompt: 'Class starts. The teacher enters. Students say:',
+        options: ['きりつ、れい', 'いただきます', 'おやすみなさい', 'さようなら'],
+        correctAnswer: 'きりつ、れい',
+        explanation: 'きりつ (stand) and れい (bow) are the classroom start commands.'
+      },
+      {
+        id: 'JL2-ch-q5',
+        type: 'translation-jp-en',
+        prompt: 'What does 「わかりました」 mean?',
+        correctAnswer: 'I understand',
+        acceptedAnswers: ['Understood', 'I got it', 'I see'],
+        explanation: 'わかりました is the polite past form of わかる (to understand).'
+      },
+      {
+        id: 'JL2-ch-q6',
+        type: 'sentence-build',
+        prompt: 'Build: "I like Japanese."',
+        correctAnswer: 'にほんごがすきです',
+        explanation: '〜がすきです means "I like 〜".'
+      },
+      {
+        id: 'JL2-ch-q7',
+        type: 'multiple-choice',
+        prompt: 'Yuki asks: 「しゅみは　なんですか？」 She is asking about your:',
+        options: ['hobby', 'age', 'hometown', 'school'],
+        correctAnswer: 'hobby',
+        explanation: 'しゅみ means hobby or interest.'
+      },
+      {
+        id: 'JL2-ch-q8',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "I am a student."',
+        correctAnswer: 'わたしは　がくせいです',
+        acceptedAnswers: ['がくせいです', 'わたしはがくせいです'],
+        explanation: '〜です attaches to nouns to make polite statements.'
+      },
+      {
+        id: 'JL2-ch-q9',
+        type: 'fill-in-blank',
+        prompt: 'You don\'t understand. You ask: 「もう___　おねがいします。」(once more, please)',
+        correctAnswer: 'いちど',
+        acceptedAnswers: ['いちど', '一度'],
+        explanation: 'もういちど means "once more / one more time".'
+      },
+      {
+        id: 'JL2-ch-q10',
+        type: 'multiple-choice',
+        prompt: 'How do you ask "What is this?" in Japanese?',
+        options: ['これは　なんですか', 'どれですか', 'いくらですか', 'だれですか'],
+        correctAnswer: 'これは　なんですか',
+        explanation: 'これは〜ですか is the question form for identifying something close to you.'
+      },
+      {
+        id: 'JL2-ch-q11',
+        type: 'translation-jp-en',
+        prompt: 'What does 「どこから　きましたか」 mean?',
+        correctAnswer: 'Where did you come from?',
+        acceptedAnswers: ['Where are you from?', 'Where do you come from?'],
+        explanation: 'どこから　きましたか asks about someone\'s origin.'
+      },
+      {
+        id: 'JL2-ch-q12',
+        type: 'multiple-choice',
+        prompt: 'The transfer student doesn\'t hear you. You want to say "Excuse me" to get their attention:',
+        options: ['すみません', 'ごめんなさい', 'ありがとう', 'いいえ'],
+        correctAnswer: 'すみません',
+        explanation: 'すみません is used to get attention politely in Japanese.'
+      },
+      {
+        id: 'JL2-ch-q13',
+        type: 'translation-en-jp',
+        prompt: 'Translate: "Please look at the blackboard."',
+        correctAnswer: 'こくばんを　みてください',
+        acceptedAnswers: ['こくばんをみてください', 'ボードを　みてください'],
+        explanation: '〜を　みてください means "please look at 〜".'
+      },
+      {
+        id: 'JL2-ch-q14',
+        type: 'fill-in-blank',
+        prompt: 'You are answering the teacher\'s roll call: 「___。」(Here! / Present!)',
+        correctAnswer: 'はい',
+        acceptedAnswers: ['はい', 'はい！'],
+        explanation: 'はい is used to respond "present/here" during roll call.'
+      },
+      {
+        id: 'JL2-ch-q15',
+        type: 'multiple-choice',
+        prompt: 'Class ends. Students say goodbye to the teacher. The correct phrase is:',
+        options: ['さようなら', 'いただきます', 'おはようございます', 'ただいま'],
+        correctAnswer: 'さようなら',
+        explanation: 'さようなら is the formal farewell used when parting for a longer time.'
+      }
+    ]
+  }
 };
