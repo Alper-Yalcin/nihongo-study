@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-  BookOpenText, CircleHelp, Gamepad2, GraduationCap, Home, Languages,
+  BookOpenText, CircleHelp, Gamepad2, Home, Languages,
   MoonStar, MoreHorizontal, Search, Settings2, Sword, Trophy, UserRound
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -18,12 +18,12 @@ interface LeftNavProps {
 
 const labels = {
   tr: {
-    home: 'Home', learn: 'Ogren', japanese: 'Japonca', letters: 'Harfler', practice: 'Alistirma',
+    home: 'Home', learn: 'Ogren', letters: 'Harfler', practice: 'Alistirma',
     play: 'Oyun', quests: 'Gorevler', profile: 'Profil', more: 'Daha Fazla',
     settings: 'Ayarlar', search: 'Ara', help: 'Yardim', theme: 'Tema', language: 'Dil'
   },
   en: {
-    home: 'Home', learn: 'Learn', japanese: 'Japanese', letters: 'Letters', practice: 'Practice',
+    home: 'Home', learn: 'Learn', letters: 'Letters', practice: 'Practice',
     play: 'Play', quests: 'Quests', profile: 'Profile', more: 'More',
     settings: 'Settings', search: 'Search', help: 'Help', theme: 'Theme', language: 'Language'
   }
@@ -41,7 +41,6 @@ export const LeftNav: React.FC<LeftNavProps> = ({
   const navItems = useMemo(() => [
     { id: 'home', label: copy.home, href: appShellRoutes.home, icon: Home },
     { id: 'learn', label: copy.learn, href: appShellRoutes.learn, icon: BookOpenText },
-    { id: 'japanese', label: copy.japanese, href: appShellRoutes.learnJapanese, icon: GraduationCap },
     { id: 'letters', label: copy.letters, href: `${appShellRoutes.letters}?script=${activeScript}`, icon: Languages },
     { id: 'practice', label: copy.practice, href: `${appShellRoutes.practice}?script=${activeScript}`, icon: Sword },
     { id: 'play', label: copy.play, href: getKanaEntryRoute(activeScript, 'play'), icon: Gamepad2 },
@@ -63,8 +62,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({
           const Icon = item.icon;
           const isActive =
             item.id === 'home' ? location.pathname === appShellRoutes.home
-            : item.id === 'learn' ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase)
-            : item.id === 'japanese' ? location.pathname.startsWith(appShellRoutes.learnJapanese)
+            : item.id === 'learn' ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnJapanese) || location.pathname.startsWith(appShellRoutes.learnUnitBase)
             : item.id === 'letters' ? location.pathname.startsWith(appShellRoutes.letters)
             : item.id === 'practice' ? location.pathname.startsWith(appShellRoutes.practice)
             : item.id === 'play' ? location.pathname.includes('/play')

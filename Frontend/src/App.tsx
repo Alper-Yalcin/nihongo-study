@@ -5,7 +5,6 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { Home } from './pages/Home';
 import { LandingPage } from './pages/LandingPage';
 import { Kanji } from './pages/Kanji';
 import { KanaItemPage } from './pages/KanaItemPage';
@@ -128,11 +127,8 @@ export default function App() {
         path={appShellRoutes.home}
         element={<LandingPage language={language} activeScript={activeScript} themeMode={themeMode} />}
       />
-      <Route path={appShellRoutes.learn} element={<Home language={language} activeScript={activeScript} />} />
-      <Route path={appShellRoutes.learnJapanese} element={<LearnJapanesePage language={language} />} />
-      <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
-      <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
-      <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
+      <Route path={appShellRoutes.learn} element={<LearnJapanesePage language={language} />} />
+      <Route path={appShellRoutes.learnJapanese} element={<Navigate to={appShellRoutes.learn} replace />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
       <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />
       <Route path={appShellRoutes.practiceRun} element={<PracticeRunPage language={language} />} />
@@ -228,22 +224,31 @@ export default function App() {
     </Routes>
   );
 
+  const shell = (
+    <AppShell
+      language={language}
+      themeMode={themeMode}
+      activeScript={activeScript}
+      onActiveScriptChange={setActiveScript}
+      onLanguageChange={setLanguage}
+      onThemeModeChange={setThemeMode}
+    >
+      {shellRoutes}
+    </AppShell>
+  );
+
   return (
     <KanaProgressProvider>
       <div
         className="min-h-screen bg-[var(--kt-surface-page)] text-[var(--kt-ink)]"
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
-        <AppShell
-          language={language}
-          themeMode={themeMode}
-          activeScript={activeScript}
-          onActiveScriptChange={setActiveScript}
-          onLanguageChange={setLanguage}
-          onThemeModeChange={setThemeMode}
-        >
-          {shellRoutes}
-        </AppShell>
+        <Routes>
+          <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
+          <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
+          <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
+          <Route path="*" element={shell} />
+        </Routes>
         <ReEntrySplash />
         <ChallengeReadyPrompt language={language} />
         <SpeakingSuggestToast language={language} />
