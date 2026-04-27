@@ -59,6 +59,96 @@ export type QuestionType =
   | 'dialogue-speak'
   | 'shadow-read';
 
+export type MissionTaskType =
+  | 'dialogue-completion'
+  | 'sentence-building'
+  | 'listening-response'
+  | 'context-choice'
+  | 'typing-answer';
+
+export type SrsTargetType = 'kana' | 'vocab' | 'grammar' | 'phrase' | 'skill';
+export type SrsSkill =
+  | 'recognition'
+  | 'meaning'
+  | 'listening'
+  | 'typing'
+  | 'drawing'
+  | 'production';
+
+export interface SrsTarget {
+  targetType: SrsTargetType;
+  targetId: string;
+  skills: SrsSkill[];
+  weight: number;
+}
+
+export interface MissionTaskFeedback {
+  correct: string;
+  incorrect: string;
+}
+
+export interface MissionTask {
+  id: string;
+  type: MissionTaskType;
+  prompt: string;
+  promptJapanese?: string;
+  audioKey?: string;
+  options?: string[];
+  answer: string | string[];
+  acceptedAnswers?: string[];
+  targetIds: string[];
+  feedback?: MissionTaskFeedback;
+}
+
+export interface MissionDifficulty {
+  level: 1 | 2 | 3 | 4 | 5;
+  inputSupport: 'full' | 'reduced' | 'none';
+  outputMode: 'recognition' | 'guided-production' | 'free-production' | 'mixed';
+  timePressure?: 'none' | 'soft' | 'strict';
+}
+
+export type UnlockRuleType =
+  | 'previous-mission-complete'
+  | 'lesson-checkpoint-complete'
+  | 'target-mastery'
+  | 'kana-readiness'
+  | 'weakness-repair';
+
+export interface UnlockRule {
+  type: UnlockRuleType;
+  targetId?: string;
+  minScore?: number;
+  minMastery?: number;
+}
+
+export interface LearningEvent {
+  missionId: string;
+  taskId: string;
+  questionType: QuestionType;
+  targetType: SrsTargetType;
+  targetId: string;
+  skill: SrsSkill;
+  correct: boolean;
+  latencyMs: number;
+  hintUsed: boolean;
+  attemptCount: number;
+  createdAt: string;
+}
+
+export type WeakTopicReason =
+  | 'accuracy-low'
+  | 'slow-response'
+  | 'repeated-confusion'
+  | 'hint-dependence';
+
+export interface WeakTopic {
+  targetType: SrsTargetType;
+  targetId: string;
+  reason: WeakTopicReason;
+  severity: 1 | 2 | 3;
+  lastSeenAt: string;
+}
+
 export interface PracticeQuestion {
   id: string;
   type: QuestionType;
@@ -70,6 +160,7 @@ export interface PracticeQuestion {
   explanation?: string;
   targetVocabId?: string;
   targetGrammarId?: string;
+  srsTargets?: SrsTarget[];
 }
 
 export type BranchingOutcomeKind = 'wrong' | 'partial' | 'correct';
@@ -135,6 +226,11 @@ export interface JLearnStep {
   vocabulary: VocabItem[];
   grammar: GrammarPoint[];
   examples: ExampleSentence[];
+  tasks?: MissionTask[];
+  srsTargets?: SrsTarget[];
+  difficulty?: MissionDifficulty;
+  unlockRules?: UnlockRule[];
+  adaptiveTags?: string[];
   questions: PracticeQuestion[];
   branchingChoice?: BranchingChoice;
   dialogueChains?: DialogueChain[];

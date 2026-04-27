@@ -71,7 +71,7 @@ export const TopNav: React.FC<TopNavProps> = ({
 
   const isItemActive = (id: string) => {
     if (id === 'home') return location.pathname === appShellRoutes.home;
-    if (id === 'learn') return location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase);
+    if (id === 'learn') return location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnUnitBase) || location.pathname.startsWith(appShellRoutes.learnGuideBase);
     if (id === 'japanese') return location.pathname.startsWith(appShellRoutes.learnJapanese);
     if (id === 'letters') return location.pathname.startsWith(appShellRoutes.letters);
     if (id === 'practice') return location.pathname.startsWith(appShellRoutes.practice);

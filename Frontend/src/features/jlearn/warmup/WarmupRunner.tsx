@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { PracticeQuestion, VocabItem } from '../../../data/jlearn/jlearnTypes';
-import { readUserState, readVocab, VocabProgressMap } from '../../../data/jlearn/jlearnStorage';
+import { readUserState, readVocab, readWeakTopics, VocabProgressMap, WeakTopicMap } from '../../../data/jlearn/jlearnStorage';
 import { getAllJLearnVocabItems } from '../../../data/jlearn/jlearnContent';
 import { TaskRunner, TaskSummary } from '../tasks/TaskRunner';
 import { ConfidenceLevel, JLearnUserState } from '../debug/debugStore';
@@ -80,7 +80,8 @@ function getDueVocabEntries(vocabProgress: VocabProgressMap, allVocab: VocabItem
 function getReEntryVocabEntries(
   vocabProgress: VocabProgressMap,
   allVocab: VocabItem[],
-  recentMistakes: string[]
+  recentMistakes: string[],
+  weakTopics: WeakTopicMap = readWeakTopics()
 ): DueVocabEntry[] {
   const vocabById = new Map(allVocab.map((item) => [item.id, item]));
   const nowMs = Date.now();
@@ -122,6 +123,22 @@ function getReEntryVocabEntries(
       score: (existing?.score ?? 0) + recencyBoost * 20,
     });
   });
+
+  Object.values(weakTopics)
+    .filter((topic) => topic.targetType === 'vocab')
+    .forEach((topic) => {
+      const vocab = vocabById.get(topic.targetId);
+      if (!vocab) return;
+      const existing = scored.get(topic.targetId);
+      scored.set(topic.targetId, {
+        vocab,
+        nextReviewAt: existing?.nextReviewAt ?? new Date(0).toISOString(),
+        errorCount: Math.max(existing?.errorCount ?? 0, topic.severity),
+        masteryLevel: existing?.masteryLevel ?? 0,
+        source: 'weak',
+        score: (existing?.score ?? 0) + topic.severity * 24,
+      });
+    });
 
   const sorted = Array.from(scored.values())
     .sort((left, right) => {

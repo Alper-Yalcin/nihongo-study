@@ -1,9 +1,12 @@
 import { JLearnUserState, getJLearnUserState, setJLearnUserState } from '../../features/jlearn/debug/debugStore';
+import { LearningEvent, WeakTopic } from './jlearnTypes';
 
 // ─── Storage keys ────────────────────────────────────────────────────────────
 
 const PROGRESS_KEY = 'kototsuna.jlearn.progress';
 const VOCAB_KEY = 'kototsuna.jlearn.vocab-progress';
+const LEARNING_EVENTS_KEY = 'kototsuna.jlearn.learning-events';
+const WEAK_TOPICS_KEY = 'kototsuna.jlearn.weak-topics';
 
 // ─── Schema: Mission Progress ─────────────────────────────────────────────────
 
@@ -38,6 +41,8 @@ export interface VocabProgressRecord {
 }
 
 export type VocabProgressMap = Record<string, VocabProgressRecord>;
+export type LearningEventLog = LearningEvent[];
+export type WeakTopicMap = Record<string, WeakTopic>;
 
 interface VocabAttemptUpdate {
   vocabId: string;
@@ -99,6 +104,70 @@ export function readVocab(): VocabProgressMap {
 
 export function writeVocab(v: VocabProgressMap): void {
   safeWrite(VOCAB_KEY, v);
+}
+
+export function readLearningEvents(): LearningEventLog {
+  return safeParse<LearningEventLog>(LEARNING_EVENTS_KEY, []);
+}
+
+export function writeLearningEvents(events: LearningEventLog): void {
+  safeWrite(LEARNING_EVENTS_KEY, events.slice(-500));
+}
+
+export function readWeakTopics(): WeakTopicMap {
+  return safeParse<WeakTopicMap>(WEAK_TOPICS_KEY, {});
+}
+
+export function writeWeakTopics(topics: WeakTopicMap): void {
+  safeWrite(WEAK_TOPICS_KEY, topics);
+}
+
+export function deriveWeakTopicsFromEvents(events: LearningEvent[]): WeakTopicMap {
+  const byTarget = new Map<string, LearningEvent[]>();
+
+  for (const event of events) {
+    const key = `${event.targetType}:${event.targetId}`;
+    byTarget.set(key, [...(byTarget.get(key) ?? []), event]);
+  }
+
+  const topics: WeakTopicMap = {};
+
+  for (const [key, targetEvents] of byTarget) {
+    const recent = targetEvents.slice(-8);
+    const latest = recent[recent.length - 1];
+    if (!latest) continue;
+
+    const wrongCount = recent.filter((event) => !event.correct).length;
+    const hintCount = recent.filter((event) => event.hintUsed).length;
+    const slowCount = recent.filter((event) => event.latencyMs > 12000).length;
+    const reason =
+      wrongCount >= 3
+        ? 'accuracy-low'
+        : hintCount >= 3
+          ? 'hint-dependence'
+          : slowCount >= 3
+            ? 'slow-response'
+            : null;
+
+    if (!reason) continue;
+
+    topics[key] = {
+      targetType: latest.targetType,
+      targetId: latest.targetId,
+      reason,
+      severity: Math.min(3, Math.max(1, wrongCount + hintCount >= 5 ? 3 : wrongCount >= 3 ? 2 : 1)) as 1 | 2 | 3,
+      lastSeenAt: latest.createdAt,
+    };
+  }
+
+  return topics;
+}
+
+export function appendLearningEvents(events: LearningEvent[]): void {
+  if (events.length === 0) return;
+  const nextEvents = [...readLearningEvents(), ...events].slice(-500);
+  writeLearningEvents(nextEvents);
+  writeWeakTopics(deriveWeakTopicsFromEvents(nextEvents));
 }
 
 export function deriveVocabNextReviewAt(

@@ -28,7 +28,7 @@ export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ activeScript }
         const Icon = item.icon;
         const isActive =
           item.id === 'home'
-            ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnJapanese) || location.pathname.startsWith(appShellRoutes.learnUnitBase)
+            ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnJapanese) || location.pathname.startsWith(appShellRoutes.learnUnitBase) || location.pathname.startsWith(appShellRoutes.learnGuideBase)
             : item.id === 'letters'
               ? location.pathname.startsWith(appShellRoutes.letters)
               : item.id === 'practice'

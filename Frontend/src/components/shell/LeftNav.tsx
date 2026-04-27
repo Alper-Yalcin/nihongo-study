@@ -62,7 +62,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({
           const Icon = item.icon;
           const isActive =
             item.id === 'home' ? location.pathname === appShellRoutes.home
-            : item.id === 'learn' ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnJapanese) || location.pathname.startsWith(appShellRoutes.learnUnitBase)
+            : item.id === 'learn' ? location.pathname === appShellRoutes.learn || location.pathname.startsWith(appShellRoutes.learnJapanese) || location.pathname.startsWith(appShellRoutes.learnUnitBase) || location.pathname.startsWith(appShellRoutes.learnGuideBase)
             : item.id === 'letters' ? location.pathname.startsWith(appShellRoutes.letters)
             : item.id === 'practice' ? location.pathname.startsWith(appShellRoutes.practice)
             : item.id === 'play' ? location.pathname.includes('/play')

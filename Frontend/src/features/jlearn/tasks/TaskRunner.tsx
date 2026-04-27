@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
-import { readVocab, updateVocabProgress, writeVocab } from '../../../data/jlearn/jlearnStorage';
+import React, { useEffect, useRef, useState } from 'react';
+import { LearningEvent, PracticeQuestion, SrsSkill } from '../../../data/jlearn/jlearnTypes';
+import { appendLearningEvents, readVocab, updateVocabProgress, writeVocab } from '../../../data/jlearn/jlearnStorage';
 import { ConfidenceLevel } from '../debug/debugStore';
 import { MultipleChoice } from './MultipleChoice';
 import { FillInBlank } from './FillInBlank';
@@ -57,6 +57,62 @@ function buildQuestionHint(question: PracticeQuestion): string {
     : 'Pause, re-read the prompt, and answer with the shortest natural phrase.';
 }
 
+function skillForQuestionType(type: PracticeQuestion['type']): SrsSkill {
+  if (type === 'listening-recognition') return 'listening';
+  if (type === 'translation-en-jp') return 'typing';
+  if (type === 'sentence-build' || type === 'dialogue-complete') return 'production';
+  if (type === 'translation-jp-en' || type === 'context-select') return 'meaning';
+  return 'recognition';
+}
+
+function buildLearningEvents(params: {
+  missionId: string;
+  question: PracticeQuestion;
+  wasCorrect: boolean;
+  latencyMs: number;
+  hintUsed: boolean;
+  attemptCount: number;
+}): LearningEvent[] {
+  const { missionId, question, wasCorrect, latencyMs, hintUsed, attemptCount } = params;
+  const now = new Date().toISOString();
+  const explicitTargets = question.srsTargets ?? [];
+  const fallbackTargets = [
+    question.targetVocabId
+      ? {
+          targetType: 'vocab' as const,
+          targetId: question.targetVocabId,
+          skills: [skillForQuestionType(question.type)],
+          weight: 1,
+        }
+      : null,
+    question.targetGrammarId
+      ? {
+          targetType: 'grammar' as const,
+          targetId: question.targetGrammarId,
+          skills: [skillForQuestionType(question.type)],
+          weight: 1,
+        }
+      : null,
+  ].filter((target): target is NonNullable<typeof target> => Boolean(target));
+  const targets = explicitTargets.length > 0 ? explicitTargets : fallbackTargets;
+
+  return targets.flatMap((target) =>
+    target.skills.map((skill) => ({
+      missionId,
+      taskId: question.id,
+      questionType: question.type,
+      targetType: target.targetType,
+      targetId: target.targetId,
+      skill,
+      correct: wasCorrect,
+      latencyMs,
+      hintUsed,
+      attemptCount,
+      createdAt: now,
+    }))
+  );
+}
+
 export const TaskRunner: React.FC<TaskRunnerProps> = ({
   missionId,
   questions,
@@ -69,8 +125,13 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
   const [retries, setRetries] = useState<Record<string, number>>({});
   const [openHints, setOpenHints] = useState<Record<string, boolean>>({});
   const [lockedWrong, setLockedWrong] = useState<Record<string, boolean>>({});
+  const questionStartedAtRef = useRef(Date.now());
   const isLowConfidence = confidenceLevel === 'low' && !challengeMode;
   const isHighConfidence = confidenceLevel === 'high' || challengeMode;
+
+  useEffect(() => {
+    questionStartedAtRef.current = Date.now();
+  }, [idx, eligible[idx]?.id]);
 
   const recordVocabAttempt = (question: PracticeQuestion, wasCorrect: boolean) => {
     if (!question.targetVocabId) return;
@@ -80,6 +141,20 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
       wasCorrect,
     });
     writeVocab(next);
+  };
+
+  const recordLearningAttempt = (question: PracticeQuestion, wasCorrect: boolean) => {
+    const latencyMs = Date.now() - questionStartedAtRef.current;
+    appendLearningEvents(
+      buildLearningEvents({
+        missionId,
+        question,
+        wasCorrect,
+        latencyMs,
+        hintUsed: openHints[question.id] ?? false,
+        attemptCount: (retries[question.id] ?? 0) + 1,
+      })
+    );
   };
 
   if (eligible.length === 0) {
@@ -113,11 +188,13 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
 
   const handleCorrect = () => {
     recordVocabAttempt(question, true);
+    recordLearningAttempt(question, true);
     setIdx((i) => i + 1);
   };
 
   const handleIncorrect = () => {
     recordVocabAttempt(question, false);
+    recordLearningAttempt(question, false);
     setRetries((prev) => ({
       ...prev,
       [question.id]: (prev[question.id] ?? 0) + 1,

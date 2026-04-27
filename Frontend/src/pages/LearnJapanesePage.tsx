@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AppLanguage } from '../data/appPreferences';
-import { getLearnUnitRoute } from '../data/appShellContent';
+import { getLearnGuideRoute, getLearnUnitRoute } from '../data/appShellContent';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections,
@@ -355,7 +355,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }
                   copy={copy}
                   unit={unit}
                   progressPercent={unitProgress}
-                  onGuide={() => openUnit(unit.id)}
+                  onGuide={() => navigate(getLearnGuideRoute(unit.id))}
                 />
 
                 <div className="relative flex flex-col items-center gap-7 px-4 py-9">

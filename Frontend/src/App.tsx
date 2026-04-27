@@ -19,6 +19,7 @@ import { MissionPage } from './pages/MissionPage';
 import { QuestsPage } from './pages/QuestsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LearnUnitPage } from './pages/LearnUnitPage';
+import { LearnGuidePage } from './pages/LearnGuidePage';
 import { LearnJapanesePage } from './pages/LearnJapanesePage';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
 import { AppLanguage, ThemeMode } from './data/appPreferences';
@@ -128,6 +129,7 @@ export default function App() {
         element={<LandingPage language={language} activeScript={activeScript} themeMode={themeMode} />}
       />
       <Route path={appShellRoutes.learn} element={<LearnJapanesePage language={language} />} />
+      <Route path={`${appShellRoutes.learnGuideBase}/:unitId`} element={<LearnGuidePage language={language} />} />
       <Route path={appShellRoutes.learnJapanese} element={<Navigate to={appShellRoutes.learn} replace />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
       <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />

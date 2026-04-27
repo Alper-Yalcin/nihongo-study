@@ -16,6 +16,7 @@ export const appShellRoutes = {
   learnJapaneseMissionBase: '/learn/japanese/mission',
   learnJapaneseChallengeBase: '/learn/japanese/challenge',
   learnUnitBase: '/learn/unit',
+  learnGuideBase: '/learn/guide',
   letters: '/letters',
   practice: '/practice',
   practiceRun: '/practice/run',
@@ -49,6 +50,7 @@ export const appShellRoutes = {
 } as const;
 
 export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnitBase}/${unitId}`;
+export const getLearnGuideRoute = (unitId: string) => `${appShellRoutes.learnGuideBase}/${unitId}`;
 
 const studyLearnRouteByScript: Record<KanaRouteScript, string> = {
   hiragana: appShellRoutes.hiraganaLearn,

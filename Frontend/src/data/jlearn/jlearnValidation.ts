@@ -77,6 +77,18 @@ export function validateCurriculumData(track: JLearnTrack): string[] {
         if (!Array.isArray(step.vocabulary)) issues.push(`${sp}: vocabulary must be an array`);
         if (!Array.isArray(step.grammar)) issues.push(`${sp}: grammar must be an array`);
         if (!Array.isArray(step.questions)) issues.push(`${sp}: questions must be an array`);
+        if (step.tasks != null && !Array.isArray(step.tasks)) {
+          issues.push(`${sp}: tasks must be an array when present`);
+        }
+        if (step.srsTargets != null && !Array.isArray(step.srsTargets)) {
+          issues.push(`${sp}: srsTargets must be an array when present`);
+        }
+        if (step.adaptiveTags != null && !Array.isArray(step.adaptiveTags)) {
+          issues.push(`${sp}: adaptiveTags must be an array when present`);
+        }
+        if (step.difficulty && (step.difficulty.level < 1 || step.difficulty.level > 5)) {
+          issues.push(`${sp}: difficulty.level must be between 1 and 5`);
+        }
 
         if (step.isCheckpoint && (step.minPassScore == null || step.minPassScore < 1 || step.minPassScore > 100)) {
           issues.push(`${sp}: checkpoint step must have minPassScore between 1 and 100`);
@@ -107,6 +119,23 @@ export function validateCurriculumData(track: JLearnTrack): string[] {
             (!Array.isArray(q.options) || q.options.length < 2)
           ) {
             issues.push(`${sp}/question(${q.id}): ${q.type} requires at least 2 options`);
+          }
+        }
+
+        for (const task of step.tasks ?? []) {
+          if (!task.id) issues.push(`${sp}/task: missing id`);
+          if (!task.type) issues.push(`${sp}/task(${task.id}): missing type`);
+          if (!task.prompt) issues.push(`${sp}/task(${task.id}): missing prompt`);
+          if (!Array.isArray(task.targetIds) || task.targetIds.length === 0) {
+            issues.push(`${sp}/task(${task.id}): targetIds must be non-empty`);
+          }
+        }
+
+        for (const target of step.srsTargets ?? []) {
+          if (!target.targetId) issues.push(`${sp}/srsTarget: missing targetId`);
+          if (!target.targetType) issues.push(`${sp}/srsTarget(${target.targetId}): missing targetType`);
+          if (!Array.isArray(target.skills) || target.skills.length === 0) {
+            issues.push(`${sp}/srsTarget(${target.targetId}): skills must be non-empty`);
           }
         }
       }

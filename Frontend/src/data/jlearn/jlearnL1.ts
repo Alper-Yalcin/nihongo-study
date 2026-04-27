@@ -242,6 +242,19 @@ export const jlearnLevel1: JLearnLevel = {
           title: 'Enter the house',
           kind: 'introduce',
           estimatedMinutes: 1,
+          difficulty: {
+            level: 1,
+            inputSupport: 'full',
+            outputMode: 'recognition',
+            timePressure: 'none'
+          },
+          adaptiveTags: ['arrival', 'home-entry', 'politeness', 'ritual-phrase'],
+          unlockRules: [{ type: 'previous-mission-complete' }],
+          srsTargets: [
+            { targetType: 'vocab', targetId: v.ojamaShimasu.id, skills: ['meaning', 'production', 'listening'], weight: 1 },
+            { targetType: 'vocab', targetId: v.konbanwa.id, skills: ['meaning', 'recognition'], weight: 0.6 },
+            { targetType: 'grammar', targetId: g.enteringHome.id, skills: ['meaning', 'production'], weight: 1 }
+          ],
           scenario: 'Mrs. Tanaka opens the door: 「いらっしゃい！」You step inside a Japanese home for the first time.',
           goal: 'Respond politely when entering a Japanese home.',
           vocabulary: [v.ojamaShimasu, v.konbanwa, v.arigatouGozaimasu],
@@ -270,6 +283,32 @@ export const jlearnLevel1: JLearnLevel = {
               english: 'Thank you (formal).',
               vocabIds: [v.arigatouGozaimasu.id],
               grammarIds: []
+            }
+          ],
+          tasks: [
+            {
+              id: 'task-L1-U1-M1-context',
+              type: 'context-choice',
+              prompt: 'You step into a Japanese home. Pick the expected phrase.',
+              options: [v.konbanwa.japanese, v.ojamaShimasu.japanese, v.sayounara.japanese],
+              answer: v.ojamaShimasu.japanese,
+              targetIds: [v.ojamaShimasu.id, g.enteringHome.id],
+              feedback: {
+                correct: 'Good. That phrase belongs to entering a home.',
+                incorrect: 'This is a home-entry ritual, not a generic greeting.'
+              }
+            },
+            {
+              id: 'task-L1-U1-M1-build',
+              type: 'sentence-building',
+              prompt: 'Build the home-entry phrase.',
+              options: ['ojama', 'shimasu', 'konbanwa'],
+              answer: ['ojama', 'shimasu'],
+              targetIds: [v.ojamaShimasu.id],
+              feedback: {
+                correct: 'Clean entry phrase.',
+                incorrect: 'Keep the two chunks together: ojama + shimasu.'
+              }
             }
           ],
           branchingChoice: {
@@ -358,6 +397,19 @@ export const jlearnLevel1: JLearnLevel = {
           title: 'Dinner time',
           kind: 'expand',
           estimatedMinutes: 1,
+          difficulty: {
+            level: 2,
+            inputSupport: 'reduced',
+            outputMode: 'guided-production',
+            timePressure: 'none'
+          },
+          adaptiveTags: ['meal-ritual', 'politeness', 'before-after'],
+          unlockRules: [{ type: 'previous-mission-complete', targetId: 'L1-U1-M1' }],
+          srsTargets: [
+            { targetType: 'vocab', targetId: v.itadakimasu.id, skills: ['meaning', 'production', 'listening'], weight: 1 },
+            { targetType: 'vocab', targetId: v.gochisousamaDeshita.id, skills: ['meaning', 'production'], weight: 1 },
+            { targetType: 'grammar', targetId: g.mealRituals.id, skills: ['meaning', 'production'], weight: 1 }
+          ],
           scenario: "You sit at the table. Mr. Tanaka puts his hands together: 「いただきます。」Everyone follows. You freeze.",
           goal: 'Respond correctly before and after the meal.',
           vocabulary: [v.itadakimasu, v.gochisousamaDeshita],
@@ -378,6 +430,33 @@ export const jlearnLevel1: JLearnLevel = {
               english: 'Thank you for the meal.',
               vocabIds: [v.gochisousamaDeshita.id],
               grammarIds: [g.mealRituals.id]
+            }
+          ],
+          tasks: [
+            {
+              id: 'task-L1-U1-M2-listen-before',
+              type: 'listening-response',
+              prompt: 'Listen before the meal and choose the phrase.',
+              promptJapanese: v.itadakimasu.japanese,
+              options: [v.itadakimasu.japanese, v.gochisousamaDeshita.japanese],
+              answer: v.itadakimasu.japanese,
+              targetIds: [v.itadakimasu.id, g.mealRituals.id],
+              feedback: {
+                correct: 'Before eating: itadakimasu.',
+                incorrect: 'Before eating uses itadakimasu; after eating uses gochisousama deshita.'
+              }
+            },
+            {
+              id: 'task-L1-U1-M2-context-after',
+              type: 'context-choice',
+              prompt: 'You just finished dinner. What do you say?',
+              options: [v.itadakimasu.japanese, v.gochisousamaDeshita.japanese, v.ojamaShimasu.japanese],
+              answer: v.gochisousamaDeshita.japanese,
+              targetIds: [v.gochisousamaDeshita.id, g.mealRituals.id],
+              feedback: {
+                correct: 'After eating: gochisousama deshita.',
+                incorrect: 'Use the after-meal phrase here.'
+              }
             }
           ],
           branchingChoice: {
@@ -419,6 +498,19 @@ export const jlearnLevel1: JLearnLevel = {
           title: 'Saying goodnight',
           kind: 'review',
           estimatedMinutes: 1,
+          difficulty: {
+            level: 2,
+            inputSupport: 'reduced',
+            outputMode: 'mixed',
+            timePressure: 'none'
+          },
+          adaptiveTags: ['farewell', 'formality', 'host-family'],
+          unlockRules: [{ type: 'previous-mission-complete', targetId: 'L1-U1-M2' }],
+          srsTargets: [
+            { targetType: 'vocab', targetId: v.oyasuminasai.id, skills: ['meaning', 'production', 'listening'], weight: 1 },
+            { targetType: 'vocab', targetId: v.oyasumi.id, skills: ['meaning', 'recognition'], weight: 0.7 },
+            { targetType: 'grammar', targetId: g.formalCasualFarewell.id, skills: ['meaning', 'production'], weight: 1 }
+          ],
           scenario: "It's late. Mrs. Tanaka walks you to your room: 「おやすみなさい。」",
           goal: 'Match formality to the situation and say goodnight.',
           vocabulary: [v.oyasuminasai, v.oyasumi],
@@ -426,6 +518,32 @@ export const jlearnLevel1: JLearnLevel = {
           examples: [
             { id: 'ex-L1-U1-M3-1', japanese: 'おやすみなさい。', romaji: 'Oyasuminasai.', english: 'Good night (formal).', vocabIds: [v.oyasuminasai.id], grammarIds: [g.formalCasualFarewell.id] },
             { id: 'ex-L1-U1-M3-2', japanese: 'おやすみ。', romaji: 'Oyasumi.', english: 'Night (casual).', vocabIds: [v.oyasumi.id], grammarIds: [g.formalCasualFarewell.id] }
+          ],
+          tasks: [
+            {
+              id: 'task-L1-U1-M3-formal-choice',
+              type: 'context-choice',
+              prompt: 'Say goodnight to your host mother.',
+              options: [v.oyasumi.japanese, v.oyasuminasai.japanese, v.konbanwa.japanese],
+              answer: v.oyasuminasai.japanese,
+              targetIds: [v.oyasuminasai.id, g.formalCasualFarewell.id],
+              feedback: {
+                correct: 'Formal goodnight fits the host-family context.',
+                incorrect: 'Use the longer formal form with your host mother.'
+              }
+            },
+            {
+              id: 'task-L1-U1-M3-casual-choice',
+              type: 'context-choice',
+              prompt: 'Say goodnight to a close friend.',
+              options: [v.oyasumi.japanese, v.oyasuminasai.japanese, v.sayounara.japanese],
+              answer: v.oyasumi.japanese,
+              targetIds: [v.oyasumi.id, g.formalCasualFarewell.id],
+              feedback: {
+                correct: 'Short form fits a close friend.',
+                incorrect: 'Close friends can use the shorter casual form.'
+              }
+            }
           ],
           branchingChoice: {
             prompt: 'Mrs. Tanaka says おやすみなさい — what do you reply with?',
