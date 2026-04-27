@@ -240,7 +240,7 @@ export const ListeningRecognitionPanel: React.FC<Props> = ({
       variant: 'recognition'
     };
 
-    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType });
+    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType, sessionId: sessionRef.current?.id });
 
     sessionStatsRef.current = nextStats;
     setSessionStats(nextStats);

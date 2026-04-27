@@ -230,7 +230,7 @@ export const ListeningWritingPanel: React.FC<Props> = ({
       variant: 'writing'
     };
 
-    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType });
+    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType, sessionId: sessionRef.current?.id });
 
     sessionStatsRef.current = nextStats;
     setSessionStats(nextStats);

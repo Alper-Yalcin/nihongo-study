@@ -19,6 +19,9 @@ import { appShellRoutes, getKanaEntryRoute } from '../../data/appShellContent';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
 import { getJLearnUserState, subscribeJLearnUserState } from '../../features/jlearn/debug/debugStore';
+import { useFeedback } from '../../shared/hooks/useFeedback';
+import { KiBar } from '../../shared/feedback/KiBar';
+import { tomoshibiVisual } from '../../features/streak/tomoshibi';
 
 interface TopNavProps {
   language: AppLanguage;
@@ -32,15 +35,23 @@ interface TopNavProps {
 const labels = {
   tr: {
     home: 'Home', learn: 'Ogren', japanese: 'Japonca', letters: 'Harfler', practice: 'Alistirma',
-    play: 'Oyun', quests: 'Gorevler', profile: 'Profil', settings: 'Ayarlar',
-    search: 'Ara', help: 'Yardim', theme: 'Tema', language: 'Dil', streak: 'Seri'
+    play: 'Meydan', quests: 'Gorevler', profile: 'Profil', settings: 'Ayarlar',
+    search: 'Ara', help: 'Yardim', theme: 'Tema', language: 'Dil',
+    streak: 'Tomoshibi', hanabira: 'Hanabira', dan: 'Dan'
   },
   en: {
     home: 'Home', learn: 'Learn', japanese: 'Japanese', letters: 'Letters', practice: 'Practice',
-    play: 'Play', quests: 'Quests', profile: 'Profile', settings: 'Settings',
-    search: 'Search', help: 'Help', theme: 'Theme', language: 'Language', streak: 'Streak'
+    play: 'Meydan', quests: 'Quests', profile: 'Profile', settings: 'Settings',
+    search: 'Search', help: 'Help', theme: 'Theme', language: 'Language',
+    streak: 'Tomoshibi', hanabira: 'Hanabira', dan: 'Dan'
   }
 } as const;
+
+// Dan/Kyū placeholder derivation — Sprint 4'te `data/danSystem.ts`'e taşınacak.
+const deriveKyuFromStreak = (streakDays: number): number => {
+  const advanced = Math.floor(streakDays / 14);
+  return Math.max(1, 10 - advanced);
+};
 
 export const TopNav: React.FC<TopNavProps> = ({
   language, themeMode, activeScript,
@@ -51,6 +62,11 @@ export const TopNav: React.FC<TopNavProps> = ({
   const [moreOpen, setMoreOpen] = useState(false);
   const [streakDays, setStreakDays] = useState(() => getJLearnUserState().streakDays);
   const logoSrc = themeMode === 'dark' ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
+
+  const { state: feedbackState } = useFeedback();
+  const hanabira = feedbackState.hanabira;
+  const kyu = deriveKyuFromStreak(streakDays);
+  const tomoshibi = tomoshibiVisual(streakDays);
 
   useEffect(() => { setMoreOpen(false); }, [location.pathname]);
   useEffect(
@@ -64,7 +80,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     { id: 'japanese', label: copy.japanese, href: appShellRoutes.learnJapanese, icon: GraduationCap },
     { id: 'letters', label: copy.letters, href: `${appShellRoutes.letters}?script=${activeScript}`, icon: Languages },
     { id: 'practice', label: copy.practice, href: `${appShellRoutes.practice}?script=${activeScript}`, icon: Sword },
-    { id: 'play', label: copy.play, href: getKanaEntryRoute(activeScript, 'play'), icon: Gamepad2 },
+    { id: 'play', label: copy.play, href: `${appShellRoutes.meydan}?script=${activeScript}`, icon: Gamepad2 },
     { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
     { id: 'profile', label: copy.profile, href: appShellRoutes.account, icon: UserRound }
   ], [activeScript, copy]);
@@ -87,13 +103,19 @@ export const TopNav: React.FC<TopNavProps> = ({
           <img src={logoSrc} alt="Kototsuna" className="h-9 w-auto" />
         </Link>
 
+        {/* Mobile: kompakt tomoshibi rozeti */}
         <Link
           to={appShellRoutes.learnJapanese}
-          className="flex shrink-0 items-center gap-1 rounded-[0.85rem] border border-[color:var(--kt-accent-warning)]/35 bg-[var(--kt-accent-warning-soft)] px-2.5 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-[var(--kt-accent-warning)] shadow-[var(--kt-shadow-sm)] md:hidden"
+          className="flex shrink-0 items-center gap-1 rounded-[0.85rem] border px-2.5 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] md:hidden"
+          style={{
+            borderColor: 'color-mix(in srgb, var(--kt-tomoshibi) 35%, transparent)',
+            background: 'color-mix(in srgb, var(--kt-tomoshibi) 14%, transparent)',
+            color: 'var(--kt-tomoshibi-strong)'
+          }}
           title={`${copy.streak}: ${streakDays}`}
           aria-label={`${copy.streak}: ${streakDays}`}
         >
-          <Flame size={14} />
+          <Flame size={14} className={streakDays > 0 ? 'kt-tomoshibi-flicker' : ''} />
           <span>{streakDays}</span>
         </Link>
 
@@ -119,15 +141,56 @@ export const TopNav: React.FC<TopNavProps> = ({
         </nav>
 
         <div className="relative hidden items-center gap-2 md:flex">
+          {/* Tomoshibi 灯 — primary, glow */}
           <Link
             to={appShellRoutes.learnJapanese}
-            className="flex items-center gap-1.5 rounded-[0.95rem] border border-[color:var(--kt-accent-warning)]/35 bg-[var(--kt-accent-warning-soft)] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[var(--kt-accent-warning)] shadow-[var(--kt-shadow-sm)] transition hover:-translate-y-0.5 hover:bg-[var(--kt-nav-item-hover)]"
+            className="flex items-center gap-1.5 rounded-[0.95rem] border px-3 py-2 text-[12px] font-black uppercase tracking-[0.12em] transition hover:-translate-y-0.5"
+            style={{
+              borderColor: `color-mix(in srgb, ${tomoshibi.haloColor} 50%, transparent)`,
+              background: 'color-mix(in srgb, var(--kt-tomoshibi) 14%, transparent)',
+              color: 'var(--kt-tomoshibi-strong)',
+              boxShadow:
+                streakDays > 0
+                  ? `0 0 ${tomoshibi.glow}px color-mix(in srgb, ${tomoshibi.haloColor} 70%, transparent)`
+                  : 'var(--kt-shadow-sm)'
+            }}
             title={`${copy.streak}: ${streakDays}`}
             aria-label={`${copy.streak}: ${streakDays}`}
           >
-            <Flame size={15} />
-            <span>{streakDays}</span>
+            <Flame size={16} className={streakDays > 0 ? 'kt-tomoshibi-flicker' : ''} />
+            <span className="text-sm font-black">{streakDays}</span>
           </Link>
+
+          {/* Ki 気 — 5 nokta */}
+          <KiBar />
+
+          {/* Hanabira 花 — secondary, muted */}
+          <div
+            className="flex items-center gap-1.5 rounded-[0.85rem] px-2.5 py-1.5 text-[11px] font-bold tracking-[0.08em]"
+            style={{
+              background: 'var(--kt-hanabira-soft)',
+              color: 'var(--kt-hanabira)'
+            }}
+            title={`${copy.hanabira}: ${hanabira}`}
+            aria-label={`${copy.hanabira}: ${hanabira}`}
+          >
+            <span aria-hidden="true">花</span>
+            <span>{hanabira}</span>
+          </div>
+
+          {/* Dan rozeti — prestige sinyali */}
+          <div
+            className="flex items-center gap-1 rounded-[0.85rem] border px-2.5 py-1.5 text-[11px] font-black uppercase tracking-[0.12em]"
+            style={{
+              borderColor: 'color-mix(in srgb, var(--kt-dan-gold) 50%, transparent)',
+              background: 'var(--kt-dan-gold-soft)',
+              color: 'var(--kt-dan-ink)'
+            }}
+            title={`${copy.dan}: ${kyu}° kyū`}
+            aria-label={`${copy.dan}: ${kyu}° kyū`}
+          >
+            <span>{kyu}°</span>
+          </div>
 
           <div className="flex items-center rounded-[0.95rem] border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] p-1">
             {(['hiragana', 'katakana'] as KanaScript[]).map((script) => {

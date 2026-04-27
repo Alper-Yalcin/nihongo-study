@@ -483,7 +483,7 @@ export const DrawingStudyPanel: React.FC<Props> = ({
       variant: drawingMode,
       responseItemId: null
     };
-    syncProgressFromSessionAnswer(progressSyncContext, answerRecord);
+    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { sessionId: sessionRef.current?.id });
 
     setFeedback(isCorrect ? 'correct' : 'wrong');
     setSessionStats(nextStats);

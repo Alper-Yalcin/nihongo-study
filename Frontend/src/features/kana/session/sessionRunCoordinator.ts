@@ -7,6 +7,17 @@ import {
   recordStudySessionAnswer,
   updateStudySession
 } from './sessionEngine';
+import {
+  recordCorrect as feedbackRecordCorrect,
+  recordWrong as feedbackRecordWrong
+} from '../../../shared/hooks/useFeedback';
+import {
+  captureMasteryBefore,
+  captureMasteryAfter,
+  finalizeMasterySession
+} from '../../../shared/feedback/masterySession';
+import { markPracticedToday } from '../../streak/tomoshibi';
+import { recordPracticeHour } from '../../notifications/smartNotifications';
 
 interface SessionPersistenceContext {
   sessionRef: MutableRefObject<StudySession | null>;
@@ -32,6 +43,7 @@ interface ProgressSyncContext {
 
 interface ProgressSyncOptions {
   datasetType?: 'character' | 'word';
+  sessionId?: string;
 }
 
 export const persistSessionState = (
@@ -97,6 +109,17 @@ export const recordAnswerAndPersistSession = (
   });
 
   persistSessionState(context, nextSession);
+
+  // Sprint 1 Day 4 — feedback hook bağlantısı:
+  // Her gerçek cevap merkezî combo/ki/hanabira hook'una düşer.
+  if (answer.correct) {
+    feedbackRecordCorrect();
+    markPracticedToday();
+    recordPracticeHour();
+  } else {
+    feedbackRecordWrong();
+  }
+
   return nextSession;
 };
 
@@ -105,8 +128,13 @@ export const completeAndPersistSession = (context: SessionPersistenceContext) =>
     return null;
   }
 
+  const sessionId = context.sessionRef.current.id;
   const completedSession = completeStudySession(context.sessionRef.current);
   persistSessionState(context, completedSession, { active: false, clearActive: true });
+
+  // Sprint 1 Day 4 — mastery delta yayını
+  finalizeMasterySession(sessionId);
+
   return completedSession;
 };
 
@@ -125,5 +153,15 @@ export const syncProgressFromSessionAnswer = (
     return;
   }
 
-  context.saveProgress(applySessionAnswerToProgress(currentProgress, answer));
+  // Sprint 1 Day 4 — before snapshot (her itemId için bir kez)
+  if (options.sessionId) {
+    captureMasteryBefore(options.sessionId, answer.itemId, currentProgress);
+  }
+
+  const nextProgress = applySessionAnswerToProgress(currentProgress, answer);
+  context.saveProgress(nextProgress);
+
+  if (options.sessionId) {
+    captureMasteryAfter(options.sessionId, answer.itemId, nextProgress);
+  }
 };

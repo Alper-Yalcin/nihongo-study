@@ -21,6 +21,8 @@ import { ProfilePage } from './pages/ProfilePage';
 import { LearnUnitPage } from './pages/LearnUnitPage';
 import { LearnGuidePage } from './pages/LearnGuidePage';
 import { LearnJapanesePage } from './pages/LearnJapanesePage';
+import { ForgePage } from './pages/ForgePage';
+import { MeydanPage } from './pages/MeydanPage';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
 import { AppLanguage, ThemeMode } from './data/appPreferences';
 import { usePersistentState } from './hooks/usePersistentState';
@@ -33,6 +35,11 @@ import { ReEntrySplash } from './features/jlearn/reentry/ReEntrySplash';
 import { ChallengeReadyPrompt } from './features/jlearn/challenge/ChallengeReadyPrompt';
 import { ChallengeMissionPage } from './pages/ChallengeMissionPage';
 import { SpeakingSuggestToast } from './features/jlearn/speaking/SpeakingSuggestToast';
+import { FeedbackLayer } from './shared/feedback/FeedbackLayer';
+import { ensureWeeklyFreezeGrant } from './features/streak/tomoshibi';
+import { TomoshibiRelightModal } from './shared/feedback/TomoshibiRelightModal';
+import { OnboardingGate } from './pages/OnboardingPage';
+import { installSmartNotifier } from './features/notifications/smartNotifications';
 
 const KANA_FONT_STORAGE_KEY = 'kototsuna.kana-font-style';
 const APP_LANGUAGE_STORAGE_KEY = 'kototsuna.app-language';
@@ -105,6 +112,12 @@ export default function App() {
   }, [language]);
 
   useEffect(() => {
+    ensureWeeklyFreezeGrant();
+    const cleanup = installSmartNotifier(language === 'tr' ? 'tr' : 'en');
+    return cleanup;
+  }, [language]);
+
+  useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('theme-light', 'theme-dark');
     root.classList.add(themeMode === 'dark' ? 'theme-dark' : 'theme-light');
@@ -134,6 +147,8 @@ export default function App() {
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
       <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />
       <Route path={appShellRoutes.practiceRun} element={<PracticeRunPage language={language} />} />
+      <Route path={appShellRoutes.forge} element={<ForgePage language={language} />} />
+      <Route path={appShellRoutes.meydan} element={<MeydanPage language={language} />} />
       <Route path={appShellRoutes.quests} element={<QuestsPage language={language} />} />
 
       <Route path="/overview" element={<Navigate to={appShellRoutes.learn} replace />} />
@@ -254,6 +269,9 @@ export default function App() {
         <ReEntrySplash />
         <ChallengeReadyPrompt language={language} />
         <SpeakingSuggestToast language={language} />
+        <FeedbackLayer />
+        <TomoshibiRelightModal language={language} />
+        <OnboardingGate language={language} />
       </div>
     </KanaProgressProvider>
   );

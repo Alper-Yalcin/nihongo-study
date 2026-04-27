@@ -229,7 +229,7 @@ export const ListeningTypingPanel: React.FC<Props> = ({
       variant: 'typing'
     };
 
-    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType });
+    syncProgressFromSessionAnswer(progressSyncContext, answerRecord, { datasetType, sessionId: sessionRef.current?.id });
 
     sessionStatsRef.current = nextStats;
     setSessionStats(nextStats);

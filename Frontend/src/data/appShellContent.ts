@@ -20,6 +20,8 @@ export const appShellRoutes = {
   letters: '/letters',
   practice: '/practice',
   practiceRun: '/practice/run',
+  forge: '/practice/forge',
+  meydan: '/meydan',
   quests: '/quests',
   hiraganaOverview: '/kana/hiragana/overview',
   hiraganaLearn: '/kana/hiragana/learn',
@@ -324,7 +326,7 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
         },
         {
           id: 'play',
-          label: 'Play',
+          label: 'Meydan',
           groups: [
             {
               id: 'hiragana',
@@ -719,7 +721,7 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
         },
         {
           id: 'play',
-          label: 'Play',
+          label: 'Meydan',
           groups: [
             {
               id: 'hiragana',

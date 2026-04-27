@@ -100,6 +100,38 @@
   --kt-space-24: 1.5rem;
   --kt-space-32: 2rem;
   --kt-space-48: 3rem;
+
+  /* === Sprint 1: Tomoshibi / Hanabira / Dan / Ki / Washi === */
+  --kt-tomoshibi: #f0a14a;
+  --kt-tomoshibi-strong: #e58432;
+  --kt-tomoshibi-glow: 0 0 12px rgba(240, 161, 74, 0.55);
+  --kt-tomoshibi-glow-strong: 0 0 18px rgba(229, 132, 50, 0.7);
+
+  --kt-hanabira: #d06070;
+  --kt-hanabira-soft: #ffe2e8;
+
+  --kt-dan-gold: #c9a961;
+  --kt-dan-gold-soft: #f5ecd2;
+  --kt-dan-ink: #4a3a18;
+
+  --kt-ki: #6b9bd8;
+  --kt-ki-soft: #dbe7f5;
+  --kt-ki-dim: #b9c5d4;
+
+  --kt-sumi: rgba(20, 20, 20, 0.85);
+  --kt-sumi-stroke: 1px solid rgba(20, 20, 20, 0.85);
+
+  /* Subtle washi paper backdrop — layered radial noise */
+  --kt-washi-bg:
+    radial-gradient(circle at 20% 18%, rgba(208, 96, 112, 0.04), transparent 38%),
+    radial-gradient(circle at 82% 82%, rgba(201, 169, 97, 0.04), transparent 42%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(20, 20, 20, 0.012) 0px,
+      rgba(20, 20, 20, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
 }
 
 .theme-dark {
@@ -157,6 +189,37 @@
   --kt-nav-text-muted: rgba(255, 255, 255, 0.55);
   --kt-dropdown-bg: rgba(12, 18, 26, 0.98);
   --kt-progress-track: rgba(255, 255, 255, 0.10);
+
+  /* Sprint 1: dark tema — tomoshibi/hanabira/dan/ki */
+  --kt-tomoshibi: #ffb96a;
+  --kt-tomoshibi-strong: #ffa14a;
+  --kt-tomoshibi-glow: 0 0 14px rgba(255, 185, 106, 0.55);
+  --kt-tomoshibi-glow-strong: 0 0 20px rgba(255, 161, 74, 0.75);
+
+  --kt-hanabira: #f0a8b5;
+  --kt-hanabira-soft: rgba(208, 96, 112, 0.22);
+
+  --kt-dan-gold: #e2c98a;
+  --kt-dan-gold-soft: rgba(201, 169, 97, 0.22);
+  --kt-dan-ink: #f5ecd2;
+
+  --kt-ki: #8eb8e6;
+  --kt-ki-soft: rgba(107, 155, 216, 0.22);
+  --kt-ki-dim: rgba(255, 255, 255, 0.16);
+
+  --kt-sumi: rgba(245, 240, 240, 0.88);
+  --kt-sumi-stroke: 1px solid rgba(245, 240, 240, 0.6);
+
+  --kt-washi-bg:
+    radial-gradient(circle at 20% 18%, rgba(232, 139, 156, 0.05), transparent 40%),
+    radial-gradient(circle at 82% 82%, rgba(226, 201, 138, 0.04), transparent 44%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.014) 0px,
+      rgba(255, 255, 255, 0.014) 1px,
+      transparent 1px,
+      transparent 3px
+    );
 }
 
 @keyframes kt-character-wave {
@@ -196,9 +259,44 @@
   animation: kt-phase-fade 150ms ease-out both;
 }
 
+.kt-tap-bounce {
+  transition: transform 80ms ease-out;
+}
+.kt-tap-bounce:active:not(:disabled) {
+  transform: scale(0.94);
+}
+@media (prefers-reduced-motion: reduce) {
+  .kt-tap-bounce:active { transform: none; }
+}
+
+@keyframes kt-completed-glow {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--kt-accent-success) 70%, transparent); }
+  60%  { box-shadow: 0 0 24px 6px color-mix(in srgb, var(--kt-accent-success) 60%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.kt-completed-glow {
+  animation: kt-completed-glow 700ms ease-out;
+}
+
+@keyframes kt-tomoshibi-flicker {
+  0%, 100% {
+    filter: drop-shadow(var(--kt-tomoshibi-glow));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(var(--kt-tomoshibi-glow-strong));
+    transform: scale(1.04);
+  }
+}
+
+.kt-tomoshibi-flicker {
+  animation: kt-tomoshibi-flicker 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .kt-character-wave,
-  .kt-phase-fade {
+  .kt-phase-fade,
+  .kt-tomoshibi-flicker {
     animation: none;
   }
 }

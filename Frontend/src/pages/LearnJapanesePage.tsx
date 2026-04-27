@@ -224,7 +224,7 @@ const RoadmapNode: React.FC<RoadmapNodeProps> = ({
         disabled={isLocked}
         onClick={onOpen}
         aria-label={`${unit.title}: ${step.title}`}
-        className={`relative flex h-[76px] w-[76px] items-center justify-center rounded-full border-[7px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--kt-focus-ring)] ${
+        className={`kt-tap-bounce relative flex h-[76px] w-[76px] items-center justify-center rounded-full border-[7px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--kt-focus-ring)] ${
           isLocked ? 'cursor-not-allowed' : 'hover:-translate-y-0.5 hover:brightness-105'
         } ${outerClass}`}
         style={{
