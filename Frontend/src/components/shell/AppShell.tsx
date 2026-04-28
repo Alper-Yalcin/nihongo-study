@@ -26,17 +26,20 @@ export const AppShell: React.FC<AppShellProps> = ({
 }) => {
   const location = useLocation();
   const isLearnMap = location.pathname === '/learn' || location.pathname === '/learn/japanese';
+  const pageBackgroundImage = themeMode === 'dark'
+    ? "url('/images/darkmode.png')"
+    : "url('/images/light.png')";
 
   return (
     <div
       className={`min-h-screen text-[var(--kt-ink)] ${themeMode === 'dark' ? 'theme-dark' : 'theme-light'}`}
       style={{
-        backgroundImage: isLearnMap ? 'none' : 'var(--kt-washi-bg)',
-        backgroundColor: isLearnMap
-          ? themeMode === 'dark'
-            ? '#151017'
-            : '#fff5ef'
-          : 'var(--kt-surface-page)'
+        backgroundAttachment: 'fixed',
+        backgroundColor: themeMode === 'dark' ? '#151017' : '#fff5ef',
+        backgroundImage: pageBackgroundImage,
+        backgroundPosition: 'center top',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover'
       }}
     >
       {!isLearnMap && <SeasonalBackdrop />}
@@ -52,7 +55,7 @@ export const AppShell: React.FC<AppShellProps> = ({
       <main
         className={
           isLearnMap
-            ? 'mx-auto w-full max-w-[1800px] px-0 pb-0 pt-0'
+            ? 'w-full max-w-none px-0 pb-0 pt-0'
             : 'mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-10 xl:pb-12 xl:pt-7'
         }
       >

@@ -99,41 +99,42 @@ const pageCopy = {
 
 // x, y: absolute coords within the 1320×1120 inner div
 const unitMarkers: UnitMarker[] = [
-  { id: 'u1', x: 20,   y: 270, badge: 'ÜNİTE 1', title: 'Temel İletişim',        subtitle: 'Selamlaşma ve basit ifadeler',   tone: 'pink'   },
-  { id: 'u2', x: 950, y: 590, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
-  { id: 'u3', x: 300,  y: 555, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
-  { id: 'u4', x: 20,   y: 960, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
+  { id: 'u1', x: 440,   y: 220, badge: 'ÜNİTE 1', title: 'Temel İletişim',        subtitle: 'Selamlaşma ve basit ifadeler',   tone: 'pink'   },
+  { id: 'u2', x: 1800, y: 490, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
+  { id: 'u3', x: 750,  y: 455, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
+  { id: 'u4', x: 750,   y: 790, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
 ];
+//
 
 // x, y: node center, absolute within the 1320×1120 inner div
 const lessonNodes: LessonNode[] = [
   // Ünite 1 — soldan sağa (y≈305)
-  { id: 'n1',  number: 1,  x: 350,  y: 355, title: 'Hiragana 1',      subtitle: 'A - O',          tone: 'pink',   icon: Sprout           },
-  { id: 'n2',  number: 2,  x: 530,  y: 355, title: 'Hiragana 2',      subtitle: 'Ka - Ko',        tone: 'pink',   icon: Sprout           },
-  { id: 'n3',  number: 3,  x: 710,  y: 355, title: 'Selamlaşma',      subtitle: 'Konnichiwa!',    tone: 'pink',   icon: MessageCircleMore},
-  { id: 'n4',  number: 4,  x: 890,  y: 355, title: 'Dinleme 1',       subtitle: 'Sesler',         tone: 'pink',   icon: Headphones       },
-  { id: 'n5',  number: 5,  x: 1070,  y: 355, title: 'Kontrol Noktası', subtitle: 'Ünite 1 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n1',  number: 1,  x: 710,  y: 300, title: 'Hiragana 1',      subtitle: 'A - O',          tone: 'pink',   icon: Sprout           },
+  { id: 'n2',  number: 2,  x: 910,  y: 300, title: 'Hiragana 2',      subtitle: 'Ka - Ko',        tone: 'pink',   icon: Sprout           },
+  { id: 'n3',  number: 3,  x: 1110,  y: 300, title: 'Selamlaşma',      subtitle: 'Konnichiwa!',    tone: 'pink',   icon: MessageCircleMore},
+  { id: 'n4',  number: 4,  x: 1310,  y: 300, title: 'Dinleme 1',       subtitle: 'Sesler',         tone: 'pink',   icon: Headphones       },
+  { id: 'n5',  number: 5,  x: 1570,  y: 400, title: 'Kontrol Noktası', subtitle: 'Ünite 1 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
   // Ünite 2 — sağdan sola (y≈545)
-  { id: 'n6',  number: 6,  x: 1270, y: 475, title: 'İsimler 1',       subtitle: 'Kişiler',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n7',  number: 7,  x: 1220,  y: 645, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n8',  number: 8,  x: 1410,  y: 645, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n9',  number: 9,  x: 1310,  y: 800, title: 'İsimler 4', subtitle: 'Ü',   tone: 'blue', icon: LockKeyhole  },
-  { id: 'n10',  number: 10,  x: 1100,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n6',  number: 6,  x: 1310, y: 525, title: 'İsimler 1',       subtitle: 'Kişiler',        tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n7',  number: 7,  x: 1520,  y: 625, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n8',  number: 8,  x: 1710,  y: 625, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n9',  number: 9,  x: 1710,  y: 870, title: 'İsimler 4', subtitle: 'Ü',   tone: 'blue', icon: LockKeyhole  },
+  { id: 'n10',  number: 10,  x: 1400,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
   // Ünite 3 — sağdan sola (y≈655)
-  { id: 'n11', number: 11, x: 810,  y: 835, title: 'Konuşma 1',       subtitle: 'Temel cümleler', tone: 'purple', icon: Mic              },
-  { id: 'n12', number: 12, x: 660,  y: 755, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n13', number: 13, x: 520,  y: 755, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n14', number: 14, x: 370,  y: 755, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n15', number: 15, x: 240,  y: 805, title: 'Kontrol Noktası', subtitle: 'Ünite 3 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n11', number: 11, x: 1110,  y: 735, title: 'Konuşma 1',       subtitle: 'Temel cümleler', tone: 'purple', icon: Mic              },
+  { id: 'n12', number: 12, x: 960,  y: 675, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
+  { id: 'n13', number: 13, x: 820,  y: 675, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
+  { id: 'n14', number: 14, x: 670,  y: 675, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
+  { id: 'n15', number: 15, x: 440,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 3 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
   // Ünite 4 — soldan sağa (y≈995)
-  { id: 'n16', number: 16, x: 280,  y: 995, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n17', number: 17, x: 460,  y: 995, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n18', number: 18, x: 640,  y: 995, title: 'Fiiller 2',       subtitle: '~ku',            tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n19', number: 19, x: 820,  y: 995, title: 'Cümleler 1',      subtitle: '~ desu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n20', number: 20, x: 1050,  y: 995, title: 'Büyük Kontrol',   subtitle: 'Ünite 4 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n16', number: 16, x: 520,  y: 995, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n17', number: 17, x: 720,  y: 995, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n18', number: 18, x: 920,  y: 995, title: 'Fiiller 2',       subtitle: '~ku',            tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n19', number: 19, x: 1120,  y: 995, title: 'Cümleler 1',      subtitle: '~ desu',         tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n20', number: 20, x: 1320,  y: 995, title: 'Büyük Kontrol',   subtitle: 'Ünite 4 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 ];
 
 const sideItems = [
@@ -526,13 +527,18 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
   const { completedCount } = useLearnCourseProgress(orderedUnitIds);
+  const backgroundImage = isDark ? '/images/darkmode.png' : '/images/light.png';
 
   return (
     <div
-      className={`relative min-h-[1120px] overflow-hidden rounded-b-[0.6rem] bg-cover bg-top bg-no-repeat text-[#1f2937] ${
+      className={`relative min-h-screen w-full overflow-hidden bg-cover bg-center bg-no-repeat text-[#1f2937] ${
         isDark ? 'bg-[#151017]' : 'bg-[#fff5ef]'
       }`}
-      style={{ backgroundImage: `url('${isDark ? '/images/dark.png' : '/images/learn-background.png'}')` }}
+      style={{
+        backgroundAttachment: 'fixed',
+        backgroundImage: `url('${backgroundImage}')`,
+        minHeight: 'max(100vh, 1120px)'
+      }}
     >
       <div className="sr-only">
         <h1>{copy.title}</h1>
@@ -546,8 +552,12 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
       <section className="relative z-10 min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:pl-[112px]">
         <div className="relative h-[1120px] w-[1320px]">
           <div className="absolute left-[62px] top-[34px] lg:left-[170px]">
-            <h1 className="text-[28px] font-extrabold tracking-[-0.02em] text-[#1f2b3b]">{copy.title}</h1>
-            <p className="mt-2 text-[17px] font-medium text-[#405064]">{copy.subtitle}</p>
+            <h1 className={`text-[28px] font-extrabold tracking-[-0.02em] ${
+              isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.72)]' : 'text-[#1f2b3b]'
+            }`}>{copy.title}</h1>
+            <p className={`mt-2 text-[17px] font-medium ${
+              isDark ? 'text-[#d5dceb] drop-shadow-[0_2px_4px_rgba(0,0,0,0.62)]' : 'text-[#405064]'
+            }`}>{copy.subtitle}</p>
           </div>
 
           <RoadmapConnections isDark={isDark} />

@@ -109,6 +109,9 @@ export default function App() {
     () => kanaFontStyles.find((option) => option.id === kanaFontStyle) ?? kanaFontStyles[0],
     [kanaFontStyle]
   );
+  const appBackgroundImage = themeMode === 'dark'
+    ? "url('/images/darkmode.png')"
+    : "url('/images/light.png')";
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -276,7 +279,14 @@ export default function App() {
               : 'bg-[#fff5ef]'
             : 'bg-[var(--kt-surface-page)]'
         }`}
-        style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
+        style={{
+          ['--font-jp-current' as string]: selectedKanaFont.fontFamily,
+          backgroundAttachment: 'fixed',
+          backgroundImage: appBackgroundImage,
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover'
+        }}
       >
         <Routes>
           <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
