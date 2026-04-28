@@ -39,13 +39,13 @@ export const LearnSideRail: React.FC<LearnSideRailProps> = ({
   language,
   themeMode,
   activeItem,
-  position = 'absolute'
+    position = 'absolute'
 }) => {
   const isDark = themeMode === 'dark';
   const labels = copy[language];
   const positionClass =
     position === 'fixed'
-      ? 'fixed bottom-0 left-0 top-[92px]'
+      ? 'fixed bottom-0 left-0 top-[93px]'
       : 'absolute bottom-0 left-0 top-0';
 
   return (

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -31,6 +31,13 @@ interface LearnJapanesePageProps {
 
 type NodeTone = 'pink' | 'orange' | 'purple' | 'blue' | 'gray';
 type LessonNodeState = 'locked' | 'active' | 'available' | 'completed';
+
+const DESKTOP_NAV_HEIGHT = 93;
+const DESKTOP_SIDE_RAIL_WIDTH = 112;
+const DESKTOP_MAP_WIDTH = 1800;
+const DESKTOP_MAP_HEIGHT = 1120;
+const DESKTOP_MAP_MIN_SCALE = 0.45;
+const DESKTOP_MAP_X_OFFSET = -170;
 
 interface LessonNode {
   id: string;
@@ -232,6 +239,18 @@ const roadmapLinks: RoadmapLink[] = [
   { id: 'n19-n20', fromId: 'n19', toId: 'n20', tone: 'orange' }
 ];
 
+const getDesktopMapScale = () => {
+  if (typeof window === 'undefined') {
+    return 1;
+  }
+
+  const availableWidth = Math.max(1, window.innerWidth - DESKTOP_SIDE_RAIL_WIDTH);
+  const availableHeight = Math.max(1, window.innerHeight - DESKTOP_NAV_HEIGHT);
+  const nextScale = Math.min(1, availableWidth / DESKTOP_MAP_WIDTH, availableHeight / DESKTOP_MAP_HEIGHT);
+
+  return Math.max(DESKTOP_MAP_MIN_SCALE, nextScale);
+};
+
 const fallingFlowers: FallingFlower[] = [
   { id: 1, left: 4, size: 18, duration: 24, delay: -18, drift: 82, spin: 320, opacity: 0.62 },
   { id: 2, left: 8, size: 12, duration: 19, delay: -7, drift: -54, spin: -260, opacity: 0.42 },
@@ -271,13 +290,15 @@ const drawRoadmapPath = (from: { x: number; y: number }, to: { x: number; y: num
   return `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`;
 };
 
-const RoadmapConnections: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+const RoadmapConnections: React.FC<{ isDark: boolean; xOffset?: number }> = ({ isDark, xOffset = 0 }) => {
   const trackStyle = isDark ? roadmapTrackStyles.dark : roadmapTrackStyles.light;
 
   return (
     <svg
-      className="pointer-events-none absolute inset-0 z-[2] h-[1120px] w-[1320px] overflow-visible"
-      viewBox="0 0 1320 1120"
+      className="pointer-events-none absolute inset-0 z-[2] overflow-visible"
+      width={DESKTOP_MAP_WIDTH}
+      height={DESKTOP_MAP_HEIGHT}
+      viewBox={`0 0 ${DESKTOP_MAP_WIDTH} ${DESKTOP_MAP_HEIGHT}`}
       fill="none"
       aria-hidden="true"
     >
@@ -295,7 +316,11 @@ const RoadmapConnections: React.FC<{ isDark: boolean }> = ({ isDark }) => {
           return null;
         }
 
-        const path = drawRoadmapPath(fromNode, toNode, link.curveOffset);
+        const path = drawRoadmapPath(
+          { x: fromNode.x + xOffset, y: fromNode.y },
+          { x: toNode.x + xOffset, y: toNode.y },
+          link.curveOffset
+        );
 
         return (
           <g key={link.id}>
@@ -431,8 +456,9 @@ const UnitMarkerLabel: React.FC<{
   isDark: boolean;
   guideHref?: string;
   guideLabel: string;
-}> = ({ marker, isDark, guideHref, guideLabel }) => (
-  <div className="absolute z-[5]" style={{ left: marker.x, top: marker.y }}>
+  xOffset?: number;
+}> = ({ marker, isDark, guideHref, guideLabel, xOffset = 0 }) => (
+  <div className="absolute z-[5]" style={{ left: marker.x + xOffset, top: marker.y }}>
     <div className={`inline-flex rounded-[0.45rem] px-3 py-1.5 text-sm font-black text-white shadow-[0_8px_16px_rgba(160,70,90,0.18)] ${badgeStyles[marker.tone]}`}>
       {marker.badge}
     </div>
@@ -463,7 +489,8 @@ const LessonNodeButton: React.FC<{
   state: LessonNodeState;
   progress: number;
   onSelect?: () => void;
-}> = ({ node, isDark, state, progress, onSelect }) => {
+  xOffset?: number;
+}> = ({ node, isDark, state, progress, onSelect, xOffset = 0 }) => {
   const Icon = node.icon;
   const size = node.checkpoint ? 92 : 82;
   const iconSize = node.checkpoint ? 42 : 34;
@@ -481,7 +508,7 @@ const LessonNodeButton: React.FC<{
       className={`absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center z-[10] ${
         isActive ? 'kt-learn-node-active' : ''
       }`}
-      style={{ left: node.x, top: node.y }}
+      style={{ left: node.x + xOffset, top: node.y }}
     >
       <button
         type="button"
@@ -792,6 +819,7 @@ const MobileLearnRoadmap: React.FC<{
 
 export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, themeMode }) => {
   const navigate = useNavigate();
+  const [desktopMapScale, setDesktopMapScale] = useState(getDesktopMapScale);
   const copy = pageCopy[language];
   const isDark = themeMode === 'dark';
   const sections = useMemo(() => getLearnCourseSections(language), [language]);
@@ -835,10 +863,17 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
     [nodeRuntime, units]
   );
 
+  useEffect(() => {
+    const updateScale = () => setDesktopMapScale(getDesktopMapScale());
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
   return (
     <div
-      className={`relative w-full overflow-hidden text-[#1f2937]`}
-      style={{ minHeight: '100vh' }}
+      className="kt-learn-page relative min-h-screen w-full overflow-hidden text-[#1f2937]"
     >
       <div className="sr-only">
         <h1>{copy.title}</h1>
@@ -865,6 +900,13 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             animation: none;
           }
         }
+
+        @media (min-width: 1024px) {
+          .kt-learn-page {
+            height: calc(100vh - ${DESKTOP_NAV_HEIGHT}px);
+            min-height: 0;
+          }
+        }
       `}</style>
       <LearnFallingFlowers isDark={isDark} />
       <div className="hidden lg:block">
@@ -878,9 +920,30 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         onOpenUnit={(unitId) => navigate(getLearnUnitRoute(unitId))}
       />
 
-      <section className="relative z-10 hidden min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:block lg:pl-[112px]">
-        <div className="relative h-[1120px] w-[1320px]">
-          <div className="absolute left-[62px] top-[34px] lg:left-[170px]">
+      <section
+        className="relative z-10 hidden overflow-hidden pl-0 lg:block lg:pl-[112px]"
+        style={{ height: `calc(100vh - ${DESKTOP_NAV_HEIGHT}px)` }}
+      >
+        <div
+          className="relative mx-auto"
+          style={{
+            width: DESKTOP_MAP_WIDTH * desktopMapScale,
+            height: DESKTOP_MAP_HEIGHT * desktopMapScale
+          }}
+        >
+          <div
+            className="relative"
+            style={{
+              width: DESKTOP_MAP_WIDTH,
+              height: DESKTOP_MAP_HEIGHT,
+              transform: `scale(${desktopMapScale})`,
+              transformOrigin: 'top left'
+            }}
+          >
+          <div
+            className="absolute top-[34px]"
+            style={{ left: 170 + DESKTOP_MAP_X_OFFSET }}
+          >
             <h1 className={`text-[28px] font-extrabold tracking-[-0.02em] ${
               isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.72)]' : 'text-[#1f2b3b]'
             }`}>{copy.title}</h1>
@@ -889,7 +952,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             }`}>{copy.subtitle}</p>
           </div>
 
-          <RoadmapConnections isDark={isDark} />
+          <RoadmapConnections isDark={isDark} xOffset={DESKTOP_MAP_X_OFFSET} />
 
           {unitMarkers.map((marker, index) => (
             <UnitMarkerLabel
@@ -898,6 +961,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
               isDark={isDark}
               guideHref={units[index] ? getLearnGuideRoute(units[index].id) : undefined}
               guideLabel={copy.unitGuide}
+              xOffset={DESKTOP_MAP_X_OFFSET}
             />
           ))}
 
@@ -909,9 +973,11 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
               state={state}
               progress={progress}
               onSelect={unitId && state !== 'locked' ? () => navigate(getLearnUnitRoute(unitId)) : undefined}
+              xOffset={DESKTOP_MAP_X_OFFSET}
             />
           ))}
 
+          </div>
         </div>
       </section>
     </div>
