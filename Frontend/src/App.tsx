@@ -128,7 +128,9 @@ export default function App() {
 
   useEffect(() => {
     document.body.style.backgroundColor = isLearnMapRoute
-      ? '#fff5ef'
+      ? themeMode === 'dark'
+        ? '#151017'
+        : '#fff5ef'
       : themeMode === 'dark'
         ? '#1f1b20'
         : '#fdfcfc';
@@ -151,7 +153,7 @@ export default function App() {
         path={appShellRoutes.home}
         element={<LandingPage language={language} activeScript={activeScript} themeMode={themeMode} />}
       />
-      <Route path={appShellRoutes.learn} element={<LearnJapanesePage language={language} />} />
+      <Route path={appShellRoutes.learn} element={<LearnJapanesePage language={language} themeMode={themeMode} />} />
       <Route path={`${appShellRoutes.learnGuideBase}/:unitId`} element={<LearnGuidePage language={language} />} />
       <Route path={appShellRoutes.learnJapanese} element={<Navigate to={appShellRoutes.learn} replace />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
@@ -267,7 +269,13 @@ export default function App() {
   return (
     <KanaProgressProvider>
       <div
-        className={`min-h-screen text-[var(--kt-ink)] ${isLearnMapRoute ? 'bg-[#fff5ef]' : 'bg-[var(--kt-surface-page)]'}`}
+        className={`min-h-screen text-[var(--kt-ink)] ${
+          isLearnMapRoute
+            ? themeMode === 'dark'
+              ? 'bg-[#151017]'
+              : 'bg-[#fff5ef]'
+            : 'bg-[var(--kt-surface-page)]'
+        }`}
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
         <Routes>

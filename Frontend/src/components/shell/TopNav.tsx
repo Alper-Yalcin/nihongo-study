@@ -5,7 +5,8 @@ import {
   Gamepad2,
   GraduationCap,
   Landmark,
-  Languages,
+  Moon,
+  Sun,
   Trophy
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -62,9 +63,15 @@ const LanternMark: React.FC = () => (
   </span>
 );
 
-export const TopNav: React.FC<TopNavProps> = ({ language, activeScript }) => {
+export const TopNav: React.FC<TopNavProps> = ({
+  language,
+  themeMode,
+  activeScript,
+  onThemeModeChange
+}) => {
   const location = useLocation();
   const copy = labels[language];
+  const isDark = themeMode === 'dark';
   const [streakDays, setStreakDays] = useState(() => getJLearnUserState().streakDays);
   const { state: feedbackState } = useFeedback();
   const hanabira = Math.max(feedbackState.hanabira, 450);
@@ -101,11 +108,13 @@ export const TopNav: React.FC<TopNavProps> = ({ language, activeScript }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#f3e8df] bg-[#fffaf4]/94 shadow-[0_4px_18px_rgba(132,82,62,0.06)] backdrop-blur-xl">
+    <header className={`sticky top-0 z-40 border-b shadow-[0_4px_18px_rgba(132,82,62,0.06)] backdrop-blur-xl ${
+      isDark ? 'border-slate-800 bg-slate-950/90' : 'border-[#f3e8df] bg-[#fffaf4]/94'
+    }`}>
       <div className="mx-auto flex h-[92px] max-w-[1800px] items-center gap-8 px-8">
         <Link to={appShellRoutes.learn} className="flex shrink-0 items-center gap-3">
           <LanternMark />
-          <span className="text-[26px] font-extrabold tracking-[-0.02em] text-[#1f2b3b]">Kototsuna</span>
+          <span className={`text-[26px] font-extrabold tracking-[-0.02em] ${isDark ? 'text-white' : 'text-[#1f2b3b]'}`}>Kototsuna</span>
         </Link>
 
         <nav className="scrollbar-hide flex min-w-0 flex-1 items-center gap-8 overflow-x-auto">
@@ -118,7 +127,7 @@ export const TopNav: React.FC<TopNavProps> = ({ language, activeScript }) => {
                 key={item.id}
                 to={item.href}
                 className={`relative flex shrink-0 items-center gap-2.5 py-4 text-[15px] font-semibold transition ${
-                  isActive ? 'text-[#f04d72]' : 'text-[#4d5968] hover:text-[#f04d72]'
+                  isActive ? 'text-[#f04d72]' : isDark ? 'text-slate-200 hover:text-[#ff88a2]' : 'text-[#4d5968] hover:text-[#f04d72]'
                 }`}
               >
                 <Icon size={24} strokeWidth={isActive ? 2.4 : 2.1} />
@@ -129,7 +138,21 @@ export const TopNav: React.FC<TopNavProps> = ({ language, activeScript }) => {
           })}
         </nav>
 
-        <div className="hidden shrink-0 items-center gap-8 text-[16px] font-bold text-[#263344] md:flex">
+        <div className={`hidden shrink-0 items-center gap-5 text-[16px] font-bold md:flex ${isDark ? 'text-slate-100' : 'text-[#263344]'}`}>
+          <button
+            type="button"
+            onClick={() => onThemeModeChange(isDark ? 'light' : 'dark')}
+            className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
+              isDark
+                ? 'border-slate-700 bg-slate-900 text-yellow-200 hover:bg-slate-800'
+                : 'border-[#ffd8c2] bg-white text-[#d94872] hover:bg-[#fff0e4]'
+            }`}
+            aria-label={isDark ? 'Light mode' : 'Dark mode'}
+            title={isDark ? 'Light mode' : 'Dark mode'}
+          >
+            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
           <Link
             to={appShellRoutes.learn}
             className="flex items-center gap-1.5 text-[#df6c20]"

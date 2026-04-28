@@ -32,7 +32,11 @@ export const AppShell: React.FC<AppShellProps> = ({
       className={`min-h-screen text-[var(--kt-ink)] ${themeMode === 'dark' ? 'theme-dark' : 'theme-light'}`}
       style={{
         backgroundImage: isLearnMap ? 'none' : 'var(--kt-washi-bg)',
-        backgroundColor: isLearnMap ? '#fff5ef' : 'var(--kt-surface-page)'
+        backgroundColor: isLearnMap
+          ? themeMode === 'dark'
+            ? '#151017'
+            : '#fff5ef'
+          : 'var(--kt-surface-page)'
       }}
     >
       {!isLearnMap && <SeasonalBackdrop />}

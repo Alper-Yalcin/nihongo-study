@@ -14,7 +14,7 @@ import {
   Star,
   Utensils
 } from 'lucide-react';
-import { AppLanguage } from '../data/appPreferences';
+import { AppLanguage, ThemeMode } from '../data/appPreferences';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
@@ -24,6 +24,7 @@ import { MascotFigure } from '../components/mascot/MascotFigure';
 
 interface LearnJapanesePageProps {
   language: AppLanguage;
+  themeMode: ThemeMode;
 }
 
 type NodeTone = 'pink' | 'orange' | 'purple' | 'blue' | 'gray';
@@ -154,12 +155,35 @@ const badgeStyles: Record<UnitMarker['tone'], string> = {
   gray:   'bg-[linear-gradient(135deg,#aaaaaa,#777777)]'
 };
 
-const roadmapTrackStyle = {
-  shadow: '#e8a69d',
-  rim: '#f4bdb6',
-  outer: '#fde2df',
-  inner: '#fff8f3',
-  highlight: '#ffffff'
+const roadmapTrackStyles = {
+  light: {
+    shadow: '#e8a69d',
+    rim: '#f4bdb6',
+    outer: '#fde2df',
+    inner: '#fff8f3',
+    highlight: '#ffffff',
+    shadowWidth: 40,
+    rimWidth: 34,
+    outerWidth: 30,
+    innerWidth: 20,
+    highlightWidth: 12,
+    shadowOpacity: 0.22,
+    highlightOpacity: 0.42
+  },
+  dark: {
+    shadow: '#ff8fa3',
+    rim: '#ffb7c1',
+    outer: '#ffd9dc',
+    inner: '#fff4ef',
+    highlight: '#ffffff',
+    shadowWidth: 34,
+    rimWidth: 28,
+    outerWidth: 24,
+    innerWidth: 14,
+    highlightWidth: 6,
+    shadowOpacity: 0.26,
+    highlightOpacity: 0.26
+  }
 };
 
 const roadmapLinks: RoadmapLink[] = [
@@ -200,7 +224,9 @@ const drawRoadmapPath = (from: { x: number; y: number }, to: { x: number; y: num
   return `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`;
 };
 
-const RoadmapConnections: React.FC = () => {
+const RoadmapConnections: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+  const trackStyle = isDark ? roadmapTrackStyles.dark : roadmapTrackStyles.light;
+
   return (
     <svg
       className="pointer-events-none absolute inset-0 z-[2] h-[1120px] w-[1320px] overflow-visible"
@@ -228,39 +254,39 @@ const RoadmapConnections: React.FC = () => {
           <g key={link.id}>
             <path
               d={path}
-              stroke={roadmapTrackStyle.shadow}
-              strokeWidth={40}
-              opacity={0.22}
+              stroke={trackStyle.shadow}
+              strokeWidth={trackStyle.shadowWidth}
+              opacity={trackStyle.shadowOpacity}
               strokeLinecap="round"
               strokeLinejoin="round"
               filter="url(#roadmap-soft-shadow)"
             />
             <path
               d={path}
-              stroke={roadmapTrackStyle.rim}
-              strokeWidth={34}
+              stroke={trackStyle.rim}
+              strokeWidth={trackStyle.rimWidth}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <path
               d={path}
-              stroke={roadmapTrackStyle.outer}
-              strokeWidth={30}
+              stroke={trackStyle.outer}
+              strokeWidth={trackStyle.outerWidth}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <path
               d={path}
-              stroke={roadmapTrackStyle.inner}
-              strokeWidth={20}
+              stroke={trackStyle.inner}
+              strokeWidth={trackStyle.innerWidth}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <path
               d={path}
-              stroke={roadmapTrackStyle.highlight}
-              strokeWidth={12}
-              opacity={0.42}
+              stroke={trackStyle.highlight}
+              strokeWidth={trackStyle.highlightWidth}
+              opacity={trackStyle.highlightOpacity}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -271,8 +297,15 @@ const RoadmapConnections: React.FC = () => {
   );
 };
 
-const LearnSideRail: React.FC<{ copy: typeof pageCopy.tr.side | typeof pageCopy.en.side }> = ({ copy }) => (
-  <aside className="absolute bottom-0 left-0 top-0 z-20 hidden w-[112px] flex-col items-center border-r border-[#f2e7df] bg-[rgba(255,255,255,0.76)] pt-16 shadow-[8px_0_30px_rgba(150,96,72,0.05)] backdrop-blur lg:flex">
+const LearnSideRail: React.FC<{
+  copy: typeof pageCopy.tr.side | typeof pageCopy.en.side;
+  isDark: boolean;
+}> = ({ copy, isDark }) => (
+  <aside className={`absolute bottom-0 left-0 top-0 z-20 hidden w-[112px] flex-col items-center border-r pt-16 backdrop-blur lg:flex ${
+    isDark
+      ? 'border-[#2c3144] bg-[rgba(19,22,34,0.82)] shadow-[8px_0_30px_rgba(0,0,0,0.2)]'
+      : 'border-[#f2e7df] bg-[rgba(255,255,255,0.76)] shadow-[8px_0_30px_rgba(150,96,72,0.05)]'
+  }`}>
     <nav className="flex flex-1 flex-col items-center gap-7">
       {sideItems.map((item, index) => {
         const Icon = item.icon;
@@ -283,8 +316,12 @@ const LearnSideRail: React.FC<{ copy: typeof pageCopy.tr.side | typeof pageCopy.
             type="button"
             className={`relative flex h-[82px] w-[70px] flex-col items-center justify-center gap-2 rounded-[0.65rem] text-xs font-semibold transition ${
               active
-                ? 'bg-[#fffdfb] text-[#f04d72] shadow-[0_12px_28px_rgba(220,90,110,0.18)]'
-                : 'text-[#67717d] hover:bg-[rgba(255,255,255,0.7)]'
+                ? isDark
+                  ? 'bg-[rgba(255,255,255,0.13)] text-[#ff7c99] shadow-[0_12px_28px_rgba(0,0,0,0.22)]'
+                  : 'bg-[#fffdfb] text-[#f04d72] shadow-[0_12px_28px_rgba(220,90,110,0.18)]'
+                : isDark
+                  ? 'text-[#c6d0e4] hover:bg-[rgba(255,255,255,0.08)] hover:text-white'
+                  : 'text-[#67717d] hover:bg-[rgba(255,255,255,0.7)]'
             }`}
           >
             {active && <span className="absolute left-0 h-[54px] w-[3px] rounded-full bg-[#ff5b82]" />}
@@ -294,8 +331,10 @@ const LearnSideRail: React.FC<{ copy: typeof pageCopy.tr.side | typeof pageCopy.
         );
       })}
     </nav>
-    <div className="mb-8 flex flex-col items-center gap-2 text-xs font-semibold text-[#4f5965]">
-      <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-[#ffd6de] bg-[#fff1f4] shadow-[0_8px_18px_rgba(220,90,110,0.16)]">
+    <div className={`mb-8 flex flex-col items-center gap-2 text-xs font-semibold ${isDark ? 'text-[#d6deef]' : 'text-[#4f5965]'}`}>
+      <div className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 shadow-[0_8px_18px_rgba(220,90,110,0.16)] ${
+        isDark ? 'border-[#ffb7c7] bg-[rgba(255,255,255,0.12)]' : 'border-[#ffd6de] bg-[#fff1f4]'
+      }`}>
         <MascotFigure pose="cheer" tone="brand" size={48} />
       </div>
       <span>{copy.profile}</span>
@@ -303,17 +342,17 @@ const LearnSideRail: React.FC<{ copy: typeof pageCopy.tr.side | typeof pageCopy.
   </aside>
 );
 
-const UnitMarkerLabel: React.FC<{ marker: UnitMarker }> = ({ marker }) => (
+const UnitMarkerLabel: React.FC<{ marker: UnitMarker; isDark: boolean }> = ({ marker, isDark }) => (
   <div className="absolute z-[5]" style={{ left: marker.x, top: marker.y }}>
     <div className={`inline-flex rounded-[0.45rem] px-3 py-1.5 text-sm font-black text-white shadow-[0_8px_16px_rgba(160,70,90,0.18)] ${badgeStyles[marker.tone]}`}>
       {marker.badge}
     </div>
-    <h2 className="mt-2 text-xl font-extrabold tracking-[-0.01em] text-[#1f2b3b]">{marker.title}</h2>
-    <p className="mt-1 text-sm font-medium text-[#465161]">{marker.subtitle}</p>
+    <h2 className={`mt-2 text-xl font-extrabold tracking-[-0.01em] ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
+    <p className={`mt-1 text-sm font-medium ${isDark ? 'text-[#d5dceb] drop-shadow-[0_2px_4px_rgba(0,0,0,0.65)]' : 'text-[#465161]'}`}>{marker.subtitle}</p>
   </div>
 );
 
-const LessonNodeButton: React.FC<{ node: LessonNode }> = ({ node }) => {
+const LessonNodeButton: React.FC<{ node: LessonNode; isDark: boolean }> = ({ node, isDark }) => {
   const Icon = node.icon;
   const size = node.checkpoint ? 92 : 82;
   const iconSize = node.checkpoint ? 42 : 34;
@@ -324,7 +363,9 @@ const LessonNodeButton: React.FC<{ node: LessonNode }> = ({ node }) => {
       style={{ left: node.x, top: node.y }}
     >
       <div
-        className={`relative flex items-center justify-center rounded-full border-[7px] text-white ${toneStyles[node.tone]}`}
+        className={`relative flex items-center justify-center rounded-full border-[7px] text-white ${toneStyles[node.tone]} ${
+          isDark ? 'drop-shadow-[0_12px_20px_rgba(0,0,0,0.42)]' : ''
+        }`}
         style={{ width: size, height: size }}
       >
         <span className="absolute inset-[5px] rounded-full border border-white/55 bg-white/10" />
@@ -341,19 +382,30 @@ const LessonNodeButton: React.FC<{ node: LessonNode }> = ({ node }) => {
         </span>
       </div>
       <div className="mt-3 max-w-[140px] text-center">
-        <div className={`text-[14px] font-bold leading-tight ${node.tone === 'orange' ? 'text-[#e36b1d]' : 'text-[#1e2a3a]'}`}>
+        <div className={`text-[14px] font-bold leading-tight ${
+          isDark
+            ? node.tone === 'orange'
+              ? 'text-[#ffad58] drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]'
+              : 'text-[#f8fbff] drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]'
+            : node.tone === 'orange'
+              ? 'text-[#e36b1d]'
+              : 'text-[#1e2a3a]'
+        }`}>
           {node.title}
         </div>
         {node.subtitle && (
-          <div className="mt-0.5 text-[12px] leading-tight text-[#4f5967]">{node.subtitle}</div>
+          <div className={`mt-0.5 text-[12px] leading-tight ${
+            isDark ? 'text-[#d7deec] drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]' : 'text-[#4f5967]'
+          }`}>{node.subtitle}</div>
         )}
       </div>
     </div>
   );
 };
 
-export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }) => {
+export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, themeMode }) => {
   const copy = pageCopy[language];
+  const isDark = themeMode === 'dark';
   const sections = useMemo(() => getLearnCourseSections(language), [language]);
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
@@ -361,8 +413,10 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }
 
   return (
     <div
-      className="relative min-h-[1120px] overflow-hidden rounded-b-[0.6rem] bg-[#fff5ef] bg-cover bg-top bg-no-repeat text-[#1f2937]"
-      style={{ backgroundImage: "url('/images/learn-background.png')" }}
+      className={`relative min-h-[1120px] overflow-hidden rounded-b-[0.6rem] bg-cover bg-top bg-no-repeat text-[#1f2937] ${
+        isDark ? 'bg-[#151017]' : 'bg-[#fff5ef]'
+      }`}
+      style={{ backgroundImage: `url('${isDark ? '/images/dark.png' : '/images/learn-background.png'}')` }}
     >
       <div className="sr-only">
         <h1>{copy.title}</h1>
@@ -370,7 +424,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }
           {completedCount} / {units.length} {copy.progress}
         </p>
       </div>
-      <LearnSideRail copy={copy.side} />
+      <LearnSideRail copy={copy.side} isDark={isDark} />
 
       <section className="relative z-10 min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:pl-[112px]">
         <div className="relative h-[1120px] w-[1320px]">
@@ -379,14 +433,14 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }
             <p className="mt-2 text-[17px] font-medium text-[#405064]">{copy.subtitle}</p>
           </div>
 
-          <RoadmapConnections />
+          <RoadmapConnections isDark={isDark} />
 
           {unitMarkers.map((marker) => (
-            <UnitMarkerLabel key={marker.id} marker={marker} />
+            <UnitMarkerLabel key={marker.id} marker={marker} isDark={isDark} />
           ))}
 
           {lessonNodes.map((node) => (
-            <LessonNodeButton key={node.id} node={node} />
+            <LessonNodeButton key={node.id} node={node} isDark={isDark} />
           ))}
 
           <div className="absolute bottom-4 right-12 flex h-24 w-40 items-center justify-center opacity-80">
