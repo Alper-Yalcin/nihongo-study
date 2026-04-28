@@ -99,42 +99,42 @@ const pageCopy = {
 
 // x, y: absolute coords within the 1320×1120 inner div
 const unitMarkers: UnitMarker[] = [
-  { id: 'u1', x: 440,   y: 220, badge: 'ÜNİTE 1', title: 'Temel İletişim',        subtitle: 'Selamlaşma ve basit ifadeler',   tone: 'pink'   },
-  { id: 'u2', x: 1800, y: 490, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
-  { id: 'u3', x: 750,  y: 455, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
-  { id: 'u4', x: 750,   y: 790, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
+  { id: 'u1', x: 340,   y: 170, badge: 'ÜNİTE 1', title: 'Temel İletişim',        subtitle: 'Selamlaşma ve basit ifadeler',   tone: 'pink'   },
+  { id: 'u2', x: 1700, y: 440, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
+  { id: 'u3', x: 650,  y: 405, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
+  { id: 'u4', x: 650,   y: 740, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
 ];
 //
 
 // x, y: node center, absolute within the 1320×1120 inner div
 const lessonNodes: LessonNode[] = [
-  // Ünite 1 — soldan sağa (y≈305)
-  { id: 'n1',  number: 1,  x: 710,  y: 300, title: 'Hiragana 1',      subtitle: 'A - O',          tone: 'pink',   icon: Sprout           },
-  { id: 'n2',  number: 2,  x: 910,  y: 300, title: 'Hiragana 2',      subtitle: 'Ka - Ko',        tone: 'pink',   icon: Sprout           },
-  { id: 'n3',  number: 3,  x: 1110,  y: 300, title: 'Selamlaşma',      subtitle: 'Konnichiwa!',    tone: 'pink',   icon: MessageCircleMore},
-  { id: 'n4',  number: 4,  x: 1310,  y: 300, title: 'Dinleme 1',       subtitle: 'Sesler',         tone: 'pink',   icon: Headphones       },
-  { id: 'n5',  number: 5,  x: 1570,  y: 400, title: 'Kontrol Noktası', subtitle: 'Ünite 1 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  // Ünite 1 — soldan sağa (y≈255)
+  { id: 'n1',  number: 1,  x: 610,  y: 250, title: 'Hiragana 1',      subtitle: 'A - O',          tone: 'pink',   icon: Sprout           },
+  { id: 'n2',  number: 2,  x: 810,  y: 250, title: 'Hiragana 2',      subtitle: 'Ka - Ko',        tone: 'pink',   icon: Sprout           },
+  { id: 'n3',  number: 3,  x: 1010,  y: 250, title: 'Selamlaşma',      subtitle: 'Konnichiwa!',    tone: 'pink',   icon: MessageCircleMore},
+  { id: 'n4',  number: 4,  x: 1210,  y: 250, title: 'Dinleme 1',       subtitle: 'Sesler',         tone: 'pink',   icon: Headphones       },
+  { id: 'n5',  number: 5,  x: 1470,  y: 350, title: 'Kontrol Noktası', subtitle: 'Ünite 1 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
-  // Ünite 2 — sağdan sola (y≈545)
-  { id: 'n6',  number: 6,  x: 1310, y: 525, title: 'İsimler 1',       subtitle: 'Kişiler',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n7',  number: 7,  x: 1520,  y: 625, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n8',  number: 8,  x: 1710,  y: 625, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n9',  number: 9,  x: 1710,  y: 870, title: 'İsimler 4', subtitle: 'Ü',   tone: 'blue', icon: LockKeyhole  },
-  { id: 'n10',  number: 10,  x: 1400,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  // Ünite 2 — sağdan sola (y≈495)
+  { id: 'n6',  number: 6,  x: 1210, y: 475, title: 'İsimler 1',       subtitle: 'Kişiler',        tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n7',  number: 7,  x: 1420,  y: 575, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n8',  number: 8,  x: 1610,  y: 575, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n9',  number: 9,  x: 1610,  y: 820, title: 'İsimler 4', subtitle: 'Ü',   tone: 'blue', icon: LockKeyhole  },
+  { id: 'n10',  number: 10,  x: 1300,  y: 750, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
-  // Ünite 3 — sağdan sola (y≈655)
-  { id: 'n11', number: 11, x: 1110,  y: 735, title: 'Konuşma 1',       subtitle: 'Temel cümleler', tone: 'purple', icon: Mic              },
-  { id: 'n12', number: 12, x: 960,  y: 675, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n13', number: 13, x: 820,  y: 675, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n14', number: 14, x: 670,  y: 675, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n15', number: 15, x: 440,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 3 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  // Ünite 3 — sağdan sola (y≈605)
+  { id: 'n11', number: 11, x: 1010,  y: 685, title: 'Konuşma 1',       subtitle: 'Temel cümleler', tone: 'purple', icon: Mic              },
+  { id: 'n12', number: 12, x: 860,  y: 625, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
+  { id: 'n13', number: 13, x: 720,  y: 625, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
+  { id: 'n14', number: 14, x: 570,  y: 625, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
+  { id: 'n15', number: 15, x: 340,  y: 750, title: 'Kontrol Noktası', subtitle: 'Ünite 3 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
-  // Ünite 4 — soldan sağa (y≈995)
-  { id: 'n16', number: 16, x: 520,  y: 995, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n17', number: 17, x: 720,  y: 995, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n18', number: 18, x: 920,  y: 995, title: 'Fiiller 2',       subtitle: '~ku',            tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n19', number: 19, x: 1120,  y: 995, title: 'Cümleler 1',      subtitle: '~ desu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n20', number: 20, x: 1320,  y: 995, title: 'Büyük Kontrol',   subtitle: 'Ünite 4 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  // Ünite 4 — soldan sağa (y≈945)
+  { id: 'n16', number: 16, x: 420,  y: 945, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n17', number: 17, x: 620,  y: 945, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n18', number: 18, x: 820,  y: 945, title: 'Fiiller 2',       subtitle: '~ku',            tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n19', number: 19, x: 1020,  y: 945, title: 'Cümleler 1',      subtitle: '~ desu',         tone: 'gray',   icon: LockKeyhole      },
+  { id: 'n20', number: 20, x: 1220,  y: 945, title: 'Büyük Kontrol',   subtitle: 'Ünite 4 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 ];
 
 const sideItems = [
