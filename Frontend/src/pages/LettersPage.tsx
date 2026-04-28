@@ -136,6 +136,11 @@ const getColumnCells = (section: KanaSection, columnId: string): (Character | nu
   return column;
 };
 
+const transpose = <T,>(matrix: T[][]): T[][] => {
+  if (matrix.length === 0) return [];
+  return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
+};
+
 const toTileMetaRows = (rows: (Character | null)[][]): (TileMeta | null)[][] =>
   rows.map((row) => row.map((cell) => (cell ? { id: cell.id, symbol: cell.symbol, label: cell.label } : null)));
 
@@ -245,10 +250,10 @@ interface BlockProps {
 }
 
 const Block: React.FC<BlockProps> = ({ title, subtitle, children }) => (
-  <section className="rounded-[1.4rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-4 shadow-[var(--kt-shadow-sm)]">
-    <h2 className="text-sm font-black text-[var(--kt-ink-strong)]">{title}</h2>
-    {subtitle ? <p className="mt-1 text-xs font-semibold text-[var(--kt-ink-subtle)]">{subtitle}</p> : null}
-    <div className="mt-3">{children}</div>
+  <section className="mt-10">
+    <h2 className="text-xl font-extrabold tracking-[-0.01em] text-[var(--kt-ink-strong)]">{title}</h2>
+    {subtitle ? <p className="mt-1 text-sm font-medium text-[var(--kt-ink-subtle)]">{subtitle}</p> : null}
+    <div className="mt-5">{children}</div>
   </section>
 );
 
@@ -1484,18 +1489,18 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
 
   const baseRows = useMemo<(TileMeta | null)[][]>(() => {
     if (!singleSection) return [];
-    return toTileMetaRows(baseColumnIds.map((columnId) => getColumnCells(singleSection, columnId)));
+    return transpose(toTileMetaRows(baseColumnIds.map((columnId) => getColumnCells(singleSection, columnId))));
   }, [singleSection]);
 
   const voicedRows = useMemo<(TileMeta | null)[][]>(() => {
     if (!singleSection) return [];
-    return toTileMetaRows(voicedColumnIds.map((columnId) => getColumnCells(singleSection, columnId)));
+    return transpose(toTileMetaRows(voicedColumnIds.map((columnId) => getColumnCells(singleSection, columnId))));
   }, [singleSection]);
 
   const comboRows = useMemo<(TileMeta | null)[][]>(() => {
     if (!doubleSection) return [];
     const ids = (doubleSection.columnGroupIds ?? []).filter((id): id is string => Boolean(id));
-    return toTileMetaRows(ids.map((id) => getColumnCells(doubleSection, id)));
+    return transpose(toTileMetaRows(ids.map((id) => getColumnCells(doubleSection, id))));
   }, [doubleSection]);
 
   const matrixCharacters = useMemo<Character[][]>(() => {
@@ -1597,89 +1602,95 @@ export const LettersPage: React.FC<LettersPageProps> = ({ language }) => {
   }, [learningOpen]);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 pb-10">
-      <div className="flex items-center justify-center gap-2 border-b border-[var(--kt-border-subtle)] pb-4">
-        {(['hiragana', 'katakana'] as KanaScript[]).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setSearchParams({ script: tab })}
-            className={`border-b-2 px-6 pb-3 text-sm font-black uppercase tracking-[0.12em] transition ${
-              script === tab
-                ? 'border-[color:var(--kt-accent-info)] text-[var(--kt-accent-info)]'
-                : 'border-transparent text-[var(--kt-ink-subtle)] hover:text-[var(--kt-ink)]'
-            }`}
-          >
-            {tab === 'hiragana' ? copy.tabHiragana : copy.tabKatakana}
-          </button>
-        ))}
-      </div>
+    <div className="mx-auto max-w-[1000px] space-y-6 pb-10 pt-4">
+      <div className="mb-10 flex items-center justify-between gap-4 px-2">
+        <div>
+          <h1 className="text-[28px] font-extrabold tracking-[-0.02em] text-[var(--kt-ink-strong)]">
+            {copy.title[script]}
+          </h1>
+          <p className="mt-1 text-[15px] font-medium text-[var(--kt-ink-subtle)]">
+            {copy.subtitle[script]}
+          </p>
+        </div>
 
-      <section className="rounded-[1.6rem] border border-[var(--kt-border)] bg-[linear-gradient(135deg,var(--kt-surface)_0%,var(--kt-surface-muted)_100%)] p-5 shadow-[var(--kt-shadow-sm)]">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-black text-[var(--kt-ink-strong)]">{copy.title[script]}</h1>
-            <p className="mt-1 text-sm font-semibold text-[var(--kt-ink-subtle)]">{copy.subtitle[script]}</p>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 mr-4">
+            {(['hiragana', 'katakana'] as KanaScript[]).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setSearchParams({ script: tab })}
+                className={`rounded-full px-5 py-2 text-sm font-black uppercase tracking-[0.05em] transition ${
+                  script === tab
+                    ? 'bg-sky-500/15 text-sky-600 dark:text-sky-300'
+                    : 'text-[var(--kt-ink-subtle)] hover:bg-[var(--kt-surface-muted)] hover:text-[var(--kt-ink)]'
+                }`}
+              >
+                {tab === 'hiragana' ? copy.tabHiragana : copy.tabKatakana}
+              </button>
+            ))}
           </div>
           <button
             type="button"
             onClick={() => setLearningOpen(true)}
-            className="inline-flex shrink-0 items-center rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink)] transition hover:-translate-y-0.5 hover:shadow-[var(--kt-shadow-sm)]"
+            className="inline-flex shrink-0 items-center rounded-xl bg-sky-500 px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#062032] transition hover:brightness-110"
           >
             {copy.cta}
           </button>
         </div>
-      </section>
+      </div>
 
-      <Block title={copy.basicsTitle} subtitle={copy.basicsSubtitle}>
-        <KanaRowGrid
-          rows={baseRows}
-          columns={5}
-          getProgress={getProgress}
-          characterById={characterById}
-          onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
-        />
-      </Block>
+      <div className="px-2">
+        <Block title={copy.basicsTitle} subtitle={copy.basicsSubtitle}>
+          <KanaRowGrid
+            rows={baseRows}
+            columns={baseRows[0]?.length || 11}
+            getProgress={getProgress}
+            characterById={characterById}
+            onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
+          />
+        </Block>
 
-      <Block title={copy.voicedTitle} subtitle={copy.voicedSubtitle}>
-        <KanaRowGrid
-          rows={voicedRows}
-          columns={5}
-          getProgress={getProgress}
-          characterById={characterById}
-          onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
-        />
-      </Block>
+        <Block title={copy.voicedTitle} subtitle={copy.voicedSubtitle}>
+          <KanaRowGrid
+            rows={voicedRows}
+            columns={voicedRows[0]?.length || 5}
+            getProgress={getProgress}
+            characterById={characterById}
+            onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
+          />
+        </Block>
 
-      <Block title={copy.comboTitle} subtitle={copy.comboSubtitle}>
-        <KanaRowGrid
-          rows={comboRows}
-          columns={3}
-          getProgress={getProgress}
-          characterById={characterById}
-          onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
-        />
-      </Block>
+        <Block title={copy.comboTitle} subtitle={copy.comboSubtitle}>
+          <KanaRowGrid
+            rows={comboRows}
+            columns={comboRows[0]?.length || 33}
+            getProgress={getProgress}
+            characterById={characterById}
+            onCharacterSelect={(character) => setSelectedCharacterId(character.id)}
+          />
+        </Block>
 
-      <Block title={copy.smallTsuTitle} subtitle={copy.smallTsuSubtitle}>
-        <KanaRowGrid
-          rows={smallTsuRows[script]}
-          columns={4}
-          getProgress={getProgress}
-          characterById={characterById}
-          clickable={false}
-        />
-      </Block>
+        <Block title={copy.smallTsuTitle} subtitle={copy.smallTsuSubtitle}>
+          <KanaRowGrid
+            rows={smallTsuRows[script]}
+            columns={smallTsuRows[script][0]?.length || 4}
+            getProgress={getProgress}
+            characterById={characterById}
+            clickable={false}
+          />
+        </Block>
 
-      <Block title={copy.longTitle} subtitle={copy.longSubtitle}>
-        <KanaRowGrid
-          rows={longVowelRows[script]}
-          columns={5}
-          getProgress={getProgress}
-          characterById={characterById}
-          clickable={false}
-        />
-      </Block>
+        <Block title={copy.longTitle} subtitle={copy.longSubtitle}>
+          <KanaRowGrid
+            rows={longVowelRows[script]}
+            columns={longVowelRows[script][0]?.length || 5}
+            getProgress={getProgress}
+            characterById={characterById}
+            clickable={false}
+          />
+        </Block>
+      </div>
 
       {selectedCharacter ? (
         <KanaDetailModal
