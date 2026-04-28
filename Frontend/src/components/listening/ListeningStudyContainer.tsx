@@ -125,7 +125,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({
     () =>
       (words ?? fetchedWords).map((word) => ({
         id: word.id,
-        script: word.script ?? script,
+        script: word.script === 'hiragana' || word.script === 'katakana' ? word.script : script,
         kana: word.kana,
         romaji: word.romaji,
         acceptedRomaji: [word.romaji],
@@ -327,7 +327,7 @@ export const ListeningStudyContainer: React.FC<Props> = ({
               </button>
             </div>
 
-            <StudyModeSelector
+            <StudyModeSelector<ListeningMode>
               label={copy.listening.modeLabel}
               value={listeningMode}
               options={modeOptions}

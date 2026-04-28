@@ -154,12 +154,12 @@ const badgeStyles: Record<UnitMarker['tone'], string> = {
   gray:   'bg-[linear-gradient(135deg,#aaaaaa,#777777)]'
 };
 
-const roadmapStrokeStyles: Record<NodeTone, { accent: string; glow: string }> = {
-  pink:   { accent: '#ef4d73', glow: '#ffd4de' },
-  orange: { accent: '#f09a20', glow: '#ffe1ad' },
-  purple: { accent: '#8753d5', glow: '#e6d5ff' },
-  blue:   { accent: '#3a8edc', glow: '#d4ebff' },
-  gray:   { accent: '#8d8d8d', glow: '#e8e3df' }
+const roadmapTrackStyle = {
+  shadow: '#e8a69d',
+  rim: '#f4bdb6',
+  outer: '#fde2df',
+  inner: '#fff8f3',
+  highlight: '#ffffff'
 };
 
 const roadmapLinks: RoadmapLink[] = [
@@ -210,7 +210,7 @@ const RoadmapConnections: React.FC = () => {
     >
       <defs>
         <filter id="roadmap-soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#9b5a52" floodOpacity="0.12" />
+          <feDropShadow dx="0" dy="7" stdDeviation="6" floodColor="#b65f58" floodOpacity="0.16" />
         </filter>
       </defs>
 
@@ -223,32 +223,46 @@ const RoadmapConnections: React.FC = () => {
         }
 
         const path = drawRoadmapPath(fromNode, toNode, link.curveOffset);
-        const stroke = roadmapStrokeStyles[link.tone];
 
         return (
           <g key={link.id}>
             <path
               d={path}
-              stroke={stroke.glow}
-              strokeWidth={30}
+              stroke={roadmapTrackStyle.shadow}
+              strokeWidth={40}
+              opacity={0.22}
               strokeLinecap="round"
               strokeLinejoin="round"
               filter="url(#roadmap-soft-shadow)"
             />
             <path
               d={path}
-              stroke="#fffaf6"
-              strokeWidth={16}
+              stroke={roadmapTrackStyle.rim}
+              strokeWidth={34}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <path
               d={path}
-              stroke={stroke.accent}
-              strokeWidth={5}
+              stroke={roadmapTrackStyle.outer}
+              strokeWidth={30}
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeDasharray="14 16"
+            />
+            <path
+              d={path}
+              stroke={roadmapTrackStyle.inner}
+              strokeWidth={20}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d={path}
+              stroke={roadmapTrackStyle.highlight}
+              strokeWidth={12}
+              opacity={0.42}
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </g>
         );

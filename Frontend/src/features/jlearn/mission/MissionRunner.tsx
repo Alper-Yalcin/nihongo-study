@@ -72,7 +72,7 @@ const MissionTopBar: React.FC<{
   current: Phase;
   isChallengeMode: boolean;
 }> = ({ step, phases, current, isChallengeMode }) => {
-  const visible = phases.filter((p) => p !== 'complete');
+  const visible: Phase[] = phases.filter((p) => p !== 'complete');
   const idx = Math.max(visible.indexOf(current), 0);
   const pct = visible.length > 1 ? Math.round((idx / (visible.length - 1)) * 100) : 0;
 

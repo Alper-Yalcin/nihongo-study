@@ -15,7 +15,9 @@
     "moduleDetection": "force",
     "allowJs": true,
     "types": [
-      "node"
+      "node",
+      "react",
+      "react-dom"
     ],
     "jsx": "react-jsx",
     "baseUrl": ".",
