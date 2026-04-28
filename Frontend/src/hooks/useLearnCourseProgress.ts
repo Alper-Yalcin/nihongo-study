@@ -3,6 +3,7 @@ import { usePersistentState } from './usePersistentState';
 
 interface LearnCourseProgressState {
   completedUnitIds: string[];
+  unitProgressById: Record<string, number>;
 }
 
 const LEARN_COURSE_PROGRESS_STORAGE_KEY = 'kototsuna.learn-course-progress';
@@ -13,24 +14,30 @@ const deserializeProgress = (value: string): LearnCourseProgressState => {
   try {
     const parsed = JSON.parse(value) as Partial<LearnCourseProgressState>;
 
-    if (!Array.isArray(parsed.completedUnitIds)) {
-      return { completedUnitIds: [] };
-    }
+    const unitProgressById =
+      parsed.unitProgressById && typeof parsed.unitProgressById === 'object'
+        ? Object.fromEntries(
+            Object.entries(parsed.unitProgressById)
+              .filter((entry): entry is [string, number] => typeof entry[0] === 'string' && typeof entry[1] === 'number')
+              .map(([unitId, progressValue]) => [unitId, Math.max(0, Math.min(100, Math.round(progressValue)))])
+          )
+        : {};
 
     return {
-      completedUnitIds: parsed.completedUnitIds.filter(
-        (entry): entry is string => typeof entry === 'string'
-      )
+      completedUnitIds: Array.isArray(parsed.completedUnitIds)
+        ? parsed.completedUnitIds.filter((entry): entry is string => typeof entry === 'string')
+        : [],
+      unitProgressById
     };
   } catch {
-    return { completedUnitIds: [] };
+    return { completedUnitIds: [], unitProgressById: {} };
   }
 };
 
 export const useLearnCourseProgress = (orderedUnitIds: string[]) => {
   const [progress, setProgress] = usePersistentState<LearnCourseProgressState>(
     LEARN_COURSE_PROGRESS_STORAGE_KEY,
-    { completedUnitIds: [] },
+    { completedUnitIds: [], unitProgressById: {} },
     {
       serialize: serializeProgress,
       deserialize: deserializeProgress
@@ -78,9 +85,47 @@ export const useLearnCourseProgress = (orderedUnitIds: string[]) => {
         : current.completedUnitIds.filter((entry) => entry !== unitId);
 
       return {
-        completedUnitIds: nextCompletedIds
+        completedUnitIds: nextCompletedIds,
+        unitProgressById: {
+          ...current.unitProgressById,
+          [unitId]: completed ? 100 : Math.min(current.unitProgressById[unitId] ?? 0, 99)
+        }
       };
     });
+  };
+
+  const setUnitProgress = (unitId: string, progressPercent: number) => {
+    if (!orderedUnitIds.includes(unitId)) {
+      return;
+    }
+
+    const nextProgress = Math.max(0, Math.min(100, Math.round(progressPercent)));
+
+    setProgress((current) => {
+      const currentProgress = current.completedUnitIds.includes(unitId)
+        ? 100
+        : current.unitProgressById[unitId] ?? 0;
+
+      if (currentProgress === nextProgress) {
+        return current;
+      }
+
+      return {
+        ...current,
+        unitProgressById: {
+          ...current.unitProgressById,
+          [unitId]: nextProgress
+        }
+      };
+    });
+  };
+
+  const getUnitProgress = (unitId: string) => {
+    if (completedSet.has(unitId)) {
+      return 100;
+    }
+
+    return Math.max(0, Math.min(100, Math.round(progress.unitProgressById[unitId] ?? 0)));
   };
 
   return {
@@ -93,7 +138,9 @@ export const useLearnCourseProgress = (orderedUnitIds: string[]) => {
         ? Math.round((completedUnitIds.length / orderedUnitIds.length) * 100)
         : 0,
     getUnitState,
+    getUnitProgress,
     isUnitCompleted: (unitId: string) => completedSet.has(unitId),
-    setUnitCompleted
+    setUnitCompleted,
+    setUnitProgress
   };
 };

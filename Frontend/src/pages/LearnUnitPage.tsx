@@ -217,7 +217,7 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((entry) => entry.id), [units]);
   const unit = useMemo(() => findLearnUnitById(sections, unitId), [sections, unitId]);
-  const { currentUnitId, getUnitState, setUnitCompleted } = useLearnCourseProgress(orderedUnitIds);
+  const { currentUnitId, getUnitState, setUnitCompleted, setUnitProgress } = useLearnCourseProgress(orderedUnitIds);
   const [taskIndex, setTaskIndex] = useState(0);
   const [lives, setLives] = useState(3);
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
@@ -227,6 +227,7 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
   const tasks = useMemo(() => (unit ? buildLessonTasks(unit, language) : []), [language, unit]);
   const task = tasks[taskIndex];
   const progress = tasks.length > 0 ? ((taskIndex + (finished ? 1 : 0)) / tasks.length) * 100 : 0;
+  const mapProgress = tasks.length > 0 ? ((finished ? tasks.length : taskIndex) / tasks.length) * 100 : 0;
   const unitIndex = unit ? units.findIndex((entry) => entry.id === unit.id) : -1;
   const nextUnit = unitIndex >= 0 && unitIndex < units.length - 1 ? units[unitIndex + 1] : null;
 
@@ -234,6 +235,14 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
     setSelectedTokens([]);
     setFeedback(null);
   }, [taskIndex]);
+
+  useEffect(() => {
+    if (!unit || getUnitState(unit.id) === 'locked') {
+      return;
+    }
+
+    setUnitProgress(unit.id, mapProgress);
+  }, [finished, mapProgress, taskIndex, unit]);
 
   if (!unit) {
     return <Navigate to={appShellRoutes.learn} replace />;

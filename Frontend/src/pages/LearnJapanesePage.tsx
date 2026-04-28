@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BarChart3,
   BookOpen,
@@ -15,6 +16,7 @@ import {
   Utensils
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
+import { getLearnUnitRoute } from '../data/appShellContent';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
@@ -28,6 +30,7 @@ interface LearnJapanesePageProps {
 }
 
 type NodeTone = 'pink' | 'orange' | 'purple' | 'blue' | 'gray';
+type LessonNodeState = 'locked' | 'active' | 'available' | 'completed';
 
 interface LessonNode {
   id: string;
@@ -158,6 +161,14 @@ const badgeNumberStyles: Record<NodeTone, string> = {
   purple: 'bg-[#8957da]',
   blue:   'bg-[#3a8edc]',
   gray:   'bg-[#8d8d8d]'
+};
+
+const progressRingStyles: Record<NodeTone, string> = {
+  pink: '#f05b7c',
+  orange: '#ffa028',
+  purple: '#8957da',
+  blue: '#3a8edc',
+  gray: '#8d8d8d'
 };
 
 const badgeStyles: Record<UnitMarker['tone'], string> = {
@@ -469,35 +480,103 @@ const UnitMarkerLabel: React.FC<{ marker: UnitMarker; isDark: boolean }> = ({ ma
   </div>
 );
 
-const LessonNodeButton: React.FC<{ node: LessonNode; isDark: boolean }> = ({ node, isDark }) => {
+const LessonNodeButton: React.FC<{
+  node: LessonNode;
+  isDark: boolean;
+  state: LessonNodeState;
+  progress: number;
+  onSelect?: () => void;
+}> = ({ node, isDark, state, progress, onSelect }) => {
   const Icon = node.icon;
   const size = node.checkpoint ? 92 : 82;
   const iconSize = node.checkpoint ? 42 : 34;
+  const ringSize = size + 24;
+  const ringStroke = 8;
+  const ringRadius = (ringSize - ringStroke) / 2;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const progressOffset = ringCircumference - (Math.max(0, Math.min(100, progress)) / 100) * ringCircumference;
+  const isLocked = state === 'locked';
+  const isActive = state === 'active';
+  const isCompleted = state === 'completed';
 
   return (
     <div
-      className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center z-[10]"
+      className={`absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center z-[10] ${
+        isActive ? 'kt-learn-node-active' : ''
+      }`}
       style={{ left: node.x, top: node.y }}
     >
-      <div
-        className={`relative flex items-center justify-center rounded-full border-[7px] text-white ${toneStyles[node.tone]} ${
+      <button
+        type="button"
+        disabled={isLocked || !onSelect}
+        onClick={onSelect}
+        aria-label={`${node.title}${node.subtitle ? `, ${node.subtitle}` : ''}`}
+        aria-disabled={isLocked}
+        className={`relative flex appearance-none items-center justify-center rounded-full border-[7px] p-0 text-white transition ${
+          isLocked ? 'cursor-not-allowed saturate-[0.55]' : 'cursor-pointer'
+        } ${toneStyles[node.tone]} ${
           isDark ? 'drop-shadow-[0_12px_20px_rgba(0,0,0,0.42)]' : ''
         }`}
         style={{ width: size, height: size }}
       >
+        {isActive && (
+          <span
+            className="pointer-events-none absolute rounded-full border-2 border-white/70"
+            style={{
+              inset: -16,
+              boxShadow: `0 0 0 8px ${progressRingStyles[node.tone]}22, 0 0 26px ${progressRingStyles[node.tone]}66`
+            }}
+          />
+        )}
+        <svg
+          className="pointer-events-none absolute -rotate-90 overflow-visible"
+          width={ringSize}
+          height={ringSize}
+          viewBox={`0 0 ${ringSize} ${ringSize}`}
+          aria-hidden="true"
+          style={{ left: -12, top: -12 }}
+        >
+          <circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={ringRadius}
+            fill="none"
+            stroke={isDark ? 'rgba(255,255,255,0.18)' : 'rgba(71,84,103,0.16)'}
+            strokeWidth={ringStroke}
+          />
+          <circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={ringRadius}
+            fill="none"
+            stroke={progressRingStyles[node.tone]}
+            strokeLinecap="round"
+            strokeWidth={ringStroke}
+            strokeDasharray={ringCircumference}
+            strokeDashoffset={progressOffset}
+            opacity={isLocked && progress === 0 ? 0 : 1}
+            className="transition-[stroke-dashoffset,opacity] duration-700 ease-out"
+          />
+        </svg>
         <span className="absolute inset-[5px] rounded-full border border-white/55 bg-white/10" />
         <Icon
           size={iconSize}
           strokeWidth={2.6}
           fill={node.icon === Star ? 'currentColor' : 'none'}
-          className="relative"
+          className={`relative ${isLocked ? 'opacity-50' : ''}`}
         />
+        {isLocked && (
+          <span className="absolute inset-0 flex items-center justify-center rounded-full bg-[#1f2937]/18">
+            <LockKeyhole size={node.checkpoint ? 34 : 28} strokeWidth={2.8} className="text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.25)]" />
+          </span>
+        )}
+        {isCompleted && <span className="absolute inset-[8px] rounded-full bg-white/10" />}
         <span
           className={`absolute -right-2 -top-3 flex h-8 min-w-8 items-center justify-center rounded-full border-[3px] border-white px-1 text-sm font-black text-white shadow-[0_5px_10px_rgba(80,45,55,0.18)] ${badgeNumberStyles[node.tone]}`}
         >
           {node.number}
         </span>
-      </div>
+      </button>
       <div className="mt-3 max-w-[140px] text-center">
         <div className={`text-[14px] font-bold leading-tight ${
           isDark
@@ -521,12 +600,36 @@ const LessonNodeButton: React.FC<{ node: LessonNode; isDark: boolean }> = ({ nod
 };
 
 export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, themeMode }) => {
+  const navigate = useNavigate();
   const copy = pageCopy[language];
   const isDark = themeMode === 'dark';
   const sections = useMemo(() => getLearnCourseSections(language), [language]);
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
-  const { completedCount } = useLearnCourseProgress(orderedUnitIds);
+  const { completedCount, getUnitProgress, getUnitState } = useLearnCourseProgress(orderedUnitIds);
+  const nodeRuntime = useMemo(
+    () =>
+      lessonNodes.map((node, index) => {
+        const unit = units[index];
+
+        if (!unit) {
+          return {
+            node,
+            unitId: null,
+            state: 'locked' as LessonNodeState,
+            progress: 0
+          };
+        }
+
+        return {
+          node,
+          unitId: unit.id,
+          state: getUnitState(unit.id),
+          progress: getUnitProgress(unit.id)
+        };
+      }),
+    [getUnitProgress, getUnitState, units]
+  );
 
   return (
     <div
@@ -539,6 +642,26 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
           {completedCount} / {units.length} {copy.progress}
         </p>
       </div>
+      <style>{`
+        @keyframes kt-learn-node-active-pulse {
+          0%, 100% {
+            filter: drop-shadow(0 0 0 rgba(240, 91, 124, 0));
+          }
+          50% {
+            filter: drop-shadow(0 0 18px rgba(240, 91, 124, 0.36));
+          }
+        }
+
+        .kt-learn-node-active {
+          animation: kt-learn-node-active-pulse 1.8s ease-in-out infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .kt-learn-node-active {
+            animation: none;
+          }
+        }
+      `}</style>
       <LearnFallingFlowers isDark={isDark} />
       <LearnSideRail copy={copy.side} isDark={isDark} />
 
@@ -559,8 +682,15 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             <UnitMarkerLabel key={marker.id} marker={marker} isDark={isDark} />
           ))}
 
-          {lessonNodes.map((node) => (
-            <LessonNodeButton key={node.id} node={node} isDark={isDark} />
+          {nodeRuntime.map(({ node, unitId, state, progress }) => (
+            <LessonNodeButton
+              key={node.id}
+              node={node}
+              isDark={isDark}
+              state={state}
+              progress={progress}
+              onSelect={unitId && state !== 'locked' ? () => navigate(getLearnUnitRoute(unitId)) : undefined}
+            />
           ))}
 
           <div className="absolute bottom-4 right-12 flex h-24 w-40 items-center justify-center opacity-80">
