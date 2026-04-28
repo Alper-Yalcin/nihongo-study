@@ -3,16 +3,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   BookOpen,
   Headphones,
+  Landmark,
   LockKeyhole,
   LucideIcon,
   MessageCircleMore,
   Mic,
+  Gamepad2,
+  GraduationCap,
   Sprout,
   Star,
+  Trophy,
   Utensils
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
-import { getLearnGuideRoute, getLearnUnitRoute } from '../data/appShellContent';
+import { appShellRoutes, getLearnGuideRoute, getLearnUnitRoute } from '../data/appShellContent';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
@@ -76,6 +80,12 @@ interface LessonNodeRuntime {
   progress: number;
 }
 
+interface MobileUnitSection {
+  marker: UnitMarker;
+  nodes: LessonNodeRuntime[];
+  guideHref?: string;
+}
+
 const pageCopy = {
   tr: {
     title: 'Japonca Yolculugu',
@@ -99,6 +109,13 @@ const unitMarkers: UnitMarker[] = [
   { id: 'u4', x: 650,   y: 740, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
 ];
 //
+
+const mobileUnitRanges = [
+  { markerId: 'u1', start: 0, end: 5 },
+  { markerId: 'u2', start: 5, end: 10 },
+  { markerId: 'u3', start: 10, end: 15 },
+  { markerId: 'u4', start: 15, end: 20 }
+];
 
 // x, y: node center, absolute within the 1320×1120 inner div
 const lessonNodes: LessonNode[] = [
@@ -420,7 +437,7 @@ const UnitMarkerLabel: React.FC<{
       {marker.badge}
     </div>
     <div className="mt-2 flex items-center gap-2">
-      <h2 className={`text-xl font-extrabold tracking-[-0.01em] ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
+      <h2 className={`whitespace-nowrap text-xl font-extrabold tracking-[-0.01em] ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
       {guideHref && (
         <Link
           to={guideHref}
@@ -559,6 +576,220 @@ const LessonNodeButton: React.FC<{
   );
 };
 
+const MobileLessonNode: React.FC<{
+  item: LessonNodeRuntime;
+  isDark: boolean;
+  onSelect?: () => void;
+}> = ({ item, isDark, onSelect }) => {
+  const Icon = item.node.icon;
+  const isLocked = item.state === 'locked';
+  const isActive = item.state === 'active';
+  const isCompleted = item.state === 'completed';
+  const size = item.node.checkpoint ? 74 : 68;
+  const iconSize = item.node.checkpoint ? 34 : 28;
+  const ringSize = size + 18;
+  const ringStroke = 7;
+  const ringRadius = (ringSize - ringStroke) / 2;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const progressOffset = ringCircumference - (Math.max(0, Math.min(100, item.progress)) / 100) * ringCircumference;
+
+  return (
+    <div className="relative flex min-w-[7.4rem] flex-col items-center text-center">
+      <button
+        type="button"
+        disabled={isLocked || !onSelect}
+        onClick={onSelect}
+        className={`relative flex appearance-none items-center justify-center rounded-full border-[6px] p-0 text-white transition ${
+          isLocked ? 'cursor-not-allowed saturate-[0.45]' : 'cursor-pointer'
+        } ${toneStyles[item.node.tone]} ${
+          isActive ? 'animate-[kt-learn-node-active-pulse_1.8s_ease-in-out_infinite]' : ''
+        }`}
+        style={{ width: size, height: size }}
+        aria-label={`${item.node.title}${item.node.subtitle ? `, ${item.node.subtitle}` : ''}`}
+      >
+        <svg
+          className="pointer-events-none absolute -rotate-90 overflow-visible"
+          width={ringSize}
+          height={ringSize}
+          viewBox={`0 0 ${ringSize} ${ringSize}`}
+          aria-hidden="true"
+          style={{ left: -9, top: -9 }}
+        >
+          <circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={ringRadius}
+            fill="none"
+            stroke={isDark ? 'rgba(255,255,255,0.18)' : 'rgba(71,84,103,0.15)'}
+            strokeWidth={ringStroke}
+          />
+          <circle
+            cx={ringSize / 2}
+            cy={ringSize / 2}
+            r={ringRadius}
+            fill="none"
+            stroke={progressRingStyles[item.node.tone]}
+            strokeLinecap="round"
+            strokeWidth={ringStroke}
+            strokeDasharray={ringCircumference}
+            strokeDashoffset={progressOffset}
+            opacity={isLocked && item.progress === 0 ? 0 : 1}
+          />
+        </svg>
+        <span className="absolute inset-[5px] rounded-full border border-white/55 bg-white/10" />
+        <Icon
+          size={iconSize}
+          strokeWidth={2.6}
+          fill={item.node.icon === Star ? 'currentColor' : 'none'}
+          className={`relative ${isLocked ? 'opacity-50' : ''}`}
+        />
+        {isLocked && (
+          <span className="absolute inset-0 flex items-center justify-center rounded-full bg-[#1f2937]/18">
+            <LockKeyhole size={24} strokeWidth={2.8} />
+          </span>
+        )}
+        {isCompleted && <span className="absolute inset-[8px] rounded-full bg-white/10" />}
+        <span className={`absolute -right-1 -top-2 flex h-7 min-w-7 items-center justify-center rounded-full border-[3px] border-white px-1 text-xs font-black text-white shadow-[0_5px_10px_rgba(80,45,55,0.18)] ${badgeNumberStyles[item.node.tone]}`}>
+          {item.node.number}
+        </span>
+      </button>
+      <div className={`mt-3 text-[13px] font-black leading-tight ${isDark ? 'text-[#f8fbff]' : 'text-[#1f2b3b]'}`}>
+        {item.node.title}
+      </div>
+      {item.node.subtitle && (
+        <div className={`mt-0.5 text-[12px] font-medium leading-tight ${isDark ? 'text-[#d7deec]' : 'text-[#4f5967]'}`}>
+          {item.node.subtitle}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MobileBottomNav: React.FC<{ language: AppLanguage }> = ({ language }) => {
+  const labels = language === 'tr'
+    ? { learn: 'Learn', letters: 'Letters', practice: 'Practice', meydan: 'Meydan', quests: 'Quests' }
+    : { learn: 'Learn', letters: 'Letters', practice: 'Practice', meydan: 'Meydan', quests: 'Quests' };
+  const items = [
+    { id: 'learn', label: labels.learn, href: appShellRoutes.learn, icon: Landmark },
+    { id: 'letters', label: labels.letters, href: appShellRoutes.letters, icon: BookOpen },
+    { id: 'practice', label: labels.practice, href: appShellRoutes.practice, icon: Gamepad2 },
+    { id: 'meydan', label: labels.meydan, href: appShellRoutes.meydan, icon: GraduationCap },
+    { id: 'quests', label: labels.quests, href: appShellRoutes.quests, icon: Trophy }
+  ];
+
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#f4d8cf] bg-[rgba(255,253,250,0.92)] px-3 py-2 shadow-[0_-12px_24px_rgba(160,90,80,0.12)] backdrop-blur-xl lg:hidden">
+      <div className="mx-auto grid max-w-[34rem] grid-cols-5">
+        {items.map((item) => {
+          const Icon = item.icon;
+          const active = item.id === 'learn';
+
+          return (
+            <Link
+              key={item.id}
+              to={item.href}
+              className={`flex flex-col items-center justify-center gap-1 py-1 text-[11px] font-bold ${active ? 'text-[#f04d72]' : 'text-[#606a78]'}`}
+            >
+              <Icon size={23} strokeWidth={active ? 2.6 : 2.1} />
+              <span>{item.label}</span>
+              {active && <span className="h-1 w-1 rounded-full bg-[#f04d72]" />}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+};
+
+const MobileLearnRoadmap: React.FC<{
+  language: AppLanguage;
+  themeMode: ThemeMode;
+  copy: typeof pageCopy.tr | typeof pageCopy.en;
+  sections: MobileUnitSection[];
+  onOpenUnit: (unitId: string) => void;
+}> = ({ language, themeMode, copy, sections, onOpenUnit }) => {
+  const isDark = themeMode === 'dark';
+
+  return (
+    <section className={`relative z-10 min-h-screen overflow-hidden pb-24 lg:hidden ${isDark ? 'text-[#f8fbff]' : 'text-[#1f2b3b]'}`}>
+      <div className={`relative overflow-hidden border-b px-6 pb-16 pt-6 ${
+        isDark ? 'border-white/10 bg-[rgba(26,18,31,0.34)]' : 'border-[#f2ddd4] bg-[rgba(255,248,239,0.74)]'
+      }`}>
+        <div className="pointer-events-none absolute inset-0 opacity-70" aria-hidden="true">
+          <div className="absolute left-[-4rem] top-20 h-28 w-36 rounded-[50%] bg-[#f7d9c7]/50 blur-xl" />
+          <div className="absolute right-[-3rem] top-10 h-32 w-44 rounded-[50%] bg-[#f6b6c7]/45 blur-xl" />
+          <div className="absolute bottom-0 right-8 text-[88px] opacity-20">⛩</div>
+        </div>
+        <div className="relative">
+          <h1 className="text-2xl font-black tracking-[-0.02em]">{copy.title}</h1>
+          <p className={`mt-2 text-sm font-semibold leading-6 ${isDark ? 'text-[#d5dceb]' : 'text-[#405064]'}`}>
+            {copy.subtitle}
+          </p>
+        </div>
+      </div>
+
+      <div className="relative">
+        {sections.map((section, sectionIndex) => (
+          <section
+            key={section.marker.id}
+            className={`relative border-b px-5 py-7 ${
+              isDark
+                ? 'border-white/10 bg-[rgba(25,18,31,0.28)]'
+                : sectionIndex % 2 === 0
+                  ? 'border-[#f1ddd4] bg-[rgba(255,248,239,0.64)]'
+                  : 'border-[#eadced] bg-[rgba(248,240,255,0.54)]'
+            }`}
+          >
+            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+              <div className="absolute right-[-4rem] top-2 h-32 w-36 rounded-full bg-white/30 blur-2xl" />
+              <div className="absolute left-[-2rem] bottom-4 h-24 w-24 rounded-full bg-[#f3b6c4]/20 blur-xl" />
+            </div>
+            <div className="relative flex items-start justify-between gap-3">
+              <div>
+                <div className={`inline-flex rounded-[0.45rem] px-2.5 py-1 text-xs font-black text-white shadow-[0_8px_16px_rgba(160,70,90,0.18)] ${badgeStyles[section.marker.tone]}`}>
+                  {section.marker.badge}
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <h2 className="whitespace-nowrap text-xl font-black tracking-[-0.01em]">{section.marker.title}</h2>
+                  {section.guideHref && (
+                    <Link
+                      to={section.guideHref}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border ${
+                        isDark ? 'border-white/15 bg-white/10' : 'border-[#ffd6de] bg-white/85 text-[#f04d72]'
+                      }`}
+                      aria-label={`${copy.unitGuide}: ${section.marker.title}`}
+                    >
+                      <BookOpen size={18} strokeWidth={2.5} />
+                    </Link>
+                  )}
+                </div>
+                <p className={`mt-1 text-sm font-semibold ${isDark ? 'text-[#d7deec]' : 'text-[#4f5967]'}`}>{section.marker.subtitle}</p>
+              </div>
+            </div>
+
+            <div className="relative mt-8 overflow-x-auto pb-3">
+              <div className="relative flex min-w-max items-start gap-6 px-2">
+                <div className={`absolute left-10 right-10 top-[34px] h-4 rounded-full border shadow-[inset_0_2px_0_rgba(255,255,255,0.7)] ${
+                  isDark ? 'border-white/10 bg-[#fff4ef]/75' : 'border-[#ead6cc] bg-[#fff8f3]'
+                }`} />
+                {section.nodes.map((item) => (
+                  <MobileLessonNode
+                    key={item.node.id}
+                    item={item}
+                    isDark={isDark}
+                    onSelect={item.unitId && item.state !== 'locked' ? () => onOpenUnit(item.unitId as string) : undefined}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
+      </div>
+      <MobileBottomNav language={language} />
+    </section>
+  );
+};
+
 export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, themeMode }) => {
   const navigate = useNavigate();
   const copy = pageCopy[language];
@@ -590,11 +821,24 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
       }),
     [getUnitProgress, getUnitState, units]
   );
+  const mobileSections = useMemo<MobileUnitSection[]>(
+    () =>
+      mobileUnitRanges.map((range, index) => {
+        const marker = unitMarkers.find((item) => item.id === range.markerId) ?? unitMarkers[index];
+
+        return {
+          marker,
+          nodes: nodeRuntime.slice(range.start, range.end),
+          guideHref: units[index] ? getLearnGuideRoute(units[index].id) : undefined
+        };
+      }),
+    [nodeRuntime, units]
+  );
 
   return (
     <div
       className={`relative w-full overflow-hidden text-[#1f2937]`}
-      style={{ minHeight: 'max(100vh, 1120px)' }}
+      style={{ minHeight: '100vh' }}
     >
       <div className="sr-only">
         <h1>{copy.title}</h1>
@@ -623,9 +867,18 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         }
       `}</style>
       <LearnFallingFlowers isDark={isDark} />
-      <LearnSideRail language={language} themeMode={themeMode} activeItem="journey" position="fixed" />
+      <div className="hidden lg:block">
+        <LearnSideRail language={language} themeMode={themeMode} activeItem="journey" position="fixed" />
+      </div>
+      <MobileLearnRoadmap
+        language={language}
+        themeMode={themeMode}
+        copy={copy}
+        sections={mobileSections}
+        onOpenUnit={(unitId) => navigate(getLearnUnitRoute(unitId))}
+      />
 
-      <section className="relative z-10 min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:pl-[112px]">
+      <section className="relative z-10 hidden min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:block lg:pl-[112px]">
         <div className="relative h-[1120px] w-[1320px]">
           <div className="absolute left-[62px] top-[34px] lg:left-[170px]">
             <h1 className={`text-[28px] font-extrabold tracking-[-0.02em] ${
