@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
+  ChevronDown,
   Flame,
   Gamepad2,
   GraduationCap,
@@ -63,16 +64,32 @@ const LanternMark: React.FC = () => (
   </span>
 );
 
+const languageOptions: Array<{ id: AppLanguage; flag: string; label: string }> = [
+  { id: 'tr', flag: '/flags/tr.svg', label: 'Türkçe' },
+  { id: 'en', flag: '/flags/gb.svg', label: 'English' }
+];
+
 export const TopNav: React.FC<TopNavProps> = ({
   language,
   themeMode,
   activeScript,
+  onLanguageChange,
   onThemeModeChange
 }) => {
   const location = useLocation();
   const copy = labels[language];
   const isDark = themeMode === 'dark';
   const [streakDays, setStreakDays] = useState(() => getJLearnUserState().streakDays);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (!langMenuRef.current?.contains(e.target as Node)) setIsLangOpen(false);
+    };
+    window.addEventListener('mousedown', handleClick);
+    return () => window.removeEventListener('mousedown', handleClick);
+  }, []);
   const { state: feedbackState } = useFeedback();
   const hanabira = Math.max(feedbackState.hanabira, 450);
   const kyu = deriveKyuFromStreak(streakDays);
@@ -108,8 +125,10 @@ export const TopNav: React.FC<TopNavProps> = ({
   };
 
   return (
-    <header className={`sticky top-0 z-40 border-b shadow-[0_4px_18px_rgba(132,82,62,0.06)] backdrop-blur-xl ${
-      isDark ? 'border-slate-800 bg-slate-950/90' : 'border-[#f3e8df] bg-[#fffaf4]/94'
+    <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${
+      isDark
+        ? 'border-[rgba(255,255,255,0.07)] bg-[rgba(18,12,22,0.52)] shadow-[0_4px_24px_rgba(0,0,0,0.22)]'
+        : 'border-[rgba(180,120,90,0.13)] bg-[rgba(255,250,244,0.52)] shadow-[0_4px_18px_rgba(132,82,62,0.04)]'
     }`}>
       <div className="mx-auto flex h-[92px] max-w-[1800px] items-center gap-8 px-8">
         <Link to={appShellRoutes.learn} className="flex shrink-0 items-center gap-3">
@@ -139,13 +158,64 @@ export const TopNav: React.FC<TopNavProps> = ({
         </nav>
 
         <div className={`hidden shrink-0 items-center gap-5 text-[16px] font-bold md:flex ${isDark ? 'text-slate-100' : 'text-[#263344]'}`}>
+
+          {/* Language selector */}
+          <div ref={langMenuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setIsLangOpen((v) => !v)}
+              className={`flex items-center gap-2 text-sm font-semibold transition ${
+                isDark ? 'text-slate-200 hover:text-white' : 'text-[#4d5968] hover:text-[#f04d72]'
+              }`}
+              aria-haspopup="listbox"
+              aria-expanded={isLangOpen}
+            >
+              <img
+                src={languageOptions.find((o) => o.id === language)?.flag}
+                alt=""
+                className="h-4 w-4 rounded-full object-cover"
+              />
+              <span className="uppercase tracking-wide">{language}</span>
+              <ChevronDown size={14} className={`transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isLangOpen && (
+              <div className={`absolute right-0 top-[calc(100%+8px)] z-50 min-w-[140px] overflow-hidden rounded-xl border shadow-lg backdrop-blur-xl ${
+                isDark
+                  ? 'border-[rgba(255,255,255,0.08)] bg-[rgba(18,12,22,0.82)]'
+                  : 'border-[rgba(180,120,90,0.13)] bg-[rgba(255,250,244,0.92)]'
+              }`}>
+                {languageOptions.map((option) => {
+                  const isActive = option.id === language;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => { onLanguageChange(option.id); setIsLangOpen(false); }}
+                      className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium transition ${
+                        isActive
+                          ? isDark
+                            ? 'bg-[rgba(255,255,255,0.1)] text-white'
+                            : 'bg-[rgba(240,77,114,0.08)] text-[#f04d72]'
+                          : isDark
+                            ? 'text-slate-300 hover:bg-[rgba(255,255,255,0.06)]'
+                            : 'text-[#4d5968] hover:bg-[rgba(180,120,90,0.07)]'
+                      }`}
+                    >
+                      <img src={option.flag} alt="" className="h-4 w-4 rounded-full object-cover" />
+                      <span>{option.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => onThemeModeChange(isDark ? 'light' : 'dark')}
-            className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
-              isDark
-                ? 'border-slate-700 bg-slate-900 text-yellow-200 hover:bg-slate-800'
-                : 'border-[#ffd8c2] bg-white text-[#d94872] hover:bg-[#fff0e4]'
+            className={`flex items-center justify-center transition ${
+              isDark ? 'text-yellow-200 hover:text-white' : 'text-[#d94872] hover:text-[#f04d72]'
             }`}
             aria-label={isDark ? 'Light mode' : 'Dark mode'}
             title={isDark ? 'Light mode' : 'Dark mode'}

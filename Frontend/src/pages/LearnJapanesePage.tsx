@@ -418,10 +418,10 @@ const LearnSideRail: React.FC<{
   copy: typeof pageCopy.tr.side | typeof pageCopy.en.side;
   isDark: boolean;
 }> = ({ copy, isDark }) => (
-  <aside className={`absolute bottom-0 left-0 top-0 z-20 hidden w-[112px] flex-col items-center border-r pt-16 backdrop-blur lg:flex ${
+  <aside className={`absolute bottom-0 left-0 top-0 z-20 hidden w-[112px] flex-col items-center border-r pt-16 backdrop-blur-xl lg:flex ${
     isDark
-      ? 'border-[#2c3144] bg-[rgba(19,22,34,0.82)] shadow-[8px_0_30px_rgba(0,0,0,0.2)]'
-      : 'border-[#f2e7df] bg-[rgba(255,255,255,0.76)] shadow-[8px_0_30px_rgba(150,96,72,0.05)]'
+      ? 'border-[rgba(255,255,255,0.07)] bg-[rgba(18,12,22,0.52)] shadow-[8px_0_24px_rgba(0,0,0,0.22)]'
+      : 'border-[rgba(180,120,90,0.13)] bg-[rgba(255,250,244,0.52)] shadow-[8px_0_24px_rgba(132,82,62,0.04)]'
   }`}>
     <nav className="flex flex-1 flex-col items-center gap-7">
       {sideItems.map((item, index) => {
