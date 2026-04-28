@@ -101,6 +101,9 @@ export default function App() {
       deserialize: deserializeActiveScript
     }
   );
+  const isLearnMapRoute =
+    location.pathname === appShellRoutes.learn ||
+    location.pathname === appShellRoutes.learnJapanese;
 
   const selectedKanaFont = useMemo(
     () => kanaFontStyles.find((option) => option.id === kanaFontStyle) ?? kanaFontStyles[0],
@@ -124,6 +127,14 @@ export default function App() {
   }, [themeMode]);
 
   useEffect(() => {
+    document.body.style.backgroundColor = isLearnMapRoute
+      ? '#fff5ef'
+      : themeMode === 'dark'
+        ? '#1f1b20'
+        : '#fdfcfc';
+  }, [isLearnMapRoute, themeMode]);
+
+  useEffect(() => {
     const routeScript = resolveActiveScript(location.pathname, location.search, activeScript);
 
     if (routeScript !== activeScript) {
@@ -134,7 +145,6 @@ export default function App() {
   const wrapPlayScope = (element: React.ReactElement) => (
     <KanaProgressProvider scope="play">{element}</KanaProgressProvider>
   );
-
   const shellRoutes = (
     <Routes>
       <Route
@@ -257,7 +267,7 @@ export default function App() {
   return (
     <KanaProgressProvider>
       <div
-        className="min-h-screen bg-[var(--kt-surface-page)] text-[var(--kt-ink)]"
+        className={`min-h-screen text-[var(--kt-ink)] ${isLearnMapRoute ? 'bg-[#fff5ef]' : 'bg-[var(--kt-surface-page)]'}`}
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
         <Routes>
@@ -270,8 +280,8 @@ export default function App() {
         <ChallengeReadyPrompt language={language} />
         <SpeakingSuggestToast language={language} />
         <FeedbackLayer />
-        <TomoshibiRelightModal language={language} />
-        <OnboardingGate language={language} />
+        {!isLearnMapRoute && <TomoshibiRelightModal language={language} />}
+        {!isLearnMapRoute && <OnboardingGate language={language} />}
       </div>
     </KanaProgressProvider>
   );
