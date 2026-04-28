@@ -21,6 +21,8 @@ import { ProfilePage } from './pages/ProfilePage';
 import { LearnUnitPage } from './pages/LearnUnitPage';
 import { LearnGuidePage } from './pages/LearnGuidePage';
 import { LearnJapanesePage } from './pages/LearnJapanesePage';
+import { LearnReviewPage } from './pages/LearnReviewPage';
+import { LearnStatisticPage } from './pages/LearnStatisticPage';
 import { ForgePage } from './pages/ForgePage';
 import { MeydanPage } from './pages/MeydanPage';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
@@ -148,6 +150,9 @@ export default function App() {
         element={<LandingPage language={language} activeScript={activeScript} themeMode={themeMode} />}
       />
       <Route path={appShellRoutes.learn} element={<LearnJapanesePage language={language} themeMode={themeMode} />} />
+      <Route path={appShellRoutes.learnReview} element={<LearnReviewPage language={language} themeMode={themeMode} />} />
+      <Route path={appShellRoutes.learnStatistic} element={<LearnStatisticPage language={language} themeMode={themeMode} />} />
+      <Route path={appShellRoutes.learnStatisticAlias} element={<LearnStatisticPage language={language} themeMode={themeMode} />} />
       <Route path={`${appShellRoutes.learnGuideBase}/:unitId`} element={<LearnGuidePage language={language} />} />
       <Route path={appShellRoutes.learnJapanese} element={<Navigate to={appShellRoutes.learn} replace />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />

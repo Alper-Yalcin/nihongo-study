@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Landmark,
   Moon,
+  Settings2,
   Sun,
   Trophy
 } from 'lucide-react';
@@ -33,6 +34,7 @@ const labels = {
     practice: 'Practice',
     play: 'Meydan',
     quests: 'Quests',
+    settings: 'Ayarlar',
     streak: 'Tomoshibi',
     hanabira: 'Hanabira',
     dan: 'Dan'
@@ -43,6 +45,7 @@ const labels = {
     practice: 'Practice',
     play: 'Meydan',
     quests: 'Quests',
+    settings: 'Settings',
     streak: 'Tomoshibi',
     hanabira: 'Hanabira',
     dan: 'Dan'
@@ -104,7 +107,8 @@ export const TopNav: React.FC<TopNavProps> = ({
     { id: 'letters', label: copy.letters, href: `${appShellRoutes.letters}?script=${activeScript}`, icon: BookOpen },
     { id: 'practice', label: copy.practice, href: `${appShellRoutes.practice}?script=${activeScript}`, icon: Gamepad2 },
     { id: 'play', label: copy.play, href: appShellRoutes.meydan, icon: GraduationCap },
-    { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy }
+    { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
+    { id: 'settings', label: copy.settings, href: appShellRoutes.settings, icon: Settings2 }
   ], [activeScript, copy]);
 
   const isItemActive = (id: string) => {
@@ -112,6 +116,9 @@ export const TopNav: React.FC<TopNavProps> = ({
       return (
         location.pathname === appShellRoutes.learn ||
         location.pathname.startsWith(appShellRoutes.learnJapanese) ||
+        location.pathname.startsWith(appShellRoutes.learnReview) ||
+        location.pathname.startsWith(appShellRoutes.learnStatistic) ||
+        location.pathname.startsWith(appShellRoutes.learnStatisticAlias) ||
         location.pathname.startsWith(appShellRoutes.learnUnitBase) ||
         location.pathname.startsWith(appShellRoutes.learnGuideBase)
       );
@@ -121,6 +128,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     if (id === 'practice') return location.pathname.startsWith(appShellRoutes.practice);
     if (id === 'play') return location.pathname.startsWith(appShellRoutes.meydan);
     if (id === 'quests') return location.pathname.startsWith(appShellRoutes.quests);
+    if (id === 'settings') return location.pathname.startsWith(appShellRoutes.settings);
     return false;
   };
 

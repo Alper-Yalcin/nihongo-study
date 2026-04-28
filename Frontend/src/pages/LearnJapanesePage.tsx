@@ -1,28 +1,24 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  BarChart3,
   BookOpen,
-  BookOpenText,
   Headphones,
   LockKeyhole,
   LucideIcon,
   MessageCircleMore,
   Mic,
-  RotateCcw,
-  Settings2,
   Sprout,
   Star,
   Utensils
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
-import { getLearnUnitRoute } from '../data/appShellContent';
+import { getLearnGuideRoute, getLearnUnitRoute } from '../data/appShellContent';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
 } from '../data/learnCourseContent';
 import { useLearnCourseProgress } from '../hooks/useLearnCourseProgress';
-import { MascotFigure } from '../components/mascot/MascotFigure';
+import { LearnSideRail } from '../components/learn/LearnSideRail';
 
 interface LearnJapanesePageProps {
   language: AppLanguage;
@@ -73,29 +69,24 @@ interface FallingFlower {
   opacity: number;
 }
 
+interface LessonNodeRuntime {
+  node: LessonNode;
+  unitId: string | null;
+  state: LessonNodeState;
+  progress: number;
+}
+
 const pageCopy = {
   tr: {
     title: 'Japonca Yolculugu',
     subtitle: "Dan'a giden yolculugun burada baslar.",
-    side: {
-      journey: 'Yolculuk',
-      review: 'Tekrar',
-      stats: 'Istatistik',
-      settings: 'Ayarlar',
-      profile: 'Profil'
-    },
+    unitGuide: 'Unite rehberi',
     progress: 'Ilerleme'
   },
   en: {
     title: 'Japanese Journey',
     subtitle: "Your journey toward Dan starts here.",
-    side: {
-      journey: 'Journey',
-      review: 'Review',
-      stats: 'Stats',
-      settings: 'Settings',
-      profile: 'Profile'
-    },
+    unitGuide: 'Unit guide',
     progress: 'Progress'
   }
 } as const;
@@ -139,13 +130,6 @@ const lessonNodes: LessonNode[] = [
   { id: 'n19', number: 19, x: 1020,  y: 945, title: 'Cümleler 1',      subtitle: '~ desu',         tone: 'gray',   icon: LockKeyhole      },
   { id: 'n20', number: 20, x: 1220,  y: 945, title: 'Büyük Kontrol',   subtitle: 'Ünite 4 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 ];
-
-const sideItems = [
-  { id: 'journey', icon: BookOpenText },
-  { id: 'review',  icon: RotateCcw    },
-  { id: 'stats',   icon: BarChart3    },
-  { id: 'settings',icon: Settings2   }
-] as const;
 
 const toneStyles: Record<NodeTone, string> = {
   pink:   'border-[#ffe3ea] bg-[linear-gradient(145deg,#ff9fb4,#ef4d73)] shadow-[0_8px_0_#d8385c,0_18px_30px_rgba(237,75,112,0.24)]',
@@ -425,57 +409,33 @@ const LearnFallingFlowers: React.FC<{ isDark: boolean }> = ({ isDark }) => (
   </div>
 );
 
-const LearnSideRail: React.FC<{
-  copy: typeof pageCopy.tr.side | typeof pageCopy.en.side;
+const UnitMarkerLabel: React.FC<{
+  marker: UnitMarker;
   isDark: boolean;
-}> = ({ copy, isDark }) => (
-  <aside className={`absolute bottom-0 left-0 top-0 z-20 hidden w-[112px] flex-col items-center border-r pt-16 backdrop-blur-xl lg:flex ${
-    isDark
-      ? 'border-[rgba(255,255,255,0.07)] bg-[rgba(18,12,22,0.52)] shadow-[8px_0_24px_rgba(0,0,0,0.22)]'
-      : 'border-[rgba(180,120,90,0.13)] bg-[rgba(255,250,244,0.52)] shadow-[8px_0_24px_rgba(132,82,62,0.04)]'
-  }`}>
-    <nav className="flex flex-1 flex-col items-center gap-7">
-      {sideItems.map((item, index) => {
-        const Icon = item.icon;
-        const active = index === 0;
-        return (
-          <button
-            key={item.id}
-            type="button"
-            className={`relative flex h-[82px] w-[70px] flex-col items-center justify-center gap-2 rounded-[0.65rem] text-xs font-semibold transition ${
-              active
-                ? isDark
-                  ? 'bg-[rgba(255,255,255,0.13)] text-[#ff7c99] shadow-[0_12px_28px_rgba(0,0,0,0.22)]'
-                  : 'bg-[#fffdfb] text-[#f04d72] shadow-[0_12px_28px_rgba(220,90,110,0.18)]'
-                : isDark
-                  ? 'text-[#c6d0e4] hover:bg-[rgba(255,255,255,0.08)] hover:text-white'
-                  : 'text-[#67717d] hover:bg-[rgba(255,255,255,0.7)]'
-            }`}
-          >
-            {active && <span className="absolute left-0 h-[54px] w-[3px] rounded-full bg-[#ff5b82]" />}
-            <Icon size={25} strokeWidth={active ? 2.4 : 2.1} />
-            <span>{copy[item.id]}</span>
-          </button>
-        );
-      })}
-    </nav>
-    <div className={`mb-8 flex flex-col items-center gap-2 text-xs font-semibold ${isDark ? 'text-[#d6deef]' : 'text-[#4f5965]'}`}>
-      <div className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 shadow-[0_8px_18px_rgba(220,90,110,0.16)] ${
-        isDark ? 'border-[#ffb7c7] bg-[rgba(255,255,255,0.12)]' : 'border-[#ffd6de] bg-[#fff1f4]'
-      }`}>
-        <MascotFigure pose="cheer" tone="brand" size={48} />
-      </div>
-      <span>{copy.profile}</span>
-    </div>
-  </aside>
-);
-
-const UnitMarkerLabel: React.FC<{ marker: UnitMarker; isDark: boolean }> = ({ marker, isDark }) => (
+  guideHref?: string;
+  guideLabel: string;
+}> = ({ marker, isDark, guideHref, guideLabel }) => (
   <div className="absolute z-[5]" style={{ left: marker.x, top: marker.y }}>
     <div className={`inline-flex rounded-[0.45rem] px-3 py-1.5 text-sm font-black text-white shadow-[0_8px_16px_rgba(160,70,90,0.18)] ${badgeStyles[marker.tone]}`}>
       {marker.badge}
     </div>
-    <h2 className={`mt-2 text-xl font-extrabold tracking-[-0.01em] ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
+    <div className="mt-2 flex items-center gap-2">
+      <h2 className={`text-xl font-extrabold tracking-[-0.01em] ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
+      {guideHref && (
+        <Link
+          to={guideHref}
+          className={`flex h-8 w-8 items-center justify-center rounded-full border transition ${
+            isDark
+              ? 'border-white/15 bg-white/10 text-[#f8fbff] hover:bg-white/18'
+              : 'border-[#ffd6de] bg-white/85 text-[#f04d72] hover:bg-[#fff1f4]'
+          }`}
+          aria-label={`${guideLabel}: ${marker.title}`}
+          title={`${guideLabel}: ${marker.title}`}
+        >
+          <BookOpen size={18} strokeWidth={2.5} />
+        </Link>
+      )}
+    </div>
     <p className={`mt-1 text-sm font-medium ${isDark ? 'text-[#d5dceb] drop-shadow-[0_2px_4px_rgba(0,0,0,0.65)]' : 'text-[#465161]'}`}>{marker.subtitle}</p>
   </div>
 );
@@ -607,7 +567,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
   const { completedCount, getUnitProgress, getUnitState } = useLearnCourseProgress(orderedUnitIds);
-  const nodeRuntime = useMemo(
+  const nodeRuntime = useMemo<LessonNodeRuntime[]>(
     () =>
       lessonNodes.map((node, index) => {
         const unit = units[index];
@@ -663,7 +623,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         }
       `}</style>
       <LearnFallingFlowers isDark={isDark} />
-      <LearnSideRail copy={copy.side} isDark={isDark} />
+      <LearnSideRail language={language} themeMode={themeMode} activeItem="journey" position="fixed" />
 
       <section className="relative z-10 min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:pl-[112px]">
         <div className="relative h-[1120px] w-[1320px]">
@@ -678,8 +638,14 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
 
           <RoadmapConnections isDark={isDark} />
 
-          {unitMarkers.map((marker) => (
-            <UnitMarkerLabel key={marker.id} marker={marker} isDark={isDark} />
+          {unitMarkers.map((marker, index) => (
+            <UnitMarkerLabel
+              key={marker.id}
+              marker={marker}
+              isDark={isDark}
+              guideHref={units[index] ? getLearnGuideRoute(units[index].id) : undefined}
+              guideLabel={copy.unitGuide}
+            />
           ))}
 
           {nodeRuntime.map(({ node, unitId, state, progress }) => (
@@ -693,9 +659,6 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             />
           ))}
 
-          <div className="absolute bottom-4 right-12 flex h-24 w-40 items-center justify-center opacity-80">
-            <BookOpen size={32} className="text-[#a7a0a0]" />
-          </div>
         </div>
       </section>
     </div>

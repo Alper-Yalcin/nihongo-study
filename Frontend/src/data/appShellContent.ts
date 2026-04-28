@@ -12,6 +12,9 @@ type KanaPlayNavView =
 export const appShellRoutes = {
   home: '/',
   learn: '/learn',
+  learnReview: '/learn/review',
+  learnStatistic: '/learn/staticstic',
+  learnStatisticAlias: '/learn/statistic',
   learnJapanese: '/learn/japanese',
   learnJapaneseMissionBase: '/learn/japanese/mission',
   learnJapaneseChallengeBase: '/learn/japanese/challenge',
