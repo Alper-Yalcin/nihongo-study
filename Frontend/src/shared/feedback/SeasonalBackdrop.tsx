@@ -110,9 +110,7 @@ export const SeasonalBackdrop: React.FC<SeasonalBackdropProps> = ({ density = 's
     <div
       aria-hidden="true"
       className={`${fixed ? 'fixed' : 'absolute'} pointer-events-none inset-0 z-0 overflow-hidden`}
-      style={{ background: palette.tint }}
     >
-      <div className="absolute inset-0" style={{ background: vignette }} />
       {particles.map((p) => (
         <span
           key={p.id}

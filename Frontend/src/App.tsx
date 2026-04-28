@@ -109,10 +109,6 @@ export default function App() {
     () => kanaFontStyles.find((option) => option.id === kanaFontStyle) ?? kanaFontStyles[0],
     [kanaFontStyle]
   );
-  const appBackgroundImage = themeMode === 'dark'
-    ? "url('/images/darkmode.png')"
-    : "url('/images/light.png')";
-
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
@@ -130,14 +126,9 @@ export default function App() {
   }, [themeMode]);
 
   useEffect(() => {
-    document.body.style.backgroundColor = isLearnMapRoute
-      ? themeMode === 'dark'
-        ? '#151017'
-        : '#fff5ef'
-      : themeMode === 'dark'
-        ? '#1f1b20'
-        : '#fdfcfc';
-  }, [isLearnMapRoute, themeMode]);
+    // Consistent fallback color — AppShell fixed layers handle the actual background image.
+    document.body.style.backgroundColor = themeMode === 'dark' ? '#151017' : '#fff5ef';
+  }, [themeMode]);
 
   useEffect(() => {
     const routeScript = resolveActiveScript(location.pathname, location.search, activeScript);
@@ -272,21 +263,8 @@ export default function App() {
   return (
     <KanaProgressProvider>
       <div
-        className={`min-h-screen text-[var(--kt-ink)] ${
-          isLearnMapRoute
-            ? themeMode === 'dark'
-              ? 'bg-[#151017]'
-              : 'bg-[#fff5ef]'
-            : 'bg-[var(--kt-surface-page)]'
-        }`}
-        style={{
-          ['--font-jp-current' as string]: selectedKanaFont.fontFamily,
-          backgroundAttachment: 'fixed',
-          backgroundImage: appBackgroundImage,
-          backgroundPosition: 'center top',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover'
-        }}
+        className="min-h-screen text-[var(--kt-ink)]"
+        style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
         <Routes>
           <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />

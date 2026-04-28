@@ -25,42 +25,62 @@ export const AppShell: React.FC<AppShellProps> = ({
   children
 }) => {
   const location = useLocation();
+  const isDark = themeMode === 'dark';
   const isLearnMap = location.pathname === '/learn' || location.pathname === '/learn/japanese';
-  const pageBackgroundImage = themeMode === 'dark'
-    ? "url('/images/darkmode.png')"
-    : "url('/images/light.png')";
 
   return (
-    <div
-      className={`min-h-screen text-[var(--kt-ink)] ${themeMode === 'dark' ? 'theme-dark' : 'theme-light'}`}
-      style={{
-        backgroundAttachment: 'fixed',
-        backgroundColor: themeMode === 'dark' ? '#151017' : '#fff5ef',
-        backgroundImage: pageBackgroundImage,
-        backgroundPosition: 'center top',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover'
-      }}
-    >
-      {!isLearnMap && <SeasonalBackdrop />}
-      <TopNav
-        language={language}
-        themeMode={themeMode}
-        activeScript={activeScript}
-        onActiveScriptChange={onActiveScriptChange}
-        onLanguageChange={onLanguageChange}
-        onThemeModeChange={onThemeModeChange}
+    <div className={`min-h-screen !bg-transparent text-[var(--kt-ink)] ${isDark ? 'theme-dark' : 'theme-light'}`}>
+
+      {/* Layer 0 — background image, softened */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[0] bg-cover bg-top bg-no-repeat"
+        style={{
+          backgroundImage: isDark ? "url('/images/darkmode.png')" : "url('/images/light.png')",
+          backgroundColor: isDark ? '#151017' : '#fff5ef',
+          filter: isDark ? 'brightness(0.85) saturate(0.78)' : 'brightness(0.96) saturate(0.88)',
+        }}
       />
 
-      <main
-        className={
-          isLearnMap
-            ? 'w-full max-w-none px-0 pb-0 pt-0'
-            : 'mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-10 xl:pb-12 xl:pt-7'
-        }
-      >
-        {children}
-      </main>
+      {/* Layer 1 — gradient overlay, unifies contrast across pages */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[1]"
+        style={{
+          background: isDark
+            ? 'linear-gradient(180deg, rgba(20,15,25,0.44) 0%, rgba(20,15,25,0.54) 100%)'
+            : 'linear-gradient(180deg, rgba(255,245,239,0.18) 0%, rgba(255,245,239,0.26) 100%)',
+        }}
+      />
+
+      {/* Layer 3 — seasonal particles, above overlay so they remain visible */}
+      {!isLearnMap && (
+        <div className="pointer-events-none fixed inset-0 z-[3]" aria-hidden="true">
+          <SeasonalBackdrop fixed={false} />
+        </div>
+      )}
+
+      {/* Layer 5+ — all page content */}
+      <div className="relative z-[5] min-h-screen">
+        <TopNav
+          language={language}
+          themeMode={themeMode}
+          activeScript={activeScript}
+          onActiveScriptChange={onActiveScriptChange}
+          onLanguageChange={onLanguageChange}
+          onThemeModeChange={onThemeModeChange}
+        />
+
+        <main
+          className={
+            isLearnMap
+              ? 'w-full max-w-none px-0 pb-0 pt-0'
+              : 'mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-10 xl:pb-12 xl:pt-7'
+          }
+        >
+          {children}
+        </main>
+      </div>
     </div>
   );
 };

@@ -527,18 +527,11 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
   const { completedCount } = useLearnCourseProgress(orderedUnitIds);
-  const backgroundImage = isDark ? '/images/darkmode.png' : '/images/light.png';
 
   return (
     <div
-      className={`relative min-h-screen w-full overflow-hidden bg-cover bg-center bg-no-repeat text-[#1f2937] ${
-        isDark ? 'bg-[#151017]' : 'bg-[#fff5ef]'
-      }`}
-      style={{
-        backgroundAttachment: 'fixed',
-        backgroundImage: `url('${backgroundImage}')`,
-        minHeight: 'max(100vh, 1120px)'
-      }}
+      className={`relative w-full overflow-hidden text-[#1f2937]`}
+      style={{ minHeight: 'max(100vh, 1120px)' }}
     >
       <div className="sr-only">
         <h1>{copy.title}</h1>
