@@ -50,6 +50,14 @@ interface UnitMarker {
   tone: 'pink' | 'blue' | 'purple' | 'gray';
 }
 
+interface RoadmapLink {
+  id: string;
+  fromId: string;
+  toId: string;
+  tone: NodeTone;
+  curveOffset?: number;
+}
+
 const pageCopy = {
   tr: {
     title: 'Japonca Yolculugu',
@@ -80,8 +88,8 @@ const pageCopy = {
 // x, y: absolute coords within the 1320×1120 inner div
 const unitMarkers: UnitMarker[] = [
   { id: 'u1', x: 20,   y: 270, badge: 'ÜNİTE 1', title: 'Temel İletişim',        subtitle: 'Selamlaşma ve basit ifadeler',   tone: 'pink'   },
-  { id: 'u2', x: 820, y: 440, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
-  { id: 'u3', x: 155,  y: 585, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
+  { id: 'u2', x: 950, y: 590, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
+  { id: 'u3', x: 300,  y: 555, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
   { id: 'u4', x: 20,   y: 960, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
 ];
 
@@ -96,10 +104,10 @@ const lessonNodes: LessonNode[] = [
 
   // Ünite 2 — sağdan sola (y≈545)
   { id: 'n6',  number: 6,  x: 1270, y: 475, title: 'İsimler 1',       subtitle: 'Kişiler',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n7',  number: 7,  x: 1160,  y: 645, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n8',  number: 8,  x: 1310,  y: 645, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n7',  number: 7,  x: 1220,  y: 645, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
+  { id: 'n8',  number: 8,  x: 1410,  y: 645, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
   { id: 'n9',  number: 9,  x: 1310,  y: 800, title: 'İsimler 4', subtitle: 'Ü',   tone: 'blue', icon: LockKeyhole  },
-  { id: 'n10',  number: 10,  x: 1160,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n10',  number: 10,  x: 1100,  y: 800, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
 
   // Ünite 3 — sağdan sola (y≈655)
   { id: 'n11', number: 11, x: 810,  y: 835, title: 'Konuşma 1',       subtitle: 'Temel cümleler', tone: 'purple', icon: Mic              },
@@ -144,6 +152,109 @@ const badgeStyles: Record<UnitMarker['tone'], string> = {
   blue:   'bg-[linear-gradient(135deg,#63b9ff,#3e8edc)]',
   purple: 'bg-[linear-gradient(135deg,#a984f0,#7e52d0)]',
   gray:   'bg-[linear-gradient(135deg,#aaaaaa,#777777)]'
+};
+
+const roadmapStrokeStyles: Record<NodeTone, { accent: string; glow: string }> = {
+  pink:   { accent: '#ef4d73', glow: '#ffd4de' },
+  orange: { accent: '#f09a20', glow: '#ffe1ad' },
+  purple: { accent: '#8753d5', glow: '#e6d5ff' },
+  blue:   { accent: '#3a8edc', glow: '#d4ebff' },
+  gray:   { accent: '#8d8d8d', glow: '#e8e3df' }
+};
+
+const roadmapLinks: RoadmapLink[] = [
+  { id: 'n1-n2', fromId: 'n1', toId: 'n2', tone: 'pink' },
+  { id: 'n2-n3', fromId: 'n2', toId: 'n3', tone: 'pink' },
+  { id: 'n3-n4', fromId: 'n3', toId: 'n4', tone: 'pink' },
+  { id: 'n4-n5', fromId: 'n4', toId: 'n5', tone: 'orange' },
+  { id: 'n5-n6', fromId: 'n5', toId: 'n6', tone: 'blue' },
+  { id: 'n6-n7', fromId: 'n6', toId: 'n7', tone: 'blue' },
+  { id: 'n7-n8', fromId: 'n7', toId: 'n8', tone: 'blue' },
+  { id: 'n8-n9', fromId: 'n8', toId: 'n9', tone: 'blue', curveOffset: 90 },
+  { id: 'n9-n10', fromId: 'n9', toId: 'n10', tone: 'orange' },
+  { id: 'n10-n11', fromId: 'n10', toId: 'n11', tone: 'purple' },
+  { id: 'n11-n12', fromId: 'n11', toId: 'n12', tone: 'purple' },
+  { id: 'n12-n13', fromId: 'n12', toId: 'n13', tone: 'purple' },
+  { id: 'n13-n14', fromId: 'n13', toId: 'n14', tone: 'purple' },
+  { id: 'n14-n15', fromId: 'n14', toId: 'n15', tone: 'orange' },
+  { id: 'n15-n16', fromId: 'n15', toId: 'n16', tone: 'gray' },
+  { id: 'n16-n17', fromId: 'n16', toId: 'n17', tone: 'gray' },
+  { id: 'n17-n18', fromId: 'n17', toId: 'n18', tone: 'gray' },
+  { id: 'n18-n19', fromId: 'n18', toId: 'n19', tone: 'gray' },
+  { id: 'n19-n20', fromId: 'n19', toId: 'n20', tone: 'orange' }
+];
+
+const drawRoadmapPath = (from: { x: number; y: number }, to: { x: number; y: number }, curveOffset = 0) => {
+  const midX = (from.x + to.x) / 2;
+  const midY = (from.y + to.y) / 2;
+  const horizontalBias = Math.abs(to.x - from.x) >= Math.abs(to.y - from.y);
+
+  if (curveOffset !== 0) {
+    return `M ${from.x} ${from.y} C ${midX + curveOffset} ${from.y}, ${midX + curveOffset} ${to.y}, ${to.x} ${to.y}`;
+  }
+
+  if (horizontalBias) {
+    return `M ${from.x} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x} ${to.y}`;
+  }
+
+  return `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`;
+};
+
+const RoadmapConnections: React.FC = () => {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 z-[2] h-[1120px] w-[1320px] overflow-visible"
+      viewBox="0 0 1320 1120"
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <filter id="roadmap-soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#9b5a52" floodOpacity="0.12" />
+        </filter>
+      </defs>
+
+      {roadmapLinks.map((link) => {
+        const fromNode = lessonNodes.find((node) => node.id === link.fromId);
+        const toNode = lessonNodes.find((node) => node.id === link.toId);
+
+        if (!fromNode || !toNode) {
+          return null;
+        }
+
+        const path = drawRoadmapPath(fromNode, toNode, link.curveOffset);
+        const stroke = roadmapStrokeStyles[link.tone];
+
+        return (
+          <g key={link.id}>
+            <path
+              d={path}
+              stroke={stroke.glow}
+              strokeWidth={30}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              filter="url(#roadmap-soft-shadow)"
+            />
+            <path
+              d={path}
+              stroke="#fffaf6"
+              strokeWidth={16}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d={path}
+              stroke={stroke.accent}
+              strokeWidth={5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="14 16"
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
 };
 
 const LearnSideRail: React.FC<{ copy: typeof pageCopy.tr.side | typeof pageCopy.en.side }> = ({ copy }) => (
@@ -248,11 +359,13 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language }
       <LearnSideRail copy={copy.side} />
 
       <section className="relative z-10 min-h-[1120px] overflow-x-auto overflow-y-hidden pl-0 lg:pl-[112px]">
-        <div className="relative h-[1120px] min-w-[1320px]">
+        <div className="relative h-[1120px] w-[1320px]">
           <div className="absolute left-[62px] top-[34px] lg:left-[170px]">
             <h1 className="text-[28px] font-extrabold tracking-[-0.02em] text-[#1f2b3b]">{copy.title}</h1>
             <p className="mt-2 text-[17px] font-medium text-[#405064]">{copy.subtitle}</p>
           </div>
+
+          <RoadmapConnections />
 
           {unitMarkers.map((marker) => (
             <UnitMarkerLabel key={marker.id} marker={marker} />
