@@ -694,7 +694,7 @@ const MobileLessonNode: React.FC<{
 
 const MobileBottomNav: React.FC<{ language: AppLanguage }> = ({ language }) => {
   const labels = language === 'tr'
-    ? { learn: 'Learn', letters: 'Letters', practice: 'Practice', meydan: 'Meydan', quests: 'Quests' }
+    ? { learn: 'Öğren', letters: 'Harfler', practice: 'Pratik', meydan: 'Meydan', quests: 'Görevler' }
     : { learn: 'Learn', letters: 'Letters', practice: 'Practice', meydan: 'Meydan', quests: 'Quests' };
   const items = [
     { id: 'learn', label: labels.learn, href: appShellRoutes.learn, icon: Landmark },

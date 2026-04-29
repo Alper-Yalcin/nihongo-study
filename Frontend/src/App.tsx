@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LandingPage } from './pages/LandingPage';
 import { Kanji } from './pages/Kanji';
@@ -68,6 +69,7 @@ const resolveDefaultThemeMode = (): ThemeMode => {
 
 export default function App() {
   const location = useLocation();
+  const { i18n } = useTranslation();
   const [language, setLanguage] = usePersistentState<AppLanguage>(
     APP_LANGUAGE_STORAGE_KEY,
     'tr',
@@ -113,13 +115,11 @@ export default function App() {
   );
   useEffect(() => {
     document.documentElement.lang = language;
-  }, [language]);
-
-  useEffect(() => {
+    i18n.changeLanguage(language);
     ensureWeeklyFreezeGrant();
     const cleanup = installSmartNotifier(language === 'tr' ? 'tr' : 'en');
     return cleanup;
-  }, [language]);
+  }, [language, i18n]);
 
   useEffect(() => {
     const root = document.documentElement;

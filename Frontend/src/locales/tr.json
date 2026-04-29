@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "learn": "Öğren",
+    "letters": "Harfler",
+    "practice": "Pratik",
+    "play": "Meydan",
+    "quests": "Görevler",
+    "settings": "Ayarlar",
+    "streak": "Tomoshibi",
+    "hanabira": "Hanabira",
+    "dan": "Dan"
+  },
+  "home": {
+    "welcome": "Tekrar hoş geldin",
+    "start": "Öğrenmeye başla",
+    "continue": "Devam et"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "learn": "Learn",
+    "letters": "Letters",
+    "practice": "Practice",
+    "play": "Meydan",
+    "quests": "Quests",
+    "settings": "Settings",
+    "streak": "Tomoshibi",
+    "hanabira": "Hanabira",
+    "dan": "Dan"
+  },
+  "home": {
+    "welcome": "Welcome back",
+    "start": "Start learning",
+    "continue": "Continue"
+  }
+}

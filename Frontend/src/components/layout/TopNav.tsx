@@ -29,11 +29,11 @@ interface TopNavProps {
 
 const labels = {
   tr: {
-    learn: 'Learn',
-    letters: 'Letters',
-    practice: 'Practice',
+    learn: 'Öğren',
+    letters: 'Harfler',
+    practice: 'Pratik',
     play: 'Meydan',
-    quests: 'Quests',
+    quests: 'Görevler',
     settings: 'Ayarlar',
     streak: 'Tomoshibi',
     hanabira: 'Hanabira',
