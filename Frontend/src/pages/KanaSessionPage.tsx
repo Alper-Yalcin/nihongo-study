@@ -9,7 +9,7 @@ import {
   Card,
   CardHeader,
   StatCard
-} from '../shared/ui';
+} from '../components/ui';
 
 interface KanaSessionPageProps {
   language: AppLanguage;

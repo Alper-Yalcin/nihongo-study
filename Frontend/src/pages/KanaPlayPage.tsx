@@ -23,7 +23,7 @@ import {
   PageSection,
   PageShell,
   StatCard
-} from '../shared/ui';
+} from '../components/ui';
 import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';

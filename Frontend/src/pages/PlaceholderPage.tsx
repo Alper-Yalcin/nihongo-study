@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Button, Card, Eyebrow, PageHeader, PageShell } from '../shared/ui';
+import { Button, Card, Eyebrow, PageHeader, PageShell } from '../components/ui';
 
 interface PlaceholderPageProps {
   title: string;

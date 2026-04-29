@@ -32,14 +32,14 @@ import { ACTIVE_SCRIPT_STORAGE_KEY, isKanaScript, resolveActiveScript } from './
 import { appShellRoutes, getPracticeRoute } from './data/appShellContent';
 import { KanaProgressProvider } from './features/kana/progress/progressStore';
 import { KanaScript } from './features/kana/domain/kanaItem';
-import { AppShell } from './components/shell';
+import { AppShell } from './components/layout';
 import { ReEntrySplash } from './features/jlearn/reentry/ReEntrySplash';
 import { ChallengeReadyPrompt } from './features/jlearn/challenge/ChallengeReadyPrompt';
 import { ChallengeMissionPage } from './pages/ChallengeMissionPage';
 import { SpeakingSuggestToast } from './features/jlearn/speaking/SpeakingSuggestToast';
-import { FeedbackLayer } from './shared/feedback/FeedbackLayer';
+import { FeedbackLayer } from './components/feedback/FeedbackLayer';
 import { ensureWeeklyFreezeGrant } from './features/streak/tomoshibi';
-import { TomoshibiRelightModal } from './shared/feedback/TomoshibiRelightModal';
+import { TomoshibiRelightModal } from './components/feedback/TomoshibiRelightModal';
 import { OnboardingGate } from './pages/OnboardingPage';
 import { installSmartNotifier } from './features/notifications/smartNotifications';
 

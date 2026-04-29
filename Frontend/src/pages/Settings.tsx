@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
-import { Card } from '../shared/ui';
+import { Card } from '../components/ui';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
 import { kanaFontStyles, KanaFontStyleId } from '../data/kanaFontStyles';
 import { usePersistentState } from '../hooks/usePersistentState';

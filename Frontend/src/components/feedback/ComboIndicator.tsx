@@ -5,7 +5,7 @@ import {
   subscribeFeedback,
   getFeedbackState,
   subscribeFeedbackPulse
-} from '../hooks/useFeedback';
+} from '../../hooks/useFeedback';
 
 const findTier = (combo: number) => {
   let current = COMBO_TIERS[0];

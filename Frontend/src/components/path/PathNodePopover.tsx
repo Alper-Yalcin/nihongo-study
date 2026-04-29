@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../shared/ui';
+import { Button } from '../ui';
 
 interface PathNodePopoverProps {
   title: string;

@@ -10,7 +10,7 @@ import {
   getPlayChallenges
 } from '../../features/play/challenges/challengeEngine';
 import { usePlayProgressStore } from '../../features/play/progress/usePlayProgressStore';
-import { Button, Card, StatCard } from '../../shared/ui';
+import { Button, Card, StatCard } from '../ui';
 import { ProgressRing } from '../shared/ProgressRing';
 import { DailyQuestsCard } from './DailyQuestsCard';
 import { StatsStrip } from './StatsStrip';

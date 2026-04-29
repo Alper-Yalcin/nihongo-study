@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getFeedbackState, subscribeFeedback, subscribeFeedbackPulse } from '../hooks/useFeedback';
+import { getFeedbackState, subscribeFeedback, subscribeFeedbackPulse } from '../../hooks/useFeedback';
 
 interface KiBarProps {
   size?: 'sm' | 'md';

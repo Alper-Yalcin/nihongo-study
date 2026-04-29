@@ -10,12 +10,12 @@ import {
 import {
   recordCorrect as feedbackRecordCorrect,
   recordWrong as feedbackRecordWrong
-} from '../../../shared/hooks/useFeedback';
+} from '../../../hooks/useFeedback';
 import {
   captureMasteryBefore,
   captureMasteryAfter,
   finalizeMasterySession
-} from '../../../shared/feedback/masterySession';
+} from '../../../components/feedback/masterySession';
 import { markPracticedToday } from '../../streak/tomoshibi';
 import { recordPracticeHour } from '../../notifications/smartNotifications';
 

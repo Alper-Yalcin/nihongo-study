@@ -19,7 +19,7 @@ import {
   Card,
   CardHeader,
   StatCard
-} from '../shared/ui';
+} from '../components/ui';
 import { ProgressRing } from '../components/shared/ProgressRing';
 
 interface KanaItemPageProps {

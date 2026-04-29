@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '../../shared/ui';
+import { Badge } from '../ui';
 
 interface QuestCardProps {
   title: string;

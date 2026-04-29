@@ -5,16 +5,16 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { jlearnTrack } from '../Frontend/src/data/jlearn/jlearnContent';
+import { jlearnTrack } from '../../Frontend/src/data/jlearn/jlearnContent';
 import {
   validateCurriculumData,
   validateProgress,
   validateVocabProgress,
   validateUserState,
-} from '../Frontend/src/data/jlearn/jlearnValidation';
-import { defaultUserState } from '../Frontend/src/features/jlearn/debug/debugStore';
-import type { MissionProgress, VocabProgressMap } from '../Frontend/src/data/jlearn/jlearnStorage';
-import type { JLearnUserState } from '../Frontend/src/features/jlearn/debug/debugStore';
+} from '../../Frontend/src/data/jlearn/jlearnValidation';
+import { defaultUserState } from '../../Frontend/src/features/jlearn/debug/debugStore';
+import type { MissionProgress, VocabProgressMap } from '../../Frontend/src/data/jlearn/jlearnStorage';
+import type { JLearnUserState } from '../../Frontend/src/features/jlearn/debug/debugStore';
 
 const PASS = '\x1b[32m✓\x1b[0m';
 const FAIL = '\x1b[31m✗\x1b[0m';

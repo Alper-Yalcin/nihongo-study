@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
 import { TopNav } from './TopNav';
-import { SeasonalBackdrop } from '../../shared/feedback/SeasonalBackdrop';
+import { SeasonalBackdrop } from '../feedback/SeasonalBackdrop';
 
 interface AppShellProps {
   language: AppLanguage;

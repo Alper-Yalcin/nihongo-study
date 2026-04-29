@@ -17,7 +17,7 @@ import {
 } from '../features/meydan/meydanBoosts';
 import { getCurrentDojoBoss, getDojoChampions } from '../features/meydan/dojoStore';
 import { getDanProgress, getKyuFromXp } from '../data/danSystem';
-import { useFeedback } from '../shared/hooks/useFeedback';
+import { useFeedback } from '../hooks/useFeedback';
 import { getJLearnUserState, subscribeJLearnUserState } from '../features/jlearn/debug/debugStore';
 
 interface MeydanPageProps {

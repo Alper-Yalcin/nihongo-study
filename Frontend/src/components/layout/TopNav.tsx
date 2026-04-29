@@ -16,7 +16,7 @@ import { appShellRoutes } from '../../data/appShellContent';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
 import { getJLearnUserState, subscribeJLearnUserState } from '../../features/jlearn/debug/debugStore';
-import { useFeedback } from '../../shared/hooks/useFeedback';
+import { useFeedback } from '../../hooks/useFeedback';
 
 interface TopNavProps {
   language: AppLanguage;

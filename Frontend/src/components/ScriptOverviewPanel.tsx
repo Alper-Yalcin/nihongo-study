@@ -26,7 +26,7 @@ import {
   CardHeader,
   Eyebrow,
   StatCard
-} from '../shared/ui';
+} from './ui';
 
 interface Props {
   title: string;

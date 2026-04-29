@@ -11,7 +11,7 @@ import {
   playShoji,
   playSumi
 } from './sounds';
-import { subscribeFeedbackPulse } from '../hooks/useFeedback';
+import { subscribeFeedbackPulse } from '../../hooks/useFeedback';
 
 const tryVibrate = (pattern: number | number[]): void => {
   if (typeof navigator === 'undefined') return;

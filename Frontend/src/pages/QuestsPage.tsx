@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Clock3, Gift, Sparkles } from 'lucide-react';
-import { Card } from '../shared/ui';
+import { Card } from '../components/ui';
 import { AppLanguage } from '../data/appPreferences';
 import {
   evaluateChallengeProgress,
@@ -8,8 +8,8 @@ import {
 } from '../features/play/challenges/challengeEngine';
 import { usePlayProgressStore } from '../features/play/progress/usePlayProgressStore';
 import { QuestCard } from '../components/quests/QuestCard';
-import { awardBonusHanabira } from '../shared/hooks/useFeedback';
-import { playKoto } from '../shared/feedback/sounds';
+import { awardBonusHanabira } from '../hooks/useFeedback';
+import { playKoto } from '../components/feedback/sounds';
 import { getSeasonInfo } from '../features/quests/seasonalQuest';
 
 interface QuestsPageProps {

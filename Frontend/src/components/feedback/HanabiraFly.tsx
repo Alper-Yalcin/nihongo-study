@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { subscribeFeedbackPulse, FeedbackPulseDetail } from '../hooks/useFeedback';
+import { subscribeFeedbackPulse, FeedbackPulseDetail } from '../../hooks/useFeedback';
 
 const prefersReducedMotion = (): boolean => {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;

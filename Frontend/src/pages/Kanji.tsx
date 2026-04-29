@@ -12,7 +12,7 @@ import {
   PageHeader,
   PageSection,
   PageShell
-} from '../shared/ui';
+} from '../components/ui';
 import { StudyNavigator } from '../components/StudyNavigator';
 import { AppLanguage } from '../data/appPreferences';
 import { useDictionaryWordSearch } from '../data/words';

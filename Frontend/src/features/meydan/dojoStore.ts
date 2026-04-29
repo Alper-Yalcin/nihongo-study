@@ -9,7 +9,7 @@
  * değeriyle senkron gösterilir (TopNav'daki feedback hook üzerinden).
  */
 
-import { getFeedbackState } from '../../shared/hooks/useFeedback';
+import { getFeedbackState } from '../../hooks/useFeedback';
 
 export interface DojoBoss {
   id: string;

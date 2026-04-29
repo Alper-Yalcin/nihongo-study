@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart3, BookMarked, Brain, Headphones, PenTool, RefreshCcw, ShieldAlert, Shuffle, Sparkles, Type } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, StatCard } from '../shared/ui';
+import { Button, Card, StatCard } from '../components/ui';
 import { AppLanguage } from '../data/appPreferences';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
 import { appShellRoutes } from '../data/appShellContent';

@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { turkishMeaningTranslations as baseTranslations } from './data/meaningTranslations';
+import { turkishMeaningTranslations as baseTranslations } from '../data-pipeline/meaningTranslations';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const GENERATED_TRANSLATIONS_PATH = path.join(__dirname, 'data', 'meaningTranslations.generated.json');
+const GENERATED_TRANSLATIONS_PATH = path.join(__dirname, '../data-pipeline', 'meaningTranslations.generated.json');
 
 const isRecord = (value: unknown): value is Record<string, string> =>
   typeof value === 'object' &&

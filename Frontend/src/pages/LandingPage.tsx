@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, BookOpenText, Languages, PlayCircle, Sparkles, Swords, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button, Card } from '../shared/ui';
+import { Button, Card } from '../components/ui';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
 import { appShellRoutes, getPracticeRoute } from '../data/appShellContent';
 import { KanaScript } from '../features/kana/domain/kanaItem';

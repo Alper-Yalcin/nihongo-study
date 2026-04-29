@@ -16,9 +16,9 @@ import {
   recordWrong,
   startSession,
   endSession
-} from '../shared/hooks/useFeedback';
+} from '../hooks/useFeedback';
 import { markPracticedToday } from '../features/streak/tomoshibi';
-import { playKoto, playShoji, unlockAudio } from '../shared/feedback/sounds';
+import { playKoto, playShoji, unlockAudio } from '../components/feedback/sounds';
 
 const ONBOARDING_DONE_KEY = 'kototsuna.onboarding.done.v1';
 
