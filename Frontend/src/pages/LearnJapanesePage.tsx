@@ -39,6 +39,10 @@ const DESKTOP_MAP_HEIGHT = 1120;
 const DESKTOP_MAP_MIN_SCALE = 0.45;
 const DESKTOP_MAP_X_OFFSET = -170;
 
+const NODES_PER_CHAPTER = 8;
+const UNIT_GROUPS_PER_CHAPTER = 4;
+const NODES_PER_GROUP = NODES_PER_CHAPTER / UNIT_GROUPS_PER_CHAPTER;
+
 interface LessonNode {
   id: string;
   number: number;
@@ -98,13 +102,19 @@ const pageCopy = {
     title: 'Japonca Yolculugu',
     subtitle: "Dan'a giden yolculugun burada baslar.",
     unitGuide: 'Unite rehberi',
-    progress: 'Ilerleme'
+    progress: 'Ilerleme',
+    bolum: 'Bölüm',
+    prevChapter: 'Önceki bölüm',
+    nextChapter: 'Sonraki bölüm'
   },
   en: {
     title: 'Japanese Journey',
     subtitle: "Your journey toward Dan starts here.",
     unitGuide: 'Unit guide',
-    progress: 'Progress'
+    progress: 'Progress',
+    bolum: 'Chapter',
+    prevChapter: 'Previous chapter',
+    nextChapter: 'Next chapter'
   }
 } as const;
 
@@ -115,7 +125,6 @@ const unitMarkers: UnitMarker[] = [
   { id: 'u3', x: 650,  y: 405, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
   { id: 'u4', x: 650,   y: 740, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
 ];
-//
 
 const mobileUnitRanges = [
   { markerId: 'u1', start: 0, end: 5 },
@@ -817,6 +826,72 @@ const MobileLearnRoadmap: React.FC<{
   );
 };
 
+// く shape navigation arrow icon
+const KuShapeIcon: React.FC<{ mirrored?: boolean }> = ({ mirrored }) => (
+  <svg width="22" height="38" viewBox="0 0 20 34" fill="none" aria-hidden="true">
+    <path
+      d={
+        mirrored
+          ? 'M 5 3 Q 17 10 17 17 Q 17 24 5 31'
+          : 'M 15 3 Q 3 10 3 17 Q 3 24 15 31'
+      }
+      stroke="currentColor"
+      strokeWidth="2.8"
+      strokeLinecap="round"
+      fill="none"
+    />
+  </svg>
+);
+
+// Chapter navigation button shown on the left/right edge of the screen
+const ChapterNavButton: React.FC<{
+  direction: 'prev' | 'next';
+  chapterLabel: string;
+  targetChapter: number;
+  isDark: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}> = ({ direction, chapterLabel, targetChapter, isDark, disabled, onClick }) => {
+  const isPrev = direction === 'prev';
+
+  return (
+    <button
+      type="button"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-label={`${chapterLabel} ${targetChapter + 1}`}
+      className={`fixed top-1/2 z-20 -translate-y-1/2 flex flex-col items-center justify-center gap-2 py-6 group transition-all ${
+        isPrev
+          ? 'left-0 lg:left-[112px] pl-2 pr-3'
+          : 'right-0 pr-2 pl-3'
+      } ${disabled ? 'pointer-events-none' : 'cursor-pointer'}`}
+    >
+      <div
+        className={`flex items-center justify-center rounded-xl px-2 py-4 transition-all duration-200 ${
+          disabled
+            ? isDark
+              ? 'bg-white/[0.03] border border-white/[0.05] text-white/18'
+              : 'bg-[#1f2b3b]/[0.025] border border-[#1f2b3b]/[0.045] text-[#1f2b3b]/18'
+            : isDark
+              ? 'bg-white/[0.07] border border-white/[0.11] text-white/55 group-hover:bg-white/[0.14] group-hover:text-white/85 group-hover:border-white/20 group-hover:scale-105'
+              : 'bg-[#1f2b3b]/[0.06] border border-[#1f2b3b]/[0.09] text-[#1f2b3b]/45 group-hover:bg-[#1f2b3b]/[0.11] group-hover:text-[#1f2b3b]/75 group-hover:border-[#1f2b3b]/15 group-hover:scale-105'
+        } shadow-[0_4px_16px_rgba(0,0,0,0.07)] backdrop-blur-sm`}
+      >
+        <KuShapeIcon mirrored={!isPrev} />
+      </div>
+      <span
+        className={`text-[10px] font-bold tracking-wide transition-colors ${
+          disabled
+            ? isDark ? 'text-white/15' : 'text-[#1f2b3b]/15'
+            : isDark ? 'text-white/30 group-hover:text-white/55' : 'text-[#1f2b3b]/28 group-hover:text-[#1f2b3b]/50'
+        }`}
+      >
+        {targetChapter + 1}
+      </span>
+    </button>
+  );
+};
+
 export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, themeMode }) => {
   const navigate = useNavigate();
   const [desktopMapScale, setDesktopMapScale] = useState(getDesktopMapScale);
@@ -825,11 +900,53 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const sections = useMemo(() => getLearnCourseSections(language), [language]);
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
-  const { completedCount, getUnitProgress, getUnitState } = useLearnCourseProgress(orderedUnitIds);
+  const { completedCount, completedSet, getUnitProgress, getUnitState } = useLearnCourseProgress(orderedUnitIds);
+
+  // Which chapter the user is currently progressing in
+  const activeChapter = useMemo(() => {
+    if (units.length === 0) return 0;
+    const firstIncompleteIndex = orderedUnitIds.findIndex((id) => !completedSet.has(id));
+    if (firstIncompleteIndex === -1) {
+      return Math.max(0, Math.ceil(units.length / NODES_PER_CHAPTER) - 1);
+    }
+    return Math.floor(firstIncompleteIndex / NODES_PER_CHAPTER);
+  }, [units.length, orderedUnitIds, completedSet]);
+
+  // Which chapter the user is currently viewing (can differ from activeChapter via nav)
+  const [viewChapter, setViewChapter] = useState(activeChapter);
+
+  // When the user completes a chapter, auto-advance the view to the new active chapter
+  useEffect(() => {
+    setViewChapter((prev) => Math.max(prev, activeChapter));
+  }, [activeChapter]);
+
+  const totalChapters = Math.max(1, Math.ceil(units.length / NODES_PER_CHAPTER));
+  const chapterStart = viewChapter * NODES_PER_CHAPTER;
+
+  // Slice of course units visible in the current chapter view
+  const chapterUnits = useMemo(
+    () => units.slice(chapterStart, chapterStart + NODES_PER_CHAPTER),
+    [units, chapterStart]
+  );
+
+  // Unit group badge numbers shift by chapter (e.g. chapter 1 → ÜNİTE 5,6,7,8)
+  const groupOffset = viewChapter * UNIT_GROUPS_PER_CHAPTER;
+  const dynamicUnitMarkers = useMemo(
+    () =>
+      unitMarkers.map((marker, index) => ({
+        ...marker,
+        badge:
+          language === 'tr'
+            ? `ÜNİTE ${groupOffset + index + 1}`
+            : `UNIT ${groupOffset + index + 1}`
+      })),
+    [groupOffset, language]
+  );
+
   const nodeRuntime = useMemo<LessonNodeRuntime[]>(
     () =>
       lessonNodes.map((node, index) => {
-        const unit = units[index];
+        const unit = chapterUnits[index];
 
         if (!unit) {
           return {
@@ -847,20 +964,24 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
           progress: getUnitProgress(unit.id)
         };
       }),
-    [getUnitProgress, getUnitState, units]
+    [chapterUnits, getUnitProgress, getUnitState]
   );
+
   const mobileSections = useMemo<MobileUnitSection[]>(
     () =>
       mobileUnitRanges.map((range, index) => {
-        const marker = unitMarkers.find((item) => item.id === range.markerId) ?? unitMarkers[index];
+        const marker =
+          dynamicUnitMarkers.find((item) => item.id === range.markerId) ??
+          dynamicUnitMarkers[index];
+        const firstGroupUnit = chapterUnits[range.start];
 
         return {
           marker,
           nodes: nodeRuntime.slice(range.start, range.end),
-          guideHref: units[index] ? getLearnGuideRoute(units[index].id) : undefined
+          guideHref: firstGroupUnit ? getLearnGuideRoute(firstGroupUnit.id) : undefined
         };
       }),
-    [nodeRuntime, units]
+    [nodeRuntime, chapterUnits, dynamicUnitMarkers]
   );
 
   useEffect(() => {
@@ -870,6 +991,9 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
   }, []);
+
+  const canGoPrev = viewChapter > 0;
+  const canGoNext = viewChapter < activeChapter;
 
   return (
     <div
@@ -912,6 +1036,25 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
       <div className="hidden lg:block">
         <LearnSideRail language={language} themeMode={themeMode} activeItem="journey" position="fixed" />
       </div>
+
+      {/* Chapter navigation arrows — always visible, disabled when no chapter to navigate to */}
+      <ChapterNavButton
+        direction="prev"
+        chapterLabel={copy.bolum}
+        targetChapter={viewChapter - 1}
+        isDark={isDark}
+        disabled={!canGoPrev}
+        onClick={() => setViewChapter((v) => v - 1)}
+      />
+      <ChapterNavButton
+        direction="next"
+        chapterLabel={copy.bolum}
+        targetChapter={viewChapter + 1}
+        isDark={isDark}
+        disabled={!canGoNext}
+        onClick={() => setViewChapter((v) => v + 1)}
+      />
+
       <MobileLearnRoadmap
         language={language}
         themeMode={themeMode}
@@ -947,19 +1090,34 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             <h1 className={`text-[28px] font-extrabold tracking-[-0.02em] ${
               isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.72)]' : 'text-[#1f2b3b]'
             }`}>{copy.title}</h1>
-            <p className={`mt-2 text-[17px] font-medium ${
-              isDark ? 'text-[#d5dceb] drop-shadow-[0_2px_4px_rgba(0,0,0,0.62)]' : 'text-[#405064]'
-            }`}>{copy.subtitle}</p>
+            <div className="mt-2 flex items-center gap-4">
+              <p className={`text-[17px] font-medium ${
+                isDark ? 'text-[#d5dceb] drop-shadow-[0_2px_4px_rgba(0,0,0,0.62)]' : 'text-[#405064]'
+              }`}>{copy.subtitle}</p>
+              {totalChapters > 1 && (
+                <span className={`rounded-full px-3 py-0.5 text-[13px] font-bold ${
+                  isDark
+                    ? 'bg-white/10 text-white/60'
+                    : 'bg-[#1f2b3b]/[0.07] text-[#1f2b3b]/55'
+                }`}>
+                  {copy.bolum} {viewChapter + 1} / {totalChapters}
+                </span>
+              )}
+            </div>
           </div>
 
           <RoadmapConnections isDark={isDark} xOffset={DESKTOP_MAP_X_OFFSET} />
 
-          {unitMarkers.map((marker, index) => (
+          {dynamicUnitMarkers.map((marker, index) => (
             <UnitMarkerLabel
               key={marker.id}
               marker={marker}
               isDark={isDark}
-              guideHref={units[index] ? getLearnGuideRoute(units[index].id) : undefined}
+              guideHref={
+                chapterUnits[index * NODES_PER_GROUP]
+                  ? getLearnGuideRoute(chapterUnits[index * NODES_PER_GROUP].id)
+                  : undefined
+              }
               guideLabel={copy.unitGuide}
               xOffset={DESKTOP_MAP_X_OFFSET}
             />

@@ -37,6 +37,7 @@ export interface LearnCourseSection {
 const trSections: LearnCourseSection[] = [
   {
     id: 'part-1',
+
     partNumber: 1,
     title: 'Temel iletisim',
     description: 'Selamlas, siparis ver, kendini ve baskalarini tanit.',
@@ -249,6 +250,211 @@ const trSections: LearnCourseSection[] = [
   }
 ];
 
+const trPart3: LearnCourseSection = {
+  id: 'part-3',
+  partNumber: 3,
+  title: 'Alisveris ve sayilar',
+  description: 'Sayilari kullan, alisveris yap, yon sor ve hava durumunu anlat.',
+  bannerClassName:
+    'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-accent-success)_100%)]',
+  units: [
+    {
+      id: 'p3-u9',
+      partNumber: 3,
+      unitNumber: 9,
+      title: 'Bir ila yuz arasi sayilari ogren',
+      summary: 'Temel Japonca sayilari ve bunlari gunluk konusmalarda kullanmayi ogren.',
+      goals: [
+        'Ichi dan hyaku ya kadar sayabilmek',
+        'Sayi + counter kaliplarini tanimak',
+        'Kac tane sorusunu yanıtlamak'
+      ],
+      vocabulary: ['ichi', 'ni', 'san', 'shi', 'go', 'juu'],
+      grammarFocus: ['Sayilar 1-100', 'Nan-bon / nan-mai', 'Ikutsu desu ka'],
+      lessonHighlights: ['Sayi kartlari', 'Hizli sayma', 'Dinle-tekrar et', 'Quiz'],
+      dialogue: [
+        { speaker: 'A', text: 'Ikutsu desu ka.', translation: 'Kac tane?' },
+        { speaker: 'B', text: 'Mittsu desu.', translation: 'Uc tane.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-accent-success)_100%)]',
+      accentGlow: 'rgba(255, 186, 90, 0.32)',
+      tone: 'warning',
+      mascotPose: 'cheer'
+    },
+    {
+      id: 'p3-u10',
+      partNumber: 3,
+      unitNumber: 10,
+      title: 'Dukkanda alisveris yap',
+      summary: 'Fiyat sor, begendiklerini ifade et ve odeme kaliplarini kullan.',
+      goals: [
+        'Ikura desu ka ile fiyat sormak',
+        'Kore o kudasai kalibini pekistirmek',
+        'Pahalı / ucuz sifatlarini eklemek'
+      ],
+      vocabulary: ['ikura', 'yasui', 'takai', 'kaimasu', 'mise', 'okane'],
+      grammarFocus: ['Ikura desu ka', 'X en desu', 'Kore o kudasai'],
+      lessonHighlights: ['Fiyat tabelasi', 'Diyalog', 'Sayi + en', 'Odeme'],
+      dialogue: [
+        { speaker: 'A', text: 'Kore wa ikura desu ka.', translation: 'Bu kac para?' },
+        { speaker: 'B', text: 'Sanbyaku en desu.', translation: 'Uc yuz yen.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-success)_0%,var(--kt-accent-warning)_100%)]',
+      accentGlow: 'rgba(144, 205, 70, 0.3)',
+      tone: 'success',
+      mascotPose: 'wave'
+    },
+    {
+      id: 'p3-u11',
+      partNumber: 3,
+      unitNumber: 11,
+      title: 'Renkler ve giysiler hakkinda konus',
+      summary: 'Renk adlarini ogren ve giysileri rengiyle birlikte tanimla.',
+      goals: [
+        'Temel renk kelimelerini tanimak',
+        'X-iro no Y kalibini kurmak',
+        'Giysi + renk kombinasyonu yapmak'
+      ],
+      vocabulary: ['aka', 'ao', 'shiro', 'kuro', 'ki', 'fuku'],
+      grammarFocus: ['X-iro no Y', 'Nani-iro desu ka', 'Sifat + isim'],
+      lessonHighlights: ['Renk paleti', 'Esleme', 'Cumle kurma', 'Mini test'],
+      dialogue: [
+        { speaker: 'A', text: 'Sono fuku wa nan-iro desu ka.', translation: 'O kıyafetin rengi ne?' },
+        { speaker: 'B', text: 'Aoi fuku desu.', translation: 'Mavi bir kıyafet.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-accent-plum)_100%)]',
+      accentGlow: 'rgba(54, 160, 255, 0.28)',
+      tone: 'info',
+      mascotPose: 'study'
+    },
+    {
+      id: 'p3-u12',
+      partNumber: 3,
+      unitNumber: 12,
+      title: 'Kontrol noktasi: Alisveris',
+      summary: 'Sayilar, fiyatlar ve renkler konularini test eden kontrol noktasi.',
+      goals: [
+        'Sayilari ve fiyatlari dogru kullanmak',
+        'Renk ve giysi tanimlamasi yapmak',
+        'Alisveris diyalogunu tamamlamak'
+      ],
+      vocabulary: ['ikura', 'en', 'iro', 'kaimasu', 'yasui', 'takai'],
+      grammarFocus: ['Sayilar + en', 'Renk + isim', 'Alisveris kaliplari'],
+      lessonHighlights: ['Karma sorular', 'Diyalog tamamlama', 'Hizli secim', 'Sonuc'],
+      dialogue: [
+        { speaker: 'A', text: 'Aoi shatsu o kudasai.', translation: 'Mavi gomlek lutfen.' },
+        { speaker: 'B', text: 'Hai, senhyaku en desu.', translation: 'Tabii, bin yuz yen.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-brand)_100%)]',
+      accentGlow: 'rgba(255, 186, 90, 0.3)',
+      tone: 'warning',
+      mascotPose: 'cheer'
+    },
+    {
+      id: 'p3-u13',
+      partNumber: 3,
+      unitNumber: 13,
+      title: 'Ulasim araclari ve yolculuk',
+      summary: 'Tren, otobus ve taksi gibi tasitlari kullanarak yolculuk cumleleri kur.',
+      goals: [
+        'Temel ulasim kelimelerini tanimak',
+        'De gitmek / binerek gitmek kalibini kullanmak',
+        'Bilet alma diyalogunu kurmak'
+      ],
+      vocabulary: ['densha', 'basu', 'takushii', 'eki', 'norimas', 'kippu'],
+      grammarFocus: ['X de ikimasu', 'X ni norimas', 'Doko made'],
+      lessonHighlights: ['Tasit kartlari', 'Guzergah', 'Bilet diyalogu', 'Quiz'],
+      dialogue: [
+        { speaker: 'A', text: 'Densha de ikimasu.', translation: 'Trenle gidiyorum.' },
+        { speaker: 'B', text: 'Eki wa doko desu ka.', translation: 'İstasyon nerede?' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-plum)_0%,var(--kt-accent-info)_100%)]',
+      accentGlow: 'rgba(176, 120, 236, 0.3)',
+      tone: 'plum',
+      mascotPose: 'study'
+    },
+    {
+      id: 'p3-u14',
+      partNumber: 3,
+      unitNumber: 14,
+      title: 'Yon tarif et ve yol sor',
+      summary: 'Sag, sol, duz gidin ve donus ifadeleriyle basit yon tarifi yap.',
+      goals: [
+        'Migi / hidari / massugu farkini pekistirmek',
+        'X wa doko desu ka sorusunu kullanmak',
+        'Basit tarifli rotayi takip etmek'
+      ],
+      vocabulary: ['migi', 'hidari', 'massugu', 'magatte', 'chikaku', 'tooi'],
+      grammarFocus: ['Migi ni magatte kudasai', 'Massugu itte', 'X no chikaku'],
+      lessonHighlights: ['Harita oyunu', 'Dinle-goster', 'Yol tarifi yaz', 'Test'],
+      dialogue: [
+        { speaker: 'A', text: 'Yuubinkyoku wa doko desu ka.', translation: 'Postane nerede?' },
+        { speaker: 'B', text: 'Massugu itte, migi ni magatte kudasai.', translation: 'Duz gidin, sağa donun.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-brand)_100%)]',
+      accentGlow: 'rgba(54, 160, 255, 0.3)',
+      tone: 'info',
+      mascotPose: 'wave'
+    },
+    {
+      id: 'p3-u15',
+      partNumber: 3,
+      unitNumber: 15,
+      title: 'Hava durumunu anlat',
+      summary: 'Bugun hava nasil, sicak mi soguk mu sorularini yanıtlamayı ogren.',
+      goals: [
+        'Temel hava durumu kelimelerini tanimak',
+        'Kyoo no tenki wa ... desu kalibini kurmak',
+        'Mevsim ve hava sifatlarini baglamak'
+      ],
+      vocabulary: ['tenki', 'atsui', 'samui', 'ame', 'hare', 'kaze'],
+      grammarFocus: ['Kyoo wa X desu', 'Tenki ga ii / warui', 'Meevsim kelimeleri'],
+      lessonHighlights: ['Hava sembolleri', 'Tahmın diyalogu', 'Mevsim esleme', 'Quiz'],
+      dialogue: [
+        { speaker: 'A', text: 'Kyoo no tenki wa dou desu ka.', translation: 'Bugunun havası nasıl?' },
+        { speaker: 'B', text: 'Atsukute, hare desu.', translation: 'Sicak ve acik.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-accent-success)_100%)]',
+      accentGlow: 'rgba(54, 160, 255, 0.28)',
+      tone: 'info',
+      mascotPose: 'study'
+    },
+    {
+      id: 'p3-u16',
+      partNumber: 3,
+      unitNumber: 16,
+      title: 'Kontrol noktasi: Ulasim ve hava',
+      summary: 'Ulasim, yon tarifi ve hava durumu konularini test eden buyuk kontrol noktasi.',
+      goals: [
+        'Ulasim ve yon kelimelerini dogru kullanmak',
+        'Hava durumu cumleleri kurmak',
+        'Karma konularda akici cevap vermek'
+      ],
+      vocabulary: ['densha', 'migi', 'tenki', 'atsui', 'eki', 'massugu'],
+      grammarFocus: ['X de ikimasu', 'Yon tarifi', 'Tenki cumleleri'],
+      lessonHighlights: ['Karma sorular', 'Senaryo oyunu', 'Hizli secim', 'Buyuk final'],
+      dialogue: [
+        { speaker: 'A', text: 'Eki wa doko desu ka.', translation: 'İstasyon nerede?' },
+        { speaker: 'B', text: 'Massugu itte, hidari ni magatte kudasai.', translation: 'Duz gidin, sola donun.' }
+      ],
+      bannerClassName:
+        'bg-[linear-gradient(135deg,var(--kt-accent-plum)_0%,var(--kt-accent-sunset)_100%)]',
+      accentGlow: 'rgba(176, 120, 236, 0.32)',
+      tone: 'plum',
+      mascotPose: 'cheer'
+    }
+  ]
+};
+
+trSections.push(trPart3);
+
 const enSections: LearnCourseSection[] = [
   {
     ...trSections[0],
@@ -297,6 +503,22 @@ const enSections: LearnCourseSection[] = [
     ]
   }
 ];
+
+enSections.push({
+  ...trPart3,
+  title: 'Shopping and numbers',
+  description: 'Use numbers, shop, ask for directions, and talk about the weather.',
+  units: [
+    { ...trPart3.units[0], summary: 'Learn numbers 1-100 and use them in conversation.' },
+    { ...trPart3.units[1], summary: 'Ask for prices, express preferences, and pay.' },
+    { ...trPart3.units[2], summary: 'Learn color names and describe clothing.' },
+    { ...trPart3.units[3], summary: 'Shopping checkpoint: numbers, prices, and colors.' },
+    { ...trPart3.units[4], summary: 'Use trains, buses, and taxis to travel.' },
+    { ...trPart3.units[5], summary: 'Ask for and give simple directions.' },
+    { ...trPart3.units[6], summary: 'Describe the weather and seasons.' },
+    { ...trPart3.units[7], summary: 'Transport and weather checkpoint.' }
+  ]
+});
 
 export const getLearnCourseSections = (language: AppLanguage): LearnCourseSection[] =>
   language === 'en' ? enSections : trSections;
