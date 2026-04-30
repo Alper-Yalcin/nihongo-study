@@ -28,6 +28,7 @@ const copy = {
     intro: 'Bu ünitenin dil bilgisi ipuçlarını öğren ve anahtar ifadeleri gör',
     keyPhrases: 'Anahtar ifadeler',
     grammar: 'Dil bilgisi ipuçları',
+    lessons: 'Dersler',
     vocabulary: 'Kelime seti',
     goals: 'Bu ünitede yapabileceklerin',
     listen: 'Dinle'
@@ -38,6 +39,7 @@ const copy = {
     intro: 'Learn the language tips and key phrases for this unit',
     keyPhrases: 'Key phrases',
     grammar: 'Language tips',
+    lessons: 'Lessons',
     vocabulary: 'Word set',
     goals: 'What you will be able to do',
     listen: 'Listen'
@@ -102,7 +104,7 @@ export const LearnGuidePage: React.FC<LearnGuidePageProps> = ({ language }) => {
     return <Navigate to={appShellRoutes.learn} replace />;
   }
 
-  const phrases = guidePhrasesByUnit[unit.id] ?? buildFallbackPhrases(unit);
+  const phrases = buildFallbackPhrases(unit);
 
   return (
     <div className="mx-auto w-full max-w-[42rem] pb-20">
@@ -203,6 +205,22 @@ export const LearnGuidePage: React.FC<LearnGuidePageProps> = ({ language }) => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-xs font-black uppercase tracking-[0.16em] text-[var(--kt-accent-info)]">
+          {pageCopy.lessons}
+        </h2>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {unit.lessonHighlights.map((lesson, index) => (
+            <div
+              key={`${lesson}-${index}`}
+              className="rounded-[0.9rem] border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 text-sm font-black text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)]"
+            >
+              {index + 1}. {lesson}
+            </div>
+          ))}
         </div>
       </section>
 

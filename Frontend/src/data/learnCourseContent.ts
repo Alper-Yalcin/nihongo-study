@@ -524,6 +524,366 @@ enSections.push({
   ]
 });
 
+interface CanonicalN5UnitBlueprint {
+  title: { tr: string; en: string };
+  summary: { tr: string; en: string };
+  goals: { tr: string[]; en: string[] };
+  vocabulary: string[];
+  grammarFocus: string[];
+  lessonHighlights: string[];
+  dialogue: {
+    text: string;
+    tr: string;
+    en: string;
+  }[];
+}
+
+const canonicalN5Units: CanonicalN5UnitBlueprint[] = [
+  {
+    title: { tr: 'Selamlasma ve sosyal rituel', en: 'Greetings and social rituals' },
+    summary: { tr: 'Eve giris, yemek, okul selami, veda, tesekkur ve ozur kaliplari.', en: 'Entering a home, meals, school greetings, farewells, thanks, and apologies.' },
+    goals: {
+      tr: ['Iliskiye gore selam secmek', 'Ev ve yemek rituel kaliplarini kullanmak', 'Tesekkur ve ozur ayrimini yapmak'],
+      en: ['Choose greetings by relationship', 'Use home and meal ritual phrases', 'Separate thanks from apologies']
+    },
+    vocabulary: ['ohayou', 'konnichiwa', 'konbanwa', 'oyasumi', 'itadakimasu', 'sumimasen'],
+    grammarFocus: ['aisatsu register', 'ohayou gozaimasu vs ohayou', 'sumimasen vs gomen nasai'],
+    lessonHighlights: ['Enter the House', 'Dinner Time', 'Saying Goodnight', 'Greeting Your Teacher', 'Meet Yuki', 'Saying Goodbye', 'Thank and Apologize', 'Checkpoint'],
+    dialogue: [
+      { text: 'Ohayou gozaimasu.', tr: 'Gunaydin.', en: 'Good morning.' },
+      { text: 'Sumimasen. Arigatou gozaimasu.', tr: 'Affedersiniz. Tesekkur ederim.', en: 'Excuse me. Thank you.' }
+    ]
+  },
+  {
+    title: { tr: 'Kendini tanitma', en: 'Self-introduction' },
+    summary: { tr: 'Isim, milliyet, meslek, soru-cevap, aitlik ve olumsuz isim cumleleri.', en: 'Name, nationality, role, questions, possession, and negative noun sentences.' },
+    goals: {
+      tr: ['Watashi wa ... desu kalibiyle tanitmak', 'Desu ka sorularina yanit vermek', 'No ile aitlik kurmak'],
+      en: ['Introduce yourself with watashi wa ... desu', 'Answer desu ka questions', 'Use no for possession']
+    },
+    vocabulary: ['watashi', 'nihon', 'amerika', 'nihonjin', 'gakusei', 'sensei'],
+    grammarFocus: ['N wa N desu', 'N wa N desu ka', 'Noun no Noun', 'N wa N janai desu'],
+    lessonHighlights: ['I Am...', 'My Occupation', 'Asking Questions', 'This and That', 'Whose Is This?', 'Negative Identity', 'Checkpoint'],
+    dialogue: [
+      { text: 'Watashi wa gakusei desu.', tr: 'Ben ogrenciyim.', en: 'I am a student.' },
+      { text: 'Sensei desu ka. Iie, chigaimasu.', tr: 'Ogretmen misiniz? Hayir, degil.', en: 'Are you a teacher? No, that is not right.' }
+    ]
+  },
+  {
+    title: { tr: 'Sayilar ve para', en: 'Numbers and money' },
+    summary: { tr: '1-10000 arasi sayilar, yen fiyatlari, pahali/ucuz tepkileri.', en: 'Numbers from 1 to 10000, yen prices, and cheap/expensive reactions.' },
+    goals: {
+      tr: ['Temel sayilari okumak', 'Fiyat sormak ve soylemek', 'Yen ile alisveris cumlesi kurmak'],
+      en: ['Read core numbers', 'Ask and state prices', 'Build yen shopping sentences']
+    },
+    vocabulary: ['ichi', 'ni', 'san', 'juu', 'hyaku', 'ikura'],
+    grammarFocus: ['cardinal numbers', 'juu / hyaku / sen / man', 'ikura + N wa N en desu'],
+    lessonHighlights: ['Numbers 1-10', 'Tens and Hundreds', 'How Much?', 'Checkpoint'],
+    dialogue: [
+      { text: 'Kore wa ikura desu ka.', tr: 'Bu ne kadar?', en: 'How much is this?' },
+      { text: 'Sanbyaku en desu.', tr: 'Uc yuz yen.', en: 'It is 300 yen.' }
+    ]
+  },
+  {
+    title: { tr: 'Saat, gun ve tarih', en: 'Time, days, and dates' },
+    summary: { tr: 'Saat soyleme, haftanin gunleri, ne zaman ve nereden nereye araligi.', en: 'Telling time, weekdays, when questions, and from-until ranges.' },
+    goals: {
+      tr: ['Ima ... ji desu kalibini kullanmak', 'Gunleri ni ile baglamak', 'Kara-made ile aralik vermek'],
+      en: ['Use ima ... ji desu', 'Attach days with ni', 'Give ranges with kara-made']
+    },
+    vocabulary: ['ima', 'ji', 'fun', 'getsuyoubi', 'kinyoubi', 'kara'],
+    grammarFocus: ['ji / fun desu', 'youbi ni', 'kara-made'],
+    lessonHighlights: ['Telling Time', 'Days of the Week', 'From / Until', 'Schedule Checkpoint'],
+    dialogue: [
+      { text: 'Ima shichi ji desu.', tr: 'Simdi saat yedi.', en: 'It is seven now.' },
+      { text: 'Getsuyoubi kara kinyoubi made desu.', tr: 'Pazartesiden cumaya kadar.', en: 'From Monday to Friday.' }
+    ]
+  },
+  {
+    title: { tr: 'Gunluk aktiviteler ve fiiller', en: 'Daily activities and verbs' },
+    summary: { tr: 'Ru-fiiller, u-fiiller, masu cekimi, nesne ve hedef parcaciklari.', en: 'Ru-verbs, u-verbs, masu forms, objects, and destination particles.' },
+    goals: {
+      tr: ['Masu formunda fiil kurmak', 'O ile nesne isaretlemek', 'Ni/he ile hedef soylemek'],
+      en: ['Use verbs in masu form', 'Mark objects with o', 'State destinations with ni/he']
+    },
+    vocabulary: ['tabemasu', 'mimasu', 'ikimasu', 'kaerimasu', 'gohan', 'gakkou'],
+    grammarFocus: ['ru-verb masu form', 'u-verb masu form', 'Verb + o', 'ni/he destination', 'mashita / masen deshita'],
+    lessonHighlights: ['Ru-Verbs', 'U-Verbs', 'What Do You Eat/Drink?', 'Where Do You Go?', 'When Do You Do It?', 'Negative and Past', 'Checkpoint'],
+    dialogue: [
+      { text: 'Mainichi gakkou ni ikimasu.', tr: 'Her gun okula giderim.', en: 'I go to school every day.' },
+      { text: 'Kinou pan o tabemashita.', tr: 'Dun ekmek yedim.', en: 'I ate bread yesterday.' }
+    ]
+  },
+  {
+    title: { tr: 'Sifatlarla anlatma', en: 'Describing with adjectives' },
+    summary: { tr: 'I-sifat ve na-sifat olumlu, olumsuz, gecmis ve isim oncesi kullanim.', en: 'I-adjectives and na-adjectives in positive, negative, past, and noun-modifying forms.' },
+    goals: {
+      tr: ['I-sifatlari cekimlemek', 'Na-sifatlari desu ile kullanmak', 'Sifat + isim kurmak'],
+      en: ['Conjugate i-adjectives', 'Use na-adjectives with desu', 'Modify nouns with adjectives']
+    },
+    vocabulary: ['ookii', 'chiisai', 'atarashii', 'yasui', 'kirei', 'shizuka'],
+    grammarFocus: ['i-adj + desu', 'i-adj kunai / katta', 'na-adj + desu', 'na-adj janai / deshita', 'adj + noun'],
+    lessonHighlights: ['Basic i-Adjectives', 'Negative and Past i-Adj', 'Ii and Bad', 'Basic na-Adjectives', 'Negative and Past na-Adj', 'Adjective + Noun', 'Checkpoint'],
+    dialogue: [
+      { text: 'Kono hon wa atarashii desu.', tr: 'Bu kitap yenidir.', en: 'This book is new.' },
+      { text: 'Ano mise wa shizuka deshita.', tr: 'Su dukkan sakindi.', en: 'That shop was quiet.' }
+    ]
+  },
+  {
+    title: { tr: 'Varlik ve konum', en: 'Existence and location' },
+    summary: { tr: 'Imasu/arimasu, yer kelimeleri ve insanlar ile nesnelerin konumu.', en: 'Imasu/arimasu, location words, and positions of people and things.' },
+    goals: {
+      tr: ['Canlilar icin imasu kullanmak', 'Nesneler icin arimasu kullanmak', 'Ue/shita/mae gibi konumlari soylemek'],
+      en: ['Use imasu for living things', 'Use arimasu for objects', 'State positions like ue/shita/mae']
+    },
+    vocabulary: ['imasu', 'arimasu', 'neko', 'tsukue', 'ue', 'shita'],
+    grammarFocus: ['N ga imasu', 'N ga arimasu', 'position noun + ni', 'N no soba ni'],
+    lessonHighlights: ['Living Things Exist', 'Things Exist', 'Location Words', 'Where Is the Station?', 'Checkpoint'],
+    dialogue: [
+      { text: 'Tsukue no ue ni hon ga arimasu.', tr: 'Masanin ustunde kitap var.', en: 'There is a book on the desk.' },
+      { text: 'Eki wa konbini no tonari ni arimasu.', tr: 'Istasyon marketin yaninda.', en: 'The station is next to the convenience store.' }
+    ]
+  },
+  {
+    title: { tr: 'Sayaclar', en: 'Counters' },
+    summary: { tr: 'Kisi sayma, yerli sayilar ve mai/hon/satsu/hiki gibi temel sayaclar.', en: 'Counting people, native numbers, and common counters like mai/hon/satsu/hiki.' },
+    goals: {
+      tr: ['Hitori/futari ayrimini bilmek', 'Hitotsu-tou arasi saymak', 'Nesne tipine gore sayac secmek'],
+      en: ['Use hitori/futari correctly', 'Count with hitotsu-tou', 'Choose counters by object type']
+    },
+    vocabulary: ['hitori', 'futari', 'nin', 'hitotsu', 'mai', 'hon'],
+    grammarFocus: ['nin counters', 'native number counters', 'mai / hon / satsu / hiki'],
+    lessonHighlights: ['Counting People', 'Counting Things', 'How Many?', 'Counter Checkpoint'],
+    dialogue: [
+      { text: 'Futari desu.', tr: 'Iki kisiyiz.', en: 'Two people.' },
+      { text: 'Hon o nisatsu kudasai.', tr: 'Iki kitap lutfen.', en: 'Two books, please.' }
+    ]
+  },
+  {
+    title: { tr: 'Alisveris ve para', en: 'Shopping and money' },
+    summary: { tr: 'Kosoado sistemi, burada/orada, isteme, adet ve tam magaza islemi.', en: 'Kosoado, here/there, wanting items, quantities, and full store transactions.' },
+    goals: {
+      tr: ['Kono/sono/ano/dono ile nesne secmek', 'Kudasai ile istemek', 'Hoshii ile istek soylemek'],
+      en: ['Pick items with kono/sono/ano/dono', 'Request with kudasai', 'Express wants with hoshii']
+    },
+    vocabulary: ['kore', 'sore', 'are', 'kudasai', 'hoshii', 'reshiito'],
+    grammarFocus: ['kono/sono/ano/dono + noun', 'koko/soko/asoko/doko', 'N o kudasai', 'N ga hoshii desu'],
+    lessonHighlights: ['This One or That One?', 'Here and There', 'Buying Things', 'I Want This', 'How Many?', 'Full Shopping Scene', 'Checkpoint'],
+    dialogue: [
+      { text: 'Kono pan o hitotsu kudasai.', tr: 'Bu ekmekten bir tane lutfen.', en: 'One of this bread, please.' },
+      { text: 'Kore ga hoshii desu.', tr: 'Bunu istiyorum.', en: 'I want this.' }
+    ]
+  },
+  {
+    title: { tr: 'Rica ve izin', en: 'Requests and permissions' },
+    summary: { tr: 'Te-form, rica, izin, yasak ve okul kurallari.', en: 'Te-form, requests, permission, prohibitions, and school rules.' },
+    goals: {
+      tr: ['Ru ve u fiilleri te-forma cevirmek', 'Te kudasai ile rica etmek', 'Te mo ii / te wa ikemasen ayrimini yapmak'],
+      en: ['Convert ru/u verbs to te-form', 'Request with te kudasai', 'Separate te mo ii from te wa ikemasen']
+    },
+    vocabulary: ['tabete', 'mite', 'itte', 'kaite', 'matte', 'kinshi'],
+    grammarFocus: ['ru-verb te-form', 'u-verb te-form', 'te kudasai', 'te mo ii desu ka', 'te wa ikemasen', 'naide kudasai'],
+    lessonHighlights: ['Te-Form of ru-Verbs', 'Te-Form of u-Verbs', 'Please Do This', 'May I?', 'Do Not Do That', 'Helping a Friend', 'Checkpoint'],
+    dialogue: [
+      { text: 'Mite kudasai.', tr: 'Lutfen bakin.', en: 'Please look.' },
+      { text: 'Koko ni suwatte mo ii desu ka.', tr: 'Buraya oturabilir miyim?', en: 'May I sit here?' }
+    ]
+  },
+  {
+    title: { tr: 'Devam eden durumlar ve aile', en: 'Ongoing actions and family' },
+    summary: { tr: 'Te iru ile su an, durum, giyinme, bilme/yasama ve aile anlatimi.', en: 'Te iru for now, states, wearing, knowing/living, and family descriptions.' },
+    goals: {
+      tr: ['Su anki eylemi te imasu ile anlatmak', 'Giyinme ve yasama durumlarini soylemek', 'Aile uyelerini tanitmak'],
+      en: ['Describe current actions with te imasu', 'State wearing/living conditions', 'Introduce family members']
+    },
+    vocabulary: ['ima', 'shitte imasu', 'sunde imasu', 'chichi', 'haha', 'kazoku'],
+    grammarFocus: ['Verb-te imasu progressive', 'te iru state', 'shitte imasu / shirimasen', 'family humble vs respectful words'],
+    lessonHighlights: ['What Are You Doing Now?', 'What Is She Wearing?', 'Do You Know?', 'My Family', 'Family Lives', 'Describe the Scene', 'Checkpoint'],
+    dialogue: [
+      { text: 'Ima denwa o shite imasu.', tr: 'Simdi telefon ediyorum.', en: 'I am on the phone now.' },
+      { text: 'Haha wa Tokyo ni sunde imasu.', tr: 'Annem Tokyo da yasiyor.', en: 'My mother lives in Tokyo.' }
+    ]
+  },
+  {
+    title: { tr: 'Sevme, isteme ve neden', en: 'Likes, wants, and reasons' },
+    summary: { tr: 'Suki/kirai, jouzu/heta, hobi, tai-form ve kara ile neden.', en: 'Suki/kirai, jouzu/heta, hobbies, tai-form, and reasons with kara.' },
+    goals: {
+      tr: ['Ga suki/kirai kalibini kullanmak', 'Vru koto ga suki demek', 'Tai desu ve kara ile istek aciklamak'],
+      en: ['Use ga suki/kirai', 'Say Vru koto ga suki', 'Explain wants with tai desu and kara']
+    },
+    vocabulary: ['suki', 'kirai', 'jouzu', 'heta', 'shumi', 'kara'],
+    grammarFocus: ['N ga suki/kirai desu', 'N ga jouzu/heta desu', 'Vru koto ga suki', 'verb-stem + tai desu', 'kara reason'],
+    lessonHighlights: ['I Like / I Dislike', 'Good At / Bad At', 'Hobbies', 'I Want To Do...', 'Because', 'Dream Conversation', 'Checkpoint'],
+    dialogue: [
+      { text: 'Eiga ga suki desu.', tr: 'Film severim.', en: 'I like movies.' },
+      { text: 'Nihon ni ikitai desu kara, benkyou shimasu.', tr: 'Japonya ya gitmek istedigim icin calisiyorum.', en: 'I study because I want to go to Japan.' }
+    ]
+  },
+  {
+    title: { tr: 'Karsilastirma ve soru kelimeleri', en: 'Comparisons and question words' },
+    summary: { tr: 'Yori, hou ga, ichiban, dochira, donna ve temel soru kelimeleri.', en: 'Yori, hou ga, ichiban, dochira, donna, and core question words.' },
+    goals: {
+      tr: ['A wa B yori kalibini kurmak', 'Ichiban ile en iyiyi soylemek', 'Soru kelimeleriyle tercih sormak'],
+      en: ['Build A wa B yori comparisons', 'Use ichiban for the best', 'Ask preferences with question words']
+    },
+    vocabulary: ['yori', 'ichiban', 'dochira', 'dare', 'nani', 'donna'],
+    grammarFocus: ['A wa B yori adj desu', 'N no naka de ichiban', 'A to B to dochira', 'question word + verb + ka', 'donna N'],
+    lessonHighlights: ['A is More Than B', 'The Best of All', 'Which Do You Prefer?', 'Who, What, Where', 'What Kind Of?', 'Travel Planning Discussion', 'Checkpoint'],
+    dialogue: [
+      { text: 'Tokyo wa Osaka yori ookii desu.', tr: 'Tokyo Osaka dan daha buyuk.', en: 'Tokyo is bigger than Osaka.' },
+      { text: 'Densha to basu to dochira ga ii desu ka.', tr: 'Tren mi otobus mu daha iyi?', en: 'Which is better, train or bus?' }
+    ]
+  },
+  {
+    title: { tr: 'Ulasim ve plan yapma', en: 'Transportation and planning' },
+    summary: { tr: 'Aracla gitme, rota, sure, mashou/mashou ka, davet ve yon tarifleri.', en: 'Travel by transport, routes, duration, mashou/mashou ka, invitations, and directions.' },
+    goals: {
+      tr: ['De ikimasu ile ulasim araci soylemek', 'Kara-made ile rota kurmak', 'Mashou/masen ka ile plan yapmak'],
+      en: ['State transport with de ikimasu', 'Build routes with kara-made', 'Plan with mashou/masen ka']
+    },
+    vocabulary: ['densha', 'basu', 'eki', 'norikae', 'massugu', 'migi'],
+    grammarFocus: ['transport + de ikimasu', 'place kara-made', 'duration + kakarimasu', 'mashou / mashou ka', 'masen ka invitation', 'direction verbs + te-form'],
+    lessonHighlights: ['Transportation', 'From Here to There', 'How Long Does It Take?', 'Let Us Go!', 'Would You Like To?', 'Getting to the Museum', 'Checkpoint'],
+    dialogue: [
+      { text: 'Densha de eki made ikimasu.', tr: 'Trenle istasyona giderim.', en: 'I go to the station by train.' },
+      { text: 'Issho ni ikimasen ka.', tr: 'Birlikte gitmez miyiz?', en: 'Would you like to go together?' }
+    ]
+  },
+  {
+    title: { tr: 'Yemek, restoran ve siralama', en: 'Food, restaurants, and sequences' },
+    summary: { tr: 'Japon yemekleri, tat sifatlari, restoran siparisi ve te-form zinciri.', en: 'Japanese foods, taste adjectives, restaurant ordering, and te-form chaining.' },
+    goals: {
+      tr: ['Yemek ve tat kelimelerini kullanmak', 'Restoranda nazik siparis vermek', 'Eylemleri te-form ile siralamak'],
+      en: ['Use food and taste words', 'Order politely at restaurants', 'Sequence actions with te-form']
+    },
+    vocabulary: ['sushi', 'raamen', 'oishii', 'karai', 'osusume', 'okaikei'],
+    grammarFocus: ['food noun vocabulary', 'taste i-adjectives', 'N o hitotsu kudasai', 'te-form action sequence', 'mazu / tsugi ni / sorekara'],
+    lessonHighlights: ['Japanese Food Vocab', 'It Is Delicious!', 'Ordering at a Restaurant', 'And Then...', 'My Morning Routine', 'Restaurant Role-play', 'Checkpoint'],
+    dialogue: [
+      { text: 'Raamen o hitotsu kudasai.', tr: 'Bir ramen lutfen.', en: 'One ramen, please.' },
+      { text: 'Shawaa o abite, dekakemasu.', tr: 'Dus alip disari cikarim.', en: 'I shower, then go out.' }
+    ]
+  },
+  {
+    title: { tr: 'Duz form ve N5 finali', en: 'Plain forms and N5 finale' },
+    summary: { tr: 'Duz form, olumsuz duz form, to omoimasu, N5 kanji ve genel tekrar.', en: 'Plain form, plain negatives, to omoimasu, N5 kanji, and full review.' },
+    goals: {
+      tr: ['Duz formu tanimak ve uretmek', 'To omoimasu ile fikir soylemek', 'N5 kapsaminda karma tekrar yapmak'],
+      en: ['Recognize and produce plain forms', 'State opinions with to omoimasu', 'Review the full N5 scope']
+    },
+    vocabulary: ['taberu', 'nomanai', 'to omoimasu', 'tabun', 'kanji', 'N5'],
+    grammarFocus: ['dictionary/plain non-past', 'verb nai-form', 'adj kunai / N janai', 'plain form + to omoimasu', 'core N5 kanji in context', 'full N5 synthesis'],
+    lessonHighlights: ['Plain Form Non-Past', 'Plain Negative', 'I Think That...', 'N5 Grammar Review', 'Kanji Basics', 'One Month in Japan', 'N5 Grand Checkpoint'],
+    dialogue: [
+      { text: 'Ashita ame ga furu to omoimasu.', tr: 'Yarin yagmur yagacak diye dusunuyorum.', en: 'I think it will rain tomorrow.' },
+      { text: 'N5 no mondai o zenbu fukushuu shimasu.', tr: 'Butun N5 sorularini tekrar ederim.', en: 'I review all N5 questions.' }
+    ]
+  }
+];
+
+const canonicalN5SectionMeta = [
+  {
+    title: { tr: 'N5 Temel iletisim', en: 'N5 core communication' },
+    description: { tr: 'Selamlas, kendini tanit, sayi ve zaman cumleleri kur.', en: 'Greet people, introduce yourself, and use numbers and time.' }
+  },
+  {
+    title: { tr: 'N5 cumle kurma', en: 'N5 sentence building' },
+    description: { tr: 'Fiil, sifat, konum ve sayaclarla temel cumleleri genislet.', en: 'Expand core sentences with verbs, adjectives, locations, and counters.' }
+  },
+  {
+    title: { tr: 'N5 sosyal yasam', en: 'N5 social life' },
+    description: { tr: 'Alisveris, rica, izin, aile, tercih ve istekleri kullan.', en: 'Use shopping, requests, permission, family, preferences, and wants.' }
+  },
+  {
+    title: { tr: 'N5 baglama ve final', en: 'N5 integration and finale' },
+    description: { tr: 'Karsilastir, plan yap, restoranda konus ve N5 finalini tamamla.', en: 'Compare, plan, order food, sequence actions, and finish the N5 review.' }
+  }
+];
+
+const canonicalN5Tones: LearnUnitTone[] = [
+  'info',
+  'brand',
+  'warning',
+  'plum',
+  'success',
+  'plum',
+  'info',
+  'warning',
+  'success',
+  'brand',
+  'info',
+  'plum',
+  'warning',
+  'info',
+  'success',
+  'brand'
+];
+
+const canonicalN5Banners = [
+  'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-accent-success)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-brand)_0%,var(--kt-accent-warning)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-accent-success)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-accent-plum)_0%,var(--kt-accent-info)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-accent-success)_0%,var(--kt-brand)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-accent-plum)_0%,var(--kt-accent-sunset)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-brand)_100%)]',
+  'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-brand)_100%)]'
+];
+
+const canonicalN5GlowByTone: Record<LearnUnitTone, string> = {
+  brand: 'rgba(208, 96, 112, 0.3)',
+  warning: 'rgba(255, 186, 90, 0.3)',
+  success: 'rgba(144, 205, 70, 0.3)',
+  plum: 'rgba(176, 120, 236, 0.3)',
+  sunset: 'rgba(255, 144, 108, 0.28)',
+  info: 'rgba(54, 160, 255, 0.3)'
+};
+
+const canonicalN5MascotPoses: LearnCourseUnit['mascotPose'][] = ['wave', 'study', 'cheer', 'study'];
+
+const buildCanonicalN5Sections = (language: AppLanguage): LearnCourseSection[] =>
+  canonicalN5SectionMeta.map((section, sectionIndex) => {
+    const partNumber = sectionIndex + 1;
+    const unitOffset = sectionIndex * 4;
+
+    return {
+      id: `n5-part-${partNumber}`,
+      partNumber,
+      level: 'n5',
+      title: section.title[language],
+      description: section.description[language],
+      bannerClassName: canonicalN5Banners[sectionIndex % canonicalN5Banners.length],
+      units: canonicalN5Units.slice(unitOffset, unitOffset + 4).map((unit, localIndex) => {
+        const unitNumber = unitOffset + localIndex + 1;
+        const tone = canonicalN5Tones[unitNumber - 1];
+
+        return {
+          id: `p${partNumber}-u${unitNumber}`,
+          partNumber,
+          unitNumber,
+          title: unit.title[language],
+          summary: unit.summary[language],
+          goals: unit.goals[language],
+          vocabulary: unit.vocabulary,
+          grammarFocus: unit.grammarFocus,
+          lessonHighlights: unit.lessonHighlights,
+          dialogue: unit.dialogue.map((line, lineIndex) => ({
+            speaker: lineIndex === 0 ? 'A' : 'B',
+            text: line.text,
+            translation: line[language]
+          })),
+          bannerClassName: canonicalN5Banners[(unitNumber - 1) % canonicalN5Banners.length],
+          accentGlow: canonicalN5GlowByTone[tone],
+          tone,
+          mascotPose: canonicalN5MascotPoses[(unitNumber - 1) % canonicalN5MascotPoses.length]
+        };
+      })
+    };
+  });
+
+trSections.splice(0, trSections.length, ...buildCanonicalN5Sections('tr'));
+enSections.splice(0, enSections.length, ...buildCanonicalN5Sections('en'));
+
 const trN4Sections: LearnCourseSection[] = [
   {
     id: 'n4-part-1',

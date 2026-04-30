@@ -102,18 +102,18 @@ const lessonWords: Record<string, LessonWord> = {
 
 const phraseByUnit: Record<string, { japanese: string; romaji: string; tr: string[]; en: string[]; distractors: string[] }> = {
   'p1-u1': {
-    japanese: 'みずとおちゃをください',
-    romaji: 'mizu to ocha o kudasai',
-    tr: ['su', 've', 'çay', 'lütfen'],
-    en: ['water', 'and', 'tea', 'please'],
-    distractors: ['pilav', 'yemek', 'suşi', 'kahve']
+    japanese: 'おはようございます',
+    romaji: 'ohayou gozaimasu',
+    tr: ['günaydın'],
+    en: ['good morning'],
+    distractors: ['kahve', 'pilav', 'küçük', 'Japonya']
   },
   'p1-u2': {
-    japanese: '大きいおちゃです',
-    romaji: 'ookii ocha desu',
-    tr: ['büyük', 'çay'],
-    en: ['big', 'tea'],
-    distractors: ['küçük', 'sakin', 'yeni', 'su']
+    japanese: 'わたしはがくせいです',
+    romaji: 'watashi wa gakusei desu',
+    tr: ['ben', 'öğrenciyim'],
+    en: ['I', 'am a student'],
+    distractors: ['su', 'çay', 'pahalı', 'sakin']
   }
 };
 

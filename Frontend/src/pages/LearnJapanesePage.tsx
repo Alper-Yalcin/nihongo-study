@@ -128,10 +128,10 @@ const pageCopy = {
 
 // x, y: absolute coords within the 1320×1120 inner div
 const unitMarkers: UnitMarker[] = [
-  { id: 'u1', x: 340,   y: 170, badge: 'ÜNİTE 1', title: 'Temel İletişim',        subtitle: 'Selamlaşma ve basit ifadeler',   tone: 'pink'   },
-  { id: 'u2', x: 1700, y: 440, badge: 'ÜNİTE 2', title: 'İsimleri Öğreniyorum',  subtitle: 'Temel isimler ve tanışma',       tone: 'blue'   },
-  { id: 'u3', x: 650,  y: 405, badge: 'ÜNİTE 3', title: 'Günlük Hayat',          subtitle: 'Günlük kelimeler ve konuşmalar', tone: 'purple' },
-  { id: 'u4', x: 650,   y: 740, badge: 'ÜNİTE 4', title: 'Fiiller ve Eylemler',   subtitle: 'Temel fiiller ve cümleler',      tone: 'gray'   }
+  { id: 'u1', x: 340,  y: 170, badge: 'UNITE 1', title: 'Unit 1', subtitle: 'Lessons 1-4 + checkpoint', tone: 'pink' },
+  { id: 'u2', x: 1700, y: 440, badge: 'UNITE 2', title: 'Unit 2', subtitle: 'Lessons 1-4 + checkpoint', tone: 'blue' },
+  { id: 'u3', x: 650,  y: 405, badge: 'UNITE 3', title: 'Unit 3', subtitle: 'Lessons 1-4 + checkpoint', tone: 'purple' },
+  { id: 'u4', x: 650,  y: 740, badge: 'UNITE 4', title: 'Unit 4', subtitle: 'Lessons 1-4 + checkpoint', tone: 'gray' }
 ];
 
 const mobileUnitRanges = [
@@ -143,33 +143,29 @@ const mobileUnitRanges = [
 
 // x, y: node center, absolute within the 1320×1120 inner div
 const lessonNodes: LessonNode[] = [
-  // Ünite 1 — soldan sağa (y≈255)
-  { id: 'n1',  number: 1,  x: 610,  y: 250, title: 'Hiragana 1',      subtitle: 'A - O',          tone: 'pink',   icon: Sprout           },
-  { id: 'n2',  number: 2,  x: 810,  y: 250, title: 'Hiragana 2',      subtitle: 'Ka - Ko',        tone: 'pink',   icon: Sprout           },
-  { id: 'n3',  number: 3,  x: 1010,  y: 250, title: 'Selamlaşma',      subtitle: 'Konnichiwa!',    tone: 'pink',   icon: MessageCircleMore},
-  { id: 'n4',  number: 4,  x: 1210,  y: 250, title: 'Dinleme 1',       subtitle: 'Sesler',         tone: 'pink',   icon: Headphones       },
-  { id: 'n5',  number: 5,  x: 1470,  y: 350, title: 'Kontrol Noktası', subtitle: 'Ünite 1 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n1',  number: 1,  x: 610,  y: 250, title: 'Ders 1', subtitle: 'Giris',       tone: 'pink',   icon: Sprout },
+  { id: 'n2',  number: 2,  x: 810,  y: 250, title: 'Ders 2', subtitle: 'Gelisme',     tone: 'pink',   icon: MessageCircleMore },
+  { id: 'n3',  number: 3,  x: 1010, y: 250, title: 'Ders 3', subtitle: 'Pratik',      tone: 'pink',   icon: Headphones },
+  { id: 'n4',  number: 4,  x: 1210, y: 250, title: 'Ders 4', subtitle: 'Uretim',      tone: 'pink',   icon: Mic },
+  { id: 'n5',  number: 5,  x: 1470, y: 350, title: 'Kontrol', subtitle: 'Unite sonu', tone: 'orange', icon: Star, checkpoint: true },
 
-  // Ünite 2 — sağdan sola (y≈495)
-  { id: 'n6',  number: 6,  x: 1210, y: 475, title: 'İsimler 1',       subtitle: 'Kişiler',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n7',  number: 7,  x: 1420,  y: 575, title: 'İsimler 2',       subtitle: 'Eşyalar',        tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n8',  number: 8,  x: 1610,  y: 575, title: 'İsimler 3',       subtitle: 'Hajimemashite',  tone: 'blue',   icon: LockKeyhole      },
-  { id: 'n9',  number: 9,  x: 1610,  y: 820, title: 'İsimler 4', subtitle: 'Ü',   tone: 'blue', icon: LockKeyhole  },
-  { id: 'n10',  number: 10,  x: 1300,  y: 750, title: 'Kontrol Noktası', subtitle: 'Ünite 2 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n6',  number: 6,  x: 1210, y: 475, title: 'Ders 1', subtitle: 'Giris',       tone: 'blue',   icon: Sprout },
+  { id: 'n7',  number: 7,  x: 1420, y: 575, title: 'Ders 2', subtitle: 'Gelisme',     tone: 'blue',   icon: MessageCircleMore },
+  { id: 'n8',  number: 8,  x: 1610, y: 575, title: 'Ders 3', subtitle: 'Pratik',      tone: 'blue',   icon: Headphones },
+  { id: 'n9',  number: 9,  x: 1610, y: 820, title: 'Ders 4', subtitle: 'Uretim',      tone: 'blue',   icon: Mic },
+  { id: 'n10', number: 10, x: 1300, y: 750, title: 'Kontrol', subtitle: 'Unite sonu', tone: 'orange', icon: Star, checkpoint: true },
 
-  // Ünite 3 — sağdan sola (y≈605)
-  { id: 'n11', number: 11, x: 1010,  y: 685, title: 'Konuşma 1',       subtitle: 'Temel cümleler', tone: 'purple', icon: Mic              },
-  { id: 'n12', number: 12, x: 860,  y: 625, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n13', number: 13, x: 720,  y: 625, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n14', number: 14, x: 570,  y: 625, title: 'Yiyecekler',      subtitle: 'Tabemono',       tone: 'purple', icon: Utensils         },
-  { id: 'n15', number: 15, x: 340,  y: 750, title: 'Kontrol Noktası', subtitle: 'Ünite 3 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n11', number: 11, x: 1010, y: 685, title: 'Ders 1', subtitle: 'Giris',       tone: 'purple', icon: Sprout },
+  { id: 'n12', number: 12, x: 860,  y: 625, title: 'Ders 2', subtitle: 'Gelisme',     tone: 'purple', icon: MessageCircleMore },
+  { id: 'n13', number: 13, x: 720,  y: 625, title: 'Ders 3', subtitle: 'Pratik',      tone: 'purple', icon: Headphones },
+  { id: 'n14', number: 14, x: 570,  y: 625, title: 'Ders 4', subtitle: 'Uretim',      tone: 'purple', icon: Mic },
+  { id: 'n15', number: 15, x: 340,  y: 750, title: 'Kontrol', subtitle: 'Unite sonu', tone: 'orange', icon: Star, checkpoint: true },
 
-  // Ünite 4 — soldan sağa (y≈945)
-  { id: 'n16', number: 16, x: 420,  y: 945, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n17', number: 17, x: 620,  y: 945, title: 'Fiiller 1',       subtitle: 'Taberu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n18', number: 18, x: 820,  y: 945, title: 'Fiiller 2',       subtitle: '~ku',            tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n19', number: 19, x: 1020,  y: 945, title: 'Cümleler 1',      subtitle: '~ desu',         tone: 'gray',   icon: LockKeyhole      },
-  { id: 'n20', number: 20, x: 1220,  y: 945, title: 'Büyük Kontrol',   subtitle: 'Ünite 4 Sonu',   tone: 'orange', icon: Star,  checkpoint: true },
+  { id: 'n16', number: 16, x: 420,  y: 945, title: 'Ders 1', subtitle: 'Giris',       tone: 'gray',   icon: Sprout },
+  { id: 'n17', number: 17, x: 620,  y: 945, title: 'Ders 2', subtitle: 'Gelisme',     tone: 'gray',   icon: MessageCircleMore },
+  { id: 'n18', number: 18, x: 820,  y: 945, title: 'Ders 3', subtitle: 'Pratik',      tone: 'gray',   icon: Headphones },
+  { id: 'n19', number: 19, x: 1020, y: 945, title: 'Ders 4', subtitle: 'Uretim',      tone: 'gray',   icon: Mic },
+  { id: 'n20', number: 20, x: 1220, y: 945, title: 'Kontrol', subtitle: 'Unite sonu', tone: 'orange', icon: Star, checkpoint: true },
 ];
 
 const toneStyles: Record<NodeTone, string> = {
@@ -407,7 +403,7 @@ const UnitMarkerLabel: React.FC<{
       {marker.badge}
     </div>
     <div className="mt-2 flex items-center gap-2">
-      <h2 className={`whitespace-nowrap text-xl font-extrabold tracking-[-0.01em] ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
+      <h2 className={`max-w-[16rem] text-xl font-extrabold leading-tight ${isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.75)]' : 'text-[#1f2b3b]'}`}>{marker.title}</h2>
       {guideHref && (
         <Link
           to={guideHref}
@@ -748,7 +744,7 @@ const MobileLearnRoadmap: React.FC<{
                   {section.marker.badge}
                 </div>
                 <div className="mt-2 flex items-center gap-2">
-                  <h2 className="whitespace-nowrap text-xl font-black tracking-[-0.01em]">{section.marker.title}</h2>
+                  <h2 className="text-xl font-black leading-tight">{section.marker.title}</h2>
                   {section.guideHref && (
                     <Link
                       to={section.guideHref}
@@ -873,9 +869,9 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
     if (units.length === 0) return 0;
     const firstIncompleteIndex = orderedUnitIds.findIndex((id) => !completedSet.has(id));
     if (firstIncompleteIndex === -1) {
-      return Math.max(0, Math.ceil(units.length / NODES_PER_CHAPTER) - 1);
+      return Math.max(0, Math.ceil(units.length / UNIT_GROUPS_PER_CHAPTER) - 1);
     }
-    return Math.floor(firstIncompleteIndex / NODES_PER_CHAPTER);
+    return Math.floor(firstIncompleteIndex / UNIT_GROUPS_PER_CHAPTER);
   }, [units.length, orderedUnitIds, completedSet]);
 
   // Which chapter the user is currently viewing (can differ from activeChapter via nav)
@@ -891,8 +887,8 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
     setViewChapter(0);
   }, [currentLevel]);
 
-  const totalChapters = Math.max(1, Math.ceil(units.length / NODES_PER_CHAPTER));
-  const chapterStart = viewChapter * NODES_PER_CHAPTER;
+  const totalChapters = Math.max(1, Math.ceil(units.length / UNIT_GROUPS_PER_CHAPTER));
+  const chapterStart = viewChapter * UNIT_GROUPS_PER_CHAPTER;
 
   // Slice of course units visible in the current chapter view
   const chapterUnits = useMemo(
@@ -900,24 +896,33 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
     [units, chapterStart]
   );
 
-  // Unit group badge numbers shift by chapter (e.g. chapter 1 → ÜNİTE 5,6,7,8)
-  const groupOffset = viewChapter * UNIT_GROUPS_PER_CHAPTER;
+  // Each chapter shows exactly four units; each marker names one unit.
   const dynamicUnitMarkers = useMemo(
     () =>
-      unitMarkers.map((marker, index) => ({
-        ...marker,
-        badge:
-          language === 'tr'
-            ? `ÜNİTE ${groupOffset + index + 1}`
-            : `UNIT ${groupOffset + index + 1}`
-      })),
-    [groupOffset, language]
+      unitMarkers.map((marker, index) => {
+        const unit = chapterUnits[index];
+        const unitNumber = chapterStart + index + 1;
+
+        return {
+          ...marker,
+          badge:
+            language === 'tr'
+              ? `ÜNİTE ${unitNumber}`
+              : `UNIT ${unitNumber}`,
+          title: unit?.title ?? marker.title,
+          subtitle: language === 'tr' ? '4 ders + kontrol noktası' : '4 lessons + checkpoint'
+        };
+      }),
+    [chapterStart, chapterUnits, language]
   );
 
   const nodeRuntime = useMemo<LessonNodeRuntime[]>(
     () =>
       lessonNodes.map((node, index) => {
-        const unit = chapterUnits[index];
+        const unitIndex = Math.floor(index / NODES_PER_GROUP);
+        const lessonIndex = index % NODES_PER_GROUP;
+        const unit = chapterUnits[unitIndex];
+        const isCheckpoint = lessonIndex === NODES_PER_GROUP - 1;
 
         if (!unit) {
           return {
@@ -928,14 +933,29 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
           };
         }
 
+        const unitState = getUnitState(unit.id);
+        const lessonTitle =
+          isCheckpoint
+            ? language === 'tr' ? 'Kontrol' : 'Checkpoint'
+            : language === 'tr' ? `Ders ${lessonIndex + 1}` : `Lesson ${lessonIndex + 1}`;
+        const lessonSubtitle =
+          isCheckpoint
+            ? language === 'tr' ? 'Ünite sonu' : 'Unit checkpoint'
+            : unit.lessonHighlights[lessonIndex] ?? node.subtitle;
+
         return {
-          node,
+          node: {
+            ...node,
+            number: lessonIndex + 1,
+            title: lessonTitle,
+            subtitle: lessonSubtitle
+          },
           unitId: unit.id,
-          state: getUnitState(unit.id),
+          state: unitState,
           progress: getUnitProgress(unit.id)
         };
       }),
-    [chapterUnits, getUnitProgress, getUnitState]
+    [chapterUnits, getUnitProgress, getUnitState, language]
   );
 
   const mobileSections = useMemo<MobileUnitSection[]>(
@@ -944,7 +964,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         const marker =
           dynamicUnitMarkers.find((item) => item.id === range.markerId) ??
           dynamicUnitMarkers[index];
-        const firstGroupUnit = chapterUnits[range.start];
+        const firstGroupUnit = chapterUnits[Math.floor(range.start / NODES_PER_GROUP)];
 
         return {
           marker,
@@ -964,7 +984,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   }, []);
 
   const canGoPrev = viewChapter > 0;
-  const canGoNext = viewChapter < activeChapter;
+  const canGoNext = viewChapter < totalChapters - 1;
 
   return (
     <div
@@ -1119,8 +1139,8 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
               marker={marker}
               isDark={isDark}
               guideHref={
-                chapterUnits[index * NODES_PER_GROUP]
-                  ? getLearnGuideRoute(chapterUnits[index * NODES_PER_GROUP].id)
+                chapterUnits[index]
+                  ? getLearnGuideRoute(chapterUnits[index].id)
                   : undefined
               }
               guideLabel={copy.unitGuide}
