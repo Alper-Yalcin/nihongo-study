@@ -1,11 +1,6 @@
-/**
- * MeydanPage — Sprint 4 D1-D2'de tamamlanır.
- * Skeleton: 4 mod kart (Speed / Timed / Dōjō / Duel), Speed + Timed
- * çalışır; Dōjō + Duel "yakında" rozetli.
- */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Flame, Sword, Timer, Trophy, Users } from 'lucide-react';
+import { Flame, Swords, Timer, Trophy, Users } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
 import { KanaScript } from '../features/kana/domain/kanaItem';
@@ -19,6 +14,8 @@ import { getCurrentDojoBoss, getDojoChampions } from '../features/meydan/dojoSto
 import { getDanProgress, getKyuFromXp } from '../data/danSystem';
 import { useFeedback } from '../hooks/useFeedback';
 import { getJLearnUserState, subscribeJLearnUserState } from '../features/jlearn/debug/debugStore';
+import { SceneHeader, ScenePanel, SceneShell } from '../components/layout';
+import { DanHall, RewardTrack } from '../components/game';
 
 interface MeydanPageProps {
   language: AppLanguage;
@@ -27,47 +24,47 @@ interface MeydanPageProps {
 const copy = {
   tr: {
     title: 'Meydan',
-    sub: 'Core loop\'a bağlı modlar',
+    sub: 'Rekabet modu, hizli turlar ve dojo boss ilerlemesi ayni arena lobisinde.',
     speed: 'Speed Mode',
-    speedSub: 'Streak +1 — hızlı doğru zinciri',
+    speedSub: 'Hizli dogru zinciri ile streak baskisi.',
     timed: 'Timed Challenge',
-    timedSub: '30 dk × 2 hanabira',
-    dojo: 'Dōjō (Boss)',
-    dojoSub: 'Haftalık ortak boss',
+    timedSub: '30 dakika boyunca x2 hanabira boost.',
+    dojo: 'Dojo Boss',
+    dojoSub: 'Haftalik ortak boss ilerlemesi.',
     duel: 'Duel',
-    duelSub: 'Async 1v1',
-    soon: 'Yakında',
-    activeBoost: 'Aktif',
+    duelSub: 'Async 1v1 modu hazirlaniyor.',
+    soon: 'Yakinda',
+    activeBoost: 'Aktif boost',
     boostRemaining: 'kalan',
-    startSpeed: 'Speed başlat',
-    startTimed: 'Timed çalıştır',
-    boss: 'Bu haftanın boss\'u',
-    leaderboard: 'Dan salonu — aylık ilk 5',
-    mins: 'dk',
-    danLabel: 'Rütbe',
-    nextRank: 'Sonraki'
+    startSpeed: 'Speed baslat',
+    startTimed: 'Timed calistir',
+    boss: 'Bu haftanin bossu',
+    leaderboard: 'Dan salonu / aylik ilk 5',
+    danLabel: 'Rutbe',
+    nextRank: 'Sonraki',
+    progress: 'Dan ilerlemesi'
   },
   en: {
     title: 'Meydan',
-    sub: 'Core-loop connected modes',
+    sub: 'Competitive modes, fast runs, and dojo boss progress in one arena lobby.',
     speed: 'Speed Mode',
-    speedSub: 'Streak +1 — quick correct chain',
+    speedSub: 'Fast correct chains with streak pressure.',
     timed: 'Timed Challenge',
-    timedSub: '30 min × 2 hanabira',
-    dojo: 'Dōjō (Boss)',
-    dojoSub: 'Weekly shared boss',
+    timedSub: 'Activate a 30 minute x2 hanabira boost.',
+    dojo: 'Dojo Boss',
+    dojoSub: 'Weekly shared boss progress.',
     duel: 'Duel',
-    duelSub: 'Async 1v1',
+    duelSub: 'Async 1v1 mode is being prepared.',
     soon: 'Soon',
-    activeBoost: 'Active',
+    activeBoost: 'Active boost',
     boostRemaining: 'remaining',
     startSpeed: 'Start Speed',
     startTimed: 'Activate Timed',
-    boss: 'This week\'s boss',
-    leaderboard: 'Dan hall — monthly top 5',
-    mins: 'min',
+    boss: "This week's boss",
+    leaderboard: 'Dan hall / monthly top 5',
     danLabel: 'Rank',
-    nextRank: 'Next'
+    nextRank: 'Next',
+    progress: 'Dan progress'
   }
 } as const;
 
@@ -77,6 +74,58 @@ const formatMmSs = (ms: number): string => {
   const s = total % 60;
   return `${m}:${String(s).padStart(2, '0')}`;
 };
+
+interface ArenaPortalContentProps {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  action: string;
+  accent: string;
+  locked?: boolean;
+  children?: React.ReactNode;
+}
+
+const ArenaPortalContent: React.FC<ArenaPortalContentProps> = ({
+  icon,
+  title,
+  subtitle,
+  action,
+  accent,
+  locked = false,
+  children
+}) => (
+  <div className="group relative h-full overflow-hidden rounded-[1.6rem] border border-[var(--kt-border-subtle)] px-5 py-5 text-left transition hover:-translate-y-0.5 hover:border-[color:var(--kt-brand)]">
+    <div
+      className="pointer-events-none absolute inset-x-5 top-0 h-1 rounded-full opacity-80"
+      style={{ background: accent }}
+    />
+    <div className="flex items-start gap-4">
+      <span
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white shadow-[0_10px_24px_rgba(0,0,0,0.12)]"
+        style={{ background: accent }}
+      >
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-base font-black uppercase tracking-[0.12em] text-[var(--kt-ink-strong)]">{title}</h3>
+          {locked ? (
+            <span className="rounded-full bg-[var(--kt-surface-muted)] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">
+              {action}
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-2 text-sm leading-6 text-[var(--kt-ink-muted)]">{subtitle}</p>
+      </div>
+    </div>
+    {children ? <div className="mt-4">{children}</div> : null}
+    {!locked ? (
+      <div className="mt-5 text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: accent }}>
+        {action}
+      </div>
+    ) : null}
+  </div>
+);
 
 export const MeydanPage: React.FC<MeydanPageProps> = ({ language }) => {
   const c = copy[language];
@@ -106,205 +155,122 @@ export const MeydanPage: React.FC<MeydanPageProps> = ({ language }) => {
   const champions = useMemo(() => getDojoChampions(language), [language]);
 
   return (
-    <div className="space-y-6 pb-10">
-      <header className="rounded-[1.4rem] border p-5"
-        style={{
-          borderColor: 'color-mix(in srgb, var(--kt-brand) 30%, transparent)',
-          background: 'var(--kt-surface-raised)'
-        }}>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-black text-[var(--kt-ink-strong)]">{c.title}</h1>
-            <p className="text-sm text-[var(--kt-ink-muted)]">{c.sub}</p>
-          </div>
+    <SceneShell variant="wide">
+      <ScenePanel className="overflow-hidden">
+        <SceneHeader
+          eyebrow={language === 'tr' ? 'Arena Lobby' : 'Arena Lobby'}
+          title={c.title}
+          description={c.sub}
+          glyph="競"
+          stats={
+            <>
+              <div
+                className="rounded-full px-4 py-2 text-sm font-black"
+                style={{ background: 'var(--kt-dan-gold-soft)', color: 'var(--kt-dan-ink)' }}
+              >
+                {c.danLabel}: {dan.label}
+              </div>
+              <div className="rounded-full bg-[var(--kt-brand-soft)] px-4 py-2 text-sm font-black text-[var(--kt-brand)]">
+                {Math.round(danProgress.percent)}% / {c.nextRank}: {danProgress.nextLabel}
+              </div>
+            </>
+          }
+        />
+
+        {boost ? (
           <div
-            className="rounded-[0.95rem] border px-3 py-2 text-right"
-            style={{
-              borderColor: 'color-mix(in srgb, var(--kt-dan-gold) 50%, transparent)',
-              background: 'var(--kt-dan-gold-soft)',
-              color: 'var(--kt-dan-ink)'
-            }}
-          >
-            <div className="text-[10px] font-black uppercase tracking-[0.18em]">{c.danLabel}</div>
-            <div className="text-lg font-black">{dan.label}</div>
-            <div className="text-[10px] font-bold tabular-nums opacity-80">
-              {Math.round(danProgress.percent)}% · {c.nextRank}: {danProgress.nextLabel}
-            </div>
-          </div>
-        </div>
-        {boost && (
-          <div
-            className="mt-3 flex items-center justify-between rounded-[0.95rem] px-3 py-2 text-sm"
+            className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-full px-4 py-3 text-sm"
             style={{ background: 'var(--kt-tomoshibi)', color: 'var(--kt-brand-on)' }}
           >
             <span className="font-black">
-              ⚡ ×{boost.multiplier} {c.activeBoost}
+              x{boost.multiplier} {c.activeBoost}
             </span>
             <span className="font-bold tabular-nums">
               {formatMmSs(boost.expiresAt - Date.now())} {c.boostRemaining}
             </span>
           </div>
-        )}
-      </header>
+        ) : null}
 
-      <section className="grid gap-3 sm:grid-cols-2">
-        {/* Speed Mode */}
-        <Link
-          to={`${appShellRoutes.practiceRun}?script=${script}&tab=review&mode=typing`}
-          className="kt-tap-bounce rounded-[1.2rem] border p-4 transition hover:-translate-y-0.5"
-          style={{
-            borderColor: 'color-mix(in srgb, var(--kt-tomoshibi) 38%, transparent)',
-            background: 'color-mix(in srgb, var(--kt-tomoshibi) 8%, var(--kt-surface))',
-            boxShadow: 'var(--kt-shadow)'
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <Flame size={28} style={{ color: 'var(--kt-tomoshibi-strong)' }} />
-            <div>
-              <div className="text-sm font-black uppercase tracking-[0.12em]" style={{ color: 'var(--kt-tomoshibi-strong)' }}>{c.speed}</div>
-              <div className="mt-1 text-sm text-[var(--kt-ink-muted)]">{c.speedSub}</div>
-            </div>
-          </div>
-          <div className="mt-3 text-[11px] font-black uppercase tracking-[0.12em]" style={{ color: 'var(--kt-tomoshibi-strong)' }}>
-            → {c.startSpeed}
-          </div>
-        </Link>
-
-        {/* Timed Challenge */}
-        <button
-          type="button"
-          onClick={() => startTimedXpBoost(2, 30)}
-          className="kt-tap-bounce text-left rounded-[1.2rem] border p-4 transition hover:-translate-y-0.5"
-          style={{
-            borderColor: 'color-mix(in srgb, var(--kt-brand) 38%, transparent)',
-            background: 'color-mix(in srgb, var(--kt-brand) 6%, var(--kt-surface))',
-            boxShadow: 'var(--kt-shadow)'
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <Timer size={28} style={{ color: 'var(--kt-brand)' }} />
-            <div>
-              <div className="text-sm font-black uppercase tracking-[0.12em]" style={{ color: 'var(--kt-brand)' }}>{c.timed}</div>
-              <div className="mt-1 text-sm text-[var(--kt-ink-muted)]">{c.timedSub}</div>
-            </div>
-          </div>
-          <div className="mt-3 text-[11px] font-black uppercase tracking-[0.12em]" style={{ color: 'var(--kt-brand)' }}>
-            → {c.startTimed}
-          </div>
-        </button>
-
-        {/* Dōjō */}
-        <article
-          className="rounded-[1.2rem] border p-4"
-          style={{
-            borderColor: 'var(--kt-border-subtle)',
-            background: 'var(--kt-surface)'
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <Sword size={28} style={{ color: 'var(--kt-accent-plum)' }} />
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-black uppercase tracking-[0.12em]" style={{ color: 'var(--kt-accent-plum)' }}>
-                  {c.dojo}
-                </span>
-              </div>
-              <div className="mt-1 text-sm text-[var(--kt-ink-muted)]">{c.dojoSub}</div>
-            </div>
-          </div>
-          {dojoBoss && (
-            <div className="mt-3">
-              <div className="text-xs font-black uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">{c.boss}</div>
-              <div className="mt-1 text-sm font-bold text-[var(--kt-ink-strong)]">{dojoBoss.name}</div>
-              <div className="mt-2 h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--kt-progress-track)' }}>
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${Math.min(100, dojoBoss.communityProgress * 100)}%`,
-                    background: 'var(--kt-accent-plum)'
-                  }}
-                />
-              </div>
-              <div className="mt-1 text-[10px] tabular-nums text-[var(--kt-ink-subtle)]">
-                {Math.round(dojoBoss.communityProgress * 100)}%
-              </div>
-            </div>
-          )}
-        </article>
-
-        {/* Duel */}
-        <article
-          className="rounded-[1.2rem] border p-4 opacity-95"
-          style={{
-            borderColor: 'var(--kt-border-subtle)',
-            background: 'var(--kt-surface)'
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <Users size={28} style={{ color: 'var(--kt-accent-info)' }} />
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-black uppercase tracking-[0.12em]" style={{ color: 'var(--kt-accent-info)' }}>
-                  {c.duel}
-                </span>
-                <span className="rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.16em]" style={{ background: 'var(--kt-surface-muted)', color: 'var(--kt-ink-muted)' }}>{c.soon}</span>
-              </div>
-              <div className="mt-1 text-sm text-[var(--kt-ink-muted)]">{c.duelSub}</div>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      {/* Dan salonu mini leaderboard (mock) */}
-      <section
-        className="rounded-[1.2rem] border p-4"
-        style={{
-          borderColor: 'var(--kt-border-subtle)',
-          background: 'var(--kt-surface)'
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <Trophy size={18} style={{ color: 'var(--kt-dan-ink)' }} />
-          <h2 className="text-sm font-black uppercase tracking-[0.12em] text-[var(--kt-ink-strong)]">
-            {c.leaderboard}
-          </h2>
+        <div className="mt-6 border-y border-[var(--kt-border-subtle)] py-5">
+          <RewardTrack
+            percent={danProgress.percent}
+            label={c.progress}
+            description={`${feedbackState.hanabira} hanabira / ${streakDays} streak`}
+            milestones={['Kyu', 'Focus', 'Dan', 'Master']}
+          />
         </div>
-        <ul className="mt-3 space-y-1.5">
-          {champions.map((ch, idx) => (
-            <li
-              key={ch.id}
-              className="flex items-center justify-between rounded-[0.7rem] px-2 py-1.5"
-              style={{
-                background: idx === 0 ? 'var(--kt-dan-gold-soft)' : 'var(--kt-surface-muted)'
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black"
-                  style={{
-                    background: idx < 3 ? 'var(--kt-dan-gold)' : 'var(--kt-border)',
-                    color: idx < 3 ? 'var(--kt-dan-ink)' : 'var(--kt-ink-muted)'
-                  }}
-                >
-                  {idx + 1}
-                </span>
-                <span className="text-sm font-bold text-[var(--kt-ink-strong)]">{ch.name}</span>
-                {ch.isYou && (
-                  <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.18em]" style={{ background: 'var(--kt-brand)', color: 'var(--kt-brand-on)' }}>
-                    you
-                  </span>
-                )}
+
+        <div className="grid gap-4 pt-6 lg:grid-cols-2">
+          <Link to={`${appShellRoutes.practiceRun}?script=${script}&tab=review&mode=typing`} className="kt-tap-bounce block">
+            <ArenaPortalContent
+              icon={<Flame size={24} />}
+              title={c.speed}
+              subtitle={c.speedSub}
+              action={c.startSpeed}
+              accent="var(--kt-tomoshibi-strong)"
+            />
+          </Link>
+
+          <button type="button" onClick={() => startTimedXpBoost(2, 30)} className="kt-tap-bounce block text-left">
+            <ArenaPortalContent
+              icon={<Timer size={24} />}
+              title={c.timed}
+              subtitle={c.timedSub}
+              action={c.startTimed}
+              accent="var(--kt-brand)"
+            />
+          </button>
+
+          <ArenaPortalContent
+            icon={<Swords size={24} />}
+            title={c.dojo}
+            subtitle={c.dojoSub}
+            action={dojoBoss ? `${Math.round(dojoBoss.communityProgress * 100)}%` : c.soon}
+            accent="var(--kt-accent-plum)"
+          >
+            {dojoBoss ? (
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">{c.boss}</div>
+                <div className="mt-1 text-sm font-bold text-[var(--kt-ink-strong)]">{dojoBoss.name}</div>
+                <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[var(--kt-progress-track)]">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${Math.min(100, dojoBoss.communityProgress * 100)}%`,
+                      background: 'var(--kt-accent-plum)'
+                    }}
+                  />
+                </div>
               </div>
-              <span className="text-xs font-bold tabular-nums text-[var(--kt-ink-muted)]">
-                花 {ch.hanabira}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+            ) : null}
+          </ArenaPortalContent>
+
+          <ArenaPortalContent
+            icon={<Users size={24} />}
+            title={c.duel}
+            subtitle={c.duelSub}
+            action={c.soon}
+            accent="var(--kt-accent-info)"
+            locked
+          />
+        </div>
+
+        <div className="grid gap-7 pt-7 lg:grid-cols-[minmax(0,1fr)_17rem]">
+          <DanHall title={c.leaderboard} entries={champions} />
+          <aside className="border-t border-[var(--kt-border-subtle)] pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-5">
+            <div className="flex items-center gap-2 text-[var(--kt-dan-ink)]">
+              <Trophy size={18} />
+              <h2 className="text-sm font-black uppercase tracking-[0.14em]">{c.danLabel}</h2>
+            </div>
+            <div className="mt-4 text-4xl font-black text-[var(--kt-ink-strong)]">{dan.label}</div>
+            <p className="mt-2 text-sm leading-6 text-[var(--kt-ink-muted)]">
+              {Math.round(danProgress.percent)}% / {c.nextRank}: {danProgress.nextLabel}
+            </p>
+          </aside>
+        </div>
+      </ScenePanel>
+    </SceneShell>
   );
 };
 
-// Sessizce export — boost manuel tüketim için
 export const consumeMeydanBoost = consumeXpMultiplier;

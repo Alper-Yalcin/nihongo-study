@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ArrowLeft, AudioLines, PenTool, Route, Target } from 'lucide-react';
+import { ArrowLeft, AudioLines, PenTool, Route, Target, Volume2 } from 'lucide-react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { AppLanguage } from '../data/appPreferences';
 import {
@@ -14,13 +14,9 @@ import { getGoogleTranslateKanaAudioSrc } from '../data/kanaAudio';
 import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
 import { getKanaItemById } from '../features/kana/data/kanaInventory';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
-import {
-  Button,
-  Card,
-  CardHeader,
-  StatCard
-} from '../components/ui';
-import { ProgressRing } from '../components/shared/ProgressRing';
+import { Button } from '../components/ui';
+import { GamePageShell, PageHero, SectionBlock } from '../components/layout';
+import { ProgressRing, StatPill } from '../components/shared';
 
 interface KanaItemPageProps {
   language: AppLanguage;
@@ -58,257 +54,210 @@ export const KanaItemPage: React.FC<KanaItemPageProps> = ({
   const confusedItems = (progress?.confusedWith ?? [])
     .map((confusedId) => getKanaItemById(confusedId))
     .filter((entry): entry is NonNullable<ReturnType<typeof getKanaItemById>> => entry !== null);
+  const masteryPercent = Math.round(((progress?.masteryScore ?? 0) / 4) * 100);
 
   if (!item) {
     return <Navigate to={appShellRoutes.home} replace />;
   }
 
   return (
-    <div className="space-y-8 pb-8">
-      <section className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-7 shadow-[var(--kt-shadow-lg)]">
-        <div className="flex flex-wrap items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <div className="rounded-[2rem] border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-8 py-6">
-              <div className="font-jp text-[120px] leading-none text-white">{item.char}</div>
+    <GamePageShell className="space-y-7">
+      <PageHero
+        backgroundGlyph="文字"
+        eyebrow={
+          <div className="text-xs font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
+            {item.script} · {item.sectionTitle}
+          </div>
+        }
+        title={item.romaji.join(', ')}
+        description={
+          language === 'tr'
+            ? 'Karakterin sesini, cizim rehberini, mastery durumunu ve ilgili kelimeleri tek odakta incele.'
+            : 'Review sound, drawing guide, mastery state, and related vocabulary from one focused character stage.'
+        }
+        actions={
+          <Button as="link" to={getKanaEntryRoute(item.script, resolvedScope)} variant="secondary" size="sm">
+            <ArrowLeft size={16} className="mr-2" />
+            {language === 'tr' ? 'Harflere don' : 'Back to letters'}
+          </Button>
+        }
+        visual={
+          <div className="flex flex-wrap items-center justify-end gap-5">
+            <div className="flex h-48 w-48 items-center justify-center">
+              <div className="font-jp text-[9.5rem] leading-none text-[var(--kt-ink-strong)]">{item.char}</div>
             </div>
-            <div>
-              <div className="text-sm font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
-                {item.script}
+            <div className="flex flex-col items-center border-l border-[var(--kt-border-subtle)] pl-5">
+              <ProgressRing
+                value={masteryPercent}
+                size={132}
+                strokeWidth={12}
+                tone="brand"
+                label={<span className="text-sm font-black text-[var(--kt-ink-strong)]">{`${masteryPercent}%`}</span>}
+              />
+              <div className="mt-4 text-center">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">Mastery</div>
+                <div className="mt-1 text-xl font-black text-[var(--kt-ink-strong)]">{progress?.state ?? 'new'}</div>
               </div>
-              <h1 className="mt-3 text-5xl font-black text-white">{item.romaji.join(', ')}</h1>
-              <p className="mt-3 text-base leading-8 text-[var(--kt-ink-muted)]">
-                {language === 'tr'
-                  ? 'Karakter vitrini, mastery ve ilgili baglam kartlari artik tek bir detay sayfasinda.'
-                  : 'The character spotlight, mastery, and related context now live in one detail screen.'}
-              </p>
             </div>
           </div>
-
-          <div className="flex flex-col items-center gap-3">
-            <ProgressRing
-              value={Math.round(((progress?.masteryScore ?? 0) / 4) * 100)}
-              size={112}
-              strokeWidth={10}
-              tone="brand"
-              label={<span className="text-xs font-black text-white">{`${Math.round(((progress?.masteryScore ?? 0) / 4) * 100)}%`}</span>}
-            />
-            <Button
-              as="link"
-              to={getKanaEntryRoute(item.script, resolvedScope)}
-              variant="secondary"
-              size="sm"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              {language === 'tr' ? 'Harflere don' : 'Back to letters'}
-            </Button>
-          </div>
-        </div>
-      </section>
+        }
+      />
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="State" value={progress?.state ?? 'new'} />
-        <StatCard label="Mastery" value={`${progress?.masteryScore ?? 0}/4`} tone="brand" />
-        <StatCard label="Seen" value={progress?.timesSeen ?? 0} />
-        <StatCard label="Wrong" value={progress?.timesWrong ?? 0} tone="danger" />
+        <StatPill label="Mastery" value={`${progress?.masteryScore ?? 0}/4`} tone="brand" />
+        <StatPill label="Typing" value={`${progress?.typingScore ?? 0}/4`} icon={<Target size={16} />} />
+        <StatPill label="Drawing" value={`${progress?.drawingScore ?? 0}/4`} icon={<PenTool size={16} />} />
+        <StatPill label="Listening" value={`${progress?.listeningScore ?? 0}/4`} icon={<AudioLines size={16} />} />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <Card padding="md">
-            <CardHeader
-              title={language === 'tr' ? 'Profile' : 'Profile'}
-              description={
-                language === 'tr'
-                  ? 'Karakter bilgisi ve score dagilimi.'
-                  : 'Character metadata and score distribution.'
-              }
-            />
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <InfoTile label="Section" value={item.sectionTitle} />
-              <InfoTile label="Group" value={item.groupLabel} />
-              <InfoTile
-                label={
-                  <span className="flex items-center gap-2">
-                    <Target size={14} /> Typing
-                  </span>
-                }
-                value={`${progress?.typingScore ?? 0}/4`}
-              />
-              <InfoTile
-                label={
-                  <span className="flex items-center gap-2">
-                    <PenTool size={14} /> Drawing
-                  </span>
-                }
-                value={`${progress?.drawingScore ?? 0}/4`}
-              />
-              <div className="sm:col-span-2">
-                <InfoTile
-                  label={
-                    <span className="flex items-center gap-2">
-                      <AudioLines size={14} /> Listening
-                    </span>
-                  }
-                  value={`${progress?.listeningScore ?? 0}/4`}
-                />
-              </div>
-            </div>
-          </Card>
+        <SectionBlock>
+          <h2 className="text-2xl font-black text-[var(--kt-ink-strong)]">
+            {language === 'tr' ? 'Karakter profili' : 'Character profile'}
+          </h2>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <InfoTile label="Section" value={item.sectionTitle} />
+            <InfoTile label="Group" value={item.groupLabel} />
+            <InfoTile label="Seen" value={progress?.timesSeen ?? 0} />
+            <InfoTile label="Wrong" value={progress?.timesWrong ?? 0} tone="danger" />
+          </div>
 
-          <Card padding="md">
-            <CardHeader
-              title={language === 'tr' ? 'Assets' : 'Assets'}
-              description={
-                language === 'tr'
-                  ? 'Ses ve guide image varsa burada gorunur.'
-                  : 'Audio and guide image appear here when available.'
-              }
-            />
-            <div className="mt-5 space-y-4">
-              {audioSrc && <audio controls src={audioSrc} className="w-full" />}
-              {guideImageSrc ? (
-                <div className="overflow-hidden rounded-[var(--kt-radius)] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-4">
-                  <img src={guideImageSrc} alt={`${item.char} guide`} className="mx-auto h-auto max-h-80 w-auto" />
-                </div>
-              ) : (
-                <div className="rounded-[var(--kt-radius)] border border-dashed border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-6 text-sm text-[var(--kt-ink-muted)]">
-                  {language === 'tr'
-                    ? 'Bu karakter icin guide image bulunmuyor.'
-                    : 'No guide image is available for this character.'}
-                </div>
-              )}
-            </div>
-          </Card>
-      </section>
-
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <Card padding="md">
-            <CardHeader
-              title={language === 'tr' ? 'Confusions' : 'Confusions'}
-              description={
-                language === 'tr'
-                  ? 'Bu karakterle karisan itemler.'
-                  : 'Items commonly confused with this character.'
-              }
-            />
-            <div className="mt-5 flex flex-wrap gap-3">
-              {confusedItems.length === 0 && (
-                <div className="rounded-[var(--kt-radius)] border border-dashed border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4 text-sm text-[var(--kt-ink-muted)]">
+          <div className="mt-6">
+            <h3 className="text-sm font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
+              {language === 'tr' ? 'Karisan karakterler' : 'Confusions'}
+            </h3>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {confusedItems.length === 0 ? (
+                <div className="border-y border-dashed border-[var(--kt-border-subtle)] py-4 text-sm text-[var(--kt-ink-muted)]">
                   {language === 'tr' ? 'Henuz kayitli karisma verisi yok.' : 'No confusion data is recorded yet.'}
                 </div>
-              )}
+              ) : null}
               {confusedItems.map((confusedItem) => (
                 <Link
                   key={confusedItem.id}
                   to={getKanaItemRoute(item.script, confusedItem.id, resolvedScope)}
-                  className="rounded-[var(--kt-radius)] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4 text-center transition-colors hover:bg-[var(--kt-surface)]"
+                  className="px-3 py-2 text-center transition hover:text-[var(--kt-brand)]"
                 >
-                  <div
-                    className="text-3xl text-[var(--kt-ink-strong)]"
-                    style={{ fontFamily: 'var(--font-jp-current)' }}
-                  >
-                    {confusedItem.char}
-                  </div>
-                  <div className="mt-2 text-xs uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">
+                  <div className="font-jp text-4xl text-[var(--kt-ink-strong)]">{confusedItem.char}</div>
+                  <div className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">
                     {confusedItem.romaji.join(', ')}
                   </div>
                 </Link>
               ))}
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {resolvedScope === 'play' ? (
-                <>
-                  <Button as="link" to={getKanaEntryRoute(item.script, 'play')} variant="secondary" size="sm">
-                    <Route size={16} className="mr-2" />
-                    {language === 'tr' ? 'Play akisini ac' : 'Open play flow'}
-                  </Button>
-                  <Button as="link" to={getKanaStatsRoute(item.script, 'play')} variant="secondary" size="sm">
-                    <Target size={16} className="mr-2" />
-                    {language === 'tr' ? 'Play stats ac' : 'Open play stats'}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    as="link"
-                    to={item.script === 'hiragana' ? appShellRoutes.hiraganaReview : appShellRoutes.katakanaReview}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <Route size={16} className="mr-2" />
-                    {language === 'tr' ? 'Review akisini ac' : 'Open review flow'}
-                  </Button>
-                  <Button
-                    as="link"
-                    to={item.script === 'hiragana' ? appShellRoutes.hiraganaWeak : appShellRoutes.katakanaWeak}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <Target size={16} className="mr-2" />
-                    {language === 'tr' ? 'Weak akisini ac' : 'Open weak flow'}
-                  </Button>
-                  <Button
-                    as="link"
-                    to={item.script === 'hiragana' ? appShellRoutes.hiraganaConfusable : appShellRoutes.katakanaConfusable}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <Route size={16} className="mr-2" />
-                    {language === 'tr' ? 'Confusable akisini ac' : 'Open confusable flow'}
-                  </Button>
-                </>
-              )}
-            </div>
-          </Card>
+          </div>
+        </SectionBlock>
 
-          <Card padding="md">
-            <CardHeader
-              title={language === 'tr' ? 'Related words' : 'Related words'}
-              description={
-                language === 'tr'
-                  ? 'Karakteri iceren ilk kelime ornekleri.'
-                  : 'First vocabulary examples containing this character.'
-              }
-            />
-            <div className="mt-5 space-y-3">
-              {areRelatedWordsLoading && (
-                <div className="rounded-[var(--kt-radius)] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4 text-sm text-[var(--kt-ink-muted)]">
-                  {language === 'tr' ? 'Ilgili kelimeler yukleniyor...' : 'Loading related words...'}
+        <SectionBlock className="bg-[linear-gradient(135deg,var(--kt-surface),var(--kt-brand-soft))]">
+          <h2 className="text-2xl font-black text-[var(--kt-ink-strong)]">
+            {language === 'tr' ? 'Ses ve cizim' : 'Sound and drawing'}
+          </h2>
+          <div className="mt-5 space-y-4">
+            {audioSrc ? (
+              <div className="border-b border-[var(--kt-border-subtle)] pb-4">
+                <div className="mb-3 flex items-center gap-2 text-sm font-black text-[var(--kt-ink-strong)]">
+                  <Volume2 size={17} />
+                  Audio
                 </div>
-              )}
-              {relatedWordsError && (
-                <div className="rounded-[var(--kt-radius)] border border-[var(--kt-accent-danger)]/30 bg-[var(--kt-accent-danger-soft)] px-4 py-4 text-sm text-[var(--kt-accent-danger)]">
-                  {relatedWordsError}
-                </div>
-              )}
-              {relatedWords.length === 0 && !areRelatedWordsLoading && (
-                <div className="rounded-[var(--kt-radius)] border border-dashed border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4 text-sm text-[var(--kt-ink-muted)]">
-                  {language === 'tr'
-                    ? 'Bu karakterle iliskili kelime bulunamadi.'
-                    : 'No related words were found for this character.'}
-                </div>
-              )}
-              {relatedWords.map((word) => (
-                <div
-                  key={word.id}
-                  className="rounded-[var(--kt-radius)] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4"
-                >
-                  <div className="text-lg font-semibold text-[var(--kt-ink-strong)]">{word.kana}</div>
-                  <div className="mt-1 text-sm text-[var(--kt-ink-muted)]">{word.romaji}</div>
-                  <div className="mt-2 text-sm text-[var(--kt-ink-muted)]">
-                    {word.meaning ?? word.meanings?.join(', ') ?? '--'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </section>
-    </div>
+                <audio controls src={audioSrc} className="w-full" />
+              </div>
+            ) : null}
+            {guideImageSrc ? (
+              <div className="overflow-hidden py-4">
+                <img src={guideImageSrc} alt={`${item.char} guide`} className="mx-auto h-auto max-h-80 w-auto" />
+              </div>
+            ) : (
+              <div className="border-y border-dashed border-[var(--kt-border-subtle)] py-6 text-sm text-[var(--kt-ink-muted)]">
+                {language === 'tr'
+                  ? 'Bu karakter icin guide image bulunmuyor.'
+                  : 'No guide image is available for this character.'}
+              </div>
+            )}
+          </div>
+        </SectionBlock>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <SectionBlock>
+          <h2 className="text-2xl font-black text-[var(--kt-ink-strong)]">
+            {language === 'tr' ? 'Calisma akislari' : 'Practice routes'}
+          </h2>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {resolvedScope === 'play' ? (
+              <>
+                <Button as="link" to={getKanaEntryRoute(item.script, 'play')} variant="secondary" size="sm">
+                  <Route size={16} className="mr-2" />
+                  {language === 'tr' ? 'Play akisini ac' : 'Open play flow'}
+                </Button>
+                <Button as="link" to={getKanaStatsRoute(item.script, 'play')} variant="secondary" size="sm">
+                  <Target size={16} className="mr-2" />
+                  {language === 'tr' ? 'Play stats ac' : 'Open play stats'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button as="link" to={item.script === 'hiragana' ? appShellRoutes.hiraganaReview : appShellRoutes.katakanaReview} variant="secondary" size="sm">
+                  <Route size={16} className="mr-2" />
+                  {language === 'tr' ? 'Review akisini ac' : 'Open review flow'}
+                </Button>
+                <Button as="link" to={item.script === 'hiragana' ? appShellRoutes.hiraganaWeak : appShellRoutes.katakanaWeak} variant="secondary" size="sm">
+                  <Target size={16} className="mr-2" />
+                  {language === 'tr' ? 'Weak akisini ac' : 'Open weak flow'}
+                </Button>
+                <Button as="link" to={item.script === 'hiragana' ? appShellRoutes.hiraganaConfusable : appShellRoutes.katakanaConfusable} variant="secondary" size="sm">
+                  <Route size={16} className="mr-2" />
+                  {language === 'tr' ? 'Confusable akisini ac' : 'Open confusable flow'}
+                </Button>
+              </>
+            )}
+          </div>
+        </SectionBlock>
+
+        <SectionBlock>
+          <h2 className="text-2xl font-black text-[var(--kt-ink-strong)]">
+            {language === 'tr' ? 'Ilgili kelimeler' : 'Related words'}
+          </h2>
+          <div className="mt-5 space-y-3">
+            {areRelatedWordsLoading ? (
+              <Message text={language === 'tr' ? 'Ilgili kelimeler yukleniyor...' : 'Loading related words...'} />
+            ) : null}
+            {relatedWordsError ? <Message text={relatedWordsError} danger /> : null}
+            {relatedWords.length === 0 && !areRelatedWordsLoading ? (
+              <Message text={language === 'tr' ? 'Bu karakterle iliskili kelime bulunamadi.' : 'No related words were found for this character.'} />
+            ) : null}
+            {relatedWords.map((word) => (
+              <div key={word.id} className="border-b border-[var(--kt-border-subtle)] py-4">
+                <div className="text-lg font-black text-[var(--kt-ink-strong)]">{word.kana}</div>
+                <div className="mt-1 text-sm text-[var(--kt-ink-muted)]">{word.romaji}</div>
+                <div className="mt-2 text-sm text-[var(--kt-ink-muted)]">{word.meaning ?? word.meanings?.join(', ') ?? '--'}</div>
+              </div>
+            ))}
+          </div>
+        </SectionBlock>
+      </section>
+    </GamePageShell>
   );
 };
 
-const InfoTile: React.FC<{ label: React.ReactNode; value: React.ReactNode }> = ({ label, value }) => (
-  <div className="rounded-[var(--kt-radius)] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] px-4 py-4">
-    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">{label}</div>
-    <div className="mt-2 text-lg font-semibold text-[var(--kt-ink-strong)]">{value}</div>
+const InfoTile: React.FC<{ label: React.ReactNode; value: React.ReactNode; tone?: 'default' | 'danger' }> = ({ label, value, tone = 'default' }) => (
+  <div
+    className={`border-b border-[var(--kt-border-subtle)] py-4 ${
+      tone === 'danger' ? 'text-[var(--kt-accent-danger)]' : 'text-[var(--kt-ink-strong)]'
+    }`}
+  >
+    <div className="text-xs font-black uppercase tracking-[0.16em] opacity-70">{label}</div>
+    <div className="mt-2 text-lg font-black">{value}</div>
+  </div>
+);
+
+const Message: React.FC<{ text: string; danger?: boolean }> = ({ text, danger = false }) => (
+  <div
+    className={`border-y py-4 text-sm ${
+      danger
+        ? 'border-[var(--kt-accent-danger)]/30 text-[var(--kt-accent-danger)]'
+        : 'border-dashed border-[var(--kt-border-subtle)] text-[var(--kt-ink-muted)]'
+    }`}
+  >
+    {text}
   </div>
 );

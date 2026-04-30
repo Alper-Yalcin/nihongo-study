@@ -16,14 +16,9 @@ import {
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Badge,
-  Button,
-  Card,
-  Eyebrow,
-  PageHeader,
-  PageSection,
-  PageShell,
-  StatCard
+  Button
 } from '../components/ui';
+import { GamePageShell, PageHero } from '../components/layout';
 import { AppLanguage } from '../data/appPreferences';
 import { appShellRoutes } from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
@@ -1091,17 +1086,17 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
     .filter((item) => item.item !== null);
 
   return (
-    <PageShell>
-      <PageHeader
+    <GamePageShell>
+      <PageHero
+        className="bg-[linear-gradient(135deg,var(--kt-surface-raised),var(--kt-accent-success-soft))]"
+        backgroundGlyph="勝負"
         eyebrow={
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-[var(--kt-radius)] bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]">
-              <Gamepad2 size={20} />
-            </span>
-            <Eyebrow>{copy.eyebrow}</Eyebrow>
+          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--kt-surface-muted)] px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-muted)]">
+              <Gamepad2 size={14} />
+              {copy.eyebrow}
           </div>
         }
-        title={copy.title(scriptTitleMap[script])}
+        title={copy.title(scriptTitleMap[script]).replace('Dashboard', 'Arena')}
         description={copy.subtitle}
         actions={
           <Button as="link" to={overviewRouteByScript[script]} variant="secondary" size="sm">
@@ -1111,57 +1106,41 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
         }
       />
 
-      <PageSection className="mt-8" spacing="default">
+      <div className="mt-6 space-y-6">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
+          <PlayHudMetric
             label={copy.streak}
-            value={
-              <span className="flex items-center gap-2">
-                <Flame size={22} className="text-[var(--kt-accent-warning)]" />
-                {summary.currentStreakDays}
-              </span>
-            }
-            helper={
-              summary.streakRewardDays > 0
-                ? `+${summary.streakRewardDays} ${copy.streakBonus}`
-                : undefined
-            }
+            value={summary.currentStreakDays}
+            helper={summary.streakRewardDays > 0 ? `+${summary.streakRewardDays} ${copy.streakBonus}` : undefined}
+            icon={<Flame size={20} />}
+            tone="warning"
           />
-          <StatCard
+          <PlayHudMetric
             label={copy.totalXp}
-            value={
-              <span className="flex items-center gap-2">
-                <Zap size={22} className="text-[var(--kt-brand)]" />
-                {summary.totalXp}
-              </span>
-            }
-            helper={
-              summary.claimedXp > 0
-                ? `+${summary.claimedXp} XP ${copy.rewardClaimed.toLowerCase()}`
-                : undefined
-            }
+            value={summary.totalXp}
+            helper={summary.claimedXp > 0 ? `+${summary.claimedXp} XP ${copy.rewardClaimed.toLowerCase()}` : undefined}
+            icon={<Zap size={20} />}
+            tone="brand"
           />
-          <StatCard
+          <PlayHudMetric
             label={copy.claimedRewards}
-            value={
-              <span className="flex items-center gap-2">
-                <Award size={22} className="text-[var(--kt-brand)]" />
-                {claimedChallenges}
-              </span>
-            }
+            value={claimedChallenges}
             helper={`${completedChallenges} ${copy.challengeCompleted.toLowerCase()}`}
+            icon={<Award size={20} />}
+            tone="success"
           />
-          <StatCard
+          <PlayHudMetric
             label={copy.lastScore}
             value={latestSummary ? latestSummary.score : '--'}
             helper={!latestSummary ? copy.noScoreYet : undefined}
+            icon={<Trophy size={20} />}
           />
         </div>
 
         {(summary.unlockedThemeIds.length > 0 ||
           summary.unlockedFeatureIds.length > 0 ||
           summary.badges > 0) && (
-          <Card padding="sm" tone="muted">
+          <div className="border-b border-[var(--kt-border-subtle)] pb-3">
             <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--kt-ink-muted)]">
               {summary.unlockedThemeIds.length > 0 && (
                 <Badge tone="brand">{`${copy.unlockedThemes}: ${summary.unlockedThemeIds.length}`}</Badge>
@@ -1171,11 +1150,11 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
               )}
               {summary.badges > 0 && <Badge tone="brand">{`${copy.badges}: ${summary.badges}`}</Badge>}
             </div>
-          </Card>
+          </div>
         )}
 
         {activeRun && currentQuestion && (
-          <section className="space-y-5 rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm md:p-8">
+          <section className="space-y-5 border-t border-[var(--kt-border-subtle)] py-6 md:py-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-2xl font-semibold text-[var(--kt-ink-strong)]">
@@ -1187,7 +1166,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
               </div>
 
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-3 py-2 text-center">
+                <div className="border-l border-[var(--kt-border-subtle)] px-3 py-1 text-center">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
                     {copy.timeLeft}
                   </div>
@@ -1195,7 +1174,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     {Math.ceil(timeLeftMs / 1000)}s
                   </div>
                 </div>
-                <div className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-3 py-2 text-center">
+                <div className="border-l border-[var(--kt-border-subtle)] px-3 py-1 text-center">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
                     {copy.score}
                   </div>
@@ -1203,7 +1182,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     {activeRun.score}
                   </div>
                 </div>
-                <div className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-3 py-2 text-center">
+                <div className="border-l border-[var(--kt-border-subtle)] px-3 py-1 text-center">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
                     {copy.combo}
                   </div>
@@ -1223,7 +1202,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
               />
             </div>
 
-            <div className="rounded-3xl border border-[var(--kt-border)] bg-gradient-to-br from-slate-50 to-white p-6">
+            <div className="py-6">
               {currentQuestion.kind === 'kana-match' && (
                 <>
                   <div className="text-center text-sm font-semibold uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
@@ -1252,7 +1231,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     key={option}
                     type="button"
                     onClick={() => onAnswer(option)}
-                    className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 text-left text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+                    className="rounded-full bg-[var(--kt-surface-muted)] px-4 py-3 text-left text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                   >
                     {option}
                   </button>
@@ -1263,7 +1242,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
             <button
               type="button"
               onClick={stopRun}
-              className="inline-flex items-center rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:bg-[var(--kt-surface-muted)]"
+              className="inline-flex items-center rounded-full bg-[var(--kt-surface-muted)] px-4 py-2 text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:bg-[var(--kt-brand-soft)]"
             >
               <Hourglass size={16} className="mr-2" />
               {copy.finishNow}
@@ -1272,7 +1251,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
         )}
 
         {!activeRun && latestResult && (
-          <section className="space-y-5 rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm md:p-8">
+          <section className="space-y-5 border-t border-emerald-200 py-6 md:py-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
@@ -1295,19 +1274,19 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-2xl border border-white/70 bg-[var(--kt-surface)] p-4">
+              <div className="border-l border-emerald-200 px-4 py-2">
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{copy.score}</div>
                 <div className="mt-2 text-2xl font-bold text-[var(--kt-ink-strong)]">{latestResult.session.score}</div>
               </div>
-              <div className="rounded-2xl border border-white/70 bg-[var(--kt-surface)] p-4">
+              <div className="border-l border-emerald-200 px-4 py-2">
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{copy.accuracy}</div>
                 <div className="mt-2 text-2xl font-bold text-[var(--kt-ink-strong)]">{latestResult.session.accuracy}%</div>
               </div>
-              <div className="rounded-2xl border border-white/70 bg-[var(--kt-surface)] p-4">
+              <div className="border-l border-emerald-200 px-4 py-2">
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{copy.comboMax}</div>
                 <div className="mt-2 text-2xl font-bold text-[var(--kt-ink-strong)]">{latestResult.session.comboMax}</div>
               </div>
-              <div className="rounded-2xl border border-white/70 bg-[var(--kt-surface)] p-4">
+              <div className="border-l border-emerald-200 px-4 py-2">
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{copy.averageAnswer}</div>
                 <div className="mt-2 text-2xl font-bold text-[var(--kt-ink-strong)]">{latestAverageAnswerMs}ms</div>
               </div>
@@ -1325,7 +1304,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
               <button
                 type="button"
                 onClick={() => setLatestResult(null)}
-                className="inline-flex items-center justify-center rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 py-3 text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:bg-[var(--kt-surface-muted)]"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--kt-surface-muted)] px-5 py-3 text-sm font-semibold text-[var(--kt-ink)] transition-colors hover:bg-[var(--kt-brand-soft)]"
               >
                 {copy.returnToDashboard}
               </button>
@@ -1336,25 +1315,25 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
         {!activeRun && (
           <>
             {runError && (
-              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <div className="border-y border-rose-200 py-3 text-sm text-rose-700">
                 {runError}
               </div>
             )}
 
             {showWordPoolLoading && (
-              <div className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-4 py-3 text-sm text-[var(--kt-ink-muted)]">
+              <div className="border-y border-[var(--kt-border-subtle)] py-3 text-sm text-[var(--kt-ink-muted)]">
                 {copy.loadingWords}
               </div>
             )}
 
             {hasWordPoolError && (
-              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <div className="border-y border-rose-200 py-3 text-sm text-rose-700">
                 {copy.wordPoolError}
               </div>
             )}
 
             <section className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
+              <div className="border-t border-[var(--kt-border-subtle)] py-6">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-semibold text-[var(--kt-ink-strong)]">{copy.dailyChallenges}</h2>
@@ -1384,7 +1363,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     const periodKey = item.progress.periodKey || getChallengePeriodKey(item.challenge.resetPeriod, new Date());
                     const challengeClaimed = isChallengeClaimed(item.challenge.id, periodKey);
                     return (
-                      <div key={item.challenge.id} className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] p-3">
+                      <div key={item.challenge.id} className="border-b border-[var(--kt-border-subtle)] py-3">
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <div className="text-sm font-semibold text-[var(--kt-ink-strong)]">{item.challenge.title}</div>
@@ -1408,7 +1387,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                               onClick={() =>
                                 handleClaimReward(item.challenge, periodKey, item.progress.completed)
                               }
-                              className="inline-flex items-center rounded-lg border border-emerald-200 bg-[var(--kt-surface)] px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-[var(--kt-border)] disabled:text-[var(--kt-ink-subtle)]"
+                              className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:text-[var(--kt-ink-subtle)]"
                             >
                               {challengeClaimed ? copy.rewardClaimed : copy.claimReward}
                             </button>
@@ -1426,7 +1405,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
+              <div className="border-t border-[var(--kt-border-subtle)] py-6">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-semibold text-[var(--kt-ink-strong)]">{copy.weeklyChallenges}</h2>
@@ -1456,7 +1435,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     const periodKey = item.progress.periodKey || getChallengePeriodKey(item.challenge.resetPeriod, new Date());
                     const challengeClaimed = isChallengeClaimed(item.challenge.id, periodKey);
                     return (
-                      <div key={item.challenge.id} className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] p-3">
+                      <div key={item.challenge.id} className="border-b border-[var(--kt-border-subtle)] py-3">
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <div className="text-sm font-semibold text-[var(--kt-ink-strong)]">{item.challenge.title}</div>
@@ -1480,7 +1459,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                               onClick={() =>
                                 handleClaimReward(item.challenge, periodKey, item.progress.completed)
                               }
-                              className="inline-flex items-center rounded-lg border border-emerald-200 bg-[var(--kt-surface)] px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-[var(--kt-border)] disabled:text-[var(--kt-ink-subtle)]"
+                              className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:text-[var(--kt-ink-subtle)]"
                             >
                               {challengeClaimed ? copy.rewardClaimed : copy.claimReward}
                             </button>
@@ -1499,7 +1478,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
+            <section className="border-t border-[var(--kt-border-subtle)] py-6">
               <div className="grid gap-5 lg:grid-cols-2">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--kt-ink-subtle)]">
@@ -1519,7 +1498,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                           className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
                             isActive
                               ? 'border-emerald-300 bg-emerald-100 text-emerald-700'
-                              : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] hover:border-[var(--kt-border)]'
+                              : 'border-transparent text-[var(--kt-ink-muted)] hover:bg-[var(--kt-surface-muted)]'
                           } disabled:cursor-not-allowed disabled:opacity-40`}
                         >
                           {contentTypeLabels[language][contentType]}
@@ -1542,7 +1521,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                         className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
                           selectedDifficulty === difficulty
                             ? 'border-sky-300 bg-sky-100 text-sky-700'
-                            : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] hover:border-[var(--kt-border)]'
+                            : 'border-transparent text-[var(--kt-ink-muted)] hover:bg-[var(--kt-surface-muted)]'
                         }`}
                       >
                         {difficultyLabels[language][difficulty]}
@@ -1561,7 +1540,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     {copy.miniGamesDescription}
                   </p>
                 </div>
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+                <div className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
                   {`${copy.recommendedGame}: ${playGameDefinitionMap[recommendedGameId].title}`}
                 </div>
               </div>
@@ -1578,10 +1557,10 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                   return (
                     <article
                       key={definition.id}
-                      className={`rounded-3xl border bg-[var(--kt-surface)] p-5 shadow-sm transition-colors ${
+                      className={`border-b p-5 transition-colors ${
                         highlightedGameId === definition.id
-                          ? 'border-emerald-300 ring-2 ring-emerald-100'
-                          : 'border-[var(--kt-border)]'
+                          ? 'border-emerald-300 bg-emerald-50/45'
+                          : 'border-[var(--kt-border-subtle)]'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -1600,7 +1579,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                       </div>
 
                       <div className="mt-4 grid gap-2 text-xs text-[var(--kt-ink-subtle)] sm:grid-cols-2">
-                        <div className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-3 py-2">
+                        <div className="border-l border-[var(--kt-border-subtle)] px-3 py-2">
                           <div className="font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">
                             {copy.contentPool}
                           </div>
@@ -1608,7 +1587,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                             {definition.contentType.map((contentType) => contentTypeLabels[language][contentType]).join(', ')}
                           </div>
                         </div>
-                        <div className="rounded-xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-3 py-2">
+                        <div className="border-l border-[var(--kt-border-subtle)] px-3 py-2">
                           <div className="font-semibold uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">
                             {copy.bestScore}
                           </div>
@@ -1643,9 +1622,9 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-sm">
+            <section className="border-t border-[var(--kt-border-subtle)] py-6">
               {(rewardRegistry.unlockedThemeIds.length > 0 || rewardRegistry.unlockedFeatureIds.length > 0) && (
-                <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3">
+                <div className="mb-5 border-y border-violet-200 py-3">
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700">
                     {copy.unlockedRewards}
                   </div>
@@ -1653,7 +1632,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     {rewardRegistry.unlockedThemeIds.map((themeId) => (
                       <span
                         key={themeId}
-                        className="rounded-full border border-violet-200 bg-[var(--kt-surface)] px-3 py-1 text-xs font-semibold text-violet-700"
+                        className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700"
                       >
                         {themeId}
                       </span>
@@ -1661,7 +1640,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     {rewardRegistry.unlockedFeatureIds.map((featureId) => (
                       <span
                         key={featureId}
-                        className="rounded-full border border-indigo-200 bg-[var(--kt-surface)] px-3 py-1 text-xs font-semibold text-indigo-700"
+                        className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700"
                       >
                         {featureId}
                       </span>
@@ -1699,7 +1678,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                   {weakGroups.length > 0 && (
                     <div className="mt-5 grid gap-2 md:grid-cols-3">
                       {weakGroups.map((group) => (
-                        <div key={group.groupId} className="rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-3 py-3">
+                        <div key={group.groupId} className="border-l border-[var(--kt-border-subtle)] px-3 py-3">
                           <div className="text-sm font-semibold text-slate-800">{group.groupLabel}</div>
                           <div className="mt-1 text-xs text-[var(--kt-ink-subtle)]">{group.sectionTitle}</div>
                           <div className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-rose-600">
@@ -1720,7 +1699,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     <button
                       type="button"
                       onClick={() => startGame('kana-match')}
-                      className="flex w-full items-center justify-between rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-4 py-3 text-left transition-colors hover:border-emerald-200 hover:bg-emerald-50"
+                      className="flex w-full items-center justify-between border-b border-[var(--kt-border-subtle)] py-3 text-left transition-colors hover:text-emerald-700"
                     >
                       <span className="text-sm font-semibold text-slate-800">{copy.suggestionKana}</span>
                       <Target size={16} className="text-emerald-600" />
@@ -1728,7 +1707,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     <button
                       type="button"
                       onClick={() => startGame('meaning-match')}
-                      className="flex w-full items-center justify-between rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-4 py-3 text-left transition-colors hover:border-sky-200 hover:bg-sky-50"
+                      className="flex w-full items-center justify-between border-b border-[var(--kt-border-subtle)] py-3 text-left transition-colors hover:text-sky-700"
                     >
                       <span className="text-sm font-semibold text-slate-800">{copy.suggestionMeaning}</span>
                       <Trophy size={16} className="text-sky-600" />
@@ -1736,7 +1715,7 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
                     <button
                       type="button"
                       onClick={() => startGame(recommendedGameId, { difficulty: 'hard' })}
-                      className="flex w-full items-center justify-between rounded-2xl border border-[var(--kt-border)] bg-[var(--kt-surface-muted)] px-4 py-3 text-left transition-colors hover:border-amber-200 hover:bg-amber-50"
+                      className="flex w-full items-center justify-between border-b border-[var(--kt-border-subtle)] py-3 text-left transition-colors hover:text-amber-700"
                     >
                       <span className="text-sm font-semibold text-slate-800">{copy.suggestionChallenge}</span>
                       <Zap size={16} className="text-amber-600" />
@@ -1747,7 +1726,35 @@ export const KanaPlayPage: React.FC<KanaPlayPageProps> = ({ script, language }) 
             </section>
           </>
         )}
-      </PageSection>
-    </PageShell>
+      </div>
+    </GamePageShell>
+  );
+};
+
+const PlayHudMetric: React.FC<{
+  label: string;
+  value: React.ReactNode;
+  helper?: string;
+  icon: React.ReactNode;
+  tone?: 'default' | 'brand' | 'success' | 'warning';
+}> = ({ label, value, helper, icon, tone = 'default' }) => {
+  const toneClass =
+    tone === 'brand'
+      ? 'bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]'
+      : tone === 'success'
+        ? 'bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
+        : tone === 'warning'
+          ? 'bg-[var(--kt-accent-warning-soft)] text-[var(--kt-accent-warning)]'
+          : 'text-[var(--kt-ink-strong)]';
+
+  return (
+    <article className={`px-4 py-3 ${toneClass}`}>
+      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] opacity-75">
+        {icon}
+        {label}
+      </div>
+      <div className="mt-1 text-3xl font-black tabular-nums">{value}</div>
+      {helper ? <div className="mt-1 text-xs font-semibold opacity-70">{helper}</div> : null}
+    </article>
   );
 };

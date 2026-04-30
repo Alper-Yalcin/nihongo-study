@@ -1,8 +1,14 @@
 export { AppShell } from './AppShell';
 export { DailyQuestsCard } from './DailyQuestsCard';
+export { GamePageShell } from './GamePageShell';
+export { SceneHeader } from './SceneHeader';
+export { ScenePanel } from './ScenePanel';
+export { SceneShell } from './SceneShell';
 export { LeftNav } from './LeftNav';
 export { MobileBottomBar } from './MobileBottomBar';
+export { PageHero } from './PageHero';
 export { RightRail } from './RightRail';
+export { SectionBlock } from './SectionBlock';
 export { TopNav } from './TopNav';
 export { ScriptSwitcher } from './ScriptSwitcher';
 export { StatsStrip } from './StatsStrip';

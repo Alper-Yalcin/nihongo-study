@@ -1,16 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Clock3, Gift, Sparkles } from 'lucide-react';
-import { Card } from '../components/ui';
 import { AppLanguage } from '../data/appPreferences';
-import {
-  evaluateChallengeProgress,
-  getPlayChallenges
-} from '../features/play/challenges/challengeEngine';
+import { evaluateChallengeProgress, getPlayChallenges } from '../features/play/challenges/challengeEngine';
 import { usePlayProgressStore } from '../features/play/progress/usePlayProgressStore';
-import { QuestCard } from '../components/quests/QuestCard';
 import { awardBonusHanabira } from '../hooks/useFeedback';
 import { playKoto } from '../components/feedback/sounds';
 import { getSeasonInfo } from '../features/quests/seasonalQuest';
+import { SceneHeader, ScenePanel, SceneShell } from '../components/layout';
+import { MissionBoard, QuestRow, RewardTrack } from '../components/game';
+import { StatPill } from '../components/shared';
 
 interface QuestsPageProps {
   language: AppLanguage;
@@ -28,7 +26,11 @@ const getHoursToReset = () => {
 const tryVibrate = (pattern: number | number[]): void => {
   if (typeof navigator === 'undefined') return;
   const nav = navigator as unknown as { vibrate?: (p: number | number[]) => boolean };
-  try { nav.vibrate?.(pattern); } catch { /* yok say */ }
+  try {
+    nav.vibrate?.(pattern);
+  } catch {
+    // Device vibration is optional.
+  }
 };
 
 interface NextRewardPreview {
@@ -37,11 +39,7 @@ interface NextRewardPreview {
 }
 
 export const QuestsPage: React.FC<QuestsPageProps> = ({ language }) => {
-  const {
-    runs,
-    isChallengeClaimed,
-    claimChallengeReward
-  } = usePlayProgressStore(localUserId);
+  const { runs, isChallengeClaimed, claimChallengeReward } = usePlayProgressStore(localUserId);
   const quests = useMemo(
     () =>
       evaluateChallengeProgress({
@@ -68,9 +66,7 @@ export const QuestsPage: React.FC<QuestsPageProps> = ({ language }) => {
   const claimAll = () => {
     let claimedCount = 0;
     [...daily, ...weekly].forEach((item) => {
-      const claimable =
-        item.progress.completed &&
-        !isChallengeClaimed(item.challenge.id, item.progress.periodKey);
+      const claimable = item.progress.completed && !isChallengeClaimed(item.challenge.id, item.progress.periodKey);
       if (claimable) {
         claim(item.challenge.id, item.progress.periodKey, item.challenge.rewardValue, item.challenge.rewardType);
         claimedCount += 1;
@@ -90,220 +86,138 @@ export const QuestsPage: React.FC<QuestsPageProps> = ({ language }) => {
   const anyClaimable = [...daily, ...weekly].some(
     (item) => item.progress.completed && !isChallengeClaimed(item.challenge.id, item.progress.periodKey)
   );
+  const dailyComplete = daily.filter((item) => item.progress.completed).length;
+  const weeklyComplete = weekly.filter((item) => item.progress.completed).length;
+
+  const renderQuestRows = (items: typeof daily, accent: string) =>
+    items.map((item) => {
+      const claimed = isChallengeClaimed(item.challenge.id, item.progress.periodKey);
+      const claimable = item.progress.completed && !claimed;
+
+      return (
+        <QuestRow
+          key={item.challenge.id}
+          title={item.challenge.title}
+          reward={`${item.challenge.rewardValue} ${item.challenge.rewardType.toUpperCase()}`}
+          progress={item.progress.progress}
+          goal={item.challenge.goalValue}
+          completed={item.progress.completed}
+          claimed={claimed}
+          claimLabel={language === 'tr' ? 'Al' : 'Claim'}
+          claimedLabel={language === 'tr' ? 'Alindi' : 'Claimed'}
+          accent={accent}
+          onClaim={
+            claimable
+              ? () => claim(item.challenge.id, item.progress.periodKey, item.challenge.rewardValue, item.challenge.rewardType)
+              : undefined
+          }
+        />
+      );
+    });
 
   return (
-    <div className="space-y-6 pb-10">
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <Card padding="lg" className="bg-[linear-gradient(135deg,var(--kt-accent-plum)_0%,var(--kt-accent-info)_100%)] text-white">
-          <h1 className="text-3xl font-black">{language === 'tr' ? 'Görevler' : 'Quests'}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85">
-            {language === 'tr'
-              ? 'Günlük → haftalık → sezonluk üç katman. Hazır olanları topla, sırada ne var gör.'
-              : 'Daily → weekly → seasonal three layers. Claim ready ones, see what is next.'}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+    <SceneShell variant="wide">
+      <ScenePanel className="overflow-hidden">
+        <SceneHeader
+          eyebrow={language === 'tr' ? 'Gorev Panosu' : 'Mission Board'}
+          title={language === 'tr' ? 'Bugunun Gorevleri' : "Today's Quests"}
+          description={
+            language === 'tr'
+              ? 'Gunluk hedefleri temizle, haftalik yolu ilerlet ve sezon odullerini ac.'
+              : 'Clear daily goals, move the weekly path, and unlock seasonal rewards.'
+          }
+          glyph="任務"
+          actions={
             <button
               type="button"
               onClick={claimAll}
               disabled={!anyClaimable}
-              className={`kt-tap-bounce inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.14em] transition disabled:opacity-50 ${
+              className={`kt-tap-bounce inline-flex items-center gap-2 rounded-full bg-[var(--kt-brand)] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-brand-on)] transition disabled:cursor-not-allowed disabled:opacity-45 ${
                 anyClaimable ? 'kt-claim-anticipation' : ''
               }`}
-              style={{
-                background: 'rgba(255,255,255,0.18)',
-                color: '#fff',
-                border: '1.5px solid rgba(255,255,255,0.45)'
-              }}
             >
               <Gift size={14} />
-              <span>{language === 'tr' ? 'Tümünü Al' : 'Claim All'}</span>
+              <span>{language === 'tr' ? 'Tumunu al' : 'Claim all'}</span>
             </button>
-            {nextPreview.count > 0 && (
-              <span className="text-xs font-semibold text-white/80">
-                {language === 'tr'
-                  ? `Sonraki ödüller: +${nextPreview.totalRemaining} 花 · ${nextPreview.count} görev kaldı`
-                  : `Next rewards: +${nextPreview.totalRemaining} 花 · ${nextPreview.count} quests left`}
-              </span>
-            )}
-          </div>
-        </Card>
+          }
+          stats={
+            <>
+              <StatPill label={language === 'tr' ? 'Gunluk' : 'Daily'} value={`${dailyComplete}/${daily.length}`} tone="warning" />
+              <StatPill label={language === 'tr' ? 'Haftalik' : 'Weekly'} value={`${weeklyComplete}/${weekly.length}`} tone="info" />
+              <StatPill label={language === 'tr' ? 'Kalan' : 'Left'} value={nextPreview.count} tone="brand" />
+            </>
+          }
+          visual={
+            <div className="min-w-36 border-l border-[var(--kt-border-subtle)] pl-5">
+              <div className="flex items-center gap-2 text-[var(--kt-ink-muted)]">
+                <Clock3 size={17} />
+                <span className="text-xs font-black uppercase tracking-[0.14em]">
+                  {language === 'tr' ? 'Reset' : 'Reset'}
+                </span>
+              </div>
+              <div className="mt-2 text-4xl font-black text-[var(--kt-ink-strong)]">{getHoursToReset()}h</div>
+            </div>
+          }
+        />
 
-        <Card padding="lg">
-          <div className="flex items-center gap-3">
-            <Clock3 size={18} className="text-[var(--kt-accent-warning)]" />
-            <h2 className="text-lg font-black uppercase tracking-[0.12em] text-[var(--kt-ink-strong)]">
-              {language === 'tr' ? 'Günlük yenileme' : 'Daily reset'}
-            </h2>
+        <div className="mt-6 border-y border-[var(--kt-border-subtle)] py-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-[var(--kt-dan-ink)]">
+              <Sparkles size={16} />
+              <h2 className="text-sm font-black uppercase tracking-[0.14em]">
+                {language === 'tr' ? 'Sezon yolu' : 'Season path'} / {season.label} {season.yearLabel}
+              </h2>
+            </div>
+            <div className="text-sm font-black text-[var(--kt-dan-ink)]">
+              {language === 'tr'
+                ? `${season.daysElapsed}. gun / ${season.daysRemaining} gun kaldi`
+                : `Day ${season.daysElapsed} / ${season.daysRemaining} days left`}
+            </div>
           </div>
-          <div className="mt-2 text-4xl font-black text-[var(--kt-ink-strong)]">{`${getHoursToReset()}h`}</div>
-          <p className="mt-2 text-xs leading-6 text-[var(--kt-ink-muted)]">
-            {language === 'tr'
-              ? 'Günlük görevler gece yarısı sıfırlanır.'
-              : 'Daily quests reset at midnight.'}
-          </p>
-        </Card>
-      </section>
-
-      {/* Sezon — 90 günlük */}
-      <section
-        className="rounded-[1.4rem] border p-5"
-        style={{
-          borderColor: 'color-mix(in srgb, var(--kt-dan-gold) 36%, transparent)',
-          background: 'var(--kt-dan-gold-soft)',
-          color: 'var(--kt-dan-ink)'
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <Sparkles size={16} />
-          <h2 className="text-sm font-black uppercase tracking-[0.14em]">
-            {language === 'tr' ? 'Sezon' : 'Season'} · {season.label} {season.yearLabel}
-          </h2>
-        </div>
-        <div className="mt-2 text-base font-bold">
-          {language === 'tr'
-            ? `${season.daysElapsed}. gün · ${season.daysRemaining} gün kaldı`
-            : `Day ${season.daysElapsed} · ${season.daysRemaining} days left`}
-        </div>
-        <div className="mt-3 h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(0,0,0,0.08)' }}>
-          <div
-            className="h-full rounded-full transition-all"
-            style={{ width: `${season.percent}%`, background: 'var(--kt-dan-gold)' }}
+          <RewardTrack
+            percent={season.percent}
+            label={language === 'tr' ? 'Reward path' : 'Reward path'}
+            description={
+              nextPreview.count > 0
+                ? language === 'tr'
+                  ? `Siradaki oduller: +${nextPreview.totalRemaining} hanabira / ${nextPreview.count} gorev kaldi`
+                  : `Next rewards: +${nextPreview.totalRemaining} hanabira / ${nextPreview.count} quests left`
+                : language === 'tr'
+                  ? 'Tum gorevler tamamlandi.'
+                  : 'All available quests are complete.'
+            }
           />
         </div>
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          {(['🌸', '🍵', '🎴', '⛩️'] as const).map((emoji, i) => {
-            const unlocked = season.percent > i * 25;
-            return (
-              <div
-                key={emoji}
-                className="flex h-12 items-center justify-center rounded-[0.7rem]"
-                style={{
-                  background: unlocked ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.04)',
-                  fontSize: '1.4rem',
-                  opacity: unlocked ? 1 : 0.35
-                }}
-                title={unlocked ? 'Kazanıldı' : 'Kilitli'}
-              >
-                {emoji}
-              </div>
-            );
-          })}
-        </div>
-        <p className="mt-3 text-[11px] tabular-nums opacity-75">
-          {language === 'tr'
-            ? 'Sezon sonu: dan terfi şansı + sticker koleksiyonu.'
-            : 'End of season: dan promotion + sticker collection.'}
-        </p>
-      </section>
 
-      {/* Daily */}
-      <section className="space-y-3">
-        <h2 className="text-xl font-black text-[var(--kt-ink-strong)]">
-          {language === 'tr' ? 'Günlük Görevler' : 'Daily quests'}
-        </h2>
-        <div className="grid gap-3 lg:grid-cols-2">
-          {daily.map((item, index) => {
-            const claimable =
-              item.progress.completed && !isChallengeClaimed(item.challenge.id, item.progress.periodKey);
-            return (
-              <div key={item.challenge.id} className={claimable ? 'kt-claim-anticipation rounded-[1rem]' : ''}>
-                <QuestCard
-                  title={item.challenge.title}
-                  progress={item.progress.progress}
-                  goal={item.challenge.goalValue}
-                  reward={`${item.challenge.rewardValue} ${item.challenge.rewardType.toUpperCase()}`}
-                  completed={item.progress.completed}
-                  accent={index % 2 === 0 ? 'warning' : 'brand'}
-                  action={
-                    claimable ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          claim(
-                            item.challenge.id,
-                            item.progress.periodKey,
-                            item.challenge.rewardValue,
-                            item.challenge.rewardType
-                          )
-                        }
-                        className="kt-tap-bounce w-full rounded-[0.85rem] px-3 py-2 text-xs font-black uppercase tracking-[0.14em]"
-                        style={{
-                          background: 'var(--kt-brand)',
-                          color: 'var(--kt-brand-on)',
-                          boxShadow: 'var(--kt-tomoshibi-glow)'
-                        }}
-                      >
-                        🎁 {language === 'tr' ? 'AL' : 'CLAIM'}
-                      </button>
-                    ) : undefined
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-      </section>
+        <div className="grid gap-7 pt-6 xl:grid-cols-2">
+          <MissionBoard
+            title={language === 'tr' ? 'Gunluk Misyonlar' : 'Daily Missions'}
+            summary={`${dailyComplete}/${daily.length} ${language === 'tr' ? 'tamam' : 'complete'}`}
+          >
+            {renderQuestRows(daily, 'var(--kt-accent-warning)')}
+          </MissionBoard>
 
-      {/* Weekly */}
-      <section className="space-y-3">
-        <h2 className="text-xl font-black text-[var(--kt-ink-strong)]">
-          {language === 'tr' ? 'Haftalık Görevler' : 'Weekly quests'}
-        </h2>
-        <div className="grid gap-3 lg:grid-cols-2">
-          {weekly.map((item, index) => {
-            const claimable =
-              item.progress.completed && !isChallengeClaimed(item.challenge.id, item.progress.periodKey);
-            return (
-              <div key={item.challenge.id} className={claimable ? 'kt-claim-anticipation rounded-[1rem]' : ''}>
-                <QuestCard
-                  title={item.challenge.title}
-                  progress={item.progress.progress}
-                  goal={item.challenge.goalValue}
-                  reward={`${item.challenge.rewardValue} ${item.challenge.rewardType.toUpperCase()}`}
-                  completed={item.progress.completed}
-                  accent={index % 2 === 0 ? 'plum' : 'info'}
-                  action={
-                    claimable ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          claim(
-                            item.challenge.id,
-                            item.progress.periodKey,
-                            item.challenge.rewardValue,
-                            item.challenge.rewardType
-                          )
-                        }
-                        className="kt-tap-bounce w-full rounded-[0.85rem] px-3 py-2 text-xs font-black uppercase tracking-[0.14em]"
-                        style={{
-                          background: 'var(--kt-accent-plum)',
-                          color: '#fff',
-                          boxShadow: 'var(--kt-tomoshibi-glow)'
-                        }}
-                      >
-                        🎁 {language === 'tr' ? 'AL' : 'CLAIM'}
-                      </button>
-                    ) : undefined
-                  }
-                />
-              </div>
-            );
-          })}
+          <MissionBoard
+            title={language === 'tr' ? 'Haftalik Yol' : 'Weekly Path'}
+            summary={`${weeklyComplete}/${weekly.length} ${language === 'tr' ? 'tamam' : 'complete'}`}
+          >
+            {renderQuestRows(weekly, 'var(--kt-accent-plum)')}
+          </MissionBoard>
         </div>
-      </section>
 
-      <style>{`
-        @keyframes kt-claim-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--kt-dan-gold) 60%, transparent); }
-          50%      { box-shadow: 0 0 14px 3px color-mix(in srgb, var(--kt-dan-gold) 70%, transparent); }
-        }
-        .kt-claim-anticipation {
-          animation: kt-claim-pulse 1.6s ease-in-out infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .kt-claim-anticipation { animation: none; }
-        }
-      `}</style>
-    </div>
+        <style>{`
+          @keyframes kt-claim-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--kt-dan-gold) 60%, transparent); }
+            50% { box-shadow: 0 0 14px 3px color-mix(in srgb, var(--kt-dan-gold) 70%, transparent); }
+          }
+          .kt-claim-anticipation {
+            animation: kt-claim-pulse 1.6s ease-in-out infinite;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .kt-claim-anticipation { animation: none; }
+          }
+        `}</style>
+      </ScenePanel>
+    </SceneShell>
   );
 };
