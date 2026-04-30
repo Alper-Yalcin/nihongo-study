@@ -430,11 +430,10 @@ const LessonNodeButton: React.FC<{
   const Icon = node.icon;
   const size = node.checkpoint ? 92 : 82;
   const iconSize = node.checkpoint ? 42 : 34;
-  const ringSize = size + 24;
-  const ringStroke = 8;
-  const ringRadius = (ringSize - ringStroke) / 2;
-  const ringCircumference = 2 * Math.PI * ringRadius;
-  const progressOffset = ringCircumference - (Math.max(0, Math.min(100, progress)) / 100) * ringCircumference;
+  const borderWidth = 7;
+  const r = size / 2 - borderWidth / 2;
+  const circumference = 2 * Math.PI * r;
+  const progressOffset = circumference - (Math.max(0, Math.min(100, progress)) / 100) * circumference;
   const isLocked = state === 'locked';
   const isActive = state === 'active';
   const isCompleted = state === 'completed';
@@ -470,29 +469,21 @@ const LessonNodeButton: React.FC<{
         )}
         <svg
           className="pointer-events-none absolute -rotate-90 overflow-visible"
-          width={ringSize}
-          height={ringSize}
-          viewBox={`0 0 ${ringSize} ${ringSize}`}
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
           aria-hidden="true"
-          style={{ left: -12, top: -12 }}
+          style={{ left: -borderWidth, top: -borderWidth }}
         >
           <circle
-            cx={ringSize / 2}
-            cy={ringSize / 2}
-            r={ringRadius}
-            fill="none"
-            stroke={isDark ? 'rgba(255,255,255,0.18)' : 'rgba(71,84,103,0.16)'}
-            strokeWidth={ringStroke}
-          />
-          <circle
-            cx={ringSize / 2}
-            cy={ringSize / 2}
-            r={ringRadius}
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
             fill="none"
             stroke={progressRingStyles[node.tone]}
             strokeLinecap="round"
-            strokeWidth={ringStroke}
-            strokeDasharray={ringCircumference}
+            strokeWidth={borderWidth}
+            strokeDasharray={circumference}
             strokeDashoffset={progressOffset}
             opacity={isLocked && progress === 0 ? 0 : 1}
             className="transition-[stroke-dashoffset,opacity] duration-700 ease-out"
@@ -550,11 +541,10 @@ const MobileLessonNode: React.FC<{
   const isCompleted = item.state === 'completed';
   const size = item.node.checkpoint ? 74 : 68;
   const iconSize = item.node.checkpoint ? 34 : 28;
-  const ringSize = size + 18;
-  const ringStroke = 7;
-  const ringRadius = (ringSize - ringStroke) / 2;
-  const ringCircumference = 2 * Math.PI * ringRadius;
-  const progressOffset = ringCircumference - (Math.max(0, Math.min(100, item.progress)) / 100) * ringCircumference;
+  const borderWidth = 6;
+  const r = size / 2 - borderWidth / 2;
+  const circumference = 2 * Math.PI * r;
+  const progressOffset = circumference - (Math.max(0, Math.min(100, item.progress)) / 100) * circumference;
 
   return (
     <div className="relative flex min-w-[7.4rem] flex-col items-center text-center">
@@ -572,29 +562,21 @@ const MobileLessonNode: React.FC<{
       >
         <svg
           className="pointer-events-none absolute -rotate-90 overflow-visible"
-          width={ringSize}
-          height={ringSize}
-          viewBox={`0 0 ${ringSize} ${ringSize}`}
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
           aria-hidden="true"
-          style={{ left: -9, top: -9 }}
+          style={{ left: -borderWidth, top: -borderWidth }}
         >
           <circle
-            cx={ringSize / 2}
-            cy={ringSize / 2}
-            r={ringRadius}
-            fill="none"
-            stroke={isDark ? 'rgba(255,255,255,0.18)' : 'rgba(71,84,103,0.15)'}
-            strokeWidth={ringStroke}
-          />
-          <circle
-            cx={ringSize / 2}
-            cy={ringSize / 2}
-            r={ringRadius}
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
             fill="none"
             stroke={progressRingStyles[item.node.tone]}
             strokeLinecap="round"
-            strokeWidth={ringStroke}
-            strokeDasharray={ringCircumference}
+            strokeWidth={borderWidth}
+            strokeDasharray={circumference}
             strokeDashoffset={progressOffset}
             opacity={isLocked && item.progress === 0 ? 0 : 1}
           />
