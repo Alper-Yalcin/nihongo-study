@@ -15,7 +15,12 @@ import { Settings } from './pages/Settings';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LettersPage } from './pages/LettersPage';
 import { PracticePage } from './pages/PracticePage';
+import { PracticeConfusablePage } from './pages/PracticeConfusablePage';
+import { PracticeCustomPage } from './pages/PracticeCustomPage';
 import { PracticeRunPage } from './pages/PracticeRunPage';
+import { PracticeReviewPage } from './pages/PracticeReviewPage';
+import { PracticeStatsPage } from './pages/PracticeStatsPage';
+import { PracticeWeakPage } from './pages/PracticeWeakPage';
 import { MissionPage } from './pages/MissionPage';
 import { QuestsPage } from './pages/QuestsPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -156,7 +161,27 @@ export default function App() {
       <Route path={`${appShellRoutes.learnGuideBase}/:unitId`} element={<LearnGuidePage language={language} />} />
       <Route path={appShellRoutes.learnJapanese} element={<Navigate to={appShellRoutes.learn} replace />} />
       <Route path={appShellRoutes.letters} element={<LettersPage language={language} />} />
-      <Route path={appShellRoutes.practice} element={<PracticePage language={language} />} />
+      <Route path={appShellRoutes.practice} element={<Navigate to={getPracticeRoute(activeScript, 'review')} replace />} />
+      <Route path={appShellRoutes.practiceReview} element={<PracticeReviewPage language={language} />} />
+      <Route path={appShellRoutes.practiceWeak} element={<PracticeWeakPage language={language} />} />
+      <Route path={appShellRoutes.practiceConfusable} element={<PracticeConfusablePage language={language} />} />
+      <Route path={appShellRoutes.practiceCustom} element={<PracticeCustomPage language={language} />} />
+      <Route path={appShellRoutes.practiceStats} element={<PracticeStatsPage language={language} />} />
+      <Route
+        path={appShellRoutes.practiceJapaneseFlashcards}
+        element={
+          <PlaceholderPage
+            title="Flashcards"
+            description={
+              language === 'tr'
+                ? 'Japanese flashcards sayfasi burada doldurulacak.'
+                : 'The Japanese flashcards page will be built here.'
+            }
+            actionLabel={language === 'tr' ? 'Tekrara don' : 'Back to review'}
+            actionHref={appShellRoutes.learnReview}
+          />
+        }
+      />
       <Route path={appShellRoutes.practiceRun} element={<PracticeRunPage language={language} />} />
       <Route path={appShellRoutes.forge} element={<ForgePage language={language} />} />
       <Route path={appShellRoutes.meydan} element={<MeydanPage language={language} />} />

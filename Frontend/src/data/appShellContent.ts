@@ -22,6 +22,12 @@ export const appShellRoutes = {
   learnGuideBase: '/learn/guide',
   letters: '/letters',
   practice: '/practice',
+  practiceReview: '/practice/review',
+  practiceWeak: '/practice/weak',
+  practiceConfusable: '/practice/confusable',
+  practiceCustom: '/practice/custom',
+  practiceStats: '/practice/stats',
+  practiceJapaneseFlashcards: '/practice/japanese/flashcards',
   practiceRun: '/practice/run',
   forge: '/practice/forge',
   meydan: '/meydan',
@@ -86,14 +92,18 @@ export const getPracticeRoute = (
   script: KanaRouteScript,
   tab?: 'overview' | 'review' | 'weak' | 'confusable' | 'free' | 'stats'
 ) => {
+  const routeByTab = {
+    overview: appShellRoutes.practiceReview,
+    review: appShellRoutes.practiceReview,
+    weak: appShellRoutes.practiceWeak,
+    confusable: appShellRoutes.practiceConfusable,
+    free: appShellRoutes.practiceCustom,
+    stats: appShellRoutes.practiceStats
+  } as const;
   const searchParams = new URLSearchParams();
   searchParams.set('script', script);
 
-  if (tab && tab !== 'overview') {
-    searchParams.set('tab', tab);
-  }
-
-  return `${appShellRoutes.practice}?${searchParams.toString()}`;
+  return `${routeByTab[tab ?? 'overview']}?${searchParams.toString()}`;
 };
 
 const playStatsRouteByScript: Record<KanaRouteScript, string> = {

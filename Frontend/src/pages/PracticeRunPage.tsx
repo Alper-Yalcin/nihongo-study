@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes } from '../data/appShellContent';
+import { getPracticeRoute } from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
 import { useDictionaryWordSearch } from '../data/words';
 import { StudyContainer } from '../components/StudyContainer';
@@ -88,7 +88,7 @@ export const PracticeRunPage: React.FC<PracticeRunPageProps> = ({ language }) =>
     [focusItemIds, words]
   );
 
-  const backHref = `${appShellRoutes.practice}?script=${script}${tab ? `&tab=${tab}` : ''}`;
+  const backHref = getPracticeRoute(script, tab);
 
   return (
     <div className="space-y-6 pb-8">
@@ -161,4 +161,3 @@ export const PracticeRunPage: React.FC<PracticeRunPageProps> = ({ language }) =>
     </div>
   );
 };
-

@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Flame, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { detectStreakStatus, StreakBreakStatus } from '../../features/streak/streakBreakDetector';
-import { appShellRoutes } from '../../data/appShellContent';
+import { getPracticeRoute } from '../../data/appShellContent';
 
 const SESSION_DISMISS_KEY = 'kototsuna.tomoshibi.relight.dismissed';
 
@@ -154,7 +154,7 @@ export const TomoshibiRelightModal: React.FC<TomoshibiRelightModalProps> = ({ la
 
           <div className="mt-5 flex w-full flex-col gap-2">
             <Link
-              to={`${appShellRoutes.practice}?script=hiragana`}
+              to={getPracticeRoute('hiragana', 'review')}
               onClick={handleDismiss}
               className="kt-tap-bounce inline-flex items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-black uppercase tracking-[0.12em] shadow-[var(--kt-tomoshibi-glow)]"
               style={{

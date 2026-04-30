@@ -16,7 +16,7 @@ import {
   Utensils
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
-import { appShellRoutes, getLearnGuideRoute, getLearnUnitRoute } from '../data/appShellContent';
+import { appShellRoutes, getLearnGuideRoute, getLearnUnitRoute, getPracticeRoute } from '../data/appShellContent';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
@@ -699,7 +699,7 @@ const MobileBottomNav: React.FC<{ language: AppLanguage }> = ({ language }) => {
   const items = [
     { id: 'learn', label: labels.learn, href: appShellRoutes.learn, icon: Landmark },
     { id: 'letters', label: labels.letters, href: appShellRoutes.letters, icon: BookOpen },
-    { id: 'practice', label: labels.practice, href: appShellRoutes.practice, icon: Gamepad2 },
+    { id: 'practice', label: labels.practice, href: getPracticeRoute('hiragana', 'review'), icon: Gamepad2 },
     { id: 'meydan', label: labels.meydan, href: appShellRoutes.meydan, icon: GraduationCap },
     { id: 'quests', label: labels.quests, href: appShellRoutes.quests, icon: Trophy }
   ];

@@ -29,6 +29,8 @@ import {
 
 interface PracticePageProps {
   language: AppLanguage;
+  focusDrill?: DrillId;
+  pageVariant?: 'overview' | 'drill' | 'custom' | 'stats';
 }
 
 type DrillId = 'review' | 'weak' | 'confusable' | 'free';
@@ -108,6 +110,7 @@ interface Copy {
   drillReason: Record<DrillId, string>;
   drillEmpty: Record<DrillId, string>;
   recordTitle: string;
+  recordHint: string;
   customTitle: string;
   customHint: string;
   recordOpen: string;
@@ -159,6 +162,7 @@ const copyTr: Copy = {
     free: 'En az 1 kana sec.'
   },
   recordTitle: 'Antrenman raporu',
+  recordHint: 'Mastery, zayif gruplar ve son hatalari tek sayfada incele.',
   customTitle: 'Ozel calisma',
   customHint: 'Kendi kana havuzunu sec ve serbest tur kos.',
   recordOpen: 'Raporu ac',
@@ -210,6 +214,7 @@ const copyEn: Copy = {
     free: 'Pick at least 1 kana.'
   },
   recordTitle: 'Training record',
+  recordHint: 'Review mastery, weak groups, and recent mistakes in one place.',
   customTitle: 'Custom drill',
   customHint: 'Pick your own kana pool and run a free round.',
   recordOpen: 'Open record',
@@ -236,7 +241,7 @@ const TODAY_GLYPH_TR = (date: Date) => {
   return `${m}月${d}日`;
 };
 
-export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
+export const PracticePage: React.FC<PracticePageProps> = ({ language, focusDrill, pageVariant = 'overview' }) => {
   const c = language === 'tr' ? copyTr : copyEn;
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -298,9 +303,10 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
 
   const recommendedId: DrillId =
     reviewQueue.length > 0 ? 'review' : weakEntries.length > 0 ? 'weak' : 'free';
-  const recommendedPool = drillPool(recommendedId);
-  const recommendedCount =
-    recommendedId === 'free' ? allSectionCharacterIds.length : drillPool(recommendedId).length;
+  const primaryDrillId = focusDrill ?? recommendedId;
+  const primaryPool = primaryDrillId === 'free' ? manualSelectedIds : drillPool(primaryDrillId);
+  const primaryCharacterCount =
+    primaryDrillId === 'free' && primaryPool.length === 0 ? allSectionCharacterIds.length : primaryPool.length;
 
   const setScript = (next: KanaScript) => setSearchParams({ script: next });
 
@@ -315,11 +321,11 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
     navigate(`${appShellRoutes.practiceRun}?${params.toString()}`);
   };
 
-  const beginToday = () => {
-    if (recommendedId === 'free') {
-      runDrill('free', allSectionCharacterIds);
+  const beginPrimary = () => {
+    if (primaryDrillId === 'free') {
+      runDrill('free', primaryPool.length > 0 ? primaryPool : allSectionCharacterIds);
     } else {
-      runDrill(recommendedId);
+      runDrill(primaryDrillId);
     }
   };
 
@@ -332,22 +338,26 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
   };
 
   const heroBackdropChars = useMemo(
-    () => recommendedPool.slice(0, 12).map((id) => getKanaItemById(id)?.char ?? '').filter(Boolean),
-    [recommendedPool]
+    () => primaryPool.slice(0, 12).map((id) => getKanaItemById(id)?.char ?? '').filter(Boolean),
+    [primaryPool]
   );
 
-  const recommendedTitle =
-    recommendedId === 'review'
+  const drillTitle = (id: DrillId) =>
+    id === 'review'
       ? language === 'tr'
-        ? `${recommendedCount} bekleyen kana`
-        : `${recommendedCount} due kana`
-      : recommendedId === 'weak'
+        ? `${primaryCharacterCount} bekleyen kana`
+        : `${primaryCharacterCount} due kana`
+      : id === 'weak'
         ? language === 'tr'
-          ? `${recommendedCount} zayif kana`
-          : `${recommendedCount} weak kana`
-        : language === 'tr'
-          ? 'Serbest tur'
-          : 'Free round';
+          ? `${primaryCharacterCount} zayif kana`
+          : `${primaryCharacterCount} weak kana`
+        : id === 'confusable'
+          ? language === 'tr'
+            ? `${drillCount('confusable')} karistirilan grup`
+            : `${drillCount('confusable')} confusable groups`
+          : language === 'tr'
+            ? 'Serbest tur'
+            : 'Free round';
 
   const modes: { id: RunnableMode; label: string; icon: React.ElementType; glyph: string }[] = [
     { id: 'typing',     label: c.modeTyping,     icon: Type,       glyph: '字' },
@@ -357,9 +367,25 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
   ];
 
   const todayLabel = TODAY_GLYPH_TR(new Date());
+  const isCustomPage = pageVariant === 'custom';
+  const isStatsPage = pageVariant === 'stats';
+  const pageTitle = isStatsPage
+    ? c.recordTitle
+    : isCustomPage
+      ? c.customTitle
+      : focusDrill
+        ? c.drill[focusDrill]
+        : c.pageTitle;
+  const pageSubtitle = isStatsPage
+    ? c.recordHint
+    : isCustomPage
+      ? c.customHint
+      : focusDrill
+        ? c.drillReason[focusDrill]
+        : c.pageSubtitle;
 
   const alternatives: DrillId[] = (['review', 'weak', 'confusable', 'free'] as DrillId[]).filter(
-    (id) => id !== recommendedId
+    (id) => id !== primaryDrillId
   );
 
   return (
@@ -376,9 +402,9 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
               {c.eyebrowDojo}
             </div>
             <h1 className="mt-1 text-[1.85rem] font-black tracking-[-0.01em] text-[var(--kt-ink-strong)] md:text-[2.1rem]">
-              {c.pageTitle}
+              {pageTitle}
             </h1>
-            <p className="mt-1 max-w-xl text-sm leading-6 text-[var(--kt-ink-muted)]">{c.pageSubtitle}</p>
+            <p className="mt-1 max-w-xl text-sm leading-6 text-[var(--kt-ink-muted)]">{pageSubtitle}</p>
           </div>
           <div className="flex flex-col items-start gap-2 md:items-end">
             <ScriptSwitch value={script} onChange={setScript} />
@@ -390,24 +416,41 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
           </div>
         </header>
 
+        {isStatsPage ? (
+          <TrainingRecordPanel c={c} groupStats={groupStats} weakEntries={weakEntries} />
+        ) : isCustomPage ? (
+          <CustomDrillPagePanel
+            c={c}
+            script={script}
+            activeMode={activeMode}
+            modes={modes}
+            onChangeMode={setActiveMode}
+            sections={sections}
+            allIds={allSectionCharacterIds}
+            selectedIds={manualSelectedIds}
+            setSelectedIds={setManualSelectedIds}
+            onRun={() => runDrill('free')}
+          />
+        ) : (
+          <>
         {/* HERO — today's kata */}
         <TodayKata
           c={c}
-          tone={drills[recommendedId].tone}
-          glyph={drills[recommendedId].glyph}
-          drillName={c.drill[recommendedId]}
-          drillTitle={recommendedTitle}
-          reason={c.drillReason[recommendedId]}
+          tone={drills[primaryDrillId].tone}
+          glyph={drills[primaryDrillId].glyph}
+          drillName={c.drill[primaryDrillId]}
+          drillTitle={drillTitle(primaryDrillId)}
+          reason={c.drillReason[primaryDrillId]}
           backdropChars={heroBackdropChars}
           script={script}
-          characters={recommendedCount}
+          characters={primaryCharacterCount}
           todayLabel={todayLabel}
           modes={modes}
           activeMode={activeMode}
           onChangeMode={setActiveMode}
-          onBegin={beginToday}
-          canBegin={recommendedCount > 0}
-          empty={recommendedCount === 0 ? c.drillEmpty[recommendedId] : null}
+          onBegin={beginPrimary}
+          canBegin={primaryCharacterCount > 0}
+          empty={primaryCharacterCount === 0 ? c.drillEmpty[primaryDrillId] : null}
         />
 
         {/* Alternatives row */}
@@ -440,6 +483,8 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language }) => {
             />
           </div>
         </section>
+          </>
+        )}
       </main>
 
       {drawer === 'free' ? (
@@ -923,6 +968,221 @@ const DotChip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <span className="h-1.5 w-1.5 rounded-full bg-[var(--kt-dan-gold)]" />
     {children}
   </span>
+);
+
+const CustomDrillPagePanel: React.FC<Omit<CustomDrillDrawerProps, 'onClose'>> = ({
+  c,
+  script,
+  activeMode,
+  modes,
+  onChangeMode,
+  sections,
+  allIds,
+  selectedIds,
+  setSelectedIds,
+  onRun
+}) => (
+  <section className="mt-6 overflow-hidden rounded-[1.4rem] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_88%,transparent)] shadow-[0_16px_40px_rgba(132,82,62,0.14)]">
+    <div className="flex flex-wrap items-center gap-2 border-b border-[var(--kt-border-subtle)] px-5 py-4">
+      <span className="rounded-full bg-[var(--kt-accent-info-soft)] px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-[var(--kt-accent-info)]">
+        {c.selectedCount(selectedIds.length)}
+      </span>
+      <Button as="button" type="button" variant="secondary" size="sm" onClick={() => setSelectedIds(allIds)}>
+        {c.selectAll}
+      </Button>
+      <Button as="button" type="button" variant="ghost" size="sm" onClick={() => setSelectedIds([])}>
+        {c.clear}
+      </Button>
+      <span className="ml-auto text-[11px] text-[var(--kt-ink-subtle)]">
+        {script === 'hiragana' ? 'Hiragana' : 'Katakana'}
+      </span>
+    </div>
+
+    <div className="grid gap-5 px-5 py-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="space-y-5">
+        {sections.map((section) => {
+          const sectionIds = section.matrix.flatMap((row) =>
+            row.filter((cell): cell is NonNullable<typeof cell> => cell !== null).map((cell) => cell.id)
+          );
+          const allSelected = sectionIds.every((id) => selectedIds.includes(id));
+          return (
+            <div key={section.id} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-[11px] font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
+                  {section.title}
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedIds((prev) =>
+                      allSelected
+                        ? prev.filter((id) => !sectionIds.includes(id))
+                        : Array.from(new Set([...prev, ...sectionIds]))
+                    )
+                  }
+                  className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--kt-brand)] hover:underline"
+                >
+                  {c.rowToggle}
+                </button>
+              </div>
+              {section.matrix.map((row, rowIndex) => (
+                <div
+                  key={`${section.id}-${rowIndex}`}
+                  className="grid gap-1.5"
+                  style={{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }}
+                >
+                  {row.map((cell, columnIndex) => {
+                    if (!cell) {
+                      return (
+                        <div
+                          key={`empty-${section.id}-${rowIndex}-${columnIndex}`}
+                          className="border-b border-dashed border-[var(--kt-border-subtle)] opacity-30"
+                        />
+                      );
+                    }
+                    const item = getKanaItemById(cell.id);
+                    const selected = selectedIds.includes(cell.id);
+                    return (
+                      <button
+                        key={cell.id}
+                        type="button"
+                        onClick={() =>
+                          setSelectedIds((prev) =>
+                            selected ? prev.filter((id) => id !== cell.id) : [...prev, cell.id]
+                          )
+                        }
+                        className={`group rounded-xl border px-2 py-2 text-center transition ${
+                          selected
+                            ? 'border-[color:var(--kt-brand)]/45 bg-[var(--kt-brand-soft)] text-[var(--kt-brand)] shadow-[0_4px_12px_rgba(196,93,79,0.16)]'
+                            : 'border-transparent text-[var(--kt-ink-muted)] hover:bg-[var(--kt-surface-muted)]'
+                        }`}
+                      >
+                        <div className="font-jp text-xl font-black leading-none text-[var(--kt-ink-strong)]">
+                          {item?.char ?? '?'}
+                        </div>
+                        <div className="mt-1 text-[10px] font-black uppercase tracking-[0.08em] text-[var(--kt-ink-subtle)]">
+                          {item?.romaji ?? cell.id}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
+      <aside className="rounded-[1rem] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_72%,transparent)] p-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--kt-ink-subtle)]">
+          {c.pickMode}
+        </div>
+        <div className="mt-3 grid gap-2">
+          {modes.map((m) => {
+            const Icon = m.icon;
+            const active = activeMode === m.id;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => onChangeMode(m.id)}
+                aria-pressed={active}
+                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-black transition ${
+                  active
+                    ? 'border-[color:var(--kt-brand)]/55 bg-[var(--kt-brand)] text-[var(--kt-brand-on)]'
+                    : 'border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_70%,transparent)] text-[var(--kt-ink-strong)] hover:bg-[var(--kt-surface-muted)]'
+                }`}
+              >
+                <Icon size={15} />
+                {m.label}
+              </button>
+            );
+          })}
+        </div>
+        <Button
+          as="button"
+          type="button"
+          size="md"
+          onClick={onRun}
+          disabled={selectedIds.length === 0}
+          iconEnd={<ArrowRight size={16} />}
+          className="mt-4 w-full"
+        >
+          {c.customRun}
+        </Button>
+      </aside>
+    </div>
+  </section>
+);
+
+const TrainingRecordPanel: React.FC<Omit<TrainingRecordDrawerProps, 'onClose'>> = ({ c, groupStats, weakEntries }) => (
+  <section className="mt-6 overflow-hidden rounded-[1.4rem] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_88%,transparent)] shadow-[0_16px_40px_rgba(132,82,62,0.14)]">
+    <div className="grid gap-7 px-5 py-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div>
+        <div className="space-y-3">
+          {groupStats.map((group) => {
+            const masteredPercent = group.total > 0 ? Math.round((group.mastered / group.total) * 100) : 0;
+            return (
+              <div key={group.groupId} className="border-b border-[var(--kt-border-subtle)] pb-3 last:border-b-0">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <div>
+                    <div className="text-base font-black text-[var(--kt-ink-strong)]">{group.groupLabel}</div>
+                    <div className="text-xs text-[var(--kt-ink-muted)]">{group.sectionTitle}</div>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
+                    <span>{group.mastered}/{group.total}</span>
+                    {group.due > 0 ? (
+                      <span className="rounded-full bg-[var(--kt-accent-warning-soft)] px-2 py-0.5 text-[var(--kt-accent-warning)]">
+                        {c.due} {group.due}
+                      </span>
+                    ) : null}
+                    {group.weak > 0 ? (
+                      <span className={`rounded-full px-2 py-0.5 ${toneSoftBg.danger}`}>
+                        {c.weak} {group.weak}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--kt-progress-track)]">
+                  <div
+                    className="h-full rounded-full bg-[linear-gradient(90deg,var(--kt-brand),var(--kt-dan-gold))] transition-[width]"
+                    style={{ width: `${masteredPercent}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <aside>
+        <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--kt-accent-plum)]">
+          {c.recentMistakes}
+        </div>
+        {weakEntries.length > 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {weakEntries.slice(0, 14).map((entry) => {
+              const item = getKanaItemById(entry.kanaId);
+              return (
+                <span
+                  key={entry.kanaId}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--kt-accent-danger)]/35 bg-[var(--kt-accent-danger-soft)] px-2.5 py-1.5"
+                >
+                  <span className="font-jp text-base font-black leading-none text-[var(--kt-ink-strong)]">
+                    {item?.char ?? '?'}
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">
+                    {item?.romaji ?? entry.kanaId} Ã—{entry.timesWrong}
+                  </span>
+                </span>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mt-3 text-sm text-[var(--kt-ink-muted)]">{c.noMistakes}</div>
+        )}
+      </aside>
+    </div>
+  </section>
 );
 
 /* ============================ DRAWERS ============================ */
