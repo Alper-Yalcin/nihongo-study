@@ -23,6 +23,7 @@ import {
 } from '../data/learnCourseContent';
 import { useLearnCourseProgress } from '../hooks/useLearnCourseProgress';
 import { LearnSideRail } from '../components/learn/LearnSideRail';
+import { LearnFallingFlowers } from '../components/learn/LearnFallingFlowers';
 
 interface LearnJapanesePageProps {
   language: AppLanguage;
@@ -378,87 +379,6 @@ const RoadmapConnections: React.FC<{ isDark: boolean; xOffset?: number }> = ({ i
   );
 };
 
-const FallingFlowerSvg: React.FC<{ size: number; isDark: boolean }> = ({ size, isDark }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className="block">
-    <g fill={isDark ? '#ff9eb8' : '#f56f93'}>
-      {[0, 72, 144, 216, 288].map((angle) => (
-        <ellipse
-          key={angle}
-          cx="12"
-          cy="6.4"
-          rx="3.2"
-          ry="5.2"
-          transform={`rotate(${angle} 12 12)`}
-          opacity="0.9"
-        />
-      ))}
-    </g>
-    <circle cx="12" cy="12" r="1.7" fill={isDark ? '#ffe9f0' : '#fff6d6'} opacity="0.92" />
-  </svg>
-);
-
-const LearnFallingFlowers: React.FC<{ isDark: boolean }> = ({ isDark }) => (
-  <div className="pointer-events-none absolute inset-0 z-[4] overflow-hidden" aria-hidden="true">
-    {fallingFlowers.map((flower) => (
-      <span
-        key={flower.id}
-        className="kt-learn-flower"
-        style={
-          {
-            left: `${flower.left}%`,
-            animationDuration: `${flower.duration}s`,
-            animationDelay: `${flower.delay}s`,
-            opacity: flower.opacity,
-            ['--kt-learn-flower-opacity' as string]: flower.opacity,
-            ['--kt-learn-flower-drift' as string]: `${flower.drift}px`,
-            ['--kt-learn-flower-mid-spin' as string]: `${flower.spin * 0.48}deg`,
-            ['--kt-learn-flower-spin' as string]: `${flower.spin}deg`
-          } as React.CSSProperties
-        }
-      >
-        <FallingFlowerSvg size={flower.size} isDark={isDark} />
-      </span>
-    ))}
-    <style>{`
-      @keyframes kt-learn-flower-fall {
-        0% {
-          transform: translate3d(0, -9rem, 0) rotate(0deg);
-          opacity: 0;
-        }
-        8% {
-          opacity: var(--kt-learn-flower-opacity, 0.58);
-        }
-        42% {
-          transform: translate3d(var(--kt-learn-flower-drift), 44vh, 0) rotate(var(--kt-learn-flower-mid-spin));
-        }
-        78% {
-          opacity: var(--kt-learn-flower-opacity, 0.58);
-        }
-        100% {
-          transform: translate3d(calc(var(--kt-learn-flower-drift) * -0.35), 1180px, 0) rotate(var(--kt-learn-flower-spin));
-          opacity: 0;
-        }
-      }
-
-      .kt-learn-flower {
-        position: absolute;
-        top: 0;
-        display: block;
-        filter: drop-shadow(0 4px 7px ${isDark ? 'rgba(0,0,0,0.28)' : 'rgba(190,70,95,0.14)'});
-        transform: translate3d(0, -9rem, 0);
-        animation: kt-learn-flower-fall linear infinite;
-        will-change: transform, opacity;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .kt-learn-flower {
-          animation: none;
-          opacity: 0;
-        }
-      }
-    `}</style>
-  </div>
-);
 
 const UnitMarkerLabel: React.FC<{
   marker: UnitMarker;
@@ -1032,7 +952,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
           }
         }
       `}</style>
-      <LearnFallingFlowers isDark={isDark} />
+      <LearnFallingFlowers themeMode={themeMode} />
       <div className="hidden lg:block">
         <LearnSideRail language={language} themeMode={themeMode} activeItem="journey" position="fixed" />
       </div>

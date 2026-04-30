@@ -31,28 +31,6 @@ export const AppShell: React.FC<AppShellProps> = ({
   return (
     <div className={`min-h-screen !bg-transparent text-[var(--kt-ink)] ${isDark ? 'theme-dark' : 'theme-light'}`}>
 
-      {/* Layer 0 — background image, softened */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[0] bg-cover bg-top bg-no-repeat"
-        style={{
-          backgroundImage: isDark ? "url('/images/darkmode.png')" : "url('/images/light.png')",
-          backgroundColor: isDark ? '#151017' : '#fff5ef',
-          filter: isDark ? 'brightness(0.85) saturate(0.78)' : 'brightness(0.96) saturate(0.88)',
-        }}
-      />
-
-      {/* Layer 1 — gradient overlay, unifies contrast across pages */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[1]"
-        style={{
-          background: isDark
-            ? 'linear-gradient(180deg, rgba(20,15,25,0.44) 0%, rgba(20,15,25,0.54) 100%)'
-            : 'linear-gradient(180deg, rgba(255,245,239,0.18) 0%, rgba(255,245,239,0.26) 100%)',
-        }}
-      />
-
       {/* Layer 3 — seasonal particles, above overlay so they remain visible */}
       {!isLearnMap && (
         <div className="pointer-events-none fixed inset-0 z-[3]" aria-hidden="true">

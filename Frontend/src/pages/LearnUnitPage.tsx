@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, Heart, Volume2, X } from 'lucide-react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { AppLanguage } from '../data/appPreferences';
+import { AppLanguage, ThemeMode } from '../data/appPreferences';
+import { LearnFallingFlowers } from '../components/learn/LearnFallingFlowers';
 import { appShellRoutes, getLearnUnitRoute } from '../data/appShellContent';
 import {
   findLearnUnitById,
@@ -15,6 +16,7 @@ import { MascotFigure } from '../components/mascot/MascotFigure';
 
 interface LearnUnitPageProps {
   language: AppLanguage;
+  themeMode: ThemeMode;
   activeScript: KanaScript;
 }
 
@@ -209,7 +211,7 @@ const FeedbackBar: React.FC<{
   </div>
 );
 
-export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
+export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language, themeMode }) => {
   const { unitId = '' } = useParams();
   const navigate = useNavigate();
   const copy = pageCopy[language];
@@ -463,8 +465,9 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
 
   if (finished) {
     return (
-      <div className="min-h-screen bg-[var(--kt-surface-page)] px-5 py-5 text-[var(--kt-ink)]">
-        <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center text-center">
+      <div className="relative min-h-screen overflow-hidden px-5 py-5 text-[var(--kt-ink)]">
+        <LearnFallingFlowers themeMode={themeMode} />
+        <div className="relative z-10 mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center text-center">
           <MascotFigure pose="cheer" tone={unit.tone} size={180} />
           <h1 className="mt-6 text-4xl font-black text-[var(--kt-ink-strong)]">{copy.completeTitle}</h1>
           <p className="mt-3 max-w-md text-sm leading-7 text-[var(--kt-ink-muted)]">{copy.completeBody}</p>
@@ -492,8 +495,9 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--kt-surface-page)] px-5 py-5 text-[var(--kt-ink)]">
-      <header className="mx-auto flex max-w-5xl items-center gap-4">
+    <div className="relative min-h-screen overflow-hidden px-5 py-5 text-[var(--kt-ink)]">
+      <LearnFallingFlowers themeMode={themeMode} />
+      <header className="relative z-10 mx-auto flex max-w-5xl items-center gap-4">
         <button
           type="button"
           onClick={() => navigate(appShellRoutes.learn)}
@@ -511,7 +515,7 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
         </div>
       </header>
 
-      {renderTask()}
+      <div className="relative z-10">{renderTask()}</div>
 
       {feedback && (
         <FeedbackBar
@@ -531,7 +535,7 @@ export const LearnUnitPage: React.FC<LearnUnitPageProps> = ({ language }) => {
       <button
         type="button"
         onClick={() => navigate(appShellRoutes.learn)}
-        className="fixed left-5 bottom-5 hidden items-center gap-2 rounded-full border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink-muted)] shadow-[var(--kt-shadow-sm)] md:inline-flex"
+        className="fixed left-5 bottom-5 z-10 hidden items-center gap-2 rounded-full border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[var(--kt-ink-muted)] shadow-[var(--kt-shadow-sm)] md:inline-flex"
       >
         <ArrowLeft size={15} />
         {copy.backToMap}

@@ -131,7 +131,6 @@ export default function App() {
   }, [themeMode]);
 
   useEffect(() => {
-    // Consistent fallback color — AppShell fixed layers handle the actual background image.
     document.body.style.backgroundColor = themeMode === 'dark' ? '#151017' : '#fff5ef';
   }, [themeMode]);
 
@@ -729,16 +728,37 @@ export default function App() {
     </AppShell>
   );
 
+  const isDark = themeMode === 'dark';
+
   return (
     <KanaProgressProvider>
       <div
         className="min-h-screen text-[var(--kt-ink)]"
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
+        {/* Global background layers — visible on every route */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-[0] bg-cover bg-top bg-no-repeat"
+          style={{
+            backgroundImage: isDark ? "url('/images/darkmode.png')" : "url('/images/light.png')",
+            backgroundColor: isDark ? '#151017' : '#fff5ef',
+            filter: isDark ? 'brightness(0.85) saturate(0.78)' : 'brightness(0.96) saturate(0.88)'
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-[1]"
+          style={{
+            background: isDark
+              ? 'linear-gradient(180deg, rgba(20,15,25,0.44) 0%, rgba(20,15,25,0.54) 100%)'
+              : 'linear-gradient(180deg, rgba(255,245,239,0.18) 0%, rgba(255,245,239,0.26) 100%)'
+          }}
+        />
         <Routes>
           <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
           <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
-          <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} activeScript={activeScript} />} />
+          <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} themeMode={themeMode} activeScript={activeScript} />} />
           <Route path="*" element={shell} />
         </Routes>
         <ReEntrySplash />
