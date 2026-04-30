@@ -1,24 +1,31 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  BarChart3,
   BookOpen,
   ChevronDown,
   Flame,
   Gamepad2,
   GraduationCap,
+  Headphones,
   Landmark,
+  Languages,
+  MessageCircleMore,
   Moon,
-  RefreshCcw,
+  PenTool,
   Settings2,
-  ShieldAlert,
   Shuffle,
   Sparkles,
+  Swords,
   Sun,
+  Target,
+  Timer,
   Trophy,
+  Type,
+  Users,
+  Zap,
   type LucideIcon
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { appShellRoutes, getPracticeRoute } from '../../data/appShellContent';
+import { appShellRoutes } from '../../data/appShellContent';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
 import { getJLearnUserState, subscribeJLearnUserState } from '../../features/jlearn/debug/debugStore';
@@ -47,9 +54,41 @@ const labels = {
     japanese: 'Japonca',
     kana: 'Kana',
     practiceJapanese: 'Japanese',
+    kanji: 'Kanji',
+    quiz: 'Quiz',
+    arenaLobby: 'Arena Lobby',
+    speedMode: 'Speed Mode',
+    timedChallenge: 'Timed Challenge',
+    dojoBoss: 'Dojo Boss',
+    duel: 'Duel',
     reviewQueue: 'Tekrar Sirasi',
     weakDrill: 'Zayif Drill',
     confusables: 'Karistirilanlar',
+    drawingPractice: 'Drawing Practice',
+    answerTypeKana: 'Answer Type',
+    listeningPracticeKana: 'Listening Practice',
+    kanaReading: 'Kana Reading',
+    writingRecallKana: 'Writing Recall',
+    flashcardsKana: 'Flashcards',
+    quickStudyKana: 'Quick Study',
+    kanaPop: 'Kana Pop',
+    quickStudy: 'Quick Study',
+    topicLessons: 'Topic Lessons',
+    reading: 'Kitap Okuma',
+    fillBlank: 'Fill in the Blank',
+    translationPractice: 'Translation Practice',
+    sentenceWriting: 'Sentence Writing',
+    kanjiDrawingPractice: 'Drawing Practice',
+    kanjiReading: 'Kanji Reading',
+    kanjiListening: 'Kanji Listening',
+    writingRecallKanji: 'Writing Recall',
+    kanjiUsage: 'Kanji Usage',
+    kanjiChallenge: 'Kanji Challenge',
+    kanjiMatch: 'Kanji Match',
+    kanjiPop: 'Kanji Pop',
+    kanjiQuiz: 'Kanji Quiz',
+    kanaQuiz: 'Kana Quiz',
+    japaneseQuiz: 'Japanese Quiz',
     customPractice: 'Custom Practice',
     trainingRecord: 'Antrenman Raporu',
     flashcards: 'Flashcards'
@@ -67,9 +106,41 @@ const labels = {
     japanese: 'Japanese',
     kana: 'Kana',
     practiceJapanese: 'Japanese',
+    kanji: 'Kanji',
+    quiz: 'Quiz',
+    arenaLobby: 'Arena Lobby',
+    speedMode: 'Speed Mode',
+    timedChallenge: 'Timed Challenge',
+    dojoBoss: 'Dojo Boss',
+    duel: 'Duel',
     reviewQueue: 'Review Queue',
     weakDrill: 'Weak Drill',
     confusables: 'Confusables',
+    drawingPractice: 'Drawing Practice',
+    answerTypeKana: 'Answer Type',
+    listeningPracticeKana: 'Listening Practice',
+    kanaReading: 'Kana Reading',
+    writingRecallKana: 'Writing Recall',
+    flashcardsKana: 'Flashcards',
+    quickStudyKana: 'Quick Study',
+    kanaPop: 'Kana Pop',
+    quickStudy: 'Quick Study',
+    topicLessons: 'Topic Lessons',
+    reading: 'Reading',
+    fillBlank: 'Fill in the Blank',
+    translationPractice: 'Translation Practice',
+    sentenceWriting: 'Sentence Writing',
+    kanjiDrawingPractice: 'Drawing Practice',
+    kanjiReading: 'Kanji Reading',
+    kanjiListening: 'Kanji Listening',
+    writingRecallKanji: 'Writing Recall',
+    kanjiUsage: 'Kanji Usage',
+    kanjiChallenge: 'Kanji Challenge',
+    kanjiMatch: 'Kanji Match',
+    kanjiPop: 'Kanji Pop',
+    kanjiQuiz: 'Kanji Quiz',
+    kanaQuiz: 'Kana Quiz',
+    japaneseQuiz: 'Japanese Quiz',
     customPractice: 'Custom Practice',
     trainingRecord: 'Training Record',
     flashcards: 'Flashcards'
@@ -174,23 +245,66 @@ export const TopNav: React.FC<TopNavProps> = ({
           id: 'kana',
           title: copy.kana,
           children: [
-            { id: 'practice-review', label: copy.reviewQueue, href: getPracticeRoute(activeScript, 'review'), icon: RefreshCcw },
-            { id: 'practice-weak', label: copy.weakDrill, href: getPracticeRoute(activeScript, 'weak'), icon: ShieldAlert },
-            { id: 'practice-confusable', label: copy.confusables, href: getPracticeRoute(activeScript, 'confusable'), icon: Shuffle },
-            { id: 'practice-custom', label: copy.customPractice, href: getPracticeRoute(activeScript, 'free'), icon: Sparkles },
-            { id: 'practice-stats', label: copy.trainingRecord, href: getPracticeRoute(activeScript, 'stats'), icon: BarChart3 }
+            { id: 'practice-kana-drawing', label: copy.drawingPractice, href: appShellRoutes.practiceKanaDrawing, icon: PenTool },
+            { id: 'practice-kana-answer-type', label: copy.answerTypeKana, href: appShellRoutes.practiceKanaAnswerType, icon: Type },
+            { id: 'practice-kana-listening', label: copy.listeningPracticeKana, href: appShellRoutes.practiceKanaListening, icon: Headphones },
+            { id: 'practice-kana-reading', label: copy.kanaReading, href: appShellRoutes.practiceKanaReading, icon: Type },
+            { id: 'practice-kana-writing-recall', label: copy.writingRecallKana, href: appShellRoutes.practiceKanaWritingRecall, icon: PenTool },
+            { id: 'practice-kana-flashcards', label: copy.flashcardsKana, href: appShellRoutes.practiceKanaFlashcards, icon: BookOpen },
+            { id: 'practice-kana-quick-study', label: copy.quickStudyKana, href: appShellRoutes.practiceKanaQuickStudy, icon: Zap },
+            { id: 'practice-kana-pop', label: copy.kanaPop, href: appShellRoutes.practiceKanaPop, icon: Sparkles }
           ]
         },
         {
           id: 'japanese',
           title: copy.practiceJapanese,
           children: [
-            { id: 'practice-flashcards', label: copy.flashcards, href: appShellRoutes.practiceJapaneseFlashcards, icon: BookOpen }
+            { id: 'practice-quick-study', label: copy.quickStudy, href: appShellRoutes.practiceJapaneseQuickStudy, icon: Zap },
+            { id: 'practice-topic-lessons', label: copy.topicLessons, href: appShellRoutes.practiceJapaneseTopicLessons, icon: BookOpen },
+            { id: 'practice-reading', label: copy.reading, href: appShellRoutes.practiceJapaneseReading, icon: BookOpen },
+            { id: 'practice-fill-blank', label: copy.fillBlank, href: appShellRoutes.practiceJapaneseFillBlank, icon: Type },
+            { id: 'practice-translation', label: copy.translationPractice, href: appShellRoutes.practiceJapaneseTranslation, icon: Languages },
+            { id: 'practice-sentence-writing', label: copy.sentenceWriting, href: appShellRoutes.practiceJapaneseSentenceWriting, icon: MessageCircleMore }
+          ]
+        },
+        {
+          id: 'kanji',
+          title: copy.kanji,
+          children: [
+            { id: 'practice-kanji-drawing', label: copy.kanjiDrawingPractice, href: appShellRoutes.practiceKanjiDrawing, icon: PenTool },
+            { id: 'practice-kanji-reading', label: copy.kanjiReading, href: appShellRoutes.practiceKanjiReading, icon: Type },
+            { id: 'practice-kanji-listening', label: copy.kanjiListening, href: appShellRoutes.practiceKanjiListening, icon: Headphones },
+            { id: 'practice-kanji-writing-recall', label: copy.writingRecallKanji, href: appShellRoutes.practiceKanjiWritingRecall, icon: PenTool },
+            { id: 'practice-kanji-usage', label: copy.kanjiUsage, href: appShellRoutes.practiceKanjiUsage, icon: Target },
+            { id: 'practice-kanji-challenge', label: copy.kanjiChallenge, href: appShellRoutes.practiceKanjiChallenge, icon: Trophy },
+            { id: 'practice-kanji-match', label: copy.kanjiMatch, href: appShellRoutes.practiceKanjiMatch, icon: Shuffle },
+            { id: 'practice-kanji-pop', label: copy.kanjiPop, href: appShellRoutes.practiceKanjiPop, icon: Sparkles }
           ]
         }
       ]
     },
-    { id: 'play', label: copy.play, href: appShellRoutes.meydan, icon: GraduationCap },
+    {
+      id: 'quiz',
+      label: copy.quiz,
+      icon: Target,
+      children: [
+        { id: 'quiz-kanji', label: copy.kanjiQuiz, href: appShellRoutes.quizKanji, icon: Trophy },
+        { id: 'quiz-kana', label: copy.kanaQuiz, href: appShellRoutes.quizKana, icon: Target },
+        { id: 'quiz-japanese', label: copy.japaneseQuiz, href: appShellRoutes.quizJapanese, icon: GraduationCap }
+      ]
+    },
+    {
+      id: 'play',
+      label: copy.play,
+      icon: GraduationCap,
+      children: [
+        { id: 'meydan-lobby', label: copy.arenaLobby, href: appShellRoutes.meydanLobby, icon: GraduationCap },
+        { id: 'meydan-speed', label: copy.speedMode, href: appShellRoutes.meydanSpeed, icon: Flame },
+        { id: 'meydan-timed', label: copy.timedChallenge, href: appShellRoutes.meydanTimed, icon: Timer },
+        { id: 'meydan-dojo', label: copy.dojoBoss, href: appShellRoutes.meydanDojo, icon: Swords },
+        { id: 'meydan-duel', label: copy.duel, href: appShellRoutes.meydanDuel, icon: Users }
+      ]
+    },
     { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
     { id: 'settings', label: copy.settings, href: appShellRoutes.settings, icon: Settings2 }
   ], [activeScript, copy]);
@@ -215,6 +329,7 @@ export const TopNav: React.FC<TopNavProps> = ({
       );
     }
     if (id === 'play') return location.pathname.startsWith(appShellRoutes.meydan);
+    if (id === 'quiz') return location.pathname.startsWith(appShellRoutes.quiz);
     if (id === 'quests') return location.pathname.startsWith(appShellRoutes.quests);
     if (id === 'settings') return location.pathname.startsWith(appShellRoutes.settings);
     return false;
@@ -236,7 +351,37 @@ export const TopNav: React.FC<TopNavProps> = ({
     if (item.id === 'practice-confusable') return location.pathname.startsWith(appShellRoutes.practiceConfusable);
     if (item.id === 'practice-custom') return location.pathname.startsWith(appShellRoutes.practiceCustom);
     if (item.id === 'practice-stats') return location.pathname.startsWith(appShellRoutes.practiceStats);
+    if (item.id === 'practice-kana-drawing') return location.pathname.startsWith(appShellRoutes.practiceKanaDrawing);
+    if (item.id === 'practice-kana-answer-type') return location.pathname.startsWith(appShellRoutes.practiceKanaAnswerType);
+    if (item.id === 'practice-kana-listening') return location.pathname.startsWith(appShellRoutes.practiceKanaListening);
+    if (item.id === 'practice-kana-reading') return location.pathname.startsWith(appShellRoutes.practiceKanaReading);
+    if (item.id === 'practice-kana-writing-recall') return location.pathname.startsWith(appShellRoutes.practiceKanaWritingRecall);
+    if (item.id === 'practice-kana-flashcards') return location.pathname.startsWith(appShellRoutes.practiceKanaFlashcards);
+    if (item.id === 'practice-kana-quick-study') return location.pathname.startsWith(appShellRoutes.practiceKanaQuickStudy);
+    if (item.id === 'practice-kana-pop') return location.pathname.startsWith(appShellRoutes.practiceKanaPop);
+    if (item.id === 'practice-quick-study') return location.pathname.startsWith(appShellRoutes.practiceJapaneseQuickStudy);
+    if (item.id === 'practice-topic-lessons') return location.pathname.startsWith(appShellRoutes.practiceJapaneseTopicLessons);
+    if (item.id === 'practice-reading') return location.pathname.startsWith(appShellRoutes.practiceJapaneseReading);
+    if (item.id === 'practice-fill-blank') return location.pathname.startsWith(appShellRoutes.practiceJapaneseFillBlank);
+    if (item.id === 'practice-translation') return location.pathname.startsWith(appShellRoutes.practiceJapaneseTranslation);
+    if (item.id === 'practice-sentence-writing') return location.pathname.startsWith(appShellRoutes.practiceJapaneseSentenceWriting);
     if (item.id === 'practice-flashcards') return location.pathname.startsWith(appShellRoutes.practiceJapaneseFlashcards);
+    if (item.id === 'practice-kanji-drawing') return location.pathname.startsWith(appShellRoutes.practiceKanjiDrawing);
+    if (item.id === 'practice-kanji-reading') return location.pathname.startsWith(appShellRoutes.practiceKanjiReading);
+    if (item.id === 'practice-kanji-listening') return location.pathname.startsWith(appShellRoutes.practiceKanjiListening);
+    if (item.id === 'practice-kanji-writing-recall') return location.pathname.startsWith(appShellRoutes.practiceKanjiWritingRecall);
+    if (item.id === 'practice-kanji-usage') return location.pathname.startsWith(appShellRoutes.practiceKanjiUsage);
+    if (item.id === 'practice-kanji-challenge') return location.pathname.startsWith(appShellRoutes.practiceKanjiChallenge);
+    if (item.id === 'practice-kanji-match') return location.pathname.startsWith(appShellRoutes.practiceKanjiMatch);
+    if (item.id === 'practice-kanji-pop') return location.pathname.startsWith(appShellRoutes.practiceKanjiPop);
+    if (item.id === 'meydan-lobby') return location.pathname.startsWith(appShellRoutes.meydanLobby);
+    if (item.id === 'meydan-speed') return location.pathname.startsWith(appShellRoutes.meydanSpeed);
+    if (item.id === 'meydan-timed') return location.pathname.startsWith(appShellRoutes.meydanTimed);
+    if (item.id === 'meydan-dojo') return location.pathname.startsWith(appShellRoutes.meydanDojo);
+    if (item.id === 'meydan-duel') return location.pathname.startsWith(appShellRoutes.meydanDuel);
+    if (item.id === 'quiz-kanji') return location.pathname.startsWith(appShellRoutes.quizKanji);
+    if (item.id === 'quiz-kana') return location.pathname.startsWith(appShellRoutes.quizKana);
+    if (item.id === 'quiz-japanese') return location.pathname.startsWith(appShellRoutes.quizJapanese);
     return location.pathname === item.href;
   };
 
@@ -288,7 +433,9 @@ export const TopNav: React.FC<TopNavProps> = ({
                   </button>
 
                   {isOpen && (
-                    <div className={`absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 ${item.groups ? 'min-w-[420px]' : 'min-w-[220px]'}`}>
+                    <div className={`absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 ${
+                      item.groups ? item.groups.length >= 3 ? 'min-w-[640px]' : 'min-w-[420px]' : 'min-w-[220px]'
+                    }`}>
                       <div className={`overflow-hidden rounded-xl border py-2 shadow-lg backdrop-blur-xl ${
                         isDark
                           ? 'border-[rgba(255,255,255,0.08)] bg-[rgba(18,12,22,0.88)]'
@@ -319,7 +466,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                           );
                         })}
                         {item.groups && (
-                          <div className="grid grid-cols-2 gap-2 px-2">
+                          <div className={`grid gap-2 px-2 ${item.groups.length >= 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
                             {item.groups.map((group, index) => (
                               <div
                                 key={group.id}

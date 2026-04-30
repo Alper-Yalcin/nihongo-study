@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, BookOpenText, Languages, PlayCircle, Sparkles, Swords, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button, Card } from '../components/ui';
+import { Button } from '../components/ui';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
 import { appShellRoutes, getPracticeRoute } from '../data/appShellContent';
 import { KanaScript } from '../features/kana/domain/kanaItem';
@@ -145,7 +145,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
 
   const featureCardClassName = isDark
     ? 'border-white/10 bg-[rgba(255,255,255,0.04)] text-white'
-    : 'border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] text-[var(--kt-ink)]';
+    : 'border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_82%,transparent)] text-[var(--kt-ink)]';
 
   const headingTextClassName = isDark ? 'text-white' : 'text-[var(--kt-ink-strong)]';
   const mutedTextClassName = isDark ? 'text-white/72' : 'text-[var(--kt-ink-muted)]';
@@ -281,10 +281,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
                       : practiceHref;
 
                 return (
-                  <Card
+                  <article
                     key={card.title}
-                    padding="lg"
-                    className={featureCardClassName}
+                    className={`rounded-[var(--kt-radius-md)] border p-8 shadow-[var(--kt-shadow-sm)] ${featureCardClassName}`}
                   >
                     <div className="flex items-center justify-between gap-4">
                       <h3 className={`text-2xl font-black ${headingTextClassName}`}>{card.title}</h3>
@@ -300,7 +299,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript
                         {card.cta}
                       </Button>
                     </div>
-                  </Card>
+                  </article>
                 );
               })}
             </div>

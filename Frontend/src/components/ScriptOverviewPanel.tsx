@@ -22,8 +22,6 @@ import { useKanaProgressSummary } from '../features/kana/progress/progressStore'
 import {
   Badge,
   Button,
-  Card,
-  CardHeader,
   Eyebrow,
   StatCard
 } from './ui';
@@ -71,6 +69,9 @@ const confusableSeeds = {
   hiragana: ['ぬ / め', 'あ / お', 'さ / ち', 'れ / わ'],
   katakana: ['シ / ツ', 'ソ / ン', 'ク / ケ', 'ス / ヌ']
 } as const;
+
+const surfacePanelClassName =
+  'rounded-[var(--kt-radius-md)] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_82%,transparent)] p-6 text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)]';
 
 const overviewCopy = {
   tr: {
@@ -291,11 +292,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
   return (
     <>
       <div className="mx-auto max-w-6xl space-y-16">
-        <Card
-          tone="brand"
-          padding="lg"
-          className="rounded-[var(--kt-radius-lg)]"
-        >
+        <section className="rounded-[var(--kt-radius-lg)] border border-[color:var(--kt-brand)]/30 bg-[color-mix(in_srgb,var(--kt-brand-soft)_70%,transparent)] p-8 text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)]">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
             <div className="space-y-5">
               <Eyebrow tone="brand">{pageCopy.hero.eyebrow}</Eyebrow>
@@ -320,7 +317,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
               <StatCard label={copy.stats.modes} value={availableViews.length} />
             </div>
           </div>
-        </Card>
+        </section>
 
         <section className="space-y-6">
           <div className="space-y-3">
@@ -335,7 +332,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {summaryCards.map((card) => (
-              <Card key={card.id} padding="md">
+              <article key={card.id} className={surfacePanelClassName}>
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--kt-surface-muted)] text-[var(--kt-ink-muted)]">
                     <card.Icon size={20} />
@@ -362,7 +359,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
                     {copy.actions.openFlow}
                   </Button>
                 )}
-              </Card>
+              </article>
             ))}
           </div>
         </section>
@@ -385,7 +382,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
               const startHref = startHrefByView[script][view];
 
               return (
-                <Card key={view}>
+                <article key={view} className={surfacePanelClassName}>
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]">
                     <Icon size={22} />
                   </div>
@@ -413,7 +410,7 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
                       {copy.actions.start}
                     </Button>
                   </div>
-                </Card>
+                </article>
               );
             })}
           </div>
@@ -438,21 +435,25 @@ export const ScriptOverviewPanel: React.FC<Props> = ({
               );
 
               return (
-                <Card key={section.id}>
-                  <CardHeader
-                    title={section.title}
-                    description={section.description}
-                    actions={
-                      <div className="flex flex-wrap gap-2">
-                        <Badge tone="neutral">{copy.table.groupCount(section.groups.length)}</Badge>
-                        <Badge tone="neutral">{copy.table.charCount(sectionCharacterCount)}</Badge>
-                      </div>
-                    }
-                  />
+                <section key={section.id} className={surfacePanelClassName}>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-semibold text-[var(--kt-ink-strong)]">
+                        {section.title}
+                      </h3>
+                      <p className="text-sm leading-6 text-[var(--kt-ink-muted)]">
+                        {section.description}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <Badge tone="neutral">{copy.table.groupCount(section.groups.length)}</Badge>
+                      <Badge tone="neutral">{copy.table.charCount(sectionCharacterCount)}</Badge>
+                    </div>
+                  </div>
                   <div className="mt-5">
                     <StudyTable matrix={section.matrix} columnGroupIds={section.columnGroupIds} />
                   </div>
-                </Card>
+                </section>
               );
             })}
           </div>

@@ -10,7 +10,7 @@ import {
   getPlayChallenges
 } from '../../features/play/challenges/challengeEngine';
 import { usePlayProgressStore } from '../../features/play/progress/usePlayProgressStore';
-import { Button, Card, StatCard } from '../ui';
+import { Button, StatCard } from '../ui';
 import { ProgressRing } from '../shared/ProgressRing';
 import { DailyQuestsCard } from './DailyQuestsCard';
 import { StatsStrip } from './StatsStrip';
@@ -106,7 +106,10 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
           </h3>
           <div className="mt-4 space-y-3">
             {runs.slice(0, 3).map((run) => (
-              <Card key={run.session.id} padding="sm" tone="muted">
+              <div
+                key={run.session.id}
+                className="rounded-[var(--kt-radius-md)] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface-muted)_70%,transparent)] p-4 text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)]"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-sm font-bold text-[var(--kt-ink-strong)]">{run.session.gameId}</div>
@@ -119,7 +122,7 @@ export const RightRail: React.FC<RightRailProps> = ({ language, activeScript }) 
                     <div className="text-xs text-[var(--kt-ink-muted)]">{`${run.xpEarned} XP`}</div>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </section>

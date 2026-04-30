@@ -6,8 +6,6 @@ import { appShellRoutes, getKanaEntryRoute, KanaAppScope } from '../data/appShel
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';
 import {
   Button,
-  Card,
-  CardHeader,
   StatCard
 } from '../components/ui';
 
@@ -79,8 +77,14 @@ export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({
       </section>
 
       <section>
-        <Card padding="lg">
-          <CardHeader title={language === 'tr' ? 'Session ozeti' : 'Session summary'} />
+        <div className="rounded-[var(--kt-radius-md)] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_82%,transparent)] p-8 text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold text-[var(--kt-ink-strong)]">
+                {language === 'tr' ? 'Session ozeti' : 'Session summary'}
+              </h3>
+            </div>
+          </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Script" value={session.script} />
             <StatCard label="Type" value={session.type} />
@@ -94,7 +98,7 @@ export const KanaSessionPage: React.FC<KanaSessionPageProps> = ({
               {language === 'tr' ? 'Ilgili akisa git' : 'Open matching flow'}
             </Button>
           </div>
-        </Card>
+        </div>
       </section>
     </div>
   );

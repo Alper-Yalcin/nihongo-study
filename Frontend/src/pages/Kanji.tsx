@@ -7,7 +7,6 @@ import {
 import { SectionCard } from '../components/SectionCard';
 import {
   Button,
-  Card,
   Eyebrow,
   PageHeader,
   PageSection,
@@ -466,7 +465,7 @@ export const Kanji: React.FC<Props> = ({ language }) => {
 
         {activeView === 'study' && (
           <div className="space-y-6">
-            <Card padding="md" className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <section className="flex flex-col gap-4 rounded-[var(--kt-radius-md)] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_82%,transparent)] p-6 text-[var(--kt-ink)] shadow-[var(--kt-shadow-sm)] sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <Eyebrow>{pageCopy.overviewTab}</Eyebrow>
                 <h2 className="mt-2 text-2xl font-bold text-[var(--kt-ink-strong)]">
@@ -483,7 +482,7 @@ export const Kanji: React.FC<Props> = ({ language }) => {
                 <ArrowLeft size={16} className="mr-2" />
                 {backToOverviewLabel}
               </Button>
-            </Card>
+            </section>
 
             <SectionCard
               title={copy.cardTitle}
