@@ -1,4 +1,5 @@
 import { AppLanguage } from './appPreferences';
+import { JLPTLevel } from './learnLevels';
 
 export type LearnUnitTone = 'brand' | 'warning' | 'success' | 'plum' | 'sunset' | 'info';
 
@@ -28,6 +29,7 @@ export interface LearnCourseUnit {
 export interface LearnCourseSection {
   id: string;
   partNumber: number;
+  level: JLPTLevel;
   title: string;
   description: string;
   bannerClassName: string;
@@ -37,8 +39,8 @@ export interface LearnCourseSection {
 const trSections: LearnCourseSection[] = [
   {
     id: 'part-1',
-
     partNumber: 1,
+    level: 'n5',
     title: 'Temel iletisim',
     description: 'Selamlas, siparis ver, kendini ve baskalarini tanit.',
     bannerClassName:
@@ -145,6 +147,7 @@ const trSections: LearnCourseSection[] = [
   {
     id: 'part-2',
     partNumber: 2,
+    level: 'n5',
     title: 'Cumle kurma ve sosyal hayat',
     description: 'Soru-cevap yap, arkadaslarini tanit, rutin ve mekan dili kur.',
     bannerClassName:
@@ -253,6 +256,7 @@ const trSections: LearnCourseSection[] = [
 const trPart3: LearnCourseSection = {
   id: 'part-3',
   partNumber: 3,
+  level: 'n5',
   title: 'Alisveris ve sayilar',
   description: 'Sayilari kullan, alisveris yap, yon sor ve hava durumunu anlat.',
   bannerClassName:
@@ -520,8 +524,121 @@ enSections.push({
   ]
 });
 
-export const getLearnCourseSections = (language: AppLanguage): LearnCourseSection[] =>
-  language === 'en' ? enSections : trSections;
+const trN4Sections: LearnCourseSection[] = [
+  {
+    id: 'n4-part-1',
+    partNumber: 1,
+    level: 'n4',
+    title: 'Temel dilbilgisi',
+    description: 'Te-form, geçmiş zaman ve bağlaçları kullan.',
+    bannerClassName:
+      'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-brand)_100%)]',
+    units: [
+      {
+        id: 'n4-p1-u1',
+        partNumber: 1,
+        unitNumber: 1,
+        title: 'Te-form kullanımı',
+        summary: 'Fiilleri te-form a çevir ve birden fazla eylemi birbirine bağla.',
+        goals: ['Te-form oluşturmak', 'Eylemleri zincirlemek', 'İzin ve rica ifadesi'],
+        vocabulary: ['tabete', 'nonde', 'itte', 'mite', 'shite', 'kite'],
+        grammarFocus: ['V-te form', 'V-te kudasai', 'V-te mo ii desu ka'],
+        lessonHighlights: ['Dönüşüm tablosu', 'Zincir cümleler', 'Rica kalıpları', 'Quiz'],
+        dialogue: [
+          { speaker: 'A', text: 'Mite kudasai.', translation: 'Lütfen bakın.' },
+          { speaker: 'B', text: 'Hai, wakarimashita.', translation: 'Evet, anladım.' }
+        ],
+        bannerClassName:
+          'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-brand)_100%)]',
+        accentGlow: 'rgba(54, 160, 255, 0.30)',
+        tone: 'info',
+        mascotPose: 'study'
+      },
+      {
+        id: 'n4-p1-u2',
+        partNumber: 1,
+        unitNumber: 2,
+        title: 'Geçmiş zaman',
+        summary: 'Ta-form ile geçmiş eylemleri ve deneyimleri anlat.',
+        goals: ['Ta-form oluşturmak', 'Geçmiş olayları anlatmak', 'Koto ga aru ile deneyim'],
+        vocabulary: ['tabeta', 'itta', 'mita', 'shita', 'kita', 'nonda'],
+        grammarFocus: ['V-ta form', 'V-ta koto ga aru', 'Geçmiş zaman cümleleri'],
+        lessonHighlights: ['Geçmiş dönüşümü', 'Deneyim anlatımı', 'Zaman çizgisi', 'Test'],
+        dialogue: [
+          { speaker: 'A', text: 'Nihon ni itta koto ga arimasu ka.', translation: 'Japonya ya gittin mi?' },
+          { speaker: 'B', text: 'Hai, ichinendo itta koto ga arimasu.', translation: 'Evet, bir kez gittim.' }
+        ],
+        bannerClassName:
+          'bg-[linear-gradient(135deg,var(--kt-accent-plum)_0%,var(--kt-accent-info)_100%)]',
+        accentGlow: 'rgba(176, 120, 236, 0.30)',
+        tone: 'plum',
+        mascotPose: 'wave'
+      },
+      {
+        id: 'n4-p1-u3',
+        partNumber: 1,
+        unitNumber: 3,
+        title: 'Bağlaçlar ve sıralama',
+        summary: 'Cümleleri kara, node, ga ve demo ile birbirine bağla.',
+        goals: ['Neden-sonuç ilişkisi kurmak', 'Zıtlık ifadesi', 'Cümle bağlama'],
+        vocabulary: ['dakara', 'demo', 'shikashi', 'soshite', 'mata', 'sorede'],
+        grammarFocus: ['Kara / node', 'Demo / shikashi / ga', 'Soshite / sorede'],
+        lessonHighlights: ['Bağlaç haritası', 'Cümle birleştirme', 'Tartışma diyaloğu', 'Quiz'],
+        dialogue: [
+          { speaker: 'A', text: 'Ame ga futta kara, uchi ni imashita.', translation: 'Yağmur yağdığı için evdeydim.' },
+          { speaker: 'B', text: 'Demo, watashi wa dekakemashita.', translation: 'Ama ben çıktım.' }
+        ],
+        bannerClassName:
+          'bg-[linear-gradient(135deg,var(--kt-accent-success)_0%,var(--kt-accent-warning)_100%)]',
+        accentGlow: 'rgba(144, 205, 70, 0.28)',
+        tone: 'success',
+        mascotPose: 'cheer'
+      },
+      {
+        id: 'n4-p1-u4',
+        partNumber: 1,
+        unitNumber: 4,
+        title: 'Kontrol Noktası: N4 Dilbilgisi',
+        summary: 'Te-form, geçmiş zaman ve bağlaçları test eden kontrol noktası.',
+        goals: ['Te-form ve ta-form kullanımı', 'Bağlaçlarla cümle kurma', 'N4 dilbilgisi özeti'],
+        vocabulary: ['tabete', 'itta', 'dakara', 'demo', 'koto', 'arimasu'],
+        grammarFocus: ['V-te / V-ta', 'Kara / node / demo', 'Koto ga aru'],
+        lessonHighlights: ['Karma sorular', 'Dönüşüm testi', 'Bağlaç seçimi', 'Büyük kontrol'],
+        dialogue: [
+          { speaker: 'A', text: 'Nihongo o benkyou shita koto ga arimasu ka.', translation: 'Japonca çalıştın mı?' },
+          { speaker: 'B', text: 'Hai, mainichi benkyou shite imasu.', translation: 'Evet, her gün çalışıyorum.' }
+        ],
+        bannerClassName:
+          'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-brand)_100%)]',
+        accentGlow: 'rgba(255, 186, 90, 0.32)',
+        tone: 'warning',
+        mascotPose: 'cheer'
+      }
+    ]
+  }
+];
+
+const enN4Sections: LearnCourseSection[] = [
+  {
+    ...trN4Sections[0],
+    title: 'Core grammar',
+    description: 'Use te-form, past tense, and connectors.',
+    units: [
+      { ...trN4Sections[0].units[0], summary: 'Convert verbs to te-form and chain multiple actions.' },
+      { ...trN4Sections[0].units[1], summary: 'Use ta-form to talk about past actions and experiences.' },
+      { ...trN4Sections[0].units[2], summary: 'Connect sentences using kara, node, demo, and soshite.' },
+      { ...trN4Sections[0].units[3], summary: 'N4 grammar checkpoint: te-form, past tense, and connectors.' }
+    ]
+  }
+];
+
+export const getLearnCourseSections = (language: AppLanguage, level?: JLPTLevel): LearnCourseSection[] => {
+  const trAll = [...trSections, ...trN4Sections];
+  const enAll = [...enSections, ...enN4Sections];
+  const all = language === 'en' ? enAll : trAll;
+  if (!level) return all;
+  return all.filter((s) => s.level === level);
+};
 
 export const flattenLearnCourseUnits = (sections: LearnCourseSection[]) =>
   sections.flatMap((section) => section.units);

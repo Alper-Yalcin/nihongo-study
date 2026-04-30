@@ -20,6 +20,7 @@ export const appShellRoutes = {
   learnJapaneseChallengeBase: '/learn/japanese/challenge',
   learnUnitBase: '/learn/unit',
   learnGuideBase: '/learn/guide',
+  learnExamBase: '/learn/exam',
   letters: '/letters',
   practice: '/practice',
   practiceReview: '/practice/review',
@@ -93,6 +94,7 @@ export const appShellRoutes = {
 
 export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnitBase}/${unitId}`;
 export const getLearnGuideRoute = (unitId: string) => `${appShellRoutes.learnGuideBase}/${unitId}`;
+export const getLearnExamRoute = (level: string) => `${appShellRoutes.learnExamBase}/${level}`;
 
 const studyLearnRouteByScript: Record<KanaRouteScript, string> = {
   hiragana: appShellRoutes.hiraganaLearn,

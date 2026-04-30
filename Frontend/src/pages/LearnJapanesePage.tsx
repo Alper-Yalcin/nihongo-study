@@ -22,8 +22,11 @@ import {
   getLearnCourseSections
 } from '../data/learnCourseContent';
 import { useLearnCourseProgress } from '../hooks/useLearnCourseProgress';
+import { useLearnLevelProgress } from '../hooks/useLearnLevelProgress';
+import { getLevelInfo } from '../data/learnLevels';
 import { LearnSideRail } from '../components/learn/LearnSideRail';
 import { LearnFallingFlowers } from '../components/learn/LearnFallingFlowers';
+import { getLearnExamRoute } from '../data/appShellContent';
 
 interface LearnJapanesePageProps {
   language: AppLanguage;
@@ -106,7 +109,9 @@ const pageCopy = {
     progress: 'Ilerleme',
     bolum: 'Bölüm',
     prevChapter: 'Önceki bölüm',
-    nextChapter: 'Sonraki bölüm'
+    nextChapter: 'Sonraki bölüm',
+    examButton: 'Sınava Gir',
+    examHint: 'Tüm üniteler tamamlandı! Sınava girerek sonraki seviyeye geç.'
   },
   en: {
     title: 'Japanese Journey',
@@ -115,7 +120,9 @@ const pageCopy = {
     progress: 'Progress',
     bolum: 'Chapter',
     prevChapter: 'Previous chapter',
-    nextChapter: 'Next chapter'
+    nextChapter: 'Next chapter',
+    examButton: 'Take Exam',
+    examHint: 'All units complete! Take the exam to advance to the next level.'
   }
 } as const;
 
@@ -662,8 +669,13 @@ const MobileLearnRoadmap: React.FC<{
   themeMode: ThemeMode;
   copy: typeof pageCopy.tr | typeof pageCopy.en;
   sections: MobileUnitSection[];
+  levelInfo: { label: string; color: string };
+  allLevelUnitsComplete: boolean;
+  hasNextLevel: boolean;
+  currentLevel: string;
   onOpenUnit: (unitId: string) => void;
-}> = ({ language, themeMode, copy, sections, onOpenUnit }) => {
+  onExam: () => void;
+}> = ({ language, themeMode, copy, sections, levelInfo, allLevelUnitsComplete, hasNextLevel, onOpenUnit, onExam }) => {
   const isDark = themeMode === 'dark';
 
   return (
@@ -677,10 +689,28 @@ const MobileLearnRoadmap: React.FC<{
           <div className="absolute bottom-0 right-8 text-[88px] opacity-20">⛩</div>
         </div>
         <div className="relative">
-          <h1 className="text-2xl font-black tracking-[-0.02em]">{copy.title}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-black tracking-[-0.02em]">{copy.title}</h1>
+            <span
+              className="rounded-full px-2.5 py-0.5 text-xs font-black text-white"
+              style={{ backgroundColor: levelInfo.color }}
+            >
+              {levelInfo.label}
+            </span>
+          </div>
           <p className={`mt-2 text-sm font-semibold leading-6 ${isDark ? 'text-[#d5dceb]' : 'text-[#405064]'}`}>
             {copy.subtitle}
           </p>
+          {allLevelUnitsComplete && hasNextLevel && (
+            <button
+              type="button"
+              onClick={onExam}
+              className="mt-3 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white shadow-[0_4px_14px_rgba(240,77,114,0.35)] transition hover:scale-105"
+              style={{ backgroundColor: levelInfo.color }}
+            >
+              {copy.examButton} →
+            </button>
+          )}
         </div>
       </div>
 
@@ -817,10 +847,14 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const [desktopMapScale, setDesktopMapScale] = useState(getDesktopMapScale);
   const copy = pageCopy[language];
   const isDark = themeMode === 'dark';
-  const sections = useMemo(() => getLearnCourseSections(language), [language]);
+  const { currentLevel, hasNextLevel } = useLearnLevelProgress();
+  const levelInfo = getLevelInfo(currentLevel);
+  const sections = useMemo(() => getLearnCourseSections(language, currentLevel), [language, currentLevel]);
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
   const { completedCount, completedSet, getUnitProgress, getUnitState } = useLearnCourseProgress(orderedUnitIds);
+
+  const allLevelUnitsComplete = units.length > 0 && completedCount === units.length;
 
   // Which chapter the user is currently progressing in
   const activeChapter = useMemo(() => {
@@ -839,6 +873,11 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   useEffect(() => {
     setViewChapter((prev) => Math.max(prev, activeChapter));
   }, [activeChapter]);
+
+  // Reset view to chapter 0 when the level changes (new level starts fresh)
+  useEffect(() => {
+    setViewChapter(0);
+  }, [currentLevel]);
 
   const totalChapters = Math.max(1, Math.ceil(units.length / NODES_PER_CHAPTER));
   const chapterStart = viewChapter * NODES_PER_CHAPTER;
@@ -980,7 +1019,12 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         themeMode={themeMode}
         copy={copy}
         sections={mobileSections}
+        levelInfo={levelInfo}
+        allLevelUnitsComplete={allLevelUnitsComplete}
+        hasNextLevel={hasNextLevel}
+        currentLevel={currentLevel}
         onOpenUnit={(unitId) => navigate(getLearnUnitRoute(unitId))}
+        onExam={() => navigate(getLearnExamRoute(currentLevel))}
       />
 
       <section
@@ -1007,9 +1051,17 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             className="absolute top-[34px]"
             style={{ left: 170 + DESKTOP_MAP_X_OFFSET }}
           >
-            <h1 className={`text-[28px] font-extrabold tracking-[-0.02em] ${
-              isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.72)]' : 'text-[#1f2b3b]'
-            }`}>{copy.title}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className={`text-[28px] font-extrabold tracking-[-0.02em] ${
+                isDark ? 'text-[#f8fbff] drop-shadow-[0_2px_5px_rgba(0,0,0,0.72)]' : 'text-[#1f2b3b]'
+              }`}>{copy.title}</h1>
+              <span
+                className="rounded-full px-3 py-1 text-[13px] font-black text-white shadow-[0_4px_12px_rgba(0,0,0,0.18)]"
+                style={{ backgroundColor: levelInfo.color }}
+              >
+                {levelInfo.label}
+              </span>
+            </div>
             <div className="mt-2 flex items-center gap-4">
               <p className={`text-[17px] font-medium ${
                 isDark ? 'text-[#d5dceb] drop-shadow-[0_2px_4px_rgba(0,0,0,0.62)]' : 'text-[#405064]'
@@ -1022,6 +1074,16 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
                 }`}>
                   {copy.bolum} {viewChapter + 1} / {totalChapters}
                 </span>
+              )}
+              {allLevelUnitsComplete && hasNextLevel && (
+                <button
+                  type="button"
+                  onClick={() => navigate(getLearnExamRoute(currentLevel))}
+                  className="flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-black text-white shadow-[0_4px_14px_rgba(240,77,114,0.35)] transition hover:scale-105 hover:shadow-[0_6px_18px_rgba(240,77,114,0.45)]"
+                  style={{ backgroundColor: levelInfo.color }}
+                >
+                  {copy.examButton} →
+                </button>
               )}
             </div>
           </div>

@@ -24,6 +24,7 @@ import { MissionPage } from './pages/MissionPage';
 import { QuestsPage } from './pages/QuestsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LearnUnitPage } from './pages/LearnUnitPage';
+import { LearnLevelExamPage } from './pages/LearnLevelExamPage';
 import { LearnGuidePage } from './pages/LearnGuidePage';
 import { LearnJapanesePage } from './pages/LearnJapanesePage';
 import { LearnReviewPage } from './pages/LearnReviewPage';
@@ -759,6 +760,7 @@ export default function App() {
           <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
           <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
           <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} themeMode={themeMode} activeScript={activeScript} />} />
+          <Route path={`${appShellRoutes.learnExamBase}/:level`} element={<LearnLevelExamPage language={language} themeMode={themeMode} />} />
           <Route path="*" element={shell} />
         </Routes>
         <ReEntrySplash />
