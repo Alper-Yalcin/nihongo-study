@@ -63,19 +63,18 @@ export const useLearnCourseProgress = (orderedUnitIds: string[]) => {
       return 'locked' as const;
     }
 
-    if (completedSet.has(unitId)) {
-      return 'completed' as const;
-    }
-
-    if (unitIndex === currentUnitIndex) {
-      return 'active' as const;
+    // Units AFTER the first incomplete unit are always locked, regardless of completedSet.
+    // This prevents out-of-order completions (e.g. stale test data) from unlocking nodes.
+    if (unitIndex > currentUnitIndex) {
+      return 'locked' as const;
     }
 
     if (unitIndex < currentUnitIndex) {
-      return 'available' as const;
+      return completedSet.has(unitId) ? 'completed' as const : 'available' as const;
     }
 
-    return 'locked' as const;
+    // unitIndex === currentUnitIndex
+    return 'active' as const;
   };
 
   const setUnitCompleted = (unitId: string, completed: boolean) => {
@@ -128,6 +127,10 @@ export const useLearnCourseProgress = (orderedUnitIds: string[]) => {
     return Math.max(0, Math.min(100, Math.round(progress.unitProgressById[unitId] ?? 0)));
   };
 
+  const resetProgress = () => {
+    setProgress({ completedUnitIds: [], unitProgressById: {} });
+  };
+
   return {
     completedCount: completedUnitIds.length,
     completedUnitIds,
@@ -141,6 +144,7 @@ export const useLearnCourseProgress = (orderedUnitIds: string[]) => {
     getUnitProgress,
     isUnitCompleted: (unitId: string) => completedSet.has(unitId),
     setUnitCompleted,
-    setUnitProgress
+    setUnitProgress,
+    resetProgress
   };
 };

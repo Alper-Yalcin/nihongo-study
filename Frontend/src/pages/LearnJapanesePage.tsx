@@ -43,7 +43,7 @@ const DESKTOP_MAP_HEIGHT = 1120;
 const DESKTOP_MAP_MIN_SCALE = 0.45;
 const DESKTOP_MAP_X_OFFSET = -170;
 
-const NODES_PER_CHAPTER = 8;
+const NODES_PER_CHAPTER = 20;
 const UNIT_GROUPS_PER_CHAPTER = 4;
 const NODES_PER_GROUP = NODES_PER_CHAPTER / UNIT_GROUPS_PER_CHAPTER;
 
@@ -173,11 +173,19 @@ const lessonNodes: LessonNode[] = [
 ];
 
 const toneStyles: Record<NodeTone, string> = {
-  pink:   'border-[#ffe3ea] bg-[linear-gradient(145deg,#ff9fb4,#ef4d73)] shadow-[0_8px_0_#d8385c,0_18px_30px_rgba(237,75,112,0.24)]',
-  orange: 'border-[#ffe1ad] bg-[linear-gradient(145deg,#ffc75f,#f09a20)] shadow-[0_8px_0_#d77c13,0_18px_32px_rgba(240,154,32,0.28)]',
-  purple: 'border-[#e6d5ff] bg-[linear-gradient(145deg,#b990f4,#8753d5)] shadow-[0_8px_0_#7142b8,0_18px_32px_rgba(135,83,213,0.25)]',
-  blue:   'border-[#d4ebff] bg-[linear-gradient(145deg,#7cc1ff,#3a8edc)] shadow-[0_8px_0_#2870b6,0_18px_30px_rgba(58,142,220,0.24)]',
-  gray:   'border-[#f3f0ee] bg-[linear-gradient(145deg,#c8c8c8,#868686)] shadow-[0_8px_0_#777,0_18px_28px_rgba(80,80,80,0.14)]'
+  pink:   'border-transparent bg-[linear-gradient(145deg,#ff9fb4,#ef4d73)] shadow-[0_8px_0_#d8385c,0_18px_30px_rgba(237,75,112,0.24)]',
+  orange: 'border-transparent bg-[linear-gradient(145deg,#ffc75f,#f09a20)] shadow-[0_8px_0_#d77c13,0_18px_32px_rgba(240,154,32,0.28)]',
+  purple: 'border-transparent bg-[linear-gradient(145deg,#b990f4,#8753d5)] shadow-[0_8px_0_#7142b8,0_18px_32px_rgba(135,83,213,0.25)]',
+  blue:   'border-transparent bg-[linear-gradient(145deg,#7cc1ff,#3a8edc)] shadow-[0_8px_0_#2870b6,0_18px_30px_rgba(58,142,220,0.24)]',
+  gray:   'border-transparent bg-[linear-gradient(145deg,#c8c8c8,#868686)] shadow-[0_8px_0_#777,0_18px_28px_rgba(80,80,80,0.14)]'
+};
+
+const progressTrackColors: Record<NodeTone, string> = {
+  pink:   '#ffe3ea',
+  orange: '#ffe1ad',
+  purple: '#e6d5ff',
+  blue:   '#d4ebff',
+  gray:   '#f3f0ee'
 };
 
 const badgeNumberStyles: Record<NodeTone, string> = {
@@ -475,6 +483,17 @@ const LessonNodeButton: React.FC<{
           aria-hidden="true"
           style={{ left: -borderWidth, top: -borderWidth }}
         >
+          {/* Track: only visible when node is unlocked */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={progressTrackColors[node.tone]}
+            strokeWidth={borderWidth}
+            opacity={isLocked ? 0 : 0.55}
+          />
+          {/* Progress arc */}
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -485,7 +504,7 @@ const LessonNodeButton: React.FC<{
             strokeWidth={borderWidth}
             strokeDasharray={circumference}
             strokeDashoffset={progressOffset}
-            opacity={isLocked && progress === 0 ? 0 : 1}
+            opacity={isLocked || progress === 0 ? 0 : 1}
             className="transition-[stroke-dashoffset,opacity] duration-700 ease-out"
           />
         </svg>
@@ -568,6 +587,17 @@ const MobileLessonNode: React.FC<{
           aria-hidden="true"
           style={{ left: -borderWidth, top: -borderWidth }}
         >
+          {/* Track: only visible when node is unlocked */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={progressTrackColors[item.node.tone]}
+            strokeWidth={borderWidth}
+            opacity={isLocked ? 0 : 0.55}
+          />
+          {/* Progress arc */}
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -578,7 +608,7 @@ const MobileLessonNode: React.FC<{
             strokeWidth={borderWidth}
             strokeDasharray={circumference}
             strokeDashoffset={progressOffset}
-            opacity={isLocked && item.progress === 0 ? 0 : 1}
+            opacity={isLocked || item.progress === 0 ? 0 : 1}
           />
         </svg>
         <span className="absolute inset-[5px] rounded-full border border-white/55 bg-white/10" />
@@ -834,7 +864,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const sections = useMemo(() => getLearnCourseSections(language, currentLevel), [language, currentLevel]);
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
-  const { completedCount, completedSet, getUnitProgress, getUnitState } = useLearnCourseProgress(orderedUnitIds);
+  const { completedCount, completedSet, getUnitProgress, getUnitState, resetProgress } = useLearnCourseProgress(orderedUnitIds);
 
   const allLevelUnitsComplete = units.length > 0 && completedCount === units.length;
 
@@ -1065,6 +1095,17 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
                   style={{ backgroundColor: levelInfo.color }}
                 >
                   {copy.examButton} →
+                </button>
+              )}
+              {completedCount > 0 && (
+                <button
+                  type="button"
+                  onClick={resetProgress}
+                  className={`rounded-full px-3 py-0.5 text-[12px] font-bold opacity-40 hover:opacity-70 transition ${
+                    isDark ? 'bg-white/10 text-white' : 'bg-[#1f2b3b]/[0.07] text-[#1f2b3b]'
+                  }`}
+                >
+                  ↺ Sıfırla
                 </button>
               )}
             </div>
