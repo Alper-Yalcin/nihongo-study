@@ -1,9 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import {
+  ArrowLeft,
   BadgeCheck,
   BookOpen,
   BookText,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  Library,
   Languages,
   MessageSquareText,
   PencilLine,
@@ -52,7 +56,7 @@ const modeCopy = {
     reading: {
       eyebrow: 'Japanese Practice',
       title: 'Kitap Okuma',
-      description: 'Kisa Japonca parcalari oku, ana fikri ve kelimeleri kontrol et.'
+      description: 'Kitap sec, sayfa sayfa oku, kelimeleri ve kisa anlama sorularini kontrol et.'
     },
     fill: {
       eyebrow: 'Japanese Practice',
@@ -105,7 +109,7 @@ const modeCopy = {
     reading: {
       eyebrow: 'Japanese Practice',
       title: 'Reading',
-      description: 'Read short Japanese passages and check the main idea and key vocabulary.'
+      description: 'Choose a book, read page by page, and check vocabulary plus quick comprehension.'
     },
     fill: {
       eyebrow: 'Japanese Practice',
@@ -505,38 +509,388 @@ export const PracticeJapaneseTopicLessonsPage: React.FC<PracticeJapanesePageProp
   );
 };
 
-const readingStories = [
+type ReadingBookTone = 'rose' | 'indigo' | 'amber';
+
+interface ReadingVocab {
+  japanese: string;
+  reading: string;
+  meaning: {
+    tr: string;
+    en: string;
+  };
+}
+
+interface ReadingPage {
+  id: string;
+  title: string;
+  japanese: string;
+  romaji: string;
+  meaning: {
+    tr: string;
+    en: string;
+  };
+  vocab: ReadingVocab[];
+  question: {
+    tr: string;
+    en: string;
+    answer: string;
+    options: string[];
+  };
+}
+
+interface ReadingBook {
+  id: string;
+  title: string;
+  level: string;
+  genre: string;
+  minutes: number;
+  tone: ReadingBookTone;
+  summary: {
+    tr: string;
+    en: string;
+  };
+  pages: ReadingPage[];
+}
+
+const readingBooks: ReadingBook[] = [
   {
-    id: 'morning',
-    title: 'あさの あいさつ',
-    japanese: 'あさです。たなかさんは がっこうに いきます。ともだちに「おはようございます」と いいます。',
-    romaji: 'Asa desu. Tanaka-san wa gakkou ni ikimasu. Tomodachi ni "ohayou gozaimasu" to iimasu.',
-    meaning: 'It is morning. Tanaka goes to school and says good morning to a friend.',
-    question: 'What greeting is used?',
-    answer: 'おはようございます',
-    options: ['おはようございます', 'こんばんは', 'いただきます']
+    id: 'morning-walk',
+    title: 'あさのさんぽ',
+    level: 'N5',
+    genre: 'Daily life',
+    minutes: 4,
+    tone: 'rose',
+    summary: {
+      tr: 'Kisa gunluk cumlelerle sabah rutini ve parkta karsilasma.',
+      en: 'A short daily-life story about a morning routine and a meeting at the park.'
+    },
+    pages: [
+      {
+        id: 'morning-1',
+        title: 'あたらしい あさ',
+        japanese: 'あさです。ゆきさんは みずを のみます。それから こうえんに いきます。そらは あおいです。',
+        romaji: 'Asa desu. Yuki-san wa mizu o nomimasu. Sore kara kouen ni ikimasu. Sora wa aoi desu.',
+        meaning: {
+          tr: 'Sabah oldu. Yuki su icer, sonra parka gider. Gokyuzu mavidir.',
+          en: 'It is morning. Yuki drinks water, then goes to the park. The sky is blue.'
+        },
+        vocab: [
+          { japanese: 'あさ', reading: 'asa', meaning: { tr: 'sabah', en: 'morning' } },
+          { japanese: 'みず', reading: 'mizu', meaning: { tr: 'su', en: 'water' } },
+          { japanese: 'こうえん', reading: 'kouen', meaning: { tr: 'park', en: 'park' } }
+        ],
+        question: {
+          tr: 'Yuki nereye gidiyor?',
+          en: 'Where does Yuki go?',
+          answer: 'こうえん',
+          options: ['こうえん', 'がっこう', 'えき']
+        }
+      },
+      {
+        id: 'morning-2',
+        title: 'ともだち',
+        japanese: 'こうえんで ともだちに あいます。ふたりは「おはよう」と いいます。ベンチで すこし はなします。',
+        romaji: 'Kouen de tomodachi ni aimasu. Futari wa "ohayou" to iimasu. Benchi de sukoshi hanashimasu.',
+        meaning: {
+          tr: 'Parkta bir arkadasiyla karsilasir. Ikisi "gunaydin" der. Bankta biraz konusurlar.',
+          en: 'At the park, Yuki meets a friend. They say good morning and talk a little on a bench.'
+        },
+        vocab: [
+          { japanese: 'ともだち', reading: 'tomodachi', meaning: { tr: 'arkadas', en: 'friend' } },
+          { japanese: 'あいます', reading: 'aimasu', meaning: { tr: 'karsilasir', en: 'meet' } },
+          { japanese: 'はなします', reading: 'hanashimasu', meaning: { tr: 'konusur', en: 'talk' } }
+        ],
+        question: {
+          tr: 'Iki kisi nerede konusuyor?',
+          en: 'Where do the two people talk?',
+          answer: 'ベンチ',
+          options: ['ベンチ', 'でんしゃ', 'きょうしつ']
+        }
+      }
+    ]
   },
   {
-    id: 'shop',
-    title: 'コンビニで',
-    japanese: 'これは パンです。その ジュースは いくらですか。たなかさんは パンと ジュースを かいます。',
-    romaji: 'Kore wa pan desu. Sono juusu wa ikura desu ka. Tanaka-san wa pan to juusu o kaimasu.',
-    meaning: 'This is bread. Tanaka asks how much that juice is and buys bread and juice.',
-    question: 'What does Tanaka buy?',
-    answer: 'パンとジュース',
-    options: ['パンとジュース', 'ほんとえんぴつ', 'さかなとみず']
+    id: 'station-cafe',
+    title: 'えきのカフェ',
+    level: 'N5',
+    genre: 'Travel',
+    minutes: 5,
+    tone: 'indigo',
+    summary: {
+      tr: 'Istasyonda bulusma, kafe siparisi ve saat ifadeleri.',
+      en: 'A station meetup with cafe orders and time expressions.'
+    },
+    pages: [
+      {
+        id: 'station-1',
+        title: 'えきで',
+        japanese: 'たろうさんは えきに います。いま くじです。ともだちは まだ きません。',
+        romaji: 'Tarou-san wa eki ni imasu. Ima kuji desu. Tomodachi wa mada kimasen.',
+        meaning: {
+          tr: 'Taro istasyondadir. Simdi saat dokuz. Arkadasi henuz gelmez.',
+          en: 'Taro is at the station. It is nine o clock. His friend has not come yet.'
+        },
+        vocab: [
+          { japanese: 'えき', reading: 'eki', meaning: { tr: 'istasyon', en: 'station' } },
+          { japanese: 'くじ', reading: 'kuji', meaning: { tr: 'saat dokuz', en: 'nine o clock' } },
+          { japanese: 'まだ', reading: 'mada', meaning: { tr: 'henuz', en: 'not yet' } }
+        ],
+        question: {
+          tr: 'Taro nerede?',
+          en: 'Where is Taro?',
+          answer: 'えき',
+          options: ['えき', 'カフェ', 'いえ']
+        }
+      },
+      {
+        id: 'station-2',
+        title: 'あたたかい コーヒー',
+        japanese: 'ともだちが きました。ふたりは カフェに はいります。たろうさんは あたたかい コーヒーを たのみます。',
+        romaji: 'Tomodachi ga kimashita. Futari wa kafe ni hairimasu. Tarou-san wa atatakai koohii o tanomimasu.',
+        meaning: {
+          tr: 'Arkadasi geldi. Ikisi kafeye girer. Taro sicak kahve siparis eder.',
+          en: 'The friend arrives. The two enter a cafe. Taro orders hot coffee.'
+        },
+        vocab: [
+          { japanese: 'カフェ', reading: 'kafe', meaning: { tr: 'kafe', en: 'cafe' } },
+          { japanese: 'あたたかい', reading: 'atatakai', meaning: { tr: 'sicak', en: 'warm' } },
+          { japanese: 'たのみます', reading: 'tanomimasu', meaning: { tr: 'siparis eder', en: 'order' } }
+        ],
+        question: {
+          tr: 'Taro ne siparis ediyor?',
+          en: 'What does Taro order?',
+          answer: 'コーヒー',
+          options: ['コーヒー', 'ジュース', 'おちゃ']
+        }
+      }
+    ]
+  },
+  {
+    id: 'small-library',
+    title: 'ちいさな としょかん',
+    level: 'N5-N4',
+    genre: 'School',
+    minutes: 6,
+    tone: 'amber',
+    summary: {
+      tr: 'Kutuphane, kitap secme ve sessiz okuma uzerine biraz daha uzun bir metin.',
+      en: 'A slightly longer text about a library, choosing a book, and reading quietly.'
+    },
+    pages: [
+      {
+        id: 'library-1',
+        title: 'ほんを さがす',
+        japanese: 'まいさんは としょかんが すきです。きょうは やさしい にほんごの ほんを さがします。',
+        romaji: 'Mai-san wa toshokan ga suki desu. Kyou wa yasashii nihongo no hon o sagashimasu.',
+        meaning: {
+          tr: 'Mai kutuphaneyi sever. Bugun kolay Japonca bir kitap arar.',
+          en: 'Mai likes the library. Today she looks for an easy Japanese book.'
+        },
+        vocab: [
+          { japanese: 'としょかん', reading: 'toshokan', meaning: { tr: 'kutuphane', en: 'library' } },
+          { japanese: 'やさしい', reading: 'yasashii', meaning: { tr: 'kolay', en: 'easy' } },
+          { japanese: 'さがします', reading: 'sagashimasu', meaning: { tr: 'arar', en: 'look for' } }
+        ],
+        question: {
+          tr: 'Mai ne ariyor?',
+          en: 'What is Mai looking for?',
+          answer: 'にほんごの ほん',
+          options: ['にほんごの ほん', 'あたらしい くつ', 'しろい かさ']
+        }
+      },
+      {
+        id: 'library-2',
+        title: 'しずかな へや',
+        japanese: 'まいさんは まどの ちかくに すわります。へやは しずかです。ほんの ことばを ノートに かきます。',
+        romaji: 'Mai-san wa mado no chikaku ni suwarimasu. Heya wa shizuka desu. Hon no kotoba o nooto ni kakimasu.',
+        meaning: {
+          tr: 'Mai pencerenin yakinina oturur. Oda sessizdir. Kitaptaki kelimeleri deftere yazar.',
+          en: 'Mai sits near the window. The room is quiet. She writes the book words in her notebook.'
+        },
+        vocab: [
+          { japanese: 'まど', reading: 'mado', meaning: { tr: 'pencere', en: 'window' } },
+          { japanese: 'しずか', reading: 'shizuka', meaning: { tr: 'sessiz', en: 'quiet' } },
+          { japanese: 'ことば', reading: 'kotoba', meaning: { tr: 'kelime', en: 'word' } }
+        ],
+        question: {
+          tr: 'Mai kelimeleri nereye yaziyor?',
+          en: 'Where does Mai write the words?',
+          answer: 'ノート',
+          options: ['ノート', 'かばん', 'テーブル']
+        }
+      }
+    ]
   }
 ];
 
+const readingCopy = {
+  tr: {
+    library: 'Kitaplik',
+    chooseBook: 'Kitap sec',
+    startBook: 'Okumaya basla',
+    backToLibrary: 'Kitapliga don',
+    level: 'Seviye',
+    time: 'Sure',
+    pages: 'sayfa',
+    minutes: 'dk',
+    reader: 'Okuma alani',
+    page: 'Sayfa',
+    previous: 'Onceki',
+    next: 'Sonraki',
+    finish: 'Kitabi bitir',
+    vocabulary: 'Kelimeler',
+    meaning: 'Anlam',
+    romaji: 'Romaji',
+    comprehension: 'Anlama sorusu',
+    correct: 'Dogru cevap',
+    wrong: 'Tekrar kontrol et',
+    progress: 'Ilerleme'
+  },
+  en: {
+    library: 'Library',
+    chooseBook: 'Choose a book',
+    startBook: 'Start reading',
+    backToLibrary: 'Back to library',
+    level: 'Level',
+    time: 'Time',
+    pages: 'pages',
+    minutes: 'min',
+    reader: 'Reading area',
+    page: 'Page',
+    previous: 'Previous',
+    next: 'Next',
+    finish: 'Finish book',
+    vocabulary: 'Vocabulary',
+    meaning: 'Meaning',
+    romaji: 'Romaji',
+    comprehension: 'Comprehension',
+    correct: 'Correct',
+    wrong: 'Check again',
+    progress: 'Progress'
+  }
+} as const;
+
+type BookCopy = typeof readingCopy['en'] | typeof readingCopy['tr'];
+
+const BookLeftPage: React.FC<{
+  page: ReadingPage;
+  language: AppLanguage;
+  c: BookCopy;
+  roundedLeft?: boolean;
+}> = ({ page, language, c, roundedLeft = true }) => (
+  <div
+    className={`relative min-h-[34rem] bg-[#fff8eb] px-5 py-6 shadow-[inset_-24px_0_28px_rgba(91,63,36,0.08)] sm:px-9 sm:py-8 ${
+      roundedLeft ? 'lg:rounded-l-[0.9rem]' : ''
+    }`}
+  >
+    <div className="mx-auto max-w-[34rem]">
+      <div className="text-center">
+        <BookOpen className="mx-auto text-[#6e5642]" size={24} />
+        <div className="mt-2 font-jp text-sm font-black text-[#7a5445]">✿ {page.title} ✿</div>
+        <div className="mx-auto mt-4 h-px w-4/5 bg-[#d8c7ab]" />
+      </div>
+      <div className="mt-8 border-y border-[#dfcfb3] py-5">
+        <p className="font-jp text-2xl leading-10 text-[#201a17] sm:text-3xl sm:leading-[3.3rem]">{page.japanese}</p>
+      </div>
+      <div className="mt-6 border-t border-[#dfcfb3] pt-5">
+        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#8a7460]">{c.romaji}</div>
+        <p className="mt-2 text-sm leading-6 text-[#5d4d41]">{page.romaji}</p>
+      </div>
+      <div className="mt-5 border-t border-[#dfcfb3] pt-5">
+        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#8a7460]">{c.meaning}</div>
+        <p className="mt-2 text-sm leading-6 text-[#4d4037]">{page.meaning[language]}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const BookRightPage: React.FC<{
+  page: ReadingPage;
+  language: AppLanguage;
+  c: BookCopy;
+  selected: string | null;
+  onChoose: (option: string) => void;
+  interactive: boolean;
+  roundedRight?: boolean;
+}> = ({ page, language, c, selected, onChoose, interactive, roundedRight = true }) => (
+  <div
+    className={`relative min-h-[34rem] border-t border-[#dfcfb3] bg-[#fff7e8] px-5 py-6 shadow-[inset_24px_0_28px_rgba(91,63,36,0.08)] sm:px-9 sm:py-8 lg:border-l lg:border-t-0 ${
+      roundedRight ? 'lg:rounded-r-[0.9rem]' : ''
+    }`}
+  >
+    <div className="mx-auto max-w-[34rem]">
+      <div className="text-center">
+        <Library className="mx-auto text-[#6e5642]" size={24} />
+        <div className="mt-2 text-sm font-black text-[#7a5445]">✿ {c.vocabulary} ✿</div>
+        <div className="mx-auto mt-4 h-px w-4/5 bg-[#d8c7ab]" />
+      </div>
+      <div className="mt-7 divide-y divide-[#e4d5bd]">
+        {page.vocab.map((item) => (
+          <div key={item.japanese} className="grid grid-cols-[minmax(5rem,0.8fr)_minmax(0,1fr)] gap-4 py-4">
+            <div>
+              <div className="font-jp text-3xl font-black text-[#201a17]">{item.japanese}</div>
+              <div className="mt-1 font-jp text-sm font-bold text-[#5d4d41]">[ {item.reading} ]</div>
+            </div>
+            <div className="pt-1">
+              <div className="font-jp text-base font-black text-[#2e2722]">{item.japanese}</div>
+              <div className="mt-1 text-sm font-semibold text-[#7a5445]">{item.meaning[language]}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-7 border-t border-[#dfcfb3] pt-5">
+        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#8a7460]">{c.comprehension}</div>
+        <div className="mt-2 text-base font-black text-[#2e2722]">{page.question[language]}</div>
+        <div className="mt-3 grid gap-2">
+          {page.question.options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              disabled={!interactive || selected !== null}
+              onClick={() => onChoose(option)}
+              className={`border-b px-1 py-3 text-left font-jp text-base font-black transition ${
+                selected === null
+                  ? 'border-[#dcc8a8] text-[#2e2722] hover:border-[#b69468] hover:text-[#7a5445]'
+                  : option === page.question.answer
+                    ? 'border-[color:var(--kt-accent-success)] text-[var(--kt-accent-success)]'
+                    : selected === option
+                      ? 'border-[color:var(--kt-accent-danger)] text-[var(--kt-accent-danger)]'
+                      : 'border-[#dcc8a8] text-[#2e2722] opacity-70'
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+        {selected !== null && (
+          <div
+            className={`mt-3 text-sm font-black ${
+              selected === page.question.answer ? 'text-[var(--kt-accent-success)]' : 'text-[var(--kt-accent-danger)]'
+            }`}
+          >
+            {selected === page.question.answer ? c.correct : c.wrong}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
 export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = ({ language }) => {
-  const c = modeCopy[language];
-  const [storyIndex, setStoryIndex] = useState(0);
+  const c = readingCopy[language];
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [pageIndex, setPageIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
-  const story = readingStories[storyIndex];
+  const [prevPage, setPrevPage] = useState<ReadingPage | null>(null);
+  const [flipDir, setFlipDir] = useState<'forward' | 'backward'>('forward');
+  const selectedBook = readingBooks.find((book) => book.id === selectedBookId) ?? null;
+  const page = selectedBook?.pages[pageIndex] ?? null;
+  const progress = selectedBook ? Math.round(((pageIndex + 1) / selectedBook.pages.length) * 100) : 0;
 
   const choose = (option: string) => {
+    if (!page || selected !== null) return;
     setSelected(option);
-    if (option === story.answer) {
+    if (option === page.question.answer) {
       recordCorrect();
       markPracticedToday();
     } else {
@@ -544,50 +898,273 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
     }
   };
 
+  const startBook = (bookId: string) => {
+    setSelectedBookId(bookId);
+    setPageIndex(0);
+    setSelected(null);
+  };
+
+  const goToPage = (nextPage: number) => {
+    if (!selectedBook || prevPage) return;
+    const boundedPage = Math.max(0, Math.min(nextPage, selectedBook.pages.length - 1));
+    setFlipDir(nextPage > pageIndex ? 'forward' : 'backward');
+    setPrevPage(page);
+    setPageIndex(boundedPage);
+    setSelected(null);
+    setTimeout(() => setPrevPage(null), 700);
+  };
+
+  const returnToLibrary = () => {
+    setSelectedBookId(null);
+    setPageIndex(0);
+    setSelected(null);
+  };
+
   return (
     <PageShell width="wide" className="pb-14">
-      <JapaneseHeader language={language} mode="reading" icon={<BookOpen size={14} />} />
-      <section className="mt-8 rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-xl font-black text-[var(--kt-ink-strong)]">{story.title}</h2>
-          <Button
-            as="button"
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              setStoryIndex((current) => (current + 1) % readingStories.length);
-              setSelected(null);
-            }}
-          >
-            {c.next}
-          </Button>
-        </div>
-        <p className="mt-5 font-jp text-2xl leading-10 text-[var(--kt-ink-strong)]">{story.japanese}</p>
-        <p className="mt-4 text-sm leading-6 text-[var(--kt-ink-muted)]">{story.romaji}</p>
-        <p className="mt-3 rounded-lg bg-[var(--kt-surface)] p-4 text-sm leading-6 text-[var(--kt-ink)]">{story.meaning}</p>
-        <div className="mt-5 text-base font-black text-[var(--kt-ink-strong)]">{story.question}</div>
-        <div className="mt-3 grid gap-2 md:grid-cols-3">
-          {story.options.map((option) => (
+      <style>{`
+        @keyframes book-flip-forward {
+          from { transform: rotateY(0deg); }
+          to   { transform: rotateY(-180deg); }
+        }
+        @keyframes book-flip-backward {
+          from { transform: rotateY(0deg); }
+          to   { transform: rotateY(180deg); }
+        }
+        @keyframes flip-shadow {
+          0%   { opacity: 0; }
+          40%  { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `}</style>
+      {!selectedBook || !page ? (
+        <section className="mt-8">
+          <div className="mb-6 flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
+            <Library size={16} className="text-[var(--kt-brand)]" />
+            {c.chooseBook}
+          </div>
+          <div className="grid gap-8 md:grid-cols-3">
+            {readingBooks.map((book) => (
+              <button
+                key={book.id}
+                type="button"
+                onClick={() => startBook(book.id)}
+                className="group flex flex-col items-center text-center outline-none"
+              >
+                <div
+                  className="relative flex h-[22rem] w-full max-w-[15rem] flex-col justify-between overflow-hidden rounded-r-xl border-y border-r border-black/20 px-5 py-7 text-left shadow-[12px_18px_34px_rgba(24,18,16,0.22)] transition group-hover:-translate-y-1 group-hover:shadow-[16px_24px_42px_rgba(24,18,16,0.28)]"
+                  style={{
+                    background:
+                      book.tone === 'indigo'
+                        ? 'linear-gradient(135deg, #27384f 0%, #44617f 100%)'
+                        : book.tone === 'amber'
+                          ? 'linear-gradient(135deg, #7c5540 0%, #c19369 100%)'
+                          : 'linear-gradient(135deg, #79394b 0%, #c96e81 100%)'
+                  }}
+                >
+                  <div className="absolute inset-y-0 left-0 w-8 bg-black/24 shadow-[inset_-4px_0_8px_rgba(0,0,0,0.2)]" />
+                  <div className="absolute inset-x-6 top-8 h-px bg-white/30" />
+                  <div className="absolute inset-x-6 bottom-8 h-px bg-white/25" />
+                  <div className="relative pl-6">
+                    <BookOpen className="text-white/86" size={34} />
+                    <div className="mt-8 font-jp text-3xl font-black leading-tight text-white">{book.title}</div>
+                    <div className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-white/70">{book.level}</div>
+                  </div>
+                  <div className="relative pl-6 text-xs font-bold text-white/78">
+                    {book.pages.length} {c.pages} · {book.minutes} {c.minutes}
+                  </div>
+                </div>
+                <div className="mt-4 max-w-[18rem] text-sm font-bold leading-6 text-[var(--kt-ink-muted)]">
+                  {book.summary[language]}
+                </div>
+                <div className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-brand)]">
+                  {c.startBook}
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="mt-8">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <button
-              key={option}
               type="button"
-              disabled={selected !== null}
-              onClick={() => choose(option)}
-              className={`rounded-lg border px-4 py-3 font-jp text-lg font-black transition ${
-                selected === null
-                  ? 'border-[var(--kt-border)] bg-[var(--kt-surface)] hover:bg-[var(--kt-surface-muted)]'
-                  : option === story.answer
-                    ? 'border-[color:var(--kt-accent-success)]/45 bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
-                    : selected === option
-                      ? 'border-[color:var(--kt-accent-danger)]/45 bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)]'
-                      : 'border-[var(--kt-border)] bg-[var(--kt-surface)] opacity-70'
-              }`}
+              onClick={returnToLibrary}
+              className="inline-flex items-center gap-2 text-sm font-black text-[var(--kt-ink-muted)] transition hover:text-[var(--kt-ink-strong)]"
             >
-              {option}
+              <ArrowLeft size={16} />
+              {c.backToLibrary}
             </button>
-          ))}
-        </div>
-      </section>
+            <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
+              <span className="font-jp text-sm normal-case tracking-normal text-[var(--kt-ink-strong)]">{selectedBook.title}</span>
+              <span>{c.page} {pageIndex + 1}/{selectedBook.pages.length}</span>
+              <span>{c.progress}: {progress}%</span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                as="button"
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={pageIndex === 0}
+                onClick={() => goToPage(pageIndex - 1)}
+                iconStart={<ChevronLeft size={16} />}
+              >
+                {c.previous}
+              </Button>
+              <Button
+                as="button"
+                type="button"
+                size="sm"
+                onClick={() => {
+                  if (pageIndex === selectedBook.pages.length - 1) returnToLibrary();
+                  else goToPage(pageIndex + 1);
+                }}
+                iconEnd={pageIndex === selectedBook.pages.length - 1 ? undefined : <ChevronRight size={16} />}
+              >
+                {pageIndex === selectedBook.pages.length - 1 ? c.finish : c.next}
+              </Button>
+            </div>
+          </div>
+
+            <div
+              className="relative overflow-hidden rounded-[1.25rem] border border-[#233246] bg-[#26394f] p-3 shadow-[0_28px_70px_rgba(25,18,14,0.34)] sm:p-4"
+              style={{
+                backgroundImage:
+                  'linear-gradient(90deg, #1d2d42 0%, #2f4964 5%, #26394f 12%, #26394f 88%, #2f4964 95%, #1d2d42 100%)'
+              }}
+            >
+              {pageIndex > 0 && (
+                <button
+                  type="button"
+                  onClick={() => goToPage(pageIndex - 1)}
+                  aria-label={c.previous}
+                  className="absolute bottom-4 left-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
+                >
+                  <ChevronLeft size={22} />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (pageIndex === selectedBook.pages.length - 1) returnToLibrary();
+                  else goToPage(pageIndex + 1);
+                }}
+                aria-label={pageIndex === selectedBook.pages.length - 1 ? c.finish : c.next}
+                className="absolute bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
+              >
+                {pageIndex === selectedBook.pages.length - 1 ? (
+                  <Check size={20} />
+                ) : (
+                  <ChevronRight size={22} />
+                )}
+              </button>
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-8 bottom-1 h-5 rounded-[50%] bg-black/25 blur-md"
+              />
+              <div className="relative rounded-[1rem] bg-[#d8c5a6] p-2 shadow-[inset_0_-14px_18px_rgba(65,48,32,0.24)] sm:p-3">
+                <div className="pointer-events-none absolute inset-x-8 bottom-3 h-5 rounded-b-[50%] border-b border-black/15" />
+                <div className="relative overflow-hidden rounded-[0.9rem] border border-[#d8cdb8] bg-[#f6eddf]">
+                  {/* Spine + ambient decorations */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 left-1/2 z-20 hidden w-8 -translate-x-1/2 lg:block"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, rgba(73,49,32,0.22), rgba(255,250,240,0.62) 45%, rgba(73,49,32,0.24))'
+                    }}
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 7% 18%, rgba(208,96,112,0.12), transparent 14rem), radial-gradient(circle at 92% 82%, rgba(87,103,119,0.14), transparent 16rem)'
+                    }}
+                  />
+
+                  {/* Base: destination spread (always shows the current/new page) */}
+                  <div className="grid lg:grid-cols-2">
+                    <BookLeftPage page={page} language={language} c={c} />
+                    <BookRightPage
+                      page={page}
+                      language={language}
+                      c={c}
+                      selected={prevPage ? null : selected}
+                      onChoose={choose}
+                      interactive={!prevPage}
+                    />
+                  </div>
+
+                  {/* 3D flip overlay — forward: right half flips left */}
+                  {prevPage && flipDir === 'forward' && (
+                    <div
+                      style={{
+                        position: 'absolute', top: 0, bottom: 0,
+                        left: '50%', right: 0,
+                        perspective: '2400px',
+                        zIndex: 30,
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'relative', width: '100%', height: '100%',
+                          transformStyle: 'preserve-3d',
+                          transformOrigin: 'left center',
+                          animation: 'book-flip-forward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both',
+                        }}
+                      >
+                        {/* Front: old right page (vocab side) */}
+                        <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', overflow: 'hidden' }}>
+                          <BookRightPage page={prevPage} language={language} c={c} selected={null} onChoose={() => {}} interactive={false} roundedRight={false} />
+                          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
+                        </div>
+                        {/* Back: new left page (text side) — shown after flip completes */}
+                        <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
+                          <BookLeftPage page={page} language={language} c={c} roundedLeft={false} />
+                          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to right, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3D flip overlay — backward: left half flips right */}
+                  {prevPage && flipDir === 'backward' && (
+                    <div
+                      style={{
+                        position: 'absolute', top: 0, bottom: 0,
+                        left: 0, right: '50%',
+                        perspective: '2400px',
+                        zIndex: 30,
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'relative', width: '100%', height: '100%',
+                          transformStyle: 'preserve-3d',
+                          transformOrigin: 'right center',
+                          animation: 'book-flip-backward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both',
+                        }}
+                      >
+                        {/* Front: old left page (text side) */}
+                        <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', overflow: 'hidden' }}>
+                          <BookLeftPage page={prevPage} language={language} c={c} roundedLeft={false} />
+                          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to right, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
+                        </div>
+                        {/* Back: new right page (vocab side) */}
+                        <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
+                          <BookRightPage page={page} language={language} c={c} selected={null} onChoose={() => {}} interactive={false} roundedRight={false} />
+                          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+        </section>
+      )}
     </PageShell>
   );
 };
