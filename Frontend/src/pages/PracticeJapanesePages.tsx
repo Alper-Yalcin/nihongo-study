@@ -511,31 +511,9 @@ export const PracticeJapaneseTopicLessonsPage: React.FC<PracticeJapanesePageProp
 
 type ReadingBookTone = 'rose' | 'indigo' | 'amber';
 
-interface ReadingVocab {
-  japanese: string;
-  reading: string;
-  meaning: {
-    tr: string;
-    en: string;
-  };
-}
-
 interface ReadingPage {
   id: string;
-  title: string;
   japanese: string;
-  romaji: string;
-  meaning: {
-    tr: string;
-    en: string;
-  };
-  vocab: ReadingVocab[];
-  question: {
-    tr: string;
-    en: string;
-    answer: string;
-    options: string[];
-  };
 }
 
 interface ReadingBook {
@@ -558,167 +536,47 @@ const readingBooks: ReadingBook[] = [
     title: 'あさのさんぽ',
     level: 'N5',
     genre: 'Daily life',
-    minutes: 4,
+    minutes: 8,
     tone: 'rose',
-    summary: {
-      tr: 'Kisa gunluk cumlelerle sabah rutini ve parkta karsilasma.',
-      en: 'A short daily-life story about a morning routine and a meeting at the park.'
-    },
+    summary: { tr: 'Yuki\'nin sabah yürüyüşü hikayesi.', en: 'The story of Yuki\'s morning walk.' },
     pages: [
-      {
-        id: 'morning-1',
-        title: 'あたらしい あさ',
-        japanese: 'あさです。ゆきさんは みずを のみます。それから こうえんに いきます。そらは あおいです。',
-        romaji: 'Asa desu. Yuki-san wa mizu o nomimasu. Sore kara kouen ni ikimasu. Sora wa aoi desu.',
-        meaning: {
-          tr: 'Sabah oldu. Yuki su icer, sonra parka gider. Gokyuzu mavidir.',
-          en: 'It is morning. Yuki drinks water, then goes to the park. The sky is blue.'
-        },
-        vocab: [
-          { japanese: 'あさ', reading: 'asa', meaning: { tr: 'sabah', en: 'morning' } },
-          { japanese: 'みず', reading: 'mizu', meaning: { tr: 'su', en: 'water' } },
-          { japanese: 'こうえん', reading: 'kouen', meaning: { tr: 'park', en: 'park' } }
-        ],
-        question: {
-          tr: 'Yuki nereye gidiyor?',
-          en: 'Where does Yuki go?',
-          answer: 'こうえん',
-          options: ['こうえん', 'がっこう', 'えき']
-        }
-      },
-      {
-        id: 'morning-2',
-        title: 'ともだち',
-        japanese: 'こうえんで ともだちに あいます。ふたりは「おはよう」と いいます。ベンチで すこし はなします。',
-        romaji: 'Kouen de tomodachi ni aimasu. Futari wa "ohayou" to iimasu. Benchi de sukoshi hanashimasu.',
-        meaning: {
-          tr: 'Parkta bir arkadasiyla karsilasir. Ikisi "gunaydin" der. Bankta biraz konusurlar.',
-          en: 'At the park, Yuki meets a friend. They say good morning and talk a little on a bench.'
-        },
-        vocab: [
-          { japanese: 'ともだち', reading: 'tomodachi', meaning: { tr: 'arkadas', en: 'friend' } },
-          { japanese: 'あいます', reading: 'aimasu', meaning: { tr: 'karsilasir', en: 'meet' } },
-          { japanese: 'はなします', reading: 'hanashimasu', meaning: { tr: 'konusur', en: 'talk' } }
-        ],
-        question: {
-          tr: 'Iki kisi nerede konusuyor?',
-          en: 'Where do the two people talk?',
-          answer: 'ベンチ',
-          options: ['ベンチ', 'でんしゃ', 'きょうしつ']
-        }
-      }
+      { id: 'p1', japanese: 'あさ、ゆきさんは はやく おきます。\nまどを あけると、そらは あおくて きれいです。\nきもちの いい かぜが はいってきます。\nゆきさんは みずを いっぱい のんで、\nさんぽに でかけます。' },
+      { id: 'p2', japanese: 'こうえんへの みちは しずかです。\n木の はっぱが かぜに ゆれています。\nとりの こえが きこえます。\nゆきさんは ゆっくり あるきながら、\nあさの くうきを すいます。' },
+      { id: 'p3', japanese: 'こうえんで、ゆきさんは ともだちに あいます。\n「おはよう！ きょうも いい てんきだね」\nふたりは ベンチに すわって、\nすこし はなします。\nとても たのしい じかんです。' },
+      { id: 'p4', japanese: 'こうえんには たくさんの はなが さいています。\nあかい はな、しろい はな、むらさきの はな。\nゆきさんは いちばん すきな はなの まえに たって、\nそっと てを のばします。' },
+      { id: 'p5', japanese: 'しばらくして、ゆきさんは うちに かえります。\nきょうも いい あさでした。\n「あしたも さんぽしよう」\nゆきさんは そう おもいながら、\nげんかんの ドアを そっと あけました。' },
     ]
   },
   {
     id: 'station-cafe',
     title: 'えきのカフェ',
     level: 'N5',
-    genre: 'Travel',
-    minutes: 5,
+    genre: 'Daily life',
+    minutes: 9,
     tone: 'indigo',
-    summary: {
-      tr: 'Istasyonda bulusma, kafe siparisi ve saat ifadeleri.',
-      en: 'A station meetup with cafe orders and time expressions.'
-    },
+    summary: { tr: 'Taro ve Ken\'in istasyon kafesindeki buluşması.', en: 'Taro and Ken\'s meeting at the station cafe.' },
     pages: [
-      {
-        id: 'station-1',
-        title: 'えきで',
-        japanese: 'たろうさんは えきに います。いま くじです。ともだちは まだ きません。',
-        romaji: 'Tarou-san wa eki ni imasu. Ima kuji desu. Tomodachi wa mada kimasen.',
-        meaning: {
-          tr: 'Taro istasyondadir. Simdi saat dokuz. Arkadasi henuz gelmez.',
-          en: 'Taro is at the station. It is nine o clock. His friend has not come yet.'
-        },
-        vocab: [
-          { japanese: 'えき', reading: 'eki', meaning: { tr: 'istasyon', en: 'station' } },
-          { japanese: 'くじ', reading: 'kuji', meaning: { tr: 'saat dokuz', en: 'nine o clock' } },
-          { japanese: 'まだ', reading: 'mada', meaning: { tr: 'henuz', en: 'not yet' } }
-        ],
-        question: {
-          tr: 'Taro nerede?',
-          en: 'Where is Taro?',
-          answer: 'えき',
-          options: ['えき', 'カフェ', 'いえ']
-        }
-      },
-      {
-        id: 'station-2',
-        title: 'あたたかい コーヒー',
-        japanese: 'ともだちが きました。ふたりは カフェに はいります。たろうさんは あたたかい コーヒーを たのみます。',
-        romaji: 'Tomodachi ga kimashita. Futari wa kafe ni hairimasu. Tarou-san wa atatakai koohii o tanomimasu.',
-        meaning: {
-          tr: 'Arkadasi geldi. Ikisi kafeye girer. Taro sicak kahve siparis eder.',
-          en: 'The friend arrives. The two enter a cafe. Taro orders hot coffee.'
-        },
-        vocab: [
-          { japanese: 'カフェ', reading: 'kafe', meaning: { tr: 'kafe', en: 'cafe' } },
-          { japanese: 'あたたかい', reading: 'atatakai', meaning: { tr: 'sicak', en: 'warm' } },
-          { japanese: 'たのみます', reading: 'tanomimasu', meaning: { tr: 'siparis eder', en: 'order' } }
-        ],
-        question: {
-          tr: 'Taro ne siparis ediyor?',
-          en: 'What does Taro order?',
-          answer: 'コーヒー',
-          options: ['コーヒー', 'ジュース', 'おちゃ']
-        }
-      }
+      { id: 'p1', japanese: 'たろうさんは えきの まえで ともだちを まっています。\nいま くじ はんです。\nひとが たくさん います。\nでんしゃの おとが きこえます。\nたろうさんは すこし どきどきしています。' },
+      { id: 'p2', japanese: 'じゅっぷんご、けんさんが はしって きました。\n「ごめん、おくれた！ バスが こなくて」\n「だいじょうぶだよ、ゆっくりね」\nたろうさんは わらいながら いいます。\nふたりは えきの なかに はいります。' },
+      { id: 'p3', japanese: 'えきの なかの カフェは あたたかいです。\nコーヒーと パンの においが します。\n「いい においだね」と けんさんは いいます。\nふたりは メニューを みながら、\nなにを たのもうか かんがえます。' },
+      { id: 'p4', japanese: 'たろうさんは ホットコーヒーを たのみます。\nけんさんは アイスティーと ケーキを たのみます。\nふたりは まどの そばの せきに すわります。\nそとでは ひとびとが いそがしそうに あるいています。' },
+      { id: 'p5', japanese: 'ふたりは ながい じかん はなします。\nしごとの こと、りょこうの こと、\nすきな えいがの こと。\nコーヒーは もう つめたく なりましたが、\nはなしは まだ まだ つづきます。' },
     ]
   },
   {
     id: 'small-library',
     title: 'ちいさな としょかん',
-    level: 'N5-N4',
+    level: 'N5–N4',
     genre: 'School',
-    minutes: 6,
+    minutes: 10,
     tone: 'amber',
-    summary: {
-      tr: 'Kutuphane, kitap secme ve sessiz okuma uzerine biraz daha uzun bir metin.',
-      en: 'A slightly longer text about a library, choosing a book, and reading quietly.'
-    },
+    summary: { tr: 'Mai kütüphanede bir kedi hikayesi bulur.', en: 'Mai finds a cat story at the library.' },
     pages: [
-      {
-        id: 'library-1',
-        title: 'ほんを さがす',
-        japanese: 'まいさんは としょかんが すきです。きょうは やさしい にほんごの ほんを さがします。',
-        romaji: 'Mai-san wa toshokan ga suki desu. Kyou wa yasashii nihongo no hon o sagashimasu.',
-        meaning: {
-          tr: 'Mai kutuphaneyi sever. Bugun kolay Japonca bir kitap arar.',
-          en: 'Mai likes the library. Today she looks for an easy Japanese book.'
-        },
-        vocab: [
-          { japanese: 'としょかん', reading: 'toshokan', meaning: { tr: 'kutuphane', en: 'library' } },
-          { japanese: 'やさしい', reading: 'yasashii', meaning: { tr: 'kolay', en: 'easy' } },
-          { japanese: 'さがします', reading: 'sagashimasu', meaning: { tr: 'arar', en: 'look for' } }
-        ],
-        question: {
-          tr: 'Mai ne ariyor?',
-          en: 'What is Mai looking for?',
-          answer: 'にほんごの ほん',
-          options: ['にほんごの ほん', 'あたらしい くつ', 'しろい かさ']
-        }
-      },
-      {
-        id: 'library-2',
-        title: 'しずかな へや',
-        japanese: 'まいさんは まどの ちかくに すわります。へやは しずかです。ほんの ことばを ノートに かきます。',
-        romaji: 'Mai-san wa mado no chikaku ni suwarimasu. Heya wa shizuka desu. Hon no kotoba o nooto ni kakimasu.',
-        meaning: {
-          tr: 'Mai pencerenin yakinina oturur. Oda sessizdir. Kitaptaki kelimeleri deftere yazar.',
-          en: 'Mai sits near the window. The room is quiet. She writes the book words in her notebook.'
-        },
-        vocab: [
-          { japanese: 'まど', reading: 'mado', meaning: { tr: 'pencere', en: 'window' } },
-          { japanese: 'しずか', reading: 'shizuka', meaning: { tr: 'sessiz', en: 'quiet' } },
-          { japanese: 'ことば', reading: 'kotoba', meaning: { tr: 'kelime', en: 'word' } }
-        ],
-        question: {
-          tr: 'Mai kelimeleri nereye yaziyor?',
-          en: 'Where does Mai write the words?',
-          answer: 'ノート',
-          options: ['ノート', 'かばん', 'テーブル']
-        }
-      }
+      { id: 'p1', japanese: 'まいさんは まいにち としょかんに いきます。\nしずかで、ほんの においが します。\nまいさんは この ばしょが だいすきです。\nきょうも あたらしい ほんを さがしに きました。' },
+      { id: 'p2', japanese: 'たなには たくさんの ほんが ならんでいます。\nあかい ほん、あおい ほん、おおきい ほん。\nまいさんは ゆっくり みていきます。\nどれも おもしろそうです。' },
+      { id: 'p3', japanese: 'まいさんは かわいい ねこの えが ついた ほんを みつけました。\n「ねこの きせつ」という ほんです。\nまいさんは うれしくて、\nそっと ほんを むねに だきました。' },
+      { id: 'p4', japanese: 'まいさんは まどの ちかくに すわります。\nひかりが やさしく あたっています。\nゆっくり ページを めくると、\nねこの はなしが はじまりました。' },
+      { id: 'p5', japanese: 'よみおわって、まいさんは にっこり わらいます。\nねこの はなしは とても よかったです。\n「また あした つづきを よもう」\nそう おもいながら、まいさんは\nそっと ほんを たなに もどしました。' },
     ]
   }
 ];
@@ -729,11 +587,8 @@ const readingCopy = {
     chooseBook: 'Kitap sec',
     startBook: 'Okumaya basla',
     backToLibrary: 'Kitapliga don',
-    level: 'Seviye',
-    time: 'Sure',
     pages: 'sayfa',
     minutes: 'dk',
-    reader: 'Okuma alani',
     page: 'Sayfa',
     previous: 'Onceki',
     next: 'Sonraki',
@@ -741,9 +596,6 @@ const readingCopy = {
     vocabulary: 'Kelimeler',
     meaning: 'Anlam',
     romaji: 'Romaji',
-    comprehension: 'Anlama sorusu',
-    correct: 'Dogru cevap',
-    wrong: 'Tekrar kontrol et',
     progress: 'Ilerleme'
   },
   en: {
@@ -751,11 +603,8 @@ const readingCopy = {
     chooseBook: 'Choose a book',
     startBook: 'Start reading',
     backToLibrary: 'Back to library',
-    level: 'Level',
-    time: 'Time',
     pages: 'pages',
     minutes: 'min',
-    reader: 'Reading area',
     page: 'Page',
     previous: 'Previous',
     next: 'Next',
@@ -763,115 +612,39 @@ const readingCopy = {
     vocabulary: 'Vocabulary',
     meaning: 'Meaning',
     romaji: 'Romaji',
-    comprehension: 'Comprehension',
-    correct: 'Correct',
-    wrong: 'Check again',
     progress: 'Progress'
   }
 } as const;
 
-type BookCopy = typeof readingCopy['en'] | typeof readingCopy['tr'];
-
 const BookLeftPage: React.FC<{
   page: ReadingPage;
-  language: AppLanguage;
-  c: BookCopy;
+  pageNum: number;
   roundedLeft?: boolean;
-}> = ({ page, language, c, roundedLeft = true }) => (
+}> = ({ page, pageNum, roundedLeft = true }) => (
   <div
-    className={`relative min-h-[34rem] bg-[#fff8eb] px-5 py-6 shadow-[inset_-24px_0_28px_rgba(91,63,36,0.08)] sm:px-9 sm:py-8 ${
+    className={`relative flex min-h-[34rem] flex-col bg-[#fff8eb] px-8 py-10 shadow-[inset_-24px_0_28px_rgba(91,63,36,0.08)] sm:px-12 ${
       roundedLeft ? 'lg:rounded-l-[0.9rem]' : ''
     }`}
   >
-    <div className="mx-auto max-w-[34rem]">
-      <div className="text-center">
-        <BookOpen className="mx-auto text-[#6e5642]" size={24} />
-        <div className="mt-2 font-jp text-sm font-black text-[#7a5445]">✿ {page.title} ✿</div>
-        <div className="mx-auto mt-4 h-px w-4/5 bg-[#d8c7ab]" />
-      </div>
-      <div className="mt-8 border-y border-[#dfcfb3] py-5">
-        <p className="font-jp text-2xl leading-10 text-[#201a17] sm:text-3xl sm:leading-[3.3rem]">{page.japanese}</p>
-      </div>
-      <div className="mt-6 border-t border-[#dfcfb3] pt-5">
-        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#8a7460]">{c.romaji}</div>
-        <p className="mt-2 text-sm leading-6 text-[#5d4d41]">{page.romaji}</p>
-      </div>
-      <div className="mt-5 border-t border-[#dfcfb3] pt-5">
-        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#8a7460]">{c.meaning}</div>
-        <p className="mt-2 text-sm leading-6 text-[#4d4037]">{page.meaning[language]}</p>
-      </div>
-    </div>
+    <p className="flex-1 whitespace-pre-line font-jp text-[1.45rem] leading-[2.8rem] text-[#201a17] sm:text-[1.6rem] sm:leading-[3.2rem]">
+      {page.japanese}
+    </p>
+    <div className="mt-6 text-center font-jp text-xs text-[#b8a080]">— {pageNum} —</div>
   </div>
 );
 
 const BookRightPage: React.FC<{
-  page: ReadingPage;
-  language: AppLanguage;
-  c: BookCopy;
-  selected: string | null;
-  onChoose: (option: string) => void;
-  interactive: boolean;
+  bookTitle: string;
   roundedRight?: boolean;
-}> = ({ page, language, c, selected, onChoose, interactive, roundedRight = true }) => (
+}> = ({ bookTitle, roundedRight = true }) => (
   <div
-    className={`relative min-h-[34rem] border-t border-[#dfcfb3] bg-[#fff7e8] px-5 py-6 shadow-[inset_24px_0_28px_rgba(91,63,36,0.08)] sm:px-9 sm:py-8 lg:border-l lg:border-t-0 ${
+    className={`relative flex min-h-[34rem] flex-col items-center justify-center border-t border-[#dfcfb3] bg-[#fff7e8] shadow-[inset_24px_0_28px_rgba(91,63,36,0.08)] lg:border-l lg:border-t-0 ${
       roundedRight ? 'lg:rounded-r-[0.9rem]' : ''
     }`}
   >
-    <div className="mx-auto max-w-[34rem]">
-      <div className="text-center">
-        <Library className="mx-auto text-[#6e5642]" size={24} />
-        <div className="mt-2 text-sm font-black text-[#7a5445]">✿ {c.vocabulary} ✿</div>
-        <div className="mx-auto mt-4 h-px w-4/5 bg-[#d8c7ab]" />
-      </div>
-      <div className="mt-7 divide-y divide-[#e4d5bd]">
-        {page.vocab.map((item) => (
-          <div key={item.japanese} className="grid grid-cols-[minmax(5rem,0.8fr)_minmax(0,1fr)] gap-4 py-4">
-            <div>
-              <div className="font-jp text-3xl font-black text-[#201a17]">{item.japanese}</div>
-              <div className="mt-1 font-jp text-sm font-bold text-[#5d4d41]">[ {item.reading} ]</div>
-            </div>
-            <div className="pt-1">
-              <div className="font-jp text-base font-black text-[#2e2722]">{item.japanese}</div>
-              <div className="mt-1 text-sm font-semibold text-[#7a5445]">{item.meaning[language]}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-7 border-t border-[#dfcfb3] pt-5">
-        <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#8a7460]">{c.comprehension}</div>
-        <div className="mt-2 text-base font-black text-[#2e2722]">{page.question[language]}</div>
-        <div className="mt-3 grid gap-2">
-          {page.question.options.map((option) => (
-            <button
-              key={option}
-              type="button"
-              disabled={!interactive || selected !== null}
-              onClick={() => onChoose(option)}
-              className={`border-b px-1 py-3 text-left font-jp text-base font-black transition ${
-                selected === null
-                  ? 'border-[#dcc8a8] text-[#2e2722] hover:border-[#b69468] hover:text-[#7a5445]'
-                  : option === page.question.answer
-                    ? 'border-[color:var(--kt-accent-success)] text-[var(--kt-accent-success)]'
-                    : selected === option
-                      ? 'border-[color:var(--kt-accent-danger)] text-[var(--kt-accent-danger)]'
-                      : 'border-[#dcc8a8] text-[#2e2722] opacity-70'
-              }`}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-        {selected !== null && (
-          <div
-            className={`mt-3 text-sm font-black ${
-              selected === page.question.answer ? 'text-[var(--kt-accent-success)]' : 'text-[var(--kt-accent-danger)]'
-            }`}
-          >
-            {selected === page.question.answer ? c.correct : c.wrong}
-          </div>
-        )}
-      </div>
+    <div className="select-none text-center">
+      <div className="font-jp text-[#d4b896] text-4xl">✿</div>
+      <div className="mt-4 font-jp text-sm text-[#c0a070] opacity-70">{bookTitle}</div>
     </div>
   </div>
 );
@@ -880,28 +653,15 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
   const c = readingCopy[language];
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
   const [prevPage, setPrevPage] = useState<ReadingPage | null>(null);
   const [flipDir, setFlipDir] = useState<'forward' | 'backward'>('forward');
   const selectedBook = readingBooks.find((book) => book.id === selectedBookId) ?? null;
   const page = selectedBook?.pages[pageIndex] ?? null;
   const progress = selectedBook ? Math.round(((pageIndex + 1) / selectedBook.pages.length) * 100) : 0;
 
-  const choose = (option: string) => {
-    if (!page || selected !== null) return;
-    setSelected(option);
-    if (option === page.question.answer) {
-      recordCorrect();
-      markPracticedToday();
-    } else {
-      recordWrong();
-    }
-  };
-
   const startBook = (bookId: string) => {
     setSelectedBookId(bookId);
     setPageIndex(0);
-    setSelected(null);
   };
 
   const goToPage = (nextPage: number) => {
@@ -910,14 +670,12 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
     setFlipDir(nextPage > pageIndex ? 'forward' : 'backward');
     setPrevPage(page);
     setPageIndex(boundedPage);
-    setSelected(null);
     setTimeout(() => setPrevPage(null), 700);
   };
 
   const returnToLibrary = () => {
     setSelectedBookId(null);
     setPageIndex(0);
-    setSelected(null);
   };
 
   return (
@@ -1084,45 +842,25 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                     }}
                   />
 
-                  {/* Base: destination spread (always shows the current/new page) */}
+                  {/* Base spread: visible side keeps old content until flip completes */}
                   <div className="grid lg:grid-cols-2">
-                    <BookLeftPage page={page} language={language} c={c} />
-                    <BookRightPage
-                      page={page}
-                      language={language}
-                      c={c}
-                      selected={prevPage ? null : selected}
-                      onChoose={choose}
-                      interactive={!prevPage}
+                    <BookLeftPage
+                      page={prevPage && flipDir === 'forward' ? prevPage : page}
+                      pageNum={prevPage && flipDir === 'forward' ? pageIndex : pageIndex + 1}
                     />
+                    <BookRightPage bookTitle={selectedBook.title} />
                   </div>
 
                   {/* 3D flip overlay — forward: right half flips left */}
                   {prevPage && flipDir === 'forward' && (
-                    <div
-                      style={{
-                        position: 'absolute', top: 0, bottom: 0,
-                        left: '50%', right: 0,
-                        perspective: '2400px',
-                        zIndex: 30,
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: 'relative', width: '100%', height: '100%',
-                          transformStyle: 'preserve-3d',
-                          transformOrigin: 'left center',
-                          animation: 'book-flip-forward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both',
-                        }}
-                      >
-                        {/* Front: old right page (vocab side) */}
+                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', right: 0, perspective: '2400px', zIndex: 30 }}>
+                      <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transformOrigin: 'left center', animation: 'book-flip-forward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both' }}>
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', overflow: 'hidden' }}>
-                          <BookRightPage page={prevPage} language={language} c={c} selected={null} onChoose={() => {}} interactive={false} roundedRight={false} />
+                          <BookRightPage bookTitle={selectedBook.title} roundedRight={false} />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
-                        {/* Back: new left page (text side) — shown after flip completes */}
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
-                          <BookLeftPage page={page} language={language} c={c} roundedLeft={false} />
+                          <BookLeftPage page={page} pageNum={pageIndex + 1} roundedLeft={false} />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to right, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
                       </div>
@@ -1131,30 +869,14 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
 
                   {/* 3D flip overlay — backward: left half flips right */}
                   {prevPage && flipDir === 'backward' && (
-                    <div
-                      style={{
-                        position: 'absolute', top: 0, bottom: 0,
-                        left: 0, right: '50%',
-                        perspective: '2400px',
-                        zIndex: 30,
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: 'relative', width: '100%', height: '100%',
-                          transformStyle: 'preserve-3d',
-                          transformOrigin: 'right center',
-                          animation: 'book-flip-backward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both',
-                        }}
-                      >
-                        {/* Front: old left page (text side) */}
+                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: '50%', perspective: '2400px', zIndex: 30 }}>
+                      <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transformOrigin: 'right center', animation: 'book-flip-backward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both' }}>
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', overflow: 'hidden' }}>
-                          <BookLeftPage page={prevPage} language={language} c={c} roundedLeft={false} />
+                          <BookLeftPage page={prevPage} pageNum={pageIndex + 2} roundedLeft={false} />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to right, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
-                        {/* Back: new right page (vocab side) */}
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
-                          <BookRightPage page={page} language={language} c={c} selected={null} onChoose={() => {}} interactive={false} roundedRight={false} />
+                          <BookRightPage bookTitle={selectedBook.title} roundedRight={false} />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
                       </div>
