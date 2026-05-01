@@ -29,28 +29,51 @@ export const appShellRoutes = {
   practiceCustom: '/practice/custom',
   practiceStats: '/practice/stats',
   practiceKanaDrawing: '/practice/kana/drawing',
+  practiceKanaDrawingRun: '/practice/kana/drawing/run',
   practiceKanaAnswerType: '/practice/kana/answer-type',
+  practiceKanaAnswerTypeRun: '/practice/kana/answer-type/run',
   practiceKanaListening: '/practice/kana/listening',
+  practiceKanaListeningRun: '/practice/kana/listening/run',
   practiceKanaReading: '/practice/kana/reading',
+  practiceKanaReadingRun: '/practice/kana/reading/run',
   practiceKanaWritingRecall: '/practice/kana/writing-recall',
+  practiceKanaWritingRecallRun: '/practice/kana/writing-recall/run',
   practiceKanaFlashcards: '/practice/kana/flashcards',
+  practiceKanaFlashcardsRun: '/practice/kana/flashcards/run',
   practiceKanaQuickStudy: '/practice/kana/quick-study',
+  practiceKanaQuickStudyRun: '/practice/kana/quick-study/run',
   practiceKanaPop: '/practice/kana-pop',
+  practiceKanaPopRun: '/practice/kana-pop/run',
   practiceJapaneseQuickStudy: '/practice/japanese/quick-study',
+  practiceJapaneseQuickStudyRun: '/practice/japanese/quick-study/run',
   practiceJapaneseTopicLessons: '/practice/japanese/topic-lessons',
+  practiceJapaneseTopicLessonsRun: '/practice/japanese/topic-lessons/run',
   practiceJapaneseReading: '/practice/japanese/reading',
+  practiceJapaneseReadingRun: '/practice/japanese/reading/run',
   practiceJapaneseFillBlank: '/practice/japanese/fill-blank',
+  practiceJapaneseFillBlankRun: '/practice/japanese/fill-blank/run',
   practiceJapaneseTranslation: '/practice/japanese/translation',
+  practiceJapaneseTranslationRun: '/practice/japanese/translation/run',
   practiceJapaneseSentenceWriting: '/practice/japanese/sentence-writing',
+  practiceJapaneseSentenceWritingRun: '/practice/japanese/sentence-writing/run',
   practiceJapaneseFlashcards: '/practice/japanese/flashcards',
+  practiceJapaneseFlashcardsRun: '/practice/japanese/flashcards/run',
   practiceKanjiDrawing: '/practice/kanji/drawing',
+  practiceKanjiDrawingRun: '/practice/kanji/drawing/run',
   practiceKanjiReading: '/practice/kanji/reading',
+  practiceKanjiReadingRun: '/practice/kanji/reading/run',
   practiceKanjiListening: '/practice/kanji/listening',
+  practiceKanjiListeningRun: '/practice/kanji/listening/run',
   practiceKanjiWritingRecall: '/practice/kanji/writing-recall',
+  practiceKanjiWritingRecallRun: '/practice/kanji/writing-recall/run',
   practiceKanjiUsage: '/practice/kanji/usage',
+  practiceKanjiUsageRun: '/practice/kanji/usage/run',
   practiceKanjiChallenge: '/practice/kanji/challenge',
+  practiceKanjiChallengeRun: '/practice/kanji/challenge/run',
   practiceKanjiMatch: '/practice/kanji/match',
+  practiceKanjiMatchRun: '/practice/kanji/match/run',
   practiceKanjiPop: '/practice/kanji/pop',
+  practiceKanjiPopRun: '/practice/kanji/pop/run',
   practiceRun: '/practice/run',
   quiz: '/quiz',
   quizKanji: '/quiz/kanji',
@@ -96,6 +119,12 @@ export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnit
 export const getLearnGuideRoute = (unitId: string) => `${appShellRoutes.learnGuideBase}/${unitId}`;
 export const getLearnExamRoute = (level: string) => `${appShellRoutes.learnExamBase}/${level}`;
 
+export const getPracticeHomeRoute = (script: KanaRouteScript = 'hiragana') => {
+  const searchParams = new URLSearchParams();
+  searchParams.set('script', script);
+  return `${appShellRoutes.practiceKanaQuickStudy}?${searchParams.toString()}`;
+};
+
 const studyLearnRouteByScript: Record<KanaRouteScript, string> = {
   hiragana: appShellRoutes.hiraganaLearn,
   katakana: appShellRoutes.katakanaLearn
@@ -126,11 +155,11 @@ export const getPracticeRoute = (
   tab?: 'overview' | 'review' | 'weak' | 'confusable' | 'free' | 'stats'
 ) => {
   const routeByTab = {
-    overview: appShellRoutes.practiceReview,
-    review: appShellRoutes.practiceReview,
-    weak: appShellRoutes.practiceWeak,
-    confusable: appShellRoutes.practiceConfusable,
-    free: appShellRoutes.practiceCustom,
+    overview: appShellRoutes.practiceKanaQuickStudy,
+    review: appShellRoutes.practiceKanaQuickStudy,
+    weak: appShellRoutes.practiceKanaQuickStudy,
+    confusable: appShellRoutes.practiceKanaQuickStudy,
+    free: appShellRoutes.practiceKanaQuickStudy,
     stats: appShellRoutes.practiceStats
   } as const;
   const searchParams = new URLSearchParams();

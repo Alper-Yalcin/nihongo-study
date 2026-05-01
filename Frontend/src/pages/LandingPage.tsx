@@ -3,7 +3,7 @@ import { ArrowRight, BookOpenText, Languages, PlayCircle, Sparkles, Swords, Trop
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui';
 import { AppLanguage, ThemeMode } from '../data/appPreferences';
-import { appShellRoutes, getPracticeRoute } from '../data/appShellContent';
+import { appShellRoutes, getPracticeHomeRoute } from '../data/appShellContent';
 import { KanaScript } from '../features/kana/domain/kanaItem';
 import { MascotFigure } from '../components/mascot/MascotFigure';
 
@@ -119,7 +119,7 @@ const landingCards = [
 export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript, themeMode }) => {
   const text = copy[language];
   const lettersHref = `${appShellRoutes.letters}?script=${activeScript}`;
-  const practiceHref = getPracticeRoute(activeScript);
+  const practiceHref = getPracticeHomeRoute(activeScript);
   const logoSrc = themeMode === 'dark' ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
   const isDark = themeMode === 'dark';
 

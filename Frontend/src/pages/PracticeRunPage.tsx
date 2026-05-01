@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../data/appPreferences';
-import { getPracticeRoute } from '../data/appShellContent';
+import { appShellRoutes } from '../data/appShellContent';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../data/studyContent';
 import { useDictionaryWordSearch } from '../data/words';
 import { StudyContainer } from '../components/StudyContainer';
@@ -20,6 +20,8 @@ import {
 
 interface PracticeRunPageProps {
   language: AppLanguage;
+  fixedMode?: PracticeMode;
+  backHref?: string;
 }
 
 type PracticeTab = 'review' | 'weak' | 'confusable' | 'free';
@@ -31,11 +33,11 @@ const normalizeTab = (value: string | null): PracticeTab =>
 const normalizeMode = (value: string | null): PracticeMode =>
   value === 'typing' || value === 'drawing' || value === 'listening' || value === 'dictionary' ? value : 'typing';
 
-export const PracticeRunPage: React.FC<PracticeRunPageProps> = ({ language }) => {
+export const PracticeRunPage: React.FC<PracticeRunPageProps> = ({ language, fixedMode, backHref: explicitBackHref }) => {
   const [searchParams] = useSearchParams();
   const script: KanaScript = searchParams.get('script') === 'katakana' ? 'katakana' : 'hiragana';
   const tab = normalizeTab(searchParams.get('tab'));
-  const mode = normalizeMode(searchParams.get('mode'));
+  const mode = fixedMode ?? normalizeMode(searchParams.get('mode'));
   const selectedIdsFromQuery = (searchParams.get('ids') ?? '').split(',').map((id) => id.trim()).filter(Boolean);
 
   const sections = useMemo(
@@ -88,7 +90,13 @@ export const PracticeRunPage: React.FC<PracticeRunPageProps> = ({ language }) =>
     [focusItemIds, words]
   );
 
-  const backHref = getPracticeRoute(script, tab);
+  const backBaseByMode: Record<PracticeMode, string> = {
+    typing: appShellRoutes.practiceKanaAnswerType,
+    drawing: appShellRoutes.practiceKanaDrawing,
+    listening: appShellRoutes.practiceKanaListening,
+    dictionary: appShellRoutes.practiceKanaFlashcards
+  };
+  const backHref = explicitBackHref ?? `${backBaseByMode[mode]}?script=${script}`;
 
   return (
     <div className="space-y-6 pb-8">

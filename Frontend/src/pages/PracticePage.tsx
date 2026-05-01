@@ -318,7 +318,13 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language, focusDrill
     params.set('tab', id);
     params.set('mode', activeMode);
     if (id === 'free') params.set('ids', itemIds.join(','));
-    navigate(`${appShellRoutes.practiceRun}?${params.toString()}`);
+    const runRouteByMode: Record<RunnableMode, string> = {
+      typing: appShellRoutes.practiceKanaAnswerTypeRun,
+      drawing: appShellRoutes.practiceKanaDrawingRun,
+      listening: appShellRoutes.practiceKanaListeningRun,
+      dictionary: appShellRoutes.practiceKanaFlashcardsRun
+    };
+    navigate(`${runRouteByMode[activeMode]}?${params.toString()}`);
   };
 
   const beginPrimary = () => {

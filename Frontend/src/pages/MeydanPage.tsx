@@ -201,7 +201,7 @@ export const MeydanPage: React.FC<MeydanPageProps> = ({ language }) => {
         </div>
 
         <div className="grid gap-4 pt-6 lg:grid-cols-2">
-          <Link to={`${appShellRoutes.practiceRun}?script=${script}&tab=review&mode=typing`} className="kt-tap-bounce block">
+          <Link to={`${appShellRoutes.practiceKanaAnswerTypeRun}?script=${script}&tab=review&mode=typing`} className="kt-tap-bounce block">
             <ArenaPortalContent
               icon={<Flame size={24} />}
               title={c.speed}

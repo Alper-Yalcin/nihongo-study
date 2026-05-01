@@ -4,7 +4,7 @@ import {
   MoonStar, MoreHorizontal, Search, Settings2, Sword, Trophy, UserRound
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { appShellRoutes, getKanaEntryRoute, getPracticeRoute } from '../../data/appShellContent';
+import { appShellRoutes, getKanaEntryRoute, getPracticeHomeRoute } from '../../data/appShellContent';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
 
@@ -42,7 +42,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({
     { id: 'home', label: copy.home, href: appShellRoutes.home, icon: Home },
     { id: 'learn', label: copy.learn, href: appShellRoutes.learn, icon: BookOpenText },
     { id: 'letters', label: copy.letters, href: `${appShellRoutes.letters}?script=${activeScript}`, icon: Languages },
-    { id: 'practice', label: copy.practice, href: getPracticeRoute(activeScript, 'review'), icon: Sword },
+    { id: 'practice', label: copy.practice, href: getPracticeHomeRoute(activeScript), icon: Sword },
     { id: 'play', label: copy.play, href: getKanaEntryRoute(activeScript, 'play'), icon: Gamepad2 },
     { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
     { id: 'profile', label: copy.profile, href: appShellRoutes.account, icon: UserRound }

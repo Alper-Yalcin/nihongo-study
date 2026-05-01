@@ -9,7 +9,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Bell, Check, Sparkles } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { appShellRoutes, getPracticeRoute } from '../data/appShellContent';
+import { appShellRoutes, getPracticeHomeRoute } from '../data/appShellContent';
 import {
   awardBonusHanabira,
   recordCorrect,
@@ -118,7 +118,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({ language }) => {
     markOnboardingDone();
     markPracticedToday();
     awardBonusHanabira(50); // welcome bonus
-    navigate(getPracticeRoute('hiragana', 'review'));
+    navigate(getPracticeHomeRoute('hiragana'));
   };
 
   const skipQuiz = () => {
