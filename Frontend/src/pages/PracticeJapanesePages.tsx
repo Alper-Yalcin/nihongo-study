@@ -953,31 +953,6 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                   'linear-gradient(90deg, #1d2d42 0%, #2f4964 5%, #26394f 12%, #26394f 88%, #2f4964 95%, #1d2d42 100%)'
               }}
             >
-              {pageIndex > 0 && (
-                <button
-                  type="button"
-                  onClick={() => goToPage(previousSpreadStart)}
-                  aria-label={c.previous}
-                  className="absolute bottom-4 left-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
-                >
-                  <ChevronLeft size={22} />
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  if (pageIndex >= lastReadableSpreadStart) returnToLibrary();
-                  else goToPage(nextSpreadStart);
-                }}
-                aria-label={pageIndex >= lastReadableSpreadStart ? c.finish : c.next}
-                className="absolute bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
-              >
-                {pageIndex >= lastReadableSpreadStart ? (
-                  <Check size={20} />
-                ) : (
-                  <ChevronRight size={22} />
-                )}
-              </button>
               <div
                 aria-hidden="true"
                 className="absolute inset-x-8 bottom-1 h-5 rounded-[50%] bg-black/25 blur-md"
@@ -1023,6 +998,32 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                       }
                     />
                   </div>
+
+                  {pageIndex > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => goToPage(previousSpreadStart)}
+                      aria-label={c.previous}
+                      className="absolute bottom-4 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-[#d8cdb8] bg-[#fff8eb]/95 text-[#4b3724] shadow-[0_10px_24px_rgba(65,48,32,0.24)] transition hover:bg-white hover:text-[#201a17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19369]"
+                    >
+                      <ChevronLeft size={26} strokeWidth={2.4} />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (pageIndex >= lastReadableSpreadStart) returnToLibrary();
+                      else goToPage(nextSpreadStart);
+                    }}
+                    aria-label={pageIndex >= lastReadableSpreadStart ? c.finish : c.next}
+                    className="absolute bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-[#d8cdb8] bg-[#fff8eb]/95 text-[#4b3724] shadow-[0_10px_24px_rgba(65,48,32,0.24)] transition hover:bg-white hover:text-[#201a17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19369]"
+                  >
+                    {pageIndex >= lastReadableSpreadStart ? (
+                      <Check size={23} strokeWidth={2.5} />
+                    ) : (
+                      <ChevronRight size={26} strokeWidth={2.4} />
+                    )}
+                  </button>
 
                   {/* 3D flip overlay — forward: right half flips left */}
                   {prevSpread && flipDir === 'forward' && (
