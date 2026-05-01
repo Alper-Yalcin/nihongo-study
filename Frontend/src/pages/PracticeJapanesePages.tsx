@@ -733,16 +733,28 @@ const bookPagePaddingStyle: React.CSSProperties = {
   paddingBlock: `${fixedBookText.pagePaddingY}px`
 };
 
+const bookLeftPageStyle: React.CSSProperties = {
+  ...bookPagePaddingStyle,
+  backgroundImage:
+    'linear-gradient(180deg, rgba(255,252,244,0.98), rgba(255,247,232,0.98)), radial-gradient(circle at 92% 12%, rgba(216,95,121,0.08), transparent 15rem)'
+};
+
+const bookRightPageStyle: React.CSSProperties = {
+  ...bookPagePaddingStyle,
+  backgroundImage:
+    'linear-gradient(180deg, rgba(255,250,240,0.98), rgba(255,245,226,0.98)), radial-gradient(circle at 8% 10%, rgba(193,147,105,0.1), transparent 13rem)'
+};
+
 const BookLeftPage: React.FC<{
   page: ReadingPage;
   pageNum: number;
   roundedLeft?: boolean;
 }> = ({ page, pageNum, roundedLeft = true }) => (
   <div
-    className={`relative flex h-full min-h-0 flex-col bg-[#fff8eb] shadow-[inset_-24px_0_28px_rgba(91,63,36,0.08)] ${
+    className={`relative flex h-full min-h-0 flex-col bg-[#fff8eb] shadow-[inset_-24px_0_30px_rgba(111,74,48,0.1),inset_0_0_36px_rgba(255,255,255,0.46)] ${
       roundedLeft ? 'lg:rounded-l-[0.9rem]' : ''
     }`}
-    style={bookPagePaddingStyle}
+    style={bookLeftPageStyle}
   >
     <p
       className="flex-1 overflow-hidden whitespace-pre-line font-jp text-[#201a17]"
@@ -761,10 +773,10 @@ const BookRightPage: React.FC<{
   roundedRight?: boolean;
 }> = ({ bookTitle, page = null, pageNum, roundedRight = true }) => (
   <div
-    className={`relative flex h-full min-h-0 flex-col border-l border-[#dfcfb3] bg-[#fff7e8] shadow-[inset_24px_0_28px_rgba(91,63,36,0.08)] ${
+    className={`relative flex h-full min-h-0 flex-col border-l border-[#e4d2bb] bg-[#fff7e8] shadow-[inset_24px_0_30px_rgba(111,74,48,0.1),inset_0_0_36px_rgba(255,255,255,0.42)] ${
       roundedRight ? 'lg:rounded-r-[0.9rem]' : ''
     }`}
-    style={bookPagePaddingStyle}
+    style={bookRightPageStyle}
   >
     {page ? (
       <>
@@ -945,28 +957,28 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
       ) : (
         <section className="flex h-full items-center justify-center">
             <div
-              className="relative h-full w-full overflow-hidden rounded-[1.25rem] border border-[#233246] bg-[#26394f] p-2 shadow-[0_28px_70px_rgba(25,18,14,0.34)] sm:p-3 lg:p-4"
+              className="relative h-full w-full overflow-hidden rounded-[1.25rem] border border-[#6f4450] bg-[#8e5864] p-2 shadow-[0_28px_70px_rgba(77,44,48,0.36),0_4px_18px_rgba(255,232,222,0.22)] sm:p-3 lg:p-4"
               style={{
                 minWidth: 'min(100%, 48rem)',
                 maxWidth: '88rem',
                 backgroundImage:
-                  'linear-gradient(90deg, #1d2d42 0%, #2f4964 5%, #26394f 12%, #26394f 88%, #2f4964 95%, #1d2d42 100%)'
+                  'linear-gradient(90deg, #5f3944 0%, #8f5965 5%, #a86e76 12%, #8f5965 88%, #6f4450 95%, #4f3340 100%)'
               }}
             >
               <div
                 aria-hidden="true"
                 className="absolute inset-x-8 bottom-1 h-5 rounded-[50%] bg-black/25 blur-md"
               />
-              <div className="relative h-full rounded-[1rem] bg-[#d8c5a6] p-2 shadow-[inset_0_-14px_18px_rgba(65,48,32,0.24)] sm:p-3">
-                <div className="pointer-events-none absolute inset-x-8 bottom-3 h-5 rounded-b-[50%] border-b border-black/15" />
-                <div className="relative h-full overflow-hidden rounded-[0.9rem] border border-[#d8cdb8] bg-[#f6eddf]">
+              <div className="relative h-full rounded-[1rem] bg-[#d8bfa5] p-2 shadow-[inset_0_-14px_18px_rgba(86,57,37,0.24),inset_0_1px_0_rgba(255,255,255,0.48)] sm:p-3">
+                <div className="pointer-events-none absolute inset-x-8 bottom-3 h-5 rounded-b-[50%] border-b border-[#7c5540]/20" />
+                <div className="relative h-full overflow-hidden rounded-[0.9rem] border border-[#ead9c5] bg-[#fff7e8] shadow-[0_10px_26px_rgba(83,55,37,0.16)]">
                   {/* Spine + ambient decorations */}
                   <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-y-0 left-1/2 z-20 hidden w-8 -translate-x-1/2 lg:block"
                     style={{
                       background:
-                        'linear-gradient(90deg, rgba(73,49,32,0.22), rgba(255,250,240,0.62) 45%, rgba(73,49,32,0.24))'
+                        'linear-gradient(90deg, rgba(104,70,48,0.24), rgba(255,247,232,0.72) 44%, rgba(104,70,48,0.2))'
                     }}
                   />
                   <div
@@ -974,7 +986,7 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                     className="pointer-events-none absolute inset-0"
                     style={{
                       background:
-                        'radial-gradient(circle at 7% 18%, rgba(208,96,112,0.12), transparent 14rem), radial-gradient(circle at 92% 82%, rgba(87,103,119,0.14), transparent 16rem)'
+                        'radial-gradient(circle at 7% 18%, rgba(216,95,121,0.08), transparent 14rem), radial-gradient(circle at 92% 82%, rgba(193,147,105,0.12), transparent 16rem), linear-gradient(90deg, rgba(111,74,48,0.04), transparent 16%, transparent 84%, rgba(111,74,48,0.05))'
                     }}
                   />
 
@@ -1004,7 +1016,7 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                       type="button"
                       onClick={() => goToPage(previousSpreadStart)}
                       aria-label={c.previous}
-                      className="absolute bottom-4 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-[#d8cdb8] bg-[#fff8eb]/95 text-[#4b3724] shadow-[0_10px_24px_rgba(65,48,32,0.24)] transition hover:bg-white hover:text-[#201a17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19369]"
+                      className="absolute bottom-4 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-[#e6d3bd] bg-[#fff8eb]/96 text-[#6f4450] shadow-[0_10px_24px_rgba(86,57,37,0.22)] transition hover:border-[#d9ad9f] hover:bg-white hover:text-[#201a17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d06070]"
                     >
                       <ChevronLeft size={26} strokeWidth={2.4} />
                     </button>
@@ -1016,7 +1028,7 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                       else goToPage(nextSpreadStart);
                     }}
                     aria-label={pageIndex >= lastReadableSpreadStart ? c.finish : c.next}
-                    className="absolute bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-[#d8cdb8] bg-[#fff8eb]/95 text-[#4b3724] shadow-[0_10px_24px_rgba(65,48,32,0.24)] transition hover:bg-white hover:text-[#201a17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19369]"
+                    className="absolute bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-[#e6d3bd] bg-[#fff8eb]/96 text-[#6f4450] shadow-[0_10px_24px_rgba(86,57,37,0.22)] transition hover:border-[#d9ad9f] hover:bg-white hover:text-[#201a17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d06070]"
                   >
                     {pageIndex >= lastReadableSpreadStart ? (
                       <Check size={23} strokeWidth={2.5} />
