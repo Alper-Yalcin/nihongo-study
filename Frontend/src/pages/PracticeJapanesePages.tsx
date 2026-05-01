@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArrowLeft,
   BadgeCheck,
   BookOpen,
   BookText,
@@ -616,70 +615,271 @@ const readingCopy = {
   }
 } as const;
 
+interface ReadingSpread {
+  left: ReadingPage;
+  right: ReadingPage | null;
+  startIndex: number;
+}
+
+const fixedBookText = {
+  fontSizePx: 27.2,
+  lineHeightPx: 53.6,
+  pagePaddingX: 40,
+  pagePaddingY: 32,
+  footerReserve: 72,
+  averageCharWidthRatio: 1.12
+} as const;
+
+interface ReadingPageSlots {
+  charsPerLine: number;
+  linesPerPage: number;
+}
+
+const defaultReadingPageSlots: ReadingPageSlots = {
+  charsPerLine: 14,
+  linesPerPage: 8
+};
+
+const getLastReadableSpreadStart = (pages: ReadingPage[]) => Math.max(0, pages.length - 2);
+
+const getPreviousReadingSpreadStart = (pages: ReadingPage[], startIndex: number) => {
+  const lastStart = getLastReadableSpreadStart(pages);
+  if (startIndex === lastStart && startIndex % 2 !== 0) {
+    return Math.max(0, startIndex - 1);
+  }
+
+  return Math.max(0, startIndex - 2);
+};
+
+const getNextReadingSpreadStart = (pages: ReadingPage[], startIndex: number) =>
+  Math.min(startIndex + 2, getLastReadableSpreadStart(pages));
+
+const getReadingSpread = (pages: ReadingPage[], startIndex: number): ReadingSpread | null => {
+  const boundedStart = Math.max(0, Math.min(startIndex, getLastReadableSpreadStart(pages)));
+  const left = pages[boundedStart] ?? null;
+  if (!left) return null;
+
+  return {
+    left,
+    right: pages[boundedStart + 1] ?? null,
+    startIndex: boundedStart
+  };
+};
+
+const getCharacterWeight = (char: string) => {
+  if (!char) return 0;
+  if (char === ' ') return 0.42;
+  return /[\x00-\x7F]/.test(char) ? 0.62 : 1;
+};
+
+const noLineStartPunctuation = new Set(Array.from('。、，．,.!?！？)）]】」』”’'));
+
+const wrapReadingLine = (text: string, capacity: number) => {
+  const lines: string[] = [];
+  let line = '';
+  let width = 0;
+
+  Array.from(text).forEach((char) => {
+    const charWidth = getCharacterWeight(char);
+    if (line && noLineStartPunctuation.has(char)) {
+      line += char;
+      width += charWidth;
+      return;
+    }
+
+    if (line && width + charWidth > capacity) {
+      lines.push(line.trimEnd());
+      line = char.trimStart();
+      width = getCharacterWeight(line);
+      return;
+    }
+
+    line += char;
+    width += charWidth;
+  });
+
+  if (line.trim().length > 0) {
+    lines.push(line.trimEnd());
+  }
+
+  return lines;
+};
+
+const paginateReadingBook = (book: ReadingBook, slots: ReadingPageSlots): ReadingPage[] => {
+  const sourceLines = book.pages
+    .flatMap((page) => page.japanese.split('\n'))
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  const wrappedLines = sourceLines.flatMap((line) => wrapReadingLine(line, slots.charsPerLine));
+  const pages: ReadingPage[] = [];
+
+  for (let index = 0; index < wrappedLines.length; index += slots.linesPerPage) {
+    pages.push({
+      id: `${book.id}-auto-${pages.length + 1}`,
+      japanese: wrappedLines.slice(index, index + slots.linesPerPage).join('\n')
+    });
+  }
+
+  return pages.length > 0 ? pages : book.pages;
+};
+
+const bookPageTextStyle: React.CSSProperties = {
+  fontSize: `${fixedBookText.fontSizePx}px`,
+  lineHeight: `${fixedBookText.lineHeightPx}px`
+};
+
+const bookPagePaddingStyle: React.CSSProperties = {
+  paddingInline: `${fixedBookText.pagePaddingX}px`,
+  paddingBlock: `${fixedBookText.pagePaddingY}px`
+};
+
 const BookLeftPage: React.FC<{
   page: ReadingPage;
   pageNum: number;
   roundedLeft?: boolean;
 }> = ({ page, pageNum, roundedLeft = true }) => (
   <div
-    className={`relative flex min-h-[34rem] flex-col bg-[#fff8eb] px-8 py-10 shadow-[inset_-24px_0_28px_rgba(91,63,36,0.08)] sm:px-12 ${
+    className={`relative flex h-full min-h-0 flex-col bg-[#fff8eb] shadow-[inset_-24px_0_28px_rgba(91,63,36,0.08)] ${
       roundedLeft ? 'lg:rounded-l-[0.9rem]' : ''
     }`}
+    style={bookPagePaddingStyle}
   >
-    <p className="flex-1 whitespace-pre-line font-jp text-[1.45rem] leading-[2.8rem] text-[#201a17] sm:text-[1.6rem] sm:leading-[3.2rem]">
+    <p
+      className="flex-1 overflow-hidden whitespace-pre-line font-jp text-[#201a17]"
+      style={bookPageTextStyle}
+    >
       {page.japanese}
     </p>
-    <div className="mt-6 text-center font-jp text-xs text-[#b8a080]">— {pageNum} —</div>
+    <div className="mt-6 text-center font-jp text-xs text-[#b8a080]">- {pageNum} -</div>
   </div>
 );
 
 const BookRightPage: React.FC<{
   bookTitle: string;
+  page?: ReadingPage | null;
+  pageNum?: number;
   roundedRight?: boolean;
-}> = ({ bookTitle, roundedRight = true }) => (
+}> = ({ bookTitle, page = null, pageNum, roundedRight = true }) => (
   <div
-    className={`relative flex min-h-[34rem] flex-col items-center justify-center border-t border-[#dfcfb3] bg-[#fff7e8] shadow-[inset_24px_0_28px_rgba(91,63,36,0.08)] lg:border-l lg:border-t-0 ${
+    className={`relative flex h-full min-h-0 flex-col border-l border-[#dfcfb3] bg-[#fff7e8] shadow-[inset_24px_0_28px_rgba(91,63,36,0.08)] ${
       roundedRight ? 'lg:rounded-r-[0.9rem]' : ''
     }`}
+    style={bookPagePaddingStyle}
   >
-    <div className="select-none text-center">
+    {page ? (
+      <>
+        <p
+          className="flex-1 overflow-hidden whitespace-pre-line font-jp text-[#201a17]"
+          style={bookPageTextStyle}
+        >
+          {page.japanese}
+        </p>
+        <div className="mt-6 text-center font-jp text-xs text-[#b8a080]">- {pageNum} -</div>
+      </>
+    ) : (
+      <div className="flex flex-1 select-none flex-col items-center justify-center text-center">
       <div className="font-jp text-[#d4b896] text-4xl">✿</div>
-      <div className="mt-4 font-jp text-sm text-[#c0a070] opacity-70">{bookTitle}</div>
-    </div>
+        <div className="mt-4 font-jp text-sm text-[#c0a070] opacity-70">{bookTitle}</div>
+      </div>
+    )}
   </div>
 );
 
 export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = ({ language }) => {
   const c = readingCopy[language];
+  const spreadRef = useRef<HTMLDivElement | null>(null);
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
-  const [prevPage, setPrevPage] = useState<ReadingPage | null>(null);
+  const [pageSlots, setPageSlots] = useState<ReadingPageSlots>(defaultReadingPageSlots);
+  const [prevSpread, setPrevSpread] = useState<ReadingSpread | null>(null);
   const [flipDir, setFlipDir] = useState<'forward' | 'backward'>('forward');
   const selectedBook = readingBooks.find((book) => book.id === selectedBookId) ?? null;
-  const page = selectedBook?.pages[pageIndex] ?? null;
-  const progress = selectedBook ? Math.round(((pageIndex + 1) / selectedBook.pages.length) * 100) : 0;
+  const readingPages = useMemo(
+    () => (selectedBook ? paginateReadingBook(selectedBook, pageSlots) : []),
+    [pageSlots, selectedBook]
+  );
+  const spread = readingPages.length > 0 ? getReadingSpread(readingPages, pageIndex) : null;
+  const lastReadableSpreadStart = readingPages.length > 0 ? getLastReadableSpreadStart(readingPages) : 0;
+  const previousSpreadStart = readingPages.length > 0 ? getPreviousReadingSpreadStart(readingPages, pageIndex) : 0;
+  const nextSpreadStart = readingPages.length > 0 ? getNextReadingSpreadStart(readingPages, pageIndex) : 0;
 
   const startBook = (bookId: string) => {
     setSelectedBookId(bookId);
     setPageIndex(0);
+    setPrevSpread(null);
   };
 
   const goToPage = (nextPage: number) => {
-    if (!selectedBook || prevPage) return;
-    const boundedPage = Math.max(0, Math.min(nextPage, selectedBook.pages.length - 1));
+    if (!selectedBook || !spread || prevSpread) return;
+    const boundedPage = Math.max(0, Math.min(nextPage, lastReadableSpreadStart));
     setFlipDir(nextPage > pageIndex ? 'forward' : 'backward');
-    setPrevPage(page);
+    setPrevSpread(spread);
     setPageIndex(boundedPage);
-    setTimeout(() => setPrevPage(null), 700);
+    setTimeout(() => setPrevSpread(null), 700);
   };
 
   const returnToLibrary = () => {
     setSelectedBookId(null);
     setPageIndex(0);
+    setPrevSpread(null);
   };
 
+  useEffect(() => {
+    if (!selectedBook) return undefined;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousRootOverflow;
+    };
+  }, [selectedBook]);
+
+  useEffect(() => {
+    if (!selectedBook || !spreadRef.current) return undefined;
+
+    const spreadElement = spreadRef.current;
+    const updatePageSlots = () => {
+      const rect = spreadElement.getBoundingClientRect();
+      const textWidth = rect.width / 2 - fixedBookText.pagePaddingX * 2;
+      const textHeight = rect.height - fixedBookText.pagePaddingY * 2 - fixedBookText.footerReserve;
+      const nextSlots = {
+        charsPerLine: Math.max(8, Math.floor(textWidth / (fixedBookText.fontSizePx * fixedBookText.averageCharWidthRatio))),
+        linesPerPage: Math.max(4, Math.floor(textHeight / fixedBookText.lineHeightPx))
+      };
+
+      setPageSlots((current) =>
+        current.charsPerLine === nextSlots.charsPerLine && current.linesPerPage === nextSlots.linesPerPage
+          ? current
+          : nextSlots
+      );
+    };
+
+    updatePageSlots();
+    const resizeObserver = new ResizeObserver(updatePageSlots);
+    resizeObserver.observe(spreadElement);
+    window.addEventListener('resize', updatePageSlots);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updatePageSlots);
+    };
+  }, [selectedBook]);
+
+  useEffect(() => {
+    if (!selectedBook || pageIndex <= lastReadableSpreadStart) return;
+    setPageIndex(lastReadableSpreadStart);
+    setPrevSpread(null);
+  }, [lastReadableSpreadStart, pageIndex, selectedBook]);
+
   return (
-    <PageShell width="wide" className="pb-14">
+    <PageShell
+      width="wide"
+      className={selectedBook ? 'h-[calc(100vh-7.5rem)] overflow-hidden !py-0 !pb-0' : 'pb-14'}
+    >
       <style>{`
         @keyframes book-flip-forward {
           from { transform: rotateY(0deg); }
@@ -695,7 +895,7 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
           100% { opacity: 0; }
         }
       `}</style>
-      {!selectedBook || !page ? (
+      {!selectedBook || !spread ? (
         <section className="mt-8">
           <div className="mb-6 flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
             <Library size={16} className="text-[var(--kt-brand)]" />
@@ -743,51 +943,12 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
           </div>
         </section>
       ) : (
-        <section className="mt-8">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={returnToLibrary}
-              className="inline-flex items-center gap-2 text-sm font-black text-[var(--kt-ink-muted)] transition hover:text-[var(--kt-ink-strong)]"
-            >
-              <ArrowLeft size={16} />
-              {c.backToLibrary}
-            </button>
-            <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
-              <span className="font-jp text-sm normal-case tracking-normal text-[var(--kt-ink-strong)]">{selectedBook.title}</span>
-              <span>{c.page} {pageIndex + 1}/{selectedBook.pages.length}</span>
-              <span>{c.progress}: {progress}%</span>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                as="button"
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={pageIndex === 0}
-                onClick={() => goToPage(pageIndex - 1)}
-                iconStart={<ChevronLeft size={16} />}
-              >
-                {c.previous}
-              </Button>
-              <Button
-                as="button"
-                type="button"
-                size="sm"
-                onClick={() => {
-                  if (pageIndex === selectedBook.pages.length - 1) returnToLibrary();
-                  else goToPage(pageIndex + 1);
-                }}
-                iconEnd={pageIndex === selectedBook.pages.length - 1 ? undefined : <ChevronRight size={16} />}
-              >
-                {pageIndex === selectedBook.pages.length - 1 ? c.finish : c.next}
-              </Button>
-            </div>
-          </div>
-
+        <section className="flex h-full items-center justify-center">
             <div
-              className="relative overflow-hidden rounded-[1.25rem] border border-[#233246] bg-[#26394f] p-3 shadow-[0_28px_70px_rgba(25,18,14,0.34)] sm:p-4"
+              className="relative h-full w-full overflow-hidden rounded-[1.25rem] border border-[#233246] bg-[#26394f] p-2 shadow-[0_28px_70px_rgba(25,18,14,0.34)] sm:p-3 lg:p-4"
               style={{
+                minWidth: 'min(100%, 48rem)',
+                maxWidth: '88rem',
                 backgroundImage:
                   'linear-gradient(90deg, #1d2d42 0%, #2f4964 5%, #26394f 12%, #26394f 88%, #2f4964 95%, #1d2d42 100%)'
               }}
@@ -795,7 +956,7 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
               {pageIndex > 0 && (
                 <button
                   type="button"
-                  onClick={() => goToPage(pageIndex - 1)}
+                  onClick={() => goToPage(previousSpreadStart)}
                   aria-label={c.previous}
                   className="absolute bottom-4 left-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
                 >
@@ -805,13 +966,13 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
               <button
                 type="button"
                 onClick={() => {
-                  if (pageIndex === selectedBook.pages.length - 1) returnToLibrary();
-                  else goToPage(pageIndex + 1);
+                  if (pageIndex >= lastReadableSpreadStart) returnToLibrary();
+                  else goToPage(nextSpreadStart);
                 }}
-                aria-label={pageIndex === selectedBook.pages.length - 1 ? c.finish : c.next}
+                aria-label={pageIndex >= lastReadableSpreadStart ? c.finish : c.next}
                 className="absolute bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
               >
-                {pageIndex === selectedBook.pages.length - 1 ? (
+                {pageIndex >= lastReadableSpreadStart ? (
                   <Check size={20} />
                 ) : (
                   <ChevronRight size={22} />
@@ -821,9 +982,9 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                 aria-hidden="true"
                 className="absolute inset-x-8 bottom-1 h-5 rounded-[50%] bg-black/25 blur-md"
               />
-              <div className="relative rounded-[1rem] bg-[#d8c5a6] p-2 shadow-[inset_0_-14px_18px_rgba(65,48,32,0.24)] sm:p-3">
+              <div className="relative h-full rounded-[1rem] bg-[#d8c5a6] p-2 shadow-[inset_0_-14px_18px_rgba(65,48,32,0.24)] sm:p-3">
                 <div className="pointer-events-none absolute inset-x-8 bottom-3 h-5 rounded-b-[50%] border-b border-black/15" />
-                <div className="relative overflow-hidden rounded-[0.9rem] border border-[#d8cdb8] bg-[#f6eddf]">
+                <div className="relative h-full overflow-hidden rounded-[0.9rem] border border-[#d8cdb8] bg-[#f6eddf]">
                   {/* Spine + ambient decorations */}
                   <div
                     aria-hidden="true"
@@ -843,24 +1004,41 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                   />
 
                   {/* Base spread: visible side keeps old content until flip completes */}
-                  <div className="grid lg:grid-cols-2">
+                  <div ref={spreadRef} className="grid h-full grid-cols-2">
                     <BookLeftPage
-                      page={prevPage && flipDir === 'forward' ? prevPage : page}
-                      pageNum={prevPage && flipDir === 'forward' ? pageIndex : pageIndex + 1}
+                      page={prevSpread && flipDir === 'forward' ? prevSpread.left : spread.left}
+                      pageNum={prevSpread && flipDir === 'forward' ? prevSpread.startIndex + 1 : spread.startIndex + 1}
                     />
-                    <BookRightPage bookTitle={selectedBook.title} />
+                    <BookRightPage
+                      bookTitle={selectedBook.title}
+                      page={prevSpread && flipDir === 'backward' ? prevSpread.right : spread.right}
+                      pageNum={
+                        prevSpread && flipDir === 'backward'
+                          ? prevSpread.right
+                            ? prevSpread.startIndex + 2
+                            : undefined
+                          : spread.right
+                            ? spread.startIndex + 2
+                            : undefined
+                      }
+                    />
                   </div>
 
                   {/* 3D flip overlay — forward: right half flips left */}
-                  {prevPage && flipDir === 'forward' && (
+                  {prevSpread && flipDir === 'forward' && (
                     <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', right: 0, perspective: '2400px', zIndex: 30 }}>
                       <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transformOrigin: 'left center', animation: 'book-flip-forward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both' }}>
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', overflow: 'hidden' }}>
-                          <BookRightPage bookTitle={selectedBook.title} roundedRight={false} />
+                          <BookRightPage
+                            bookTitle={selectedBook.title}
+                            page={prevSpread.right}
+                            pageNum={prevSpread.right ? prevSpread.startIndex + 2 : undefined}
+                            roundedRight={false}
+                          />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
-                          <BookLeftPage page={page} pageNum={pageIndex + 1} roundedLeft={false} />
+                          <BookLeftPage page={spread.left} pageNum={spread.startIndex + 1} roundedLeft={false} />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to right, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
                       </div>
@@ -868,15 +1046,20 @@ export const PracticeJapaneseReadingPage: React.FC<PracticeJapanesePageProps> = 
                   )}
 
                   {/* 3D flip overlay — backward: left half flips right */}
-                  {prevPage && flipDir === 'backward' && (
+                  {prevSpread && flipDir === 'backward' && (
                     <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: '50%', perspective: '2400px', zIndex: 30 }}>
                       <div style={{ position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transformOrigin: 'right center', animation: 'book-flip-backward 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000) both' }}>
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', overflow: 'hidden' }}>
-                          <BookLeftPage page={prevPage} pageNum={pageIndex + 2} roundedLeft={false} />
+                          <BookLeftPage page={prevSpread.left} pageNum={prevSpread.startIndex + 1} roundedLeft={false} />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to right, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
                         <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', overflow: 'hidden' }}>
-                          <BookRightPage bookTitle={selectedBook.title} roundedRight={false} />
+                          <BookRightPage
+                            bookTitle={selectedBook.title}
+                            page={spread.right}
+                            pageNum={spread.right ? spread.startIndex + 2 : undefined}
+                            roundedRight={false}
+                          />
                           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.18), transparent 60%)', animation: 'flip-shadow 0.65s both' }} />
                         </div>
                       </div>
