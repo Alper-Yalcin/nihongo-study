@@ -6,22 +6,22 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { LandingPage } from './pages/LandingPage';
-import { Kanji } from './pages/Kanji';
-import { KanaItemPage } from './pages/KanaItemPage';
-import { KanaPlayPage } from './pages/KanaPlayPage';
-import { KanaSessionPage } from './pages/KanaSessionPage';
-import { Settings } from './pages/Settings';
-import { PlaceholderPage } from './pages/PlaceholderPage';
-import { LettersPage } from './pages/LettersPage';
-import { PracticeKanaDrawingPage } from './pages/PracticeKanaDrawingPage';
-import { PracticeKanaAnswerTypePage } from './pages/PracticeKanaAnswerTypePage';
-import { PracticeKanaListeningPage } from './pages/PracticeKanaListeningPage';
-import { PracticeKanaReadingPage } from './pages/PracticeKanaReadingPage';
-import { PracticeKanaWritingRecallPage } from './pages/PracticeKanaWritingRecallPage';
-import { PracticeKanaFlashcardsPage } from './pages/PracticeKanaFlashcardsPage';
-import { PracticeKanaQuickStudyPage } from './pages/PracticeKanaQuickStudyPage';
-import { PracticeKanaPopPage } from './pages/PracticeKanaPopPage';
+import { LandingPage } from './pages/home/LandingPage';
+import { Kanji } from './pages/letters/Kanji';
+import { KanaItemPage } from './pages/letters/KanaItemPage';
+import { KanaPlayPage } from './pages/play/KanaPlayPage';
+import { KanaSessionPage } from './pages/letters/KanaSessionPage';
+import { Settings } from './pages/account/Settings';
+import { PlaceholderPage } from './pages/misc/PlaceholderPage';
+import { LettersPage } from './pages/letters/LettersPage';
+import { PracticeKanaDrawingPage } from './pages/practice/kana/PracticeKanaDrawingPage';
+import { PracticeKanaAnswerTypePage } from './pages/practice/kana/PracticeKanaAnswerTypePage';
+import { PracticeKanaListeningPage } from './pages/practice/kana/PracticeKanaListeningPage';
+import { PracticeKanaReadingPage } from './pages/practice/kana/PracticeKanaReadingPage';
+import { PracticeKanaWritingRecallPage } from './pages/practice/kana/PracticeKanaWritingRecallPage';
+import { PracticeKanaFlashcardsPage } from './pages/practice/kana/PracticeKanaFlashcardsPage';
+import { PracticeKanaQuickStudyPage } from './pages/practice/kana/PracticeKanaQuickStudyPage';
+import { PracticeKanaPopPage } from './pages/practice/kana/PracticeKanaPopPage';
 import {
   PracticeJapaneseFillBlankPage,
   PracticeJapaneseFlashcardsPage,
@@ -30,7 +30,7 @@ import {
   PracticeJapaneseSentenceWritingPage,
   PracticeJapaneseTopicLessonsPage,
   PracticeJapaneseTranslationPage
-} from './pages/PracticeJapanesePages';
+} from './pages/practice/japanese';
 import {
   PracticeKanjiChallengePage,
   PracticeKanjiDrawingPage,
@@ -40,20 +40,20 @@ import {
   PracticeKanjiReadingPage,
   PracticeKanjiUsagePage,
   PracticeKanjiWritingRecallPage
-} from './pages/PracticeKanjiPages';
-import { QuizJapanesePage, QuizKanaPage, QuizKanjiPage } from './pages/QuizPages';
-import { PracticeRunPage } from './pages/PracticeRunPage';
-import { PracticeStatsPage } from './pages/PracticeStatsPage';
-import { MissionPage } from './pages/MissionPage';
-import { QuestsPage } from './pages/QuestsPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { LearnUnitPage } from './pages/LearnUnitPage';
-import { LearnLevelExamPage } from './pages/LearnLevelExamPage';
-import { LearnGuidePage } from './pages/LearnGuidePage';
-import { LearnJapanesePage } from './pages/LearnJapanesePage';
-import { LearnReviewPage } from './pages/LearnReviewPage';
-import { LearnStatisticPage } from './pages/LearnStatisticPage';
-import { ForgePage } from './pages/ForgePage';
+} from './pages/practice/kanji';
+import { QuizJapanesePage, QuizKanaPage, QuizKanjiPage } from './pages/quiz';
+import { PracticeRunPage } from './pages/practice/shared/PracticeRunPage';
+import { PracticeStatsPage } from './pages/practice/shared/PracticeStatsPage';
+import { MissionPage } from './pages/learn/MissionPage';
+import { QuestsPage } from './pages/quests/QuestsPage';
+import { ProfilePage } from './pages/account/ProfilePage';
+import { LearnUnitPage } from './pages/learn/LearnUnitPage';
+import { LearnLevelExamPage } from './pages/learn/LearnLevelExamPage';
+import { LearnGuidePage } from './pages/learn/LearnGuidePage';
+import { LearnJapanesePage } from './pages/learn/LearnJapanesePage';
+import { LearnReviewPage } from './pages/learn/LearnReviewPage';
+import { LearnStatisticPage } from './pages/learn/LearnStatisticPage';
+import { ForgePage } from './pages/practice/shared/ForgePage';
 import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
 import { AppLanguage, ThemeMode } from './data/appPreferences';
 import { usePersistentState } from './hooks/usePersistentState';
@@ -64,12 +64,12 @@ import { KanaScript } from './features/kana/domain/kanaItem';
 import { AppShell } from './components/layout';
 import { ReEntrySplash } from './features/jlearn/reentry/ReEntrySplash';
 import { ChallengeReadyPrompt } from './features/jlearn/challenge/ChallengeReadyPrompt';
-import { ChallengeMissionPage } from './pages/ChallengeMissionPage';
+import { ChallengeMissionPage } from './pages/learn/ChallengeMissionPage';
 import { SpeakingSuggestToast } from './features/jlearn/speaking/SpeakingSuggestToast';
 import { FeedbackLayer } from './components/feedback/FeedbackLayer';
 import { ensureWeeklyFreezeGrant } from './features/streak/tomoshibi';
 import { TomoshibiRelightModal } from './components/feedback/TomoshibiRelightModal';
-import { OnboardingGate } from './pages/OnboardingPage';
+import { OnboardingGate } from './pages/home/OnboardingPage';
 import { installSmartNotifier } from './features/notifications/smartNotifications';
 
 const KANA_FONT_STORAGE_KEY = 'kototsuna.kana-font-style';
