@@ -19,7 +19,7 @@ import { AppLanguage } from '../../../data/appPreferences';
 import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
 import { markPracticedToday } from '../../../features/streak/tomoshibi';
 
-interface PracticeKanjiPageProps {
+export interface PracticeKanjiPageProps {
   language: AppLanguage;
 }
 
@@ -33,14 +33,14 @@ type KanjiMode =
   | 'match'
   | 'pop';
 
-interface KanjiExample {
+export interface KanjiExample {
   id: string;
   surface: string;
   reading: string;
   meaning: string;
 }
 
-interface KanjiPracticeItem {
+export interface KanjiPracticeItem {
   char: string;
   readings: string[];
   meanings: string[];
@@ -190,7 +190,7 @@ const iconByMode: Record<KanjiMode, React.ReactNode> = {
   pop: <Gamepad2 size={14} />
 };
 
-const shuffle = <T,>(items: T[]) => {
+export const shuffle = <T,>(items: T[]) => {
   const next = [...items];
   for (let index = next.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
@@ -245,7 +245,7 @@ const kanjiSeeds: KanjiSeed[] = [
   { char: '万', readings: ['まん'], tr: ['on bin'], en: ['ten thousand'], words: [{ surface: '一万', reading: 'いちまん', tr: 'on bin', en: 'ten thousand' }, { surface: '万年筆', reading: 'まんねんひつ', tr: 'dolma kalem', en: 'fountain pen' }] }
 ];
 
-const buildCuratedKanjiItems = (language: AppLanguage): KanjiPracticeItem[] =>
+export const buildCuratedKanjiItems = (language: AppLanguage): KanjiPracticeItem[] =>
   kanjiSeeds.map((seed, index) => ({
     char: seed.char,
     frequency: kanjiSeeds.length - index,
@@ -270,7 +270,7 @@ const speakJapanese = (text: string) => {
   window.speechSynthesis.speak(utterance);
 };
 
-const readKanjiProgress = (): Record<string, 'known' | 'review'> => {
+export const readKanjiProgress = (): Record<string, 'known' | 'review'> => {
   if (typeof window === 'undefined') return {};
   try {
     return JSON.parse(window.localStorage.getItem('kototsuna.kanji.practice-progress.v1') ?? '{}');
@@ -279,7 +279,7 @@ const readKanjiProgress = (): Record<string, 'known' | 'review'> => {
   }
 };
 
-const writeKanjiProgress = (progress: Record<string, 'known' | 'review'>) => {
+export const writeKanjiProgress = (progress: Record<string, 'known' | 'review'>) => {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem('kototsuna.kanji.practice-progress.v1', JSON.stringify(progress));
 };
