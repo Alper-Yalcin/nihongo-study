@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ArrowRight,
   BadgeCheck,
   BookOpen,
   Crosshair,
@@ -13,7 +14,7 @@ import {
   Target,
   Volume2
 } from 'lucide-react';
-import { Button, Eyebrow, PageHeader, PageShell } from '../../../components/ui';
+import { PageShell } from '../../../components/ui';
 import { AppLanguage } from '../../../data/appPreferences';
 import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
 import { markPracticedToday } from '../../../features/streak/tomoshibi';
@@ -283,6 +284,82 @@ const writeKanjiProgress = (progress: Record<string, 'known' | 'review'>) => {
   window.localStorage.setItem('kototsuna.kanji.practice-progress.v1', JSON.stringify(progress));
 };
 
+const KanjiPracticeThemeStyles = () => (
+  <style>{`
+    .kt-kanji-stage {
+      --kanji-panel: rgba(255, 252, 249, 0.88);
+      --kanji-panel-strong: rgba(255, 255, 255, 0.94);
+      --kanji-panel-soft: rgba(255, 245, 239, 0.78);
+      --kanji-border: rgba(208, 96, 112, 0.22);
+      --kanji-border-strong: rgba(160, 65, 87, 0.32);
+      --kanji-ink: #2b2422;
+      --kanji-ink-strong: #181514;
+      --kanji-ink-muted: rgba(65, 57, 61, 0.72);
+      --kanji-ink-soft: rgba(111, 99, 104, 0.72);
+      --kanji-paper: #fff8eb;
+      --kanji-paper-muted: #f4eadf;
+      --kanji-paper-line: #e7d2c1;
+      --kanji-accent: #d85f79;
+      --kanji-accent-strong: #a04157;
+      --kanji-accent-soft: rgba(216, 95, 121, 0.12);
+      --kanji-success: #8d5965;
+      --kanji-success-soft: rgba(168, 97, 111, 0.14);
+      --kanji-danger: #c24f69;
+      --kanji-danger-soft: rgba(216, 95, 121, 0.13);
+      --kanji-track: rgba(208, 96, 112, 0.16);
+      --kanji-ghost: rgba(255,255,255,0.68);
+      --kanji-ghost-hover: rgba(255,255,255,0.9);
+      --kanji-ghost-border: rgba(160, 65, 87, 0.16);
+      --kanji-shadow: 0 24px 70px rgba(120, 72, 82, 0.16), inset 0 1px 0 rgba(255,255,255,0.82);
+      --kanji-page-shadow: 0 28px 80px rgba(120, 72, 82, 0.16);
+      --kanji-console-bg:
+        radial-gradient(circle at 12% 8%, rgba(216,95,121,0.12), transparent 15rem),
+        radial-gradient(circle at 90% 85%, rgba(193,147,105,0.12), transparent 18rem),
+        linear-gradient(135deg, rgba(255,252,249,0.94), rgba(255,241,235,0.9));
+      --kanji-hero-bg:
+        radial-gradient(circle at 10% 8%, rgba(216,95,121,0.13), transparent 18rem),
+        radial-gradient(circle at 92% 20%, rgba(216,138,90,0.10), transparent 16rem),
+        linear-gradient(135deg, rgba(255,250,247,0.96), rgba(255,239,232,0.88));
+    }
+
+    .theme-dark .kt-kanji-stage {
+      --kanji-panel: rgba(37, 28, 36, 0.9);
+      --kanji-panel-strong: rgba(46, 36, 44, 0.94);
+      --kanji-panel-soft: rgba(255,255,255,0.06);
+      --kanji-border: rgba(245, 163, 178, 0.24);
+      --kanji-border-strong: rgba(245, 163, 178, 0.34);
+      --kanji-ink: rgba(255,255,255,0.88);
+      --kanji-ink-strong: #ffffff;
+      --kanji-ink-muted: rgba(255,255,255,0.68);
+      --kanji-ink-soft: rgba(255,255,255,0.52);
+      --kanji-paper: #fff8eb;
+      --kanji-paper-muted: #f4eadf;
+      --kanji-paper-line: #e5cdbc;
+      --kanji-accent: #e88b9c;
+      --kanji-accent-strong: #ff9aae;
+      --kanji-accent-soft: rgba(240, 138, 161, 0.12);
+      --kanji-success: #bdf3d1;
+      --kanji-success-soft: rgba(143, 214, 173, 0.12);
+      --kanji-danger: #ffb5c3;
+      --kanji-danger-soft: rgba(255, 138, 161, 0.12);
+      --kanji-track: rgba(255,255,255,0.12);
+      --kanji-ghost: rgba(255,255,255,0.08);
+      --kanji-ghost-hover: rgba(255,255,255,0.13);
+      --kanji-ghost-border: rgba(255,255,255,0.12);
+      --kanji-shadow: 0 28px 80px rgba(10, 8, 12, 0.46), inset 0 1px 0 rgba(255,255,255,0.08);
+      --kanji-page-shadow: 0 28px 80px rgba(10, 8, 12, 0.46);
+      --kanji-console-bg:
+        radial-gradient(circle at 12% 8%, rgba(216,95,121,0.18), transparent 15rem),
+        radial-gradient(circle at 90% 85%, rgba(193,147,105,0.16), transparent 18rem),
+        linear-gradient(135deg, rgba(46,36,44,0.96), rgba(28,23,30,0.94));
+      --kanji-hero-bg:
+        radial-gradient(circle at 12% 12%, rgba(216,95,121,0.2), transparent 18rem),
+        radial-gradient(circle at 92% 20%, rgba(255,184,112,0.14), transparent 16rem),
+        linear-gradient(135deg, rgba(45,34,42,0.98), rgba(19,16,23,0.96));
+    }
+  `}</style>
+);
+
 const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> = ({ language, mode }) => {
   const c = copy[language];
   const pageCopy = c[mode];
@@ -375,85 +452,140 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
 
   return (
     <PageShell width="wide" className="pb-14">
-      <PageHeader
-        eyebrow={<Eyebrow>{pageCopy.eyebrow}</Eyebrow>}
-        title={pageCopy.title}
-        description={pageCopy.description}
-        actions={
-          <div className="grid grid-cols-3 gap-2">
-            <MiniStat icon={iconByMode[mode]} label={c.pool} value={items.length} />
-            <MiniStat icon={<BadgeCheck size={14} />} label={c.knownStat} value={knownCount} />
-            <MiniStat icon={<RefreshCcw size={14} />} label={c.review} value={reviewCount} />
+      <KanjiPracticeThemeStyles />
+      <section className="kt-kanji-stage mt-8 overflow-hidden rounded-[1.25rem] border border-[var(--kanji-border-strong)] bg-[var(--kanji-panel)] shadow-[var(--kanji-shadow)]">
+        <div className="grid min-h-[22rem] lg:grid-cols-[1fr_0.95fr]" style={{ background: 'var(--kanji-hero-bg)' }}>
+          <div className="flex flex-col justify-between border-b border-[var(--kanji-border)] p-8 lg:border-b-0 lg:border-r lg:p-10">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--kanji-border-strong)] bg-[var(--kanji-accent-soft)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[var(--kanji-accent-strong)]">
+                {iconByMode[mode]}
+                {pageCopy.eyebrow}
+              </div>
+              <h1 className="mt-7 max-w-xl text-5xl font-black leading-none text-[var(--kanji-ink-strong)] lg:text-6xl">
+                {pageCopy.title}
+              </h1>
+              <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-[var(--kanji-ink-muted)]">
+                {pageCopy.description}
+              </p>
+            </div>
+            <div className="mt-9 grid gap-3 sm:grid-cols-3">
+              <KanjiStat icon={iconByMode[mode]} label={c.pool} value={items.length} />
+              <KanjiStat icon={<BadgeCheck size={16} />} label={c.knownStat} value={knownCount} />
+              <KanjiStat icon={<RefreshCcw size={16} />} label={c.review} value={reviewCount} />
+            </div>
           </div>
-        }
-      />
+          <div className="relative flex items-center justify-center p-8 lg:p-10">
+            <div className="relative w-full max-w-md rounded-[1.1rem] border border-[var(--kanji-paper-line)] bg-[var(--kanji-paper)] p-6 text-[#251a18] shadow-[var(--kanji-page-shadow)]">
+              <div className="flex items-start justify-between border-b border-[var(--kanji-paper-line)] pb-4">
+                <div>
+                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--kanji-accent-strong)]">
+                    {mode === 'challenge' || mode === 'pop' ? '15' : '10'} {language === 'tr' ? 'kartlik tur' : 'card round'}
+                  </div>
+                  <div className="mt-2 font-jp text-7xl font-black leading-none">{items[0]?.char ?? '漢'}</div>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--kanji-accent)] text-white shadow-[0_12px_24px_rgba(216,95,121,0.28)]">
+                  <Crosshair size={24} />
+                </div>
+              </div>
+              <div className="mt-5 grid grid-cols-3 gap-2">
+                {items.slice(0, 6).map((item) => (
+                  <div key={item.char} className="rounded-lg bg-[var(--kanji-paper-muted)] p-3 text-center font-jp text-3xl font-black">
+                    {item.char}
+                  </div>
+                ))}
+              </div>
+              {round.length === 0 && (
+                <button
+                  type="button"
+                  onClick={startRound}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--kanji-accent)] px-5 py-4 text-sm font-black uppercase tracking-[0.14em] text-white shadow-[0_16px_28px_rgba(216,95,121,0.34)] transition hover:-translate-y-0.5 hover:brightness-105"
+                >
+                  {c.start}
+                  <ArrowRight size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <section className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_18rem]">
-        <div className="rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
-          {items.length === 0 ? (
-            <div className="py-20 text-center text-sm text-[var(--kt-ink-muted)]">{c.empty}</div>
+      <section className="kt-kanji-stage mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="overflow-hidden rounded-[1.25rem] border border-[var(--kanji-border-strong)] bg-[var(--kanji-panel-strong)] shadow-[var(--kanji-shadow)]">
+          <div className="min-h-[32rem] p-7 lg:p-8" style={{ background: 'var(--kanji-console-bg)' }}>
+            {items.length === 0 ? (
+            <div className="py-20 text-center text-sm text-[var(--kanji-ink-muted)]">{c.empty}</div>
           ) : round.length === 0 ? (
             <div className="flex min-h-[24rem] flex-col items-center justify-center text-center">
-              <Crosshair size={38} className="text-[var(--kt-brand)]" />
-              <h2 className="mt-4 text-xl font-black text-[var(--kt-ink-strong)]">{pageCopy.title}</h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--kt-ink-muted)]">{pageCopy.description}</p>
-              <Button as="button" type="button" onClick={startRound} className="mt-5" iconStart={<Target size={16} />}>
+              <Crosshair size={42} className="text-[var(--kanji-accent-strong)]" />
+              <h2 className="mt-4 text-3xl font-black text-[var(--kanji-ink-strong)]">{pageCopy.title}</h2>
+              <p className="mt-3 max-w-md text-sm font-semibold leading-6 text-[var(--kanji-ink-muted)]">{pageCopy.description}</p>
+              <button
+                type="button"
+                onClick={startRound}
+                className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[var(--kanji-accent)] px-5 py-3 text-sm font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_28px_rgba(216,95,121,0.3)] transition hover:-translate-y-0.5 hover:brightness-105"
+              >
                 {c.start}
-              </Button>
+                <ArrowRight size={16} />
+              </button>
             </div>
           ) : complete ? (
             <div className="flex min-h-[24rem] flex-col items-center justify-center text-center">
-              <BadgeCheck size={42} className="text-[var(--kt-brand)]" />
-              <h2 className="mt-4 text-2xl font-black text-[var(--kt-ink-strong)]">{c.complete}</h2>
+              <BadgeCheck size={48} className="text-[var(--kanji-accent-strong)]" />
+              <h2 className="mt-4 text-4xl font-black text-[var(--kanji-ink-strong)]">{c.complete}</h2>
               <div className="mt-4 flex justify-center gap-3">
                 <ResultPill label={c.correct} value={correctCount} tone="success" />
                 <ResultPill label={c.wrong} value={wrongCount} tone="danger" />
                 <ResultPill label={c.combo} value={combo} tone="brand" />
               </div>
-              <Button as="button" type="button" onClick={startRound} className="mt-5" iconStart={<RefreshCcw size={16} />}>
+              <button
+                type="button"
+                onClick={startRound}
+                className="mt-6 inline-flex items-center gap-2 rounded-lg border border-[var(--kanji-border-strong)] bg-[var(--kanji-ghost)] px-5 py-3 text-sm font-black uppercase tracking-[0.14em] text-[var(--kanji-ink-strong)] transition hover:bg-[var(--kanji-ghost-hover)]"
+              >
+                <RefreshCcw size={16} />
                 {c.restart}
-              </Button>
+              </button>
             </div>
           ) : current ? (
             <div className="min-h-[24rem]">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-[var(--kanji-ink-soft)]">
                   {index + 1}/{round.length}
                 </div>
-                <div className="rounded-full bg-[var(--kt-surface-muted)] px-3 py-1 text-sm font-bold text-[var(--kt-ink-muted)]">
+                <div className="rounded-full border border-[var(--kanji-ghost-border)] bg-[var(--kanji-ghost)] px-3 py-1 text-sm font-bold text-[var(--kanji-ink-muted)]">
                   {c.score}: {correctCount} · {c.combo}: {combo}
                 </div>
               </div>
 
-              <div className="mt-5 rounded-lg bg-[var(--kt-surface)] p-5 text-center">
+              <div className="mt-5 rounded-[1rem] border border-[var(--kanji-paper-line)] bg-[var(--kanji-paper)] p-7 text-center text-[#251a18] shadow-[var(--kanji-page-shadow)]">
                 {mode === 'reading' ? (
-                  <div className="font-jp text-8xl font-black text-[var(--kt-ink-strong)]">{current.char}</div>
+                  <div className="font-jp text-8xl font-black">{current.char}</div>
                 ) : mode === 'listening' ? (
                   <button
                     type="button"
                     onClick={() => speakJapanese(current.readings[0] ?? current.char)}
-                    className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]"
+                    className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[var(--kanji-accent-soft)] text-[var(--kanji-accent-strong)] shadow-[0_16px_34px_rgba(216,95,121,0.24)] transition hover:scale-105"
                   >
                     <Volume2 size={34} />
                   </button>
                 ) : showMeaningCue ? (
                   <>
-                    <div className="text-sm font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{c.meaning}</div>
-                    <div className="mt-2 text-3xl font-black text-[var(--kt-ink-strong)]">
+                    <div className="text-sm font-black uppercase tracking-[0.14em] text-[var(--kanji-accent-strong)]">{c.meaning}</div>
+                    <div className="mt-2 text-3xl font-black">
                       {current.meanings[0] ?? current.examples[0]?.meaning ?? '-'}
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="font-jp text-7xl font-black text-[var(--kt-ink-strong)]">{current.char}</div>
-                    <div className="mt-3 text-lg font-bold text-[var(--kt-ink-muted)]">
+                    <div className="font-jp text-7xl font-black">{current.char}</div>
+                    <div className="mt-3 text-lg font-bold text-[#6f5a50]">
                       {current.meanings[0] ?? '-'}
                     </div>
                   </>
                 )}
               </div>
 
-              <div className="mt-4 grid gap-3 rounded-lg border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-4 md:grid-cols-3">
+              <div className="mt-4 grid gap-3 rounded-[1rem] border border-[var(--kanji-ghost-border)] bg-[var(--kanji-panel-soft)] p-4 md:grid-cols-3">
                 <Info label={c.readingLabel} value={current.readings.join(', ') || '-'} />
                 <Info label={c.meaning} value={current.meanings.join(', ') || '-'} />
                 <Info label={c.example} value={current.examples[0] ? `${current.examples[0].surface} (${current.examples[0].reading})` : '-'} />
@@ -473,10 +605,10 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
                         onClick={() => choose(choice)}
                         className={`min-h-20 rounded-lg border font-jp text-4xl font-black transition ${
                           showCorrect
-                            ? 'border-[color:var(--kt-accent-success)]/45 bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
+                            ? 'border-[var(--kanji-success)] bg-[var(--kanji-success-soft)] text-[var(--kanji-success)]'
                             : showWrong
-                              ? 'border-[color:var(--kt-accent-danger)]/45 bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)]'
-                              : 'border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:bg-[var(--kt-surface-muted)]'
+                              ? 'border-[var(--kanji-danger)] bg-[var(--kanji-danger-soft)] text-[var(--kanji-danger)]'
+                              : 'border-[var(--kanji-ghost-border)] bg-[var(--kanji-ghost)] text-[var(--kanji-ink-strong)] hover:bg-[var(--kanji-ghost-hover)]'
                         }`}
                       >
                         {choice.char}
@@ -496,13 +628,17 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
                     disabled={checked !== null}
-                    className="w-full rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 text-center text-2xl text-[var(--kt-ink)] outline-none focus:border-[var(--kt-brand)]"
+                    className="w-full rounded-lg border border-[var(--kanji-paper-line)] bg-[var(--kanji-paper)] px-4 py-3 text-center text-2xl font-bold text-[#251a18] outline-none transition focus:border-[var(--kanji-accent)] focus:ring-4 focus:ring-[var(--kanji-accent-soft)]"
                     placeholder={c.answer}
                   />
                   {checked === null && (
-                    <Button as="button" type="submit" disabled={!input.trim()} className="mt-3">
+                    <button
+                      type="submit"
+                      disabled={!input.trim()}
+                      className="mt-3 inline-flex items-center justify-center rounded-lg bg-[var(--kanji-accent)] px-5 py-3 text-sm font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_28px_rgba(216,95,121,0.3)] transition hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-45"
+                    >
                       {c.check}
-                    </Button>
+                    </button>
                   )}
                 </form>
               )}
@@ -511,42 +647,48 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
                 <div
                   className={`mt-4 rounded-lg border p-4 ${
                     checked
-                      ? 'border-[color:var(--kt-accent-success)]/45 bg-[var(--kt-accent-success-soft)]'
-                      : 'border-[color:var(--kt-accent-danger)]/45 bg-[var(--kt-accent-danger-soft)]'
+                      ? 'border-[var(--kanji-success)] bg-[var(--kanji-success-soft)]'
+                      : 'border-[var(--kanji-danger)] bg-[var(--kanji-danger-soft)]'
                   }`}
                 >
-                  <div className="text-sm font-black text-[var(--kt-ink-strong)]">
+                  <div className="text-sm font-black text-[var(--kanji-ink-strong)]">
                     {checked ? c.correct : c.wrong}
                   </div>
-                  <div className="mt-2 font-jp text-2xl font-black text-[var(--kt-ink-strong)]">
+                  <div className="mt-2 font-jp text-2xl font-black text-[var(--kanji-ink-strong)]">
                     {current.char} · {current.readings[0] ?? '-'}
                   </div>
-                  <Button as="button" type="button" onClick={next} className="mt-3">
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[var(--kanji-accent)] px-5 py-3 text-sm font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_28px_rgba(216,95,121,0.3)] transition hover:-translate-y-0.5 hover:brightness-105"
+                  >
                     {c.next}
-                  </Button>
+                    <ArrowRight size={16} />
+                  </button>
                 </div>
               )}
             </div>
           ) : null}
+          </div>
         </div>
 
-        <aside className="rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
+        <aside className="rounded-[1.1rem] border border-[var(--kanji-border-strong)] bg-[var(--kanji-panel)] p-5 shadow-[var(--kanji-shadow)]">
           <div className="grid gap-2">
-            <MiniStat icon={<Target size={14} />} label={c.pool} value={items.length} />
-            <MiniStat icon={<BadgeCheck size={14} />} label={c.knownStat} value={knownCount} />
-            <MiniStat icon={<RefreshCcw size={14} />} label={c.review} value={reviewCount} />
-            <MiniStat icon={<Sparkles size={14} />} label={c.usageLabel} value={items.reduce((sum, item) => sum + item.frequency, 0)} />
+            <KanjiStat icon={<Target size={14} />} label={c.pool} value={items.length} />
+            <KanjiStat icon={<BadgeCheck size={14} />} label={c.knownStat} value={knownCount} />
+            <KanjiStat icon={<RefreshCcw size={14} />} label={c.review} value={reviewCount} />
+            <KanjiStat icon={<Sparkles size={14} />} label={c.usageLabel} value={items.reduce((sum, item) => sum + item.frequency, 0)} />
           </div>
         </aside>
       </section>
 
-      <section className="mt-6 rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
-        <h2 className="text-base font-black text-[var(--kt-ink-strong)]">Kanji Pool</h2>
+      <section className="kt-kanji-stage mt-6 rounded-[1.25rem] border border-[var(--kanji-border-strong)] bg-[var(--kanji-panel)] p-5 shadow-[var(--kanji-shadow)]">
+        <h2 className="text-base font-black text-[var(--kanji-ink-strong)]">Kanji Pool</h2>
         <div className="mt-4 grid gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-10">
           {items.slice(0, 40).map((item) => (
-            <div key={item.char} className="rounded-lg border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-3 text-center">
-              <div className="font-jp text-3xl font-black text-[var(--kt-ink-strong)]">{item.char}</div>
-              <div className="mt-1 truncate text-[10px] font-bold text-[var(--kt-ink-muted)]">{item.readings[0] ?? '-'}</div>
+            <div key={item.char} className="rounded-lg border border-[var(--kanji-ghost-border)] bg-[var(--kanji-ghost)] p-3 text-center transition hover:-translate-y-0.5 hover:bg-[var(--kanji-ghost-hover)]">
+              <div className="font-jp text-3xl font-black text-[var(--kanji-ink-strong)]">{item.char}</div>
+              <div className="mt-1 truncate text-[10px] font-bold text-[var(--kanji-ink-muted)]">{item.readings[0] ?? '-'}</div>
             </div>
           ))}
         </div>
@@ -555,24 +697,24 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
   );
 };
 
-const MiniStat: React.FC<{ icon: React.ReactNode; label: string; value: number }> = ({
+const KanjiStat: React.FC<{ icon: React.ReactNode; label: string; value: number }> = ({
   icon,
   label,
   value
 }) => (
-  <div className="rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface)] px-3 py-2 shadow-[var(--kt-shadow-sm)]">
-    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
-      <span className="text-[var(--kt-brand)]">{icon}</span>
+  <div className="rounded-lg border border-[var(--kanji-ghost-border)] bg-[var(--kanji-ghost)] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
+    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--kanji-ink-soft)]">
+      <span className="text-[var(--kanji-accent-strong)]">{icon}</span>
       {label}
     </div>
-    <div className="mt-1 text-lg font-black text-[var(--kt-ink-strong)]">{value}</div>
+    <div className="mt-1 text-lg font-black text-[var(--kanji-ink-strong)]">{value}</div>
   </div>
 );
 
 const Info: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div>
-    <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">{label}</div>
-    <div className="mt-1 text-sm font-bold text-[var(--kt-ink)]">{value}</div>
+    <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kanji-ink-soft)]">{label}</div>
+    <div className="mt-1 text-sm font-bold text-[var(--kanji-ink-strong)]">{value}</div>
   </div>
 );
 
@@ -583,10 +725,10 @@ const ResultPill: React.FC<{ label: string; value: number; tone: 'success' | 'da
 }) => {
   const toneClass =
     tone === 'success'
-      ? 'bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)]'
+      ? 'bg-[var(--kanji-success-soft)] text-[var(--kanji-success)]'
       : tone === 'danger'
-        ? 'bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)]'
-        : 'bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]';
+        ? 'bg-[var(--kanji-danger-soft)] text-[var(--kanji-danger)]'
+        : 'bg-[var(--kanji-accent-soft)] text-[var(--kanji-accent-strong)]';
   return (
     <div className={`rounded-lg px-5 py-3 ${toneClass}`}>
       <div className="text-xs font-black uppercase tracking-[0.14em]">{label}</div>
