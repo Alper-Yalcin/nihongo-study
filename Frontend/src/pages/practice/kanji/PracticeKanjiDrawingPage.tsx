@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
-import { markPracticedToday } from '../../../features/streak/tomoshibi';
+import {
+  recordCorrect,
+  recordWrong,
+  getFeedbackState,
+  subscribeFeedback
+} from '../../../hooks/useFeedback';
+import { markPracticedToday, getHeatGrid } from '../../../features/streak/tomoshibi';
 import {
   PracticeKanjiPageProps,
   KanjiPracticeItem,
@@ -10,18 +15,46 @@ import {
   shuffle
 } from '../../../features/practice/kanji/KanjiPracticePages.shared';
 
+const computeStreak = (): number => {
+  const grid = getHeatGrid(60);
+  let streak = 0;
+  for (let i = grid.length - 1; i >= 0; i--) {
+    if (grid[i].active) streak++;
+    else break;
+  }
+  return streak;
+};
+
+const SCENE =
+  'relative -mx-4 sm:-mx-6 lg:-mx-10 -mt-5 xl:-mt-7 -mb-28 xl:-mb-12 flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden';
+
+const OVERLAY =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_50%,rgba(253,250,248,0.38)_0%,rgba(248,241,237,0.58)_100%)]';
+
 export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ language }) => {
   const items = useMemo(() => buildCuratedKanjiItems(language), [language]);
-  const [progress, setProgress] = useState<Record<string, 'known' | 'review'>>(() => readKanjiProgress());
+  const [progress, setProgress] = useState<Record<string, 'known' | 'review'>>(() =>
+    readKanjiProgress()
+  );
   const [round, setRound] = useState<KanjiPracticeItem[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [hanabira, setHanabira] = useState(() => getFeedbackState().hanabira);
+  const streak = useMemo(() => computeStreak(), []);
 
   const current = round[index] ?? null;
   const complete = round.length > 0 && index >= round.length;
 
-  const reviewChars = useMemo(() => new Set(Object.entries(progress).filter(([, status]) => status === 'review').map(([char]) => char)), [progress]);
-  
+  const reviewChars = useMemo(
+    () =>
+      new Set(
+        Object.entries(progress)
+          .filter(([, s]) => s === 'review')
+          .map(([c]) => c)
+      ),
+    [progress]
+  );
+
   const nextSet = useMemo(() => {
     const prioritized = [
       ...items.filter((item) => reviewChars.has(item.char)),
@@ -33,6 +66,10 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
   useEffect(() => {
     writeKanjiProgress(progress);
   }, [progress]);
+
+  useEffect(() => {
+    return subscribeFeedback(() => setHanabira(getFeedbackState().hanabira));
+  }, []);
 
   const startTraining = () => {
     const prioritized = [
@@ -57,131 +94,135 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
     setRevealed(false);
   };
 
-  // If complete, briefly show completion before restarting
+  /* ── Completion ── */
   if (complete) {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center p-6 bg-[#F6EFEA] text-[#2B2B2B] font-sans">
-        <div className="font-serif text-8xl mb-6">完</div>
-        <h2 className="text-2xl font-light tracking-[0.18em] mb-2 text-[#2B2B2B]">Training Complete</h2>
-        <p className="text-xs tracking-[0.25em] text-[#2B2B2B]/50 uppercase mb-10">The dojo rests</p>
-        <button onClick={() => setRound([])} className="rounded-full px-12 py-4 text-sm font-medium tracking-[0.18em] text-white bg-[#E06C75] hover:opacity-90 transition-opacity uppercase">
-          Return to Dojo
-        </button>
+      <div className={SCENE}>
+        <div className={OVERLAY} />
+        <div className="relative z-10 flex flex-col items-center gap-5 px-4 text-center">
+          <div className="select-none font-serif text-[9rem] leading-none text-[#2b2422]">完</div>
+          <h2 className="text-lg font-light tracking-[0.24em] text-[#2b2422]">
+            Training Complete
+          </h2>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-[#2b2422]/40">
+            The dojo rests
+          </p>
+          <button
+            onClick={() => setRound([])}
+            className="mt-3 rounded-full bg-[#d06070] px-11 py-3.5 text-sm font-medium uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 hover:scale-[1.02]"
+          >
+            Return to Dojo
+          </button>
+        </div>
       </div>
     );
   }
 
-  // Pre-start DOJO screen
+  /* ── Pre-start dojo ── */
   if (round.length === 0) {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center bg-[#F6EFEA] text-[#2B2B2B] font-sans">
-        {/* Top Header Label */}
-        <div className="absolute left-6 top-6 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-[#2B2B2B]/40">
-          <div className="h-1.5 w-1.5 rounded-full bg-[#E06C75]"></div>
-          Kanji Training · Drawing
+      <div className={SCENE}>
+        <div className={OVERLAY} />
+
+        <div className="absolute left-5 top-6 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[#2b2422]/35">
+          <span className="inline-block h-1 w-1 rounded-full bg-[#d06070]" />
+          Kanji · Drawing
         </div>
 
-        {/* HERO SCENE */}
-        <main className="flex h-[50dvh] w-full flex-col items-center justify-center px-4 pt-10">
-          <div className="font-serif text-[12rem] leading-none mb-4 md:text-[14rem] text-[#2B2B2B]">
+        <main className="relative z-10 flex flex-col items-center gap-5 px-4 text-center">
+          <div className="select-none font-serif text-[10rem] leading-none text-[#2b2422] md:text-[13rem]">
             {nextSet[0]?.char ?? '武'}
           </div>
-          <div className="text-xs font-medium uppercase tracking-[0.35em] text-[#2B2B2B]/40">
-            Recall the symbol
-          </div>
-        </main>
 
-        {/* PRIMARY ACTION */}
-        <div className="mt-8 flex flex-col items-center justify-center z-10 w-full px-4">
+          <p className="text-[11px] font-medium uppercase tracking-[0.42em] text-[#2b2422]/38">
+            Recall the symbol
+          </p>
+
           <button
             onClick={startTraining}
-            className="rounded-full px-14 py-4 text-sm font-medium uppercase tracking-[0.2em] text-white bg-[#E06C75] hover:opacity-90 transition-opacity shadow-sm"
-            style={{ minWidth: '220px' }}
+            className="mt-3 rounded-full bg-[#d06070] px-12 py-3.5 text-sm font-medium uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 hover:scale-[1.02]"
           >
             Begin Training
           </button>
 
-          {reviewChars.size > 0 && (
-            <div className="mt-4 text-[10px] tracking-widest text-[#2B2B2B]/40 uppercase">
-              {reviewChars.size} awaiting review
-            </div>
-          )}
-        </div>
-
-        {/* SECONDARY PANEL: Floating Chips (TRAINING SET) */}
-        <div className="mt-16 flex flex-col items-center pb-20 z-10 w-full px-4">
-          <div className="text-[10px] font-medium uppercase tracking-[0.3em] text-[#2B2B2B]/40 mb-6">
-            Today's Set
+          <div className="flex items-center gap-3.5 text-[10px] uppercase tracking-[0.26em] text-[#2b2422]/32">
+            <span>花 {hanabira.toLocaleString()}</span>
+            <span className="opacity-50">·</span>
+            <span>連 {streak}d</span>
+            <span className="opacity-50">·</span>
+            <span>{items.length} kanji</span>
           </div>
-          <div className="flex flex-wrap justify-center gap-4 max-w-3xl">
+
+          <div className="mt-3 flex flex-wrap justify-center gap-2.5">
             {nextSet.map((item, i) => (
               <div
                 key={item.char}
-                className={`flex items-center justify-center rounded-full px-6 py-3 text-2xl font-serif border ${
-                  i === 0 
-                    ? 'border-[#E06C75]/40 bg-[#E06C75]/10 text-[#E06C75]' 
-                    : 'border-[#2B2B2B]/10 bg-white/40 text-[#2B2B2B]/80'
+                className={`select-none rounded-full border px-5 py-2.5 font-serif text-xl transition-colors ${
+                  i === 0
+                    ? 'border-[#d06070]/22 bg-[#d06070]/7 text-[#d06070]'
+                    : 'border-[#2b2422]/8 bg-white/18 text-[#2b2422]/52'
                 }`}
-                style={{ minWidth: '80px' }}
               >
                 {item.char}
               </div>
             ))}
           </div>
-        </div>
+        </main>
       </div>
     );
   }
 
-  // ACTIVE DOJO TRAINING SCREEN
+  /* ── Active training ── */
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center bg-[#F6EFEA] text-[#2B2B2B] font-sans">
+    <div className={SCENE}>
+      <div className={OVERLAY} />
 
-      <div className="absolute left-6 top-6 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-[#2B2B2B]/40">
-        <div className="h-1.5 w-1.5 rounded-full bg-[#E06C75]"></div>
-        Drawing · {index + 1} of {round.length}
+      <div className="absolute left-5 top-6 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[#2b2422]/35">
+        <span className="inline-block h-1 w-1 rounded-full bg-[#d06070]" />
+        Drawing · {index + 1} / {round.length}
       </div>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-4">
-        {/* Cue */}
-        <div className="mb-12 text-center">
-          <div className="text-[10px] font-medium uppercase tracking-[0.35em] text-[#E06C75] mb-4">Meaning</div>
-          <h2 className="text-3xl font-light tracking-widest md:text-4xl">{current?.meanings.join(', ')}</h2>
+      <main className="relative z-10 flex w-full max-w-xs flex-col items-center gap-9 px-4 text-center sm:max-w-sm">
+        <div>
+          <div className="mb-3 text-[10px] font-medium uppercase tracking-[0.38em] text-[#d06070]">
+            Meaning
+          </div>
+          <div className="text-2xl font-light tracking-widest text-[#2b2422]">
+            {current?.meanings[0] ?? '—'}
+          </div>
         </div>
 
-        {/* Center Canvas */}
-        <div className="group relative flex h-72 w-72 items-center justify-center rounded-[2rem] border border-[#2B2B2B]/10 bg-white/40 md:h-96 md:w-96 shadow-sm">
+        <div className="relative flex h-60 w-60 items-center justify-center rounded-2xl border border-[#2b2422]/10 bg-white/22 backdrop-blur-[2px]">
           {!revealed ? (
-            <div className="text-[#2B2B2B]/30 text-xs uppercase tracking-[0.3em] font-medium flex items-center justify-center h-full w-full select-none">
-              Draw from memory
-            </div>
+            <span className="select-none text-[10px] uppercase tracking-[0.3em] text-[#2b2422]/22">
+              Draw here
+            </span>
           ) : (
-            <div className="font-serif text-9xl md:text-[10rem] text-[#2B2B2B]">
+            <div className="select-none font-serif text-[7rem] leading-none text-[#2b2422]">
               {current?.char}
             </div>
           )}
         </div>
 
-        {/* Action */}
-        <div className="mt-16 h-16 flex items-center justify-center">
+        <div className="flex h-14 items-center justify-center">
           {!revealed ? (
             <button
               onClick={() => setRevealed(true)}
-              className="rounded-full px-12 py-4 text-sm font-medium uppercase tracking-[0.2em] text-[#2B2B2B]/60 border border-[#2B2B2B]/20 hover:bg-[#2B2B2B]/5 transition-colors"
+              className="rounded-full border border-[#2b2422]/14 bg-white/18 px-10 py-3 text-sm font-medium uppercase tracking-[0.2em] text-[#2b2422]/48 transition-colors hover:bg-white/32"
             >
-              Reveal Answer
+              Reveal
             </button>
           ) : (
-            <div className="flex gap-4">
+            <div className="flex gap-3.5">
               <button
                 onClick={() => handleResult(false)}
-                className="rounded-full px-10 py-4 text-sm font-medium uppercase tracking-[0.15em] text-[#2B2B2B]/50 border border-[#2B2B2B]/10 hover:bg-[#2B2B2B]/5 transition-colors"
+                className="rounded-full border border-[#2b2422]/10 bg-white/15 px-8 py-3 text-sm font-medium uppercase tracking-[0.16em] text-[#2b2422]/42 transition-colors hover:bg-white/28"
               >
                 Missed
               </button>
               <button
                 onClick={() => handleResult(true)}
-                className="rounded-full px-10 py-4 text-sm font-medium uppercase tracking-[0.15em] text-white bg-[#E06C75] hover:opacity-90 transition-opacity shadow-sm"
+                className="rounded-full bg-[#d06070] px-8 py-3 text-sm font-medium uppercase tracking-[0.16em] text-white transition-all hover:opacity-90"
               >
                 Nailed it
               </button>
