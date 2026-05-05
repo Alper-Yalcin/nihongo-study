@@ -135,6 +135,7 @@ export default function App() {
   const isLearnMapRoute =
     location.pathname === appShellRoutes.learn ||
     location.pathname === appShellRoutes.learnJapanese;
+  const isLandingRoute = location.pathname === appShellRoutes.home;
 
   const selectedKanaFont = useMemo(
     () => kanaFontStyles.find((option) => option.id === kanaFontStyle) ?? kanaFontStyles[0],
@@ -485,6 +486,8 @@ export default function App() {
         style={{ ['--font-jp-current' as string]: selectedKanaFont.fontFamily }}
       >
         {/* Global background layers — visible on every route */}
+        {!isLandingRoute && (
+          <>
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 z-[0] bg-cover bg-top bg-no-repeat"
@@ -503,6 +506,8 @@ export default function App() {
               : 'linear-gradient(180deg, rgba(255,245,239,0.18) 0%, rgba(255,245,239,0.26) 100%)'
           }}
         />
+          </>
+        )}
         <Routes>
           <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
           <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
@@ -514,8 +519,8 @@ export default function App() {
         <ChallengeReadyPrompt language={language} />
         <SpeakingSuggestToast language={language} />
         <FeedbackLayer />
-        {!isLearnMapRoute && <TomoshibiRelightModal language={language} />}
-        {!isLearnMapRoute && <OnboardingGate language={language} />}
+        {!isLearnMapRoute && !isLandingRoute && <TomoshibiRelightModal language={language} />}
+        {!isLearnMapRoute && !isLandingRoute && <OnboardingGate language={language} />}
       </div>
     </KanaProgressProvider>
   );

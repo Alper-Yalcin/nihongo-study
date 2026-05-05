@@ -1,11 +1,19 @@
 import React from 'react';
-import { ArrowRight, BookOpenText, Languages, PlayCircle, Sparkles, Swords, Trophy } from 'lucide-react';
+import {
+  ArrowRight,
+  BookOpenText,
+  Brain,
+  Gamepad2,
+  Headphones,
+  LineChart,
+  PencilLine,
+  Repeat2,
+  Sparkles
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '../../components/ui';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
-import { appShellRoutes, getPracticeHomeRoute } from '../../data/appShellContent';
+import { appShellRoutes } from '../../data/appShellContent';
 import { KanaScript } from '../../features/kana/domain/kanaItem';
-import { MascotFigure } from '../../components/mascot/MascotFigure';
 
 interface LandingPageProps {
   language: AppLanguage;
@@ -15,297 +23,311 @@ interface LandingPageProps {
 
 const copy = {
   tr: {
-    eyebrow: 'Kototsuna',
-    title: 'Japoncayi karakterden cumleye tasiyan yeni calisma alani',
-    lead:
-      'Landing artik ayri. Ogren, Harfler, Alistirma ve Oyun artik farkli amaclara hizmet eden net alanlar.',
-    primaryCta: 'Ogren alanina gir',
-    secondaryCta: 'Harfleri ac',
-    tertiaryCta: 'Pratige gec',
-    topLearn: 'Ogren',
-    topLetters: 'Harfler',
-    topPractice: 'Alistirma',
-    featureEyebrow: 'Neyi ayirdik?',
-    featureTitle: 'Her alanin artik tek bir isi var',
-    cards: [
-      {
-        title: 'Ogren',
-        description: 'Unite, konu, kelime ve gramer akisi. Burasi artik ana kurs yolu.',
-        cta: 'Kurs yolunu ac'
-      },
-      {
-        title: 'Harfler',
-        description: 'Hiragana ve katakana hecelerini, satirlari ve benzer formlari burada oturt.',
-        cta: 'Hece modulu'
-      },
-      {
-        title: 'Alistirma',
-        description: 'Review, weak, confusable ve istatistik odakli tekrar alanlari.',
-        cta: 'Tekrar ekranlari'
-      }
+    title: 'Japoncayi ezberleyerek degil, oynayarak ogren.',
+    subtitle: 'Dersler, pratik ve ilerleme sistemiyle kendi hizinda sakin bir Japonca yolculuguna basla.',
+    cta: 'Ogrenmeye Basla',
+    microcopy: 'Hesap gerekmez - aninda basla',
+    valueTitle: 'Sakin bir ders yolu, canli bir pratik ritmi.',
+    valueText:
+      'Kototsuna Japonca calismayi tek bir basit donguye indirir: yeni konuyu ogren, kisa pratikle guclendir, ilerlemeyi gor.',
+    values: ['Structured Learning', 'Gamified Practice', 'Smart Review', 'Progress Tracking'],
+    flowTitle: 'Nasil ilerler?',
+    flowText: 'Her oturum net baslar, hizli pekisir ve bir sonraki adimi gorunur birakir.',
+    steps: [
+      { title: 'Learn', text: 'Kisa derslerle kavrami ve kullanimi anla.' },
+      { title: 'Practice', text: 'Flashcard, yazma ve dinleme ile bilgiyi aktif hale getir.' },
+      { title: 'Master', text: 'Review, streak ve XP ile gelisimi takip et.' }
     ],
-    sectionsEyebrow: 'Sistemin omurgasi',
-    sectionsTitle: 'Ilk adimdan beri net ilerleyen bir akis',
-    railTitle: 'Bugun ne yapmak istiyorsun?',
-    railCopy:
-      'Yeni landing seni shell icine zorla atmiyor. Ilk giriste dogrudan amac secimi yapiyorsun.',
-    questsCta: 'Gorevlere bak',
-    playCta: 'Oyuna git'
+    practiceTitle: 'Pratik kisa, net ve oyun hissinde.',
+    practiceText: 'Sadece en temel egzersizler: hatirla, yaz, dinle. Gereksiz kalabalik yok.',
+    finalTitle: 'Hazirsan Japonca ogrenmeye basla.',
+    finalText: 'Ilk dersin seni bekliyor. Tek tikla iceri gir ve ritmini kur.',
+    finalCta: 'Basla'
   },
   en: {
-    eyebrow: 'Kototsuna',
-    title: 'A new Japanese study surface that moves from characters to sentences',
-    lead:
-      'Landing is now separate. Learn, Letters, Practice, and Play each have a clearer purpose.',
-    primaryCta: 'Enter learn',
-    secondaryCta: 'Open letters',
-    tertiaryCta: 'Open practice',
-    topLearn: 'Learn',
-    topLetters: 'Letters',
-    topPractice: 'Practice',
-    featureEyebrow: 'What changed?',
-    featureTitle: 'Each area now has one clear job',
-    cards: [
-      {
-        title: 'Learn',
-        description: 'Unit-based course flow for topics, vocabulary, and grammar.',
-        cta: 'Open course path'
-      },
-      {
-        title: 'Letters',
-        description: 'Use this area for hiragana and katakana syllables, rows, and shape recall.',
-        cta: 'Open syllable module'
-      },
-      {
-        title: 'Practice',
-        description: 'Review, weak, confusable, and stats-focused repetition screens.',
-        cta: 'Open review tools'
-      }
+    title: 'Learn Japanese like a game.',
+    subtitle: 'Start a calm Japanese journey with lessons, practice, and progress that moves at your pace.',
+    cta: 'Start Learning',
+    microcopy: 'No account needed - start instantly',
+    valueTitle: 'A calm lesson path with a lively practice rhythm.',
+    valueText:
+      'Kototsuna turns Japanese study into one simple loop: learn the next idea, strengthen it through short practice, and see your progress.',
+    values: ['Structured Learning', 'Gamified Practice', 'Smart Review', 'Progress Tracking'],
+    flowTitle: 'How it works',
+    flowText: 'Each session starts clearly, reinforces quickly, and leaves the next step visible.',
+    steps: [
+      { title: 'Learn', text: 'Understand concepts and usage through focused lessons.' },
+      { title: 'Practice', text: 'Make knowledge active with flashcards, writing, and listening.' },
+      { title: 'Master', text: 'Use reviews, streaks, and XP to keep improving.' }
     ],
-    sectionsEyebrow: 'Core structure',
-    sectionsTitle: 'A clearer flow from the first click',
-    railTitle: 'What do you want to do today?',
-    railCopy:
-      'The new landing does not dump you directly into the shell. You choose your intent first.',
-    questsCta: 'Open quests',
-    playCta: 'Open play'
+    practiceTitle: 'Practice stays short, clear, and game-like.',
+    practiceText: 'Only the essentials: recall, write, listen. No clutter between you and the next answer.',
+    finalTitle: 'Ready to start learning Japanese?',
+    finalText: 'Your first lesson is waiting. Step in and build your rhythm.',
+    finalCta: 'Start'
   }
 } as const;
 
-const landingCards = [
-  {
-    id: 'learn',
-    icon: BookOpenText,
-    accent:
-      'bg-[linear-gradient(135deg,var(--kt-brand)_0%,var(--kt-accent-sunset)_100%)]',
-    glow: 'rgba(208,96,112,0.28)'
-  },
-  {
-    id: 'letters',
-    icon: Languages,
-    accent:
-      'bg-[linear-gradient(135deg,var(--kt-accent-info)_0%,var(--kt-accent-success)_100%)]',
-    glow: 'rgba(54,160,255,0.24)'
-  },
-  {
-    id: 'practice',
-    icon: Swords,
-    accent:
-      'bg-[linear-gradient(135deg,var(--kt-accent-warning)_0%,var(--kt-accent-sunset)_100%)]',
-    glow: 'rgba(255,186,90,0.24)'
-  }
+const valueIcons = [BookOpenText, Gamepad2, Brain, LineChart] as const;
+const practiceItems = [
+  { title: 'Flashcards', icon: Repeat2, sample: '日 -> day' },
+  { title: 'Writing', icon: PencilLine, sample: 'type: arigatou' },
+  { title: 'Listening', icon: Headphones, sample: 'hear -> choose' }
 ] as const;
 
-export const LandingPage: React.FC<LandingPageProps> = ({ language, activeScript, themeMode }) => {
+const markLandingSeen = () => {
+  try {
+    window.localStorage.setItem('hasSeenLanding', 'true');
+  } catch {
+    // Local storage can be unavailable in private or restricted contexts.
+  }
+};
+
+const StartButton: React.FC<{ label: string; compact?: boolean }> = ({ label, compact = false }) => (
+  <Link
+    to={appShellRoutes.learn}
+    onClick={markLandingSeen}
+    className={`inline-flex items-center justify-center gap-3 rounded-full bg-[linear-gradient(135deg,#ff6f8f_0%,#f04d72_48%,#f4b64d_100%)] font-black text-white shadow-[0_0_34px_rgba(240,77,114,0.34),0_18px_48px_rgba(0,0,0,0.22)] transition duration-200 hover:scale-[1.03] hover:shadow-[0_0_44px_rgba(240,77,114,0.50),0_22px_60px_rgba(0,0,0,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-4 focus-visible:ring-offset-[#080b12] ${
+      compact ? 'min-h-12 px-7 text-sm' : 'min-h-14 px-8 text-base'
+    }`}
+  >
+    <span>{label}</span>
+    <ArrowRight size={compact ? 17 : 19} />
+  </Link>
+);
+
+const SectionShell: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className = '' }) => (
+  <section className={`kt-section-reveal relative z-10 mx-auto w-full max-w-5xl px-5 py-24 sm:py-32 ${className}`}>
+    {children}
+  </section>
+);
+
+export const LandingPage: React.FC<LandingPageProps> = ({ language, themeMode }) => {
   const text = copy[language];
-  const lettersHref = `${appShellRoutes.letters}?script=${activeScript}`;
-  const practiceHref = getPracticeHomeRoute(activeScript);
-  const logoSrc = themeMode === 'dark' ? '/logo/kototsuna-logo.png' : '/logo/kototsuna-logo-light.png';
   const isDark = themeMode === 'dark';
-
-  const pageClassName = isDark
-    ? 'min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(54,160,255,0.16),transparent_34%),radial-gradient(circle_at_top_right,rgba(208,96,112,0.14),transparent_28%),linear-gradient(180deg,#071017_0%,#0d1822_52%,#111d28_100%)] text-white'
-    : 'min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(54,160,255,0.10),transparent_34%),radial-gradient(circle_at_top_right,rgba(208,96,112,0.10),transparent_28%),linear-gradient(180deg,#f9fbfd_0%,#f7f3f6_52%,#fdf7f6_100%)] text-[var(--kt-ink)]';
-
-  const headerSurfaceClassName = isDark
-    ? 'border-white/10 bg-[rgba(10,18,26,0.72)]'
-    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.86)] shadow-[var(--kt-shadow-sm)]';
-
-  const heroSurfaceClassName = isDark
-    ? 'border-white/10 bg-[rgba(10,18,26,0.76)] shadow-[0_30px_80px_rgba(0,0,0,0.28)]'
-    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.90)] shadow-[var(--kt-shadow-lg)]';
-
-  const railSurfaceClassName = isDark
-    ? 'border-white/10 bg-[rgba(10,18,26,0.76)] shadow-[0_20px_50px_rgba(0,0,0,0.24)]'
-    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.92)] shadow-[var(--kt-shadow)]';
-
-  const featureSurfaceClassName = isDark
-    ? 'border-white/10 bg-[rgba(10,18,26,0.68)]'
-    : 'border-[var(--kt-border)] bg-[rgba(255,255,255,0.94)] shadow-[var(--kt-shadow-sm)]';
-
-  const featureCardClassName = isDark
-    ? 'border-white/10 bg-[rgba(255,255,255,0.04)] text-white'
-    : 'border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_82%,transparent)] text-[var(--kt-ink)]';
-
-  const headingTextClassName = isDark ? 'text-white' : 'text-[var(--kt-ink-strong)]';
-  const mutedTextClassName = isDark ? 'text-white/72' : 'text-[var(--kt-ink-muted)]';
-  const subtleTextClassName = isDark ? 'text-white/52' : 'text-[var(--kt-ink-subtle)]';
-  const featureEyebrowTextClassName = isDark ? 'text-white/48' : 'text-[var(--kt-ink-subtle)]';
-  const featureIconClassName = isDark
-    ? 'bg-[rgba(255,255,255,0.08)] text-white'
-    : 'bg-[var(--kt-surface-muted)] text-[var(--kt-ink-strong)]';
+  const pageText = isDark ? 'text-white' : 'text-[#1f2937]';
+  const mutedText = isDark ? 'text-white/64' : 'text-[#536174]';
+  const faintText = isDark ? 'text-white/40' : 'text-[#7d8796]';
+  const hairline = isDark ? 'bg-white/14' : 'bg-[#1f2937]/14';
+  const surface = isDark
+    ? 'border-white/10 bg-white/[0.035] text-white shadow-none'
+    : 'border-[#d9e0ea] bg-white/48 text-[#1f2937] shadow-[0_18px_60px_rgba(31,41,55,0.08)]';
+  const pageBackground = isDark
+    ? 'radial-gradient(circle at 50% 26%, rgba(240,77,114,0.22), transparent 25%), radial-gradient(circle at 18% 18%, rgba(94,158,232,0.18), transparent 29%), radial-gradient(circle at 82% 76%, rgba(82,199,166,0.11), transparent 31%), linear-gradient(140deg, #060912 0%, #111827 46%, #160c18 100%)'
+    : 'radial-gradient(circle at 50% 24%, rgba(240,77,114,0.13), transparent 28%), radial-gradient(circle at 18% 18%, rgba(94,158,232,0.14), transparent 31%), radial-gradient(circle at 82% 76%, rgba(82,199,166,0.10), transparent 33%), linear-gradient(140deg, #fff8fb 0%, #f5f9ff 48%, #fff7ef 100%)';
 
   return (
-    <div className={pageClassName}>
-      <div className="mx-auto flex min-h-screen max-w-[1500px] flex-col px-5 py-6 sm:px-8 lg:px-10">
-        <header
-          className={`flex flex-wrap items-center justify-between gap-4 rounded-[1.8rem] border px-5 py-4 backdrop-blur ${headerSurfaceClassName}`}
-        >
-          <Link to={appShellRoutes.home} className="flex items-center gap-3">
-            <img src={logoSrc} alt="Kototsuna" className="h-10 w-auto" />
-          </Link>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button as="link" to={appShellRoutes.learn} variant="secondary" size="sm">
-              {text.topLearn}
-            </Button>
-            <Button as="link" to={lettersHref} variant="secondary" size="sm">
-              {text.topLetters}
-            </Button>
-            <Button as="link" to={practiceHref} variant="secondary" size="sm">
-              {text.topPractice}
-            </Button>
-          </div>
-        </header>
+    <main className={`relative isolate min-h-screen overflow-x-clip ${pageText}`} style={{ background: pageBackground }}>
+      <style>
+        {`
+          html { scroll-behavior: smooth; }
 
-        <main className="flex-1 py-8 lg:py-12">
-          <section className="grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_minmax(24rem,0.9fr)] xl:items-center">
-            <div className="relative">
-              <div className="absolute -left-12 top-6 h-36 w-36 rounded-full bg-[rgba(208,96,112,0.18)] blur-3xl" />
-              <div className="absolute left-44 top-28 h-44 w-44 rounded-full bg-[rgba(54,160,255,0.16)] blur-3xl" />
-                <div
-                  className={`relative rounded-[2.3rem] border p-7 backdrop-blur md:p-10 ${heroSurfaceClassName}`}
-                >
-                  <div className={`text-xs font-black uppercase tracking-[0.28em] ${subtleTextClassName}`}>
-                  {text.eyebrow}
-                </div>
-                  <h1 className={`mt-5 max-w-4xl text-5xl font-black leading-[1.04] md:text-6xl xl:text-7xl ${headingTextClassName}`}>
-                  {text.title}
-                </h1>
-                  <p className={`mt-6 max-w-3xl text-lg leading-8 md:text-xl ${mutedTextClassName}`}>
-                  {text.lead}
-                </p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Button as="link" to={appShellRoutes.learn} iconEnd={<ArrowRight size={16} />}>
-                    {text.primaryCta}
-                  </Button>
-                  <Button as="link" to={lettersHref} variant="secondary">
-                    {text.secondaryCta}
-                  </Button>
-                  <Button as="link" to={practiceHref} variant="secondary">
-                    {text.tertiaryCta}
-                  </Button>
-                </div>
-              </div>
-            </div>
+          @keyframes kt-entry-fade {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
 
-            <div className="grid gap-4">
-              <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
-                {landingCards.slice(0, 2).map((card, index) => {
-                  const Icon = card.icon;
-                  const cardCopy = text.cards[index];
+          @keyframes kt-entry-shift {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.72; }
+            50% { transform: translate3d(2.5rem, -1.5rem, 0) scale(1.08); opacity: 0.92; }
+          }
 
-                  return (
-                    <article
-                      key={card.id}
-                      className={`rounded-[2rem] border border-white/10 p-6 shadow-[0_20px_50px_var(--shadow-color)] ${card.accent}`}
-                      style={{ ['--shadow-color' as string]: card.glow }}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <div className="text-xs font-black uppercase tracking-[0.2em] text-white/68">
-                            {cardCopy.cta}
-                          </div>
-                          <h2 className="mt-3 text-3xl font-black text-white">{cardCopy.title}</h2>
-                        </div>
-                        <span className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[rgba(255,255,255,0.16)]">
-                          <Icon size={24} />
-                        </span>
-                      </div>
-                      <p className="mt-5 max-w-sm text-sm leading-7 text-white/82">{cardCopy.description}</p>
-                    </article>
-                  );
-                })}
-              </div>
+          @keyframes kt-entry-drift {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(-3rem, -4rem, 0); }
+          }
 
-              <article
-                className={`rounded-[2rem] border p-6 backdrop-blur ${railSurfaceClassName}`}
-              >
-                <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_12rem] md:items-center">
-                  <div>
-                    <div className={`text-xs font-black uppercase tracking-[0.2em] ${featureEyebrowTextClassName}`}>
-                      {text.railTitle}
-                    </div>
-                    <p className={`mt-4 text-base leading-8 ${mutedTextClassName}`}>{text.railCopy}</p>
-                    <div className="mt-6 flex flex-wrap gap-3">
-                      <Button as="link" to={appShellRoutes.quests} variant="secondary" size="sm" iconStart={<Trophy size={16} />}>
-                        {text.questsCta}
-                      </Button>
-                      <Button as="link" to={`${appShellRoutes.hiraganaPlay}?game=kana-match`} size="sm" iconStart={<PlayCircle size={16} />}>
-                        {text.playCta}
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="justify-self-center">
-                    <MascotFigure pose="cheer" tone="brand" size={164} />
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
+          .kt-section-reveal {
+            animation: kt-entry-fade 720ms ease-out both;
+            animation-timeline: view();
+            animation-range: entry 10% cover 34%;
+          }
 
-          <section className={`mt-16 rounded-[2.2rem] border p-7 backdrop-blur md:p-9 ${featureSurfaceClassName}`}>
-            <div className={`text-xs font-black uppercase tracking-[0.22em] ${featureEyebrowTextClassName}`}>
-              {text.featureEyebrow}
-            </div>
-            <h2 className={`mt-4 text-4xl font-black md:text-5xl ${headingTextClassName}`}>{text.featureTitle}</h2>
+          @supports not (animation-timeline: view()) {
+            .kt-section-reveal { animation: kt-entry-fade 720ms ease-out both; }
+          }
 
-            <div className="mt-8 grid gap-4 lg:grid-cols-3">
-              {text.cards.map((card, index) => {
-                const config = landingCards[index];
-                const Icon = config.icon;
-                const href =
-                  config.id === 'learn'
-                    ? appShellRoutes.learn
-                    : config.id === 'letters'
-                      ? lettersHref
-                      : practiceHref;
+          @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .kt-entry-fade,
+            .kt-entry-shift,
+            .kt-entry-drift,
+            .kt-section-reveal {
+              animation: none !important;
+            }
+          }
+        `}
+      </style>
 
-                return (
-                  <article
-                    key={card.title}
-                    className={`rounded-[var(--kt-radius-md)] border p-8 shadow-[var(--kt-shadow-sm)] ${featureCardClassName}`}
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <h3 className={`text-2xl font-black ${headingTextClassName}`}>{card.title}</h3>
-                      <span
-                        className={`flex h-11 w-11 items-center justify-center rounded-[1rem] ${featureIconClassName}`}
-                      >
-                        <Icon size={22} />
-                      </span>
-                    </div>
-                    <p className={`mt-4 text-sm leading-7 ${mutedTextClassName}`}>{card.description}</p>
-                    <div className="mt-6">
-                      <Button as="link" to={href} fullWidth variant={config.id === 'learn' ? 'primary' : 'secondary'}>
-                        {card.cta}
-                      </Button>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-        </main>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: pageBackground
+          }}
+        />
+
+        <div
+          className={`kt-entry-shift absolute left-1/2 top-[22rem] h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
+          isDark ? 'bg-[#f04d72]/16' : 'bg-[#f04d72]/10'
+        }`}
+          style={{ animation: 'kt-entry-shift 12s ease-in-out infinite' }}
+        />
+
+        <div
+          className={`absolute inset-0 ${isDark ? 'opacity-[0.08]' : 'opacity-[0.11]'}`}
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
+            backgroundSize: '18px 18px',
+            color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(31,41,55,0.35)'
+          }}
+        />
+
+        <div
+          className={`kt-entry-drift absolute inset-[-6rem] ${isDark ? 'opacity-35' : 'opacity-20'}`}
+          style={{
+            animation: 'kt-entry-drift 34s linear infinite alternate',
+            backgroundImage:
+              'radial-gradient(circle at 14% 20%, currentColor 0 1px, transparent 2px), radial-gradient(circle at 72% 34%, currentColor 0 1px, transparent 2px), radial-gradient(circle at 38% 78%, currentColor 0 1px, transparent 2px), radial-gradient(circle at 86% 82%, currentColor 0 1px, transparent 2px)',
+            backgroundSize: '19rem 19rem',
+            color: isDark ? 'rgba(255,255,255,0.38)' : 'rgba(31,41,55,0.20)'
+          }}
+        />
       </div>
-    </div>
+
+      <section className="relative z-10 flex min-h-screen items-center justify-center px-5 py-10">
+        <div
+          className="kt-entry-fade mx-auto flex max-w-4xl flex-col items-center text-center"
+          style={{ animation: 'kt-entry-fade 760ms ease-out both' }}
+        >
+          <div className={`mb-10 flex items-center gap-3 ${faintText}`}>
+            <span className={`h-px w-10 ${hairline}`} />
+            <span className="text-xs font-black uppercase tracking-[0.34em]">Kototsuna</span>
+            <span className={`h-px w-10 ${hairline}`} />
+          </div>
+
+          <div
+            className={`mb-6 font-jp text-6xl font-black leading-none sm:text-7xl ${
+              isDark
+                ? 'text-white/92 drop-shadow-[0_0_28px_rgba(240,77,114,0.28)]'
+                : 'text-[#f04d72] drop-shadow-[0_12px_28px_rgba(240,77,114,0.12)]'
+            }`}
+          >
+            学
+          </div>
+
+          <h1 className="max-w-4xl text-balance text-4xl font-black leading-[1.04] tracking-normal sm:text-6xl lg:text-7xl">
+            {text.title}
+          </h1>
+
+          <p className={`mt-6 max-w-2xl text-pretty text-base leading-7 sm:text-lg ${mutedText}`}>
+            {text.subtitle}
+          </p>
+
+          <div className="mt-10">
+            <StartButton label={text.cta} />
+          </div>
+
+          <p className={`mt-4 text-xs font-semibold tracking-[0.12em] ${faintText}`}>{text.microcopy}</p>
+        </div>
+      </section>
+
+      <SectionShell>
+        <div className="mx-auto max-w-3xl text-center">
+          <div className={`mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border ${surface}`}>
+            <Sparkles size={20} className="text-[#f04d72]" />
+          </div>
+          <h2 className="text-3xl font-black leading-tight sm:text-5xl">{text.valueTitle}</h2>
+          <p className={`mx-auto mt-5 max-w-2xl text-base leading-8 sm:text-lg ${mutedText}`}>{text.valueText}</p>
+        </div>
+
+        <div className="mx-auto mt-14 grid max-w-4xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {text.values.map((value, index) => {
+            const Icon = valueIcons[index];
+            return (
+              <div
+                key={value}
+                className="group flex flex-col items-center gap-3 text-center transition duration-200 hover:-translate-y-1"
+              >
+                <span className={`flex h-14 w-14 items-center justify-center rounded-2xl border ${surface}`}>
+                  <Icon size={22} className="text-[#f04d72]" />
+                </span>
+                <span className="text-sm font-black">{value}</span>
+              </div>
+            );
+          })}
+        </div>
+      </SectionShell>
+
+      <SectionShell>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-black leading-tight sm:text-5xl">{text.flowTitle}</h2>
+          <p className={`mx-auto mt-5 max-w-2xl text-base leading-8 sm:text-lg ${mutedText}`}>{text.flowText}</p>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-4xl gap-8 lg:grid-cols-3 lg:gap-5">
+          {text.steps.map((step, index) => (
+            <div key={step.title} className="relative text-center">
+              {index < text.steps.length - 1 && (
+                <div className={`absolute left-[calc(50%+2rem)] top-7 hidden h-px w-[calc(100%-4rem)] lg:block ${hairline}`} />
+              )}
+              <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f04d72] text-sm font-black text-white shadow-[0_0_28px_rgba(240,77,114,0.24)]">
+                {index + 1}
+              </div>
+              <h3 className="mt-6 text-xl font-black">{step.title}</h3>
+              <p className={`mx-auto mt-3 max-w-xs text-sm leading-7 ${mutedText}`}>{step.text}</p>
+            </div>
+          ))}
+        </div>
+      </SectionShell>
+
+      <SectionShell>
+        <div className="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+          <div>
+            <h2 className="text-3xl font-black leading-tight sm:text-5xl">{text.practiceTitle}</h2>
+            <p className={`mt-5 max-w-xl text-base leading-8 sm:text-lg ${mutedText}`}>{text.practiceText}</p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            {practiceItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.title}
+                  className={`group flex items-center justify-between gap-4 rounded-2xl border p-4 backdrop-blur transition duration-200 hover:-translate-y-1 ${surface}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f04d72]/12 text-[#f04d72]">
+                      <Icon size={20} />
+                    </span>
+                    <div>
+                      <h3 className="text-sm font-black">{item.title}</h3>
+                      <p className={`mt-1 text-xs ${faintText}`}>{item.sample}</p>
+                    </div>
+                  </div>
+                  <span className={`hidden h-2 w-16 rounded-full sm:block ${isDark ? 'bg-white/10' : 'bg-[#1f2937]/10'}`}>
+                    <span className="block h-full w-2/3 rounded-full bg-[#f04d72]" />
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </SectionShell>
+
+      <SectionShell className="pb-32 sm:pb-40">
+        <div className={`mx-auto max-w-4xl rounded-[2rem] border px-6 py-14 text-center backdrop-blur sm:px-10 sm:py-16 ${surface}`}>
+          <h2 className="text-3xl font-black leading-tight sm:text-5xl">{text.finalTitle}</h2>
+          <p className={`mx-auto mt-5 max-w-2xl text-base leading-8 ${mutedText}`}>{text.finalText}</p>
+          <div className="mt-9">
+            <StartButton label={text.finalCta} compact />
+          </div>
+        </div>
+      </SectionShell>
+    </main>
   );
 };
