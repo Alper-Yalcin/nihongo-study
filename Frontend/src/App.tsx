@@ -42,7 +42,6 @@ import {
   PracticeKanjiWritingRecallPage
 } from './pages/practice/kanji';
 import { QuizJapanesePage, QuizKanaPage, QuizKanjiPage } from './pages/quiz';
-import { PracticeRunPage } from './pages/practice/shared/PracticeRunPage';
 import { PracticeStatsPage } from './pages/practice/shared/PracticeStatsPage';
 import { MissionPage } from './pages/learn/MissionPage';
 import { QuestsPage } from './pages/quests/QuestsPage';
@@ -209,77 +208,23 @@ export default function App() {
         element={<PracticeKanaDrawingPage language={language} activeScript={activeScript} />}
       />
       <Route
-        path={appShellRoutes.practiceKanaDrawingRun}
-        element={
-          <PracticeRunPage
-            language={language}
-            fixedMode="drawing"
-            backHref={`${appShellRoutes.practiceKanaDrawing}?script=${activeScript}`}
-          />
-        }
-      />
-      <Route
         path={appShellRoutes.practiceKanaAnswerType}
         element={<PracticeKanaAnswerTypePage language={language} activeScript={activeScript} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanaAnswerTypeRun}
-        element={
-          <PracticeRunPage
-            language={language}
-            fixedMode="typing"
-            backHref={`${appShellRoutes.practiceKanaAnswerType}?script=${activeScript}`}
-          />
-        }
       />
       <Route
         path={appShellRoutes.practiceKanaListening}
         element={<PracticeKanaListeningPage language={language} activeScript={activeScript} />}
       />
       <Route
-        path={appShellRoutes.practiceKanaListeningRun}
-        element={
-          <PracticeRunPage
-            language={language}
-            fixedMode="listening"
-            backHref={`${appShellRoutes.practiceKanaListening}?script=${activeScript}`}
-          />
-        }
-      />
-      <Route
         path={appShellRoutes.practiceKanaReading}
         element={<PracticeKanaReadingPage language={language} activeScript={activeScript} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanaReadingRun}
-        element={
-          <PracticeRunPage
-            language={language}
-            fixedMode="typing"
-            backHref={`${appShellRoutes.practiceKanaReading}?script=${activeScript}`}
-          />
-        }
       />
       <Route
         path={appShellRoutes.practiceKanaWritingRecall}
         element={<PracticeKanaWritingRecallPage language={language} activeScript={activeScript} />}
       />
       <Route
-        path={appShellRoutes.practiceKanaWritingRecallRun}
-        element={
-          <PracticeRunPage
-            language={language}
-            fixedMode="typing"
-            backHref={`${appShellRoutes.practiceKanaWritingRecall}?script=${activeScript}`}
-          />
-        }
-      />
-      <Route
         path={appShellRoutes.practiceKanaFlashcards}
-        element={<PracticeKanaFlashcardsPage language={language} activeScript={activeScript} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanaFlashcardsRun}
         element={<PracticeKanaFlashcardsPage language={language} activeScript={activeScript} />}
       />
       <Route
@@ -287,15 +232,7 @@ export default function App() {
         element={<PracticeKanaQuickStudyPage language={language} activeScript={activeScript} />}
       />
       <Route
-        path={appShellRoutes.practiceKanaQuickStudyRun}
-        element={<PracticeKanaQuickStudyPage language={language} activeScript={activeScript} />}
-      />
-      <Route
         path={appShellRoutes.practiceKanaPop}
-        element={<PracticeKanaPopPage language={language} activeScript={activeScript} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanaPopRun}
         element={<PracticeKanaPopPage language={language} activeScript={activeScript} />}
       />
       <Route
@@ -303,15 +240,7 @@ export default function App() {
         element={<PracticeJapaneseQuickStudyPage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceJapaneseQuickStudyRun}
-        element={<PracticeJapaneseQuickStudyPage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceJapaneseTopicLessons}
-        element={<PracticeJapaneseTopicLessonsPage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceJapaneseTopicLessonsRun}
         element={<PracticeJapaneseTopicLessonsPage language={language} />}
       />
       <Route
@@ -319,15 +248,7 @@ export default function App() {
         element={<PracticeJapaneseReadingPage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceJapaneseReadingRun}
-        element={<PracticeJapaneseReadingPage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceJapaneseFillBlank}
-        element={<PracticeJapaneseFillBlankPage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceJapaneseFillBlankRun}
         element={<PracticeJapaneseFillBlankPage language={language} />}
       />
       <Route
@@ -335,15 +256,7 @@ export default function App() {
         element={<PracticeJapaneseTranslationPage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceJapaneseTranslationRun}
-        element={<PracticeJapaneseTranslationPage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceJapaneseSentenceWriting}
-        element={<PracticeJapaneseSentenceWritingPage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceJapaneseSentenceWritingRun}
         element={<PracticeJapaneseSentenceWritingPage language={language} />}
       />
       <Route
@@ -351,15 +264,7 @@ export default function App() {
         element={<PracticeJapaneseFlashcardsPage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceJapaneseFlashcardsRun}
-        element={<PracticeJapaneseFlashcardsPage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceKanjiDrawing}
-        element={<PracticeKanjiDrawingPage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanjiDrawingRun}
         element={<PracticeKanjiDrawingPage language={language} />}
       />
       <Route
@@ -367,15 +272,7 @@ export default function App() {
         element={<PracticeKanjiReadingPage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceKanjiReadingRun}
-        element={<PracticeKanjiReadingPage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceKanjiListening}
-        element={<PracticeKanjiListeningPage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanjiListeningRun}
         element={<PracticeKanjiListeningPage language={language} />}
       />
       <Route
@@ -383,15 +280,7 @@ export default function App() {
         element={<PracticeKanjiWritingRecallPage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceKanjiWritingRecallRun}
-        element={<PracticeKanjiWritingRecallPage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceKanjiUsage}
-        element={<PracticeKanjiUsagePage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanjiUsageRun}
         element={<PracticeKanjiUsagePage language={language} />}
       />
       <Route
@@ -399,26 +288,13 @@ export default function App() {
         element={<PracticeKanjiChallengePage language={language} />}
       />
       <Route
-        path={appShellRoutes.practiceKanjiChallengeRun}
-        element={<PracticeKanjiChallengePage language={language} />}
-      />
-      <Route
         path={appShellRoutes.practiceKanjiMatch}
-        element={<PracticeKanjiMatchPage language={language} />}
-      />
-      <Route
-        path={appShellRoutes.practiceKanjiMatchRun}
         element={<PracticeKanjiMatchPage language={language} />}
       />
       <Route
         path={appShellRoutes.practiceKanjiPop}
         element={<PracticeKanjiPopPage language={language} />}
       />
-      <Route
-        path={appShellRoutes.practiceKanjiPopRun}
-        element={<PracticeKanjiPopPage language={language} />}
-      />
-      <Route path={appShellRoutes.practiceRun} element={<PracticeRunPage language={language} />} />
       <Route path={appShellRoutes.quiz} element={<Navigate to={appShellRoutes.quizKana} replace />} />
       <Route path={appShellRoutes.quizKanji} element={<QuizKanjiPage language={language} />} />
       <Route path={appShellRoutes.quizKana} element={<QuizKanaPage language={language} activeScript={activeScript} />} />
@@ -615,7 +491,7 @@ export default function App() {
           style={{
             backgroundImage: isDark ? "url('/images/darkmode.png')" : "url('/images/light.png')",
             backgroundColor: isDark ? '#151017' : '#fff5ef',
-            filter: isDark ? 'brightness(0.85) saturate(0.78)' : 'brightness(0.96) saturate(0.88)'
+            filter: isDark ? 'brightness(0.95) saturate(0.9)' : 'brightness(0.96) saturate(0.88)'
           }}
         />
         <div
@@ -623,7 +499,7 @@ export default function App() {
           className="pointer-events-none fixed inset-0 z-[1]"
           style={{
             background: isDark
-              ? 'linear-gradient(180deg, rgba(20,15,25,0.44) 0%, rgba(20,15,25,0.54) 100%)'
+              ? 'linear-gradient(180deg, rgba(10,12,24,0.22) 0%, rgba(16,14,28,0.28) 100%)'
               : 'linear-gradient(180deg, rgba(255,245,239,0.18) 0%, rgba(255,245,239,0.26) 100%)'
           }}
         />

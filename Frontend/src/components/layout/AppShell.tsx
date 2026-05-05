@@ -27,6 +27,11 @@ export const AppShell: React.FC<AppShellProps> = ({
   const location = useLocation();
   const isDark = themeMode === 'dark';
   const isLearnMap = location.pathname === '/learn' || location.pathname === '/learn/japanese';
+  const isImmersivePractice =
+    location.pathname.startsWith('/practice/kana') ||
+    location.pathname.startsWith('/practice/kanji/') ||
+    (location.pathname.startsWith('/practice/japanese/') &&
+      !location.pathname.startsWith('/practice/japanese/reading'));
 
   return (
     <div className={`min-h-screen !bg-transparent text-[var(--kt-ink)] ${isDark ? 'theme-dark' : 'theme-light'}`}>
@@ -53,7 +58,9 @@ export const AppShell: React.FC<AppShellProps> = ({
           className={
             isLearnMap
               ? 'w-full max-w-none px-0 pb-0 pt-0'
-              : 'mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-10 xl:pb-12 xl:pt-7'
+              : isImmersivePractice
+                ? 'w-full max-w-none px-0 py-0'
+                : 'mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-10 xl:pb-12 xl:pt-7'
           }
         >
           {children}

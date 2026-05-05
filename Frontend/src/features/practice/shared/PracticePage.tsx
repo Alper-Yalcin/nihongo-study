@@ -313,18 +313,13 @@ export const PracticePage: React.FC<PracticePageProps> = ({ language, focusDrill
   const runDrill = (id: DrillId, idsOverride?: string[]) => {
     const itemIds = idsOverride ?? drillPool(id);
     if (itemIds.length === 0) return;
-    const params = new URLSearchParams();
-    params.set('script', script);
-    params.set('tab', id);
-    params.set('mode', activeMode);
-    if (id === 'free') params.set('ids', itemIds.join(','));
-    const runRouteByMode: Record<RunnableMode, string> = {
-      typing: appShellRoutes.practiceKanaAnswerTypeRun,
-      drawing: appShellRoutes.practiceKanaDrawingRun,
-      listening: appShellRoutes.practiceKanaListeningRun,
-      dictionary: appShellRoutes.practiceKanaFlashcardsRun
+    const lobbyByMode: Record<RunnableMode, string> = {
+      drawing:    appShellRoutes.practiceKanaDrawing,
+      typing:     appShellRoutes.practiceKanaAnswerType,
+      listening:  appShellRoutes.practiceKanaListening,
+      dictionary: appShellRoutes.practiceKanaFlashcards
     };
-    navigate(`${runRouteByMode[activeMode]}?${params.toString()}`);
+    navigate(`${lobbyByMode[activeMode]}?script=${script}`);
   };
 
   const beginPrimary = () => {

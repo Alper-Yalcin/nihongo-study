@@ -194,6 +194,36 @@ const recordQuestionAttempt = (question: PracticeQuestion, correct: boolean) => 
   }
 };
 
+/* ── Immersive scene primitives ─────────────────────────────────────── */
+
+const JP_SCENE =
+  'relative flex w-full flex-col ' +
+  'max-lg:min-h-[calc(100dvh-92px)] max-lg:overflow-y-auto ' +
+  'lg:h-[calc(100dvh-92px)] lg:overflow-y-auto';
+
+const JP_OVERLAY =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,transparent_38%,rgba(240,232,228,0.52)_100%)] [.theme-dark_&]:opacity-0';
+
+const JP_HALO =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_46%_36%_at_50%_42%,rgba(253,250,248,0.55)_0%,transparent_100%)] [.theme-dark_&]:opacity-0';
+
+const JP_DM_HALO =
+  'pointer-events-none absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 blur-3xl bg-[#d06070]/6 [.theme-dark_&]:opacity-100';
+
+const ImmersiveShell: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = ''
+}) => (
+  <div className={JP_SCENE}>
+    <div className={JP_OVERLAY} />
+    <div className={JP_HALO} />
+    <div className={JP_DM_HALO} />
+    <div className={`relative z-10 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 ${className}`}>
+      {children}
+    </div>
+  </div>
+);
+
 const JapaneseHeader: React.FC<{ language: AppLanguage; mode: JapaneseMode; icon: React.ReactNode }> = ({
   language,
   mode,
@@ -1478,9 +1508,9 @@ const QuickStudyPageContent: React.FC<PracticeJapanesePageProps> = ({ language }
   const questions = useMemo(() => pickQuestions(supportedQuickTypes, 12), []);
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <QuickStudyExperience language={language} questions={questions} />
-    </PageShell>
+    </ImmersiveShell>
   );
 };
 
@@ -1492,9 +1522,9 @@ const FillBlankPageContent: React.FC<PracticeJapanesePageProps> = ({ language })
   const questions = useMemo(() => pickQuestions(['fill-in-blank'], 12), []);
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <FillBlankExperience language={language} questions={questions} />
-    </PageShell>
+    </ImmersiveShell>
   );
 };
 
@@ -1506,9 +1536,9 @@ const TranslationPageContent: React.FC<PracticeJapanesePageProps> = ({ language 
   const questions = useMemo(() => pickQuestions(['translation-en-jp', 'translation-jp-en'], 12), []);
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <TranslationExperience language={language} questions={questions} />
-    </PageShell>
+    </ImmersiveShell>
   );
 };
 
@@ -1537,7 +1567,7 @@ export const PracticeJapaneseTopicLessonsPage: React.FC<PracticeJapanesePageProp
       : `Scan ${activeTopic.label.toLowerCase()} vocabulary like cards, review sample patterns, then run a short topic drill.`;
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <section className="kt-jp-stage mt-8 grid gap-5 lg:grid-cols-[18rem_1fr]">
         <JapanesePracticeThemeStyles />
         <aside className="rounded-[1.1rem] border border-[var(--jp-border-strong)] bg-[var(--jp-panel)] p-5 shadow-[var(--jp-elevated-shadow)]">
@@ -1673,7 +1703,7 @@ export const PracticeJapaneseTopicLessonsPage: React.FC<PracticeJapanesePageProp
         <JapanesePracticeThemeStyles />
         <QuizPanel language={language} questions={practiceQuestions} />
       </div>
-    </PageShell>
+    </ImmersiveShell>
   );
 };
 
@@ -2298,7 +2328,7 @@ const LegacyPracticeJapaneseSentenceWritingPage: React.FC<PracticeJapanesePagePr
   };
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <JapaneseHeader language={language} mode="sentence" icon={<MessageSquareText size={14} />} />
       <section className="mt-8 rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
         <div className="text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
@@ -2346,7 +2376,7 @@ const LegacyPracticeJapaneseSentenceWritingPage: React.FC<PracticeJapanesePagePr
           </div>
         )}
       </section>
-    </PageShell>
+    </ImmersiveShell>
   );
 };
 
@@ -2374,7 +2404,7 @@ export const PracticeJapaneseSentenceWritingPage: React.FC<PracticeJapanesePageP
   };
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <section className="kt-jp-stage mt-8 grid gap-5 lg:grid-cols-[18rem_1fr]">
         <JapanesePracticeThemeStyles />
         <aside className="rounded-[1.1rem] border border-[var(--jp-border-strong)] bg-[var(--jp-panel)] p-5 shadow-[var(--jp-elevated-shadow)]">
@@ -2527,7 +2557,7 @@ export const PracticeJapaneseSentenceWritingPage: React.FC<PracticeJapanesePageP
           </div>
         </div>
       </section>
-    </PageShell>
+    </ImmersiveShell>
   );
 };
 
@@ -2559,7 +2589,7 @@ export const PracticeJapaneseFlashcardsPage: React.FC<PracticeJapanesePageProps>
   };
 
   return (
-    <PageShell width="wide" className="pb-14">
+    <ImmersiveShell className="pb-14">
       <JapaneseHeader language={language} mode="flashcards" icon={<RefreshCcw size={14} />} />
       <section className="mt-8 rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
         {card ? (
@@ -2603,6 +2633,6 @@ export const PracticeJapaneseFlashcardsPage: React.FC<PracticeJapanesePageProps>
           <EmptyPanel text={c.empty} />
         )}
       </section>
-    </PageShell>
+    </ImmersiveShell>
   );
 };

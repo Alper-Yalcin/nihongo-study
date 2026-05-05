@@ -1,115 +1,83 @@
-import React, { useMemo } from 'react';
-import {
-  ArrowRight,
-  BadgeCheck,
-  Brush,
-  Clock3,
-  Eye,
-  PenLine,
-  Route,
-  ShieldAlert,
-  Sparkles,
-  Target,
-  Timer
-} from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { PageShell } from '../../../components/ui';
-import { StudyContainer } from '../../../components/StudyContainer';
+import React, { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
-import { appShellRoutes } from '../../../data/appShellContent';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
 import { getNhkKanaGuideImageSrc } from '../../../data/nhkKanaGuideImages';
+import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
 import { isKanaScript } from '../../../hooks/useActiveScript';
-import { KanaScript } from '../../../features/kana/domain/kanaItem';
+import { KanaItem, KanaScript } from '../../../features/kana/domain/kanaItem';
 import { useKanaProgressStore } from '../../../features/kana/progress/progressStore';
 import {
   buildKanaReviewQueue,
-  getKanaGroupProgressStats,
   getWeakKanaProgressEntries
 } from '../../../features/kana/review/reviewSelectors';
+import { getKanaItemById } from '../../../features/kana/data/kanaInventory';
+import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
+import { markPracticedToday } from '../../../features/streak/tomoshibi';
 
 interface PracticeKanaDrawingPageProps {
   language: AppLanguage;
   activeScript: KanaScript;
 }
 
+type SessionType = 'review' | 'weak' | 'free';
+
 const copy = {
   tr: {
-    eyebrow: 'Kana Practice',
-    title: 'Drawing Practice',
-    description: 'Kana formunu, stroke sirasini ve hafizadan yazmayi birlikte calis.',
     hiragana: 'Hiragana',
     katakana: 'Katakana',
-    startReview: 'Bekleyenleri ciz',
-    startWeak: 'Zayiflari ciz',
-    startFree: 'Serbest cizim',
-    practiceTitle: 'Cizim alani',
-    due: 'Bekleyen',
-    weak: 'Zayif',
-    mastered: 'Tamamlanan',
-    tracked: 'Takipte',
-    strokeGuide: 'Stroke rehberi',
-    strokeGuideText: 'Sira numaralari ve yon oklarini acip kapatabilirsin.',
-    formMemory: 'Form hafizasi',
-    formMemoryText: 'Once rehberli ciz, sonra test ve hafiza moduna gec.',
-    speedControl: 'Hiz kontrolu',
-    speedControlText: 'Hiz modunda dogru formu sure baskisiyla tekrar edersin.',
-    focusQueue: 'Cizim odagi',
-    focusHint: 'Zayif ve bekleyen gruplar once gorunur.',
-    emptyFocus: 'Henuz riskli grup yok.',
-    characters: 'karakter',
-    ready: 'Hazir',
-    stroke: 'stroke',
-    fallbackGuide: 'Rehber'
+    startReview: 'Bekleyenleri çiz',
+    startWeak: 'Zayıfları çiz',
+    startFree: 'Serbest çizim',
+    due: 'Bkl',
+    weak: 'Zayıf',
+    mastered: 'Tamam',
+    subtitle: 'Stroke sirasini hafizadan uret',
+    back: 'Geri'
   },
   en: {
-    eyebrow: 'Kana Practice',
-    title: 'Drawing Practice',
-    description: 'Practice kana form, stroke order, and writing from memory together.',
     hiragana: 'Hiragana',
     katakana: 'Katakana',
     startReview: 'Draw due items',
     startWeak: 'Draw weak items',
     startFree: 'Free drawing',
-    practiceTitle: 'Drawing area',
     due: 'Due',
     weak: 'Weak',
-    mastered: 'Mastered',
-    tracked: 'Tracked',
-    strokeGuide: 'Stroke guide',
-    strokeGuideText: 'Toggle stroke numbers and direction arrows while practicing.',
-    formMemory: 'Form memory',
-    formMemoryText: 'Draw with guidance first, then move into test and memory modes.',
-    speedControl: 'Speed control',
-    speedControlText: 'Use speed mode to repeat correct form under time pressure.',
-    focusQueue: 'Drawing focus',
-    focusHint: 'Weak and due groups appear first.',
-    emptyFocus: 'No risky groups yet.',
-    characters: 'characters',
-    ready: 'Ready',
-    stroke: 'strokes',
-    fallbackGuide: 'Guide'
+    mastered: 'Done',
+    subtitle: 'Reproduce the stroke order from memory',
+    back: 'Back'
   }
 } as const;
 
 const sampleIdsByScript: Record<KanaScript, string[]> = {
-  hiragana: ['h-a', 'h-ki', 'h-so', 'h-me'],
-  katakana: ['k-a', 'k-ki', 'k-so', 'k-me']
+  hiragana: ['h-a', 'h-ki', 'h-so', 'h-me', 'h-tsu'],
+  katakana: ['k-a', 'k-ki', 'k-so', 'k-me', 'k-tsu']
 };
 
 const sampleCharsByScript: Record<KanaScript, string[]> = {
-  hiragana: ['あ', 'き', 'そ', 'め'],
-  katakana: ['ア', 'キ', 'ソ', 'メ']
+  hiragana: ['あ', 'き', 'そ', 'め', 'つ'],
+  katakana: ['ア', 'キ', 'ソ', 'メ', 'ツ']
 };
 
-const buildRunHref = (script: KanaScript, tab: 'review' | 'weak' | 'free') => {
-  const params = new URLSearchParams();
-  params.set('script', script);
-  params.set('tab', tab);
-  params.set('mode', 'drawing');
+const shuffle = <T,>(arr: T[]): T[] =>
+  [...arr].sort(() => Math.random() - 0.5);
 
-  return `${appShellRoutes.practiceKanaDrawingRun}?${params.toString()}`;
-};
+const SCENE =
+  'relative flex w-full flex-col items-center justify-center max-lg:min-h-[calc(100dvh-92px)] max-lg:overflow-y-auto lg:h-[calc(100dvh-92px)] lg:overflow-hidden';
+
+const LM_VIGNETTE =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,transparent_38%,rgba(240,232,228,0.52)_100%)] [.theme-dark_&]:opacity-0';
+const LM_HALO =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_46%_36%_at_50%_42%,rgba(253,250,248,0.55)_0%,transparent_100%)] [.theme-dark_&]:opacity-0';
+const DM_CHAR_HALO =
+  'pointer-events-none absolute left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 blur-3xl bg-[#d06070]/8 [.theme-dark_&]:opacity-100';
+
+const Atmosphere: React.FC = () => (
+  <>
+    <div className={LM_VIGNETTE} />
+    <div className={LM_HALO} />
+    <div className={DM_CHAR_HALO} />
+  </>
+);
 
 export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = ({
   language,
@@ -120,257 +88,268 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
   const requestedScript = searchParams.get('script');
   const script: KanaScript = isKanaScript(requestedScript) ? requestedScript : activeScript;
 
-  const sections = useMemo(
-    () => (script === 'hiragana' ? getLocalizedHiraganaSections(language) : getLocalizedKatakanaSections(language)),
-    [language, script]
-  );
-
-  const allCharacterCount = useMemo(
-    () => new Set(sections.flatMap((section) => section.groups.flatMap((group) => group.characters.map((item) => item.id)))).size,
-    [sections]
-  );
+  const [sessionType, setSessionType] = useState<SessionType | null>(null);
+  const [round, setRound] = useState<KanaItem[]>([]);
+  const [index, setIndex] = useState(0);
+  const [revealed, setRevealed] = useState(false);
 
   const { listByScript, summaries } = useKanaProgressStore();
   const progressEntries = listByScript(script);
   const summary = summaries[script];
   const reviewQueue = useMemo(() => buildKanaReviewQueue(script, progressEntries), [progressEntries, script]);
   const weakEntries = useMemo(() => getWeakKanaProgressEntries(script, progressEntries), [progressEntries, script]);
-  const focusGroups = useMemo(
-    () => getKanaGroupProgressStats(sections, progressEntries).slice(0, 5),
-    [progressEntries, sections]
+
+  const sections = useMemo(
+    () => (script === 'hiragana' ? getLocalizedHiraganaSections(language) : getLocalizedKatakanaSections(language)),
+    [language, script]
   );
+
+  const allSectionCharacterIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          sections.flatMap((section) =>
+            section.matrix.flatMap((row) =>
+              row.filter((item): item is NonNullable<typeof item> => item !== null).map((item) => item.id)
+            )
+          )
+        )
+      ),
+    [sections]
+  );
+
+  const ids = sampleIdsByScript[script];
+  const chars = sampleCharsByScript[script];
+
+  const current = round[index] ?? null;
+  const complete = round.length > 0 && index >= round.length;
 
   const setScript = (next: KanaScript) => {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set('script', next);
     setSearchParams(nextParams);
+    setSessionType(null);
+    setRound([]);
   };
 
-  return (
-    <PageShell width="wide" className="pb-14">
-      <section className="mt-8 overflow-hidden rounded-[1.25rem] border border-[var(--kt-border)] bg-[color-mix(in_srgb,var(--kt-surface-raised)_88%,transparent)] shadow-[var(--kt-shadow-sm)]">
-        <div className="grid min-h-[22rem] bg-[radial-gradient(circle_at_12%_10%,var(--kt-brand-soft),transparent_18rem),radial-gradient(circle_at_92%_18%,var(--kt-accent-warning-soft),transparent_16rem)] lg:grid-cols-[1fr_0.95fr]">
-          <div className="flex flex-col justify-between border-b border-[var(--kt-border-subtle)] p-8 lg:border-b-0 lg:border-r lg:p-10">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--kt-border)] bg-[var(--kt-brand-soft)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[var(--kt-brand)]">
-                <PenLine size={14} />
-                {c.eyebrow}
-              </div>
-              <h1 className="mt-7 max-w-xl text-5xl font-black leading-none text-[var(--kt-ink-strong)] lg:text-6xl">
-                {c.title}
-              </h1>
-              <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-[var(--kt-ink-muted)]">
-                {c.description}
-              </p>
-            </div>
-            <div className="mt-9 grid gap-3 sm:grid-cols-3">
-              <Metric icon={<Target size={16} />} label={c.characters} value={allCharacterCount} />
-              <Metric icon={<Clock3 size={16} />} label={c.due} value={summary.dueCount} />
-              <Metric icon={<ShieldAlert size={16} />} label={c.weak} value={summary.weakCount} />
-            </div>
-          </div>
-          <div className="relative flex items-center justify-center p-8 lg:p-10">
-            <div className="relative w-full max-w-md rounded-[1.1rem] border border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-[var(--kt-shadow-sm)]">
-              <div className="flex items-start justify-between gap-4 border-b border-[var(--kt-border-subtle)] pb-4">
-                <div>
-                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[var(--kt-brand)]">
-                    {script === 'hiragana' ? c.hiragana : c.katakana}
-                  </div>
-                  <div className="mt-2 font-jp text-7xl font-black leading-none text-[var(--kt-ink-strong)]">
-                    {sampleCharsByScript[script][0]}
-                  </div>
-                </div>
-                <div className="inline-flex rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-1 shadow-[var(--kt-shadow-sm)]">
-                  {(['hiragana', 'katakana'] as KanaScript[]).map((option) => {
-                    const active = option === script;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => setScript(option)}
-                        aria-pressed={active}
-                        className={`h-9 rounded-md px-3 text-sm font-semibold transition ${
-                          active
-                            ? 'bg-[var(--kt-brand)] text-[var(--kt-brand-on)]'
-                            : 'text-[var(--kt-ink-muted)] hover:bg-[var(--kt-surface-muted)] hover:text-[var(--kt-ink)]'
-                        }`}
-                      >
-                        {option === 'hiragana' ? c.hiragana : c.katakana}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {sampleIdsByScript[script].map((id, index) => {
-                  const guideSrc = getNhkKanaGuideImageSrc(id);
-                  return (
-                    <div
-                      key={`${script}-${id}`}
-                      className="rounded-lg border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-3 text-center"
-                    >
-                      <div className="flex h-20 items-center justify-center rounded-md bg-white">
-                        {guideSrc ? (
-                          <img src={guideSrc} alt="" className="max-h-16 max-w-full object-contain opacity-85" />
-                        ) : (
-                          <span className="font-jp text-5xl font-black leading-none text-[var(--kt-ink-strong)]">
-                            {sampleCharsByScript[script][index]}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-3 rounded-md bg-[var(--kt-surface-muted)] px-2 py-1 text-xs font-bold text-[var(--kt-ink-muted)]">
-                        {guideSrc ? c.fallbackGuide : `${index + 1} ${c.stroke}`}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="mt-6 grid gap-2 sm:grid-cols-2">
-                <Link
-                  to={reviewQueue.length > 0 ? buildRunHref(script, 'review') : buildRunHref(script, 'free')}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--kt-brand)] px-5 py-3 text-sm font-black uppercase tracking-[0.12em] text-[var(--kt-brand-on)] shadow-[var(--kt-shadow-sm)] transition hover:-translate-y-0.5 hover:brightness-105"
-                >
-                  {reviewQueue.length > 0 ? c.startReview : c.startFree}
-                  <ArrowRight size={16} />
-                </Link>
-                <Link
-                  to={weakEntries.length > 0 ? buildRunHref(script, 'weak') : buildRunHref(script, 'free')}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] px-5 py-3 text-sm font-black uppercase tracking-[0.12em] text-[var(--kt-ink)] transition hover:bg-[var(--kt-surface-muted)]"
-                >
-                  {weakEntries.length > 0 ? c.startWeak : c.startFree}
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+  const startSession = (type: SessionType) => {
+    const sourceIds =
+      type === 'review'
+        ? reviewQueue.slice(0, 24).map((e) => e.kanaId)
+        : type === 'weak'
+        ? weakEntries.slice(0, 24).map((e) => e.kanaId)
+        : allSectionCharacterIds;
 
-      <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="overflow-hidden rounded-[1.25rem] border border-[var(--kt-border)] bg-[color-mix(in_srgb,var(--kt-surface-raised)_88%,transparent)] shadow-[var(--kt-shadow-sm)]">
-          <div className="p-7 lg:p-8">
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-[var(--kt-brand-soft)] px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-brand)]">
-                  <Brush size={14} />
-                  {script === 'hiragana' ? c.hiragana : c.katakana}
-                </div>
-                <h2 className="mt-4 text-3xl font-black text-[var(--kt-ink-strong)]">{c.practiceTitle}</h2>
-                <p className="mt-2 text-sm font-semibold text-[var(--kt-ink-muted)]">
-                  {allCharacterCount} {c.characters}
-                </p>
-              </div>
-              <Link
-                to={buildRunHref(script, 'free')}
-                className="inline-flex items-center gap-2 rounded-lg border border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 text-sm font-black text-[var(--kt-ink)] transition hover:bg-[var(--kt-surface-muted)]"
-              >
-                {c.startFree}
-                <ArrowRight size={15} />
-              </Link>
-            </div>
-            <div className="rounded-[1rem] border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-4">
-              <StudyContainer
-                key={`drawing-${script}-${language}`}
-                title={`${script === 'hiragana' ? c.hiragana : c.katakana} ${c.title}`}
-                language={language}
-                script={script}
-                sections={sections}
-                mode="drawing"
-              />
-            </div>
+    const items = sourceIds
+      .map((id) => getKanaItemById(id))
+      .filter((item): item is KanaItem => item !== null);
+
+    setRound(shuffle(items).slice(0, 10));
+    setIndex(0);
+    setRevealed(false);
+    setSessionType(type);
+  };
+
+  const handleResult = (correct: boolean) => {
+    if (!current) return;
+    if (correct) {
+      recordCorrect();
+      markPracticedToday();
+    } else {
+      recordWrong();
+    }
+    setIndex((v) => v + 1);
+    setRevealed(false);
+  };
+
+  /* ── Completion ── */
+  if (complete) {
+    return (
+      <div className={SCENE}>
+        <Atmosphere />
+        <div className="relative z-10 flex flex-col items-center gap-4 px-4 text-center">
+          <div
+            className="select-none font-serif text-[9rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
+            style={{ textShadow: '0 2px 18px rgba(43,36,34,0.09)' }}
+          >
+            完
           </div>
+          <h2 className="text-base font-light tracking-[0.28em] text-[#2b2422]/80 [.theme-dark_&]:text-white/80">
+            Training Complete
+          </h2>
+          <p className="text-[10px] uppercase tracking-[0.4em] text-[#2b2422]/32 [.theme-dark_&]:text-white/35">
+            The dojo rests
+          </p>
+          <button
+            onClick={() => { setRound([]); setSessionType(null); }}
+            className="mt-5 rounded-full bg-[#d06070] px-11 py-4 text-sm font-medium uppercase tracking-[0.22em] text-white transition-all duration-200 ease-out hover:opacity-90 hover:scale-[1.025] active:scale-[0.98]"
+          >
+            Return to Dojo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Active session ── */
+  if (sessionType !== null && round.length > 0) {
+    return (
+      <div className={SCENE}>
+        <Atmosphere />
+
+        <div className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
+          <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/70" />
+          Drawing · {index + 1} / {round.length}
         </div>
 
-        <aside className="rounded-[1.1rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
-          <div className="grid gap-2">
-            <Metric icon={<Clock3 size={16} />} label={c.due} value={summary.dueCount} />
-            <Metric icon={<ShieldAlert size={16} />} label={c.weak} value={summary.weakCount} />
-            <Metric icon={<BadgeCheck size={16} />} label={c.mastered} value={summary.masteredCount} />
-            <Metric icon={<Sparkles size={16} />} label={c.tracked} value={summary.tracked} />
-          </div>
-        </aside>
-      </section>
+        <main className="relative z-10 flex w-full max-w-xs flex-col items-center gap-5 px-4 text-center sm:max-w-sm">
 
-      <section className="mt-4 grid gap-3 md:grid-cols-3">
-        <ModeNote icon={<Route size={18} />} title={c.strokeGuide} text={c.strokeGuideText} />
-        <ModeNote icon={<Eye size={18} />} title={c.formMemory} text={c.formMemoryText} />
-        <ModeNote icon={<Timer size={18} />} title={c.speedControl} text={c.speedControlText} />
-      </section>
-
-      <section className="mt-6 rounded-[1.25rem] border border-[var(--kt-border)] bg-[var(--kt-surface-raised)] p-5 shadow-[var(--kt-shadow-sm)]">
-        <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-black text-[var(--kt-ink-strong)]">{c.focusQueue}</h2>
-            <p className="mt-1 text-sm text-[var(--kt-ink-muted)]">{c.focusHint}</p>
-          </div>
-          <Brush className="text-[var(--kt-brand)]" size={20} />
-        </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
-          {focusGroups.length > 0 ? (
-            focusGroups.map((group) => {
-              const risk = group.weak * 3 + group.due * 2 + (group.total - group.mastered);
-              return (
-                <div key={group.groupId} className="rounded-lg border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-bold text-[var(--kt-ink-strong)]">{group.groupLabel}</div>
-                      <div className="mt-0.5 text-xs text-[var(--kt-ink-muted)]">{group.sectionTitle}</div>
-                    </div>
-                    <span className="rounded-full bg-[var(--kt-accent-warning-soft)] px-2 py-1 text-xs font-black text-[var(--kt-accent-warning)]">
-                      {risk}
-                    </span>
-                  </div>
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--kt-progress-track)]">
-                    <div
-                      className="h-full rounded-full bg-[linear-gradient(90deg,var(--kt-brand),var(--kt-dan-gold))]"
-                      style={{ width: `${group.total > 0 ? Math.round((group.mastered / group.total) * 100) : 0}%` }}
-                    />
-                  </div>
-                  <div className="mt-2 text-xs text-[var(--kt-ink-subtle)]">
-                    {group.mastered}/{group.total} {c.ready}
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="rounded-lg border border-dashed border-[var(--kt-border)] p-4 text-sm text-[var(--kt-ink-muted)]">
-              {c.emptyFocus}
+            <div className="mb-2 text-[9px] font-medium uppercase tracking-[0.42em] text-[#d06070]/70">
+              Reading
             </div>
-          )}
+            <div className="text-xl font-light tracking-widest text-[#2b2422]/85 [.theme-dark_&]:text-white/80">
+              {current?.romaji[0] ?? '—'}
+            </div>
+          </div>
+
+          <div className="relative flex h-56 w-56 items-center justify-center rounded-2xl border border-[#2b2422]/8 bg-white/16 transition-colors duration-200 [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-transparent">
+            {!revealed ? (
+              <span className="select-none text-[9px] uppercase tracking-[0.35em] text-[#2b2422]/18 [.theme-dark_&]:text-white/22">
+                Draw here
+              </span>
+            ) : (
+              <div
+                className="select-none font-serif text-[7rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
+                style={{ textShadow: '0 2px 20px rgba(43,36,34,0.08)' }}
+              >
+                {current?.char}
+              </div>
+            )}
+          </div>
+
+          <div className="flex h-12 items-center justify-center">
+            {!revealed ? (
+              <button
+                onClick={() => setRevealed(true)}
+                className="rounded-full border border-[#2b2422]/12 bg-white/15 px-10 py-3 text-sm font-medium uppercase tracking-[0.22em] text-[#2b2422]/40 transition-all duration-150 ease-out hover:bg-white/28 hover:text-[#2b2422]/60 active:scale-[0.98] [.theme-dark_&]:border-white/14 [.theme-dark_&]:bg-white/6 [.theme-dark_&]:text-white/45 [.theme-dark_&]:hover:bg-white/10 [.theme-dark_&]:hover:text-white/65"
+              >
+                Reveal
+              </button>
+            ) : (
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleResult(false)}
+                  className="rounded-full border border-[#2b2422]/8 bg-white/12 px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-[#2b2422]/36 transition-all duration-150 ease-out hover:bg-white/24 hover:text-[#2b2422]/55 active:scale-[0.98] [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/6 [.theme-dark_&]:text-white/42 [.theme-dark_&]:hover:bg-white/10 [.theme-dark_&]:hover:text-white/60"
+                >
+                  Missed
+                </button>
+                <button
+                  onClick={() => handleResult(true)}
+                  className="rounded-full bg-[#d06070] px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white transition-all duration-200 ease-out hover:opacity-90 hover:scale-[1.025] active:scale-[0.98]"
+                >
+                  Nailed it
+                </button>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  /* ── Landing ── */
+  return (
+    <div className={SCENE}>
+      <Atmosphere />
+
+      <div className="absolute left-5 top-6 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
+        <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/70" />
+        Kana · Drawing
+      </div>
+
+      {/* Script toggle */}
+      <div className="absolute right-5 top-5 inline-flex rounded-full border border-[#2b2422]/8 bg-white/14 p-0.5 backdrop-blur-[1px]">
+        {(['hiragana', 'katakana'] as KanaScript[]).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => setScript(option)}
+            className={`rounded-full px-4 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] transition-all duration-150 ${
+              script === option ? 'bg-[#d06070] text-white' : 'text-[#2b2422]/40 [.theme-dark_&]:text-white/45 hover:text-[#2b2422]/60'
+            }`}
+          >
+            {option === 'hiragana' ? c.hiragana : c.katakana}
+          </button>
+        ))}
+      </div>
+
+      <main className="relative z-10 flex flex-col items-center px-4 text-center">
+        <div
+          className="select-none font-serif text-[11rem] leading-none tracking-[-0.01em] text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85 md:text-[14rem]"
+          style={{ textShadow: '0 3px 24px rgba(43,36,34,0.10)' }}
+        >
+          {chars[0]}
         </div>
-      </section>
-    </PageShell>
+
+        <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.48em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
+          {c.subtitle}
+        </p>
+
+        <button
+          type="button"
+          onClick={() => startSession(reviewQueue.length > 0 ? 'review' : 'free')}
+          className="mt-7 rounded-full bg-[#d06070] px-12 py-4 text-sm font-medium uppercase tracking-[0.22em] text-white transition-all duration-200 ease-out hover:opacity-90 hover:scale-[1.025] active:scale-[0.98]"
+        >
+          {reviewQueue.length > 0 ? c.startReview : c.startFree}
+        </button>
+
+        {weakEntries.length > 0 && (
+          <button
+            type="button"
+            onClick={() => startSession('weak')}
+            className="mt-3 text-[11px] font-medium uppercase tracking-[0.22em] text-[#2b2422]/35 transition-all duration-150 hover:text-[#2b2422]/55"
+          >
+            {c.startWeak}
+          </button>
+        )}
+
+        <div className="mt-8 flex items-center gap-4 text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/25 [.theme-dark_&]:text-white/30">
+          <span>{c.due} {summary.dueCount}</span>
+          <span>·</span>
+          <span>{c.weak} {summary.weakCount}</span>
+          <span>·</span>
+          <span>{c.mastered} {summary.masteredCount}</span>
+        </div>
+
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          {ids.map((id, i) => {
+            const guideSrc = getNhkKanaGuideImageSrc(id);
+            return (
+              <div
+                key={id}
+                className={`flex select-none items-center justify-center rounded-xl border transition-all duration-150 ease-out hover:scale-105 ${
+                  i === 0
+                    ? 'border-[#d06070]/20 bg-[#d06070]/6 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 hover:bg-[#d06070]/10'
+                    : 'border-[#2b2422]/7 bg-white/12 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 hover:bg-white/24'
+                } ${guideSrc ? 'h-12 w-12 p-1' : 'px-5 py-2.5'}`}
+              >
+                {guideSrc ? (
+                  <img
+                    src={guideSrc}
+                    alt={chars[i]}
+                    className={`max-h-full max-w-full object-contain ${i === 0 ? 'opacity-75' : 'opacity-40'}`}
+                  />
+                ) : (
+                  <span className={`font-serif text-lg leading-none ${i === 0 ? 'text-[#d06070]/80 [.theme-dark_&]:text-[#ffd6dc]' : 'text-[#2b2422]/38 [.theme-dark_&]:text-white/55'}`}>
+                    {chars[i]}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
+    </div>
   );
 };
-
-interface MetricProps {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-}
-
-const Metric: React.FC<MetricProps> = ({ icon, label, value }) => (
-  <div className="rounded-lg border border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] p-4">
-    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--kt-ink-subtle)]">
-      <span className="text-[var(--kt-brand)]">{icon}</span>
-      {label}
-    </div>
-    <div className="mt-2 text-2xl font-black text-[var(--kt-ink-strong)]">{value}</div>
-  </div>
-);
-
-interface ModeNoteProps {
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}
-
-const ModeNote: React.FC<ModeNoteProps> = ({ icon, title, text }) => (
-  <div className="rounded-lg border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_82%,transparent)] p-4">
-    <div className="flex items-center gap-2 text-sm font-black text-[var(--kt-ink-strong)]">
-      <span className="text-[var(--kt-brand)]">{icon}</span>
-      {title}
-    </div>
-    <p className="mt-2 text-sm leading-6 text-[var(--kt-ink-muted)]">{text}</p>
-  </div>
-);

@@ -74,7 +74,7 @@ export const ForgePage: React.FC<ForgePageProps> = ({ language }) => {
 
   const start = () => {
     if (!weakEntries.length) return;
-    navigate(`${appShellRoutes.practiceKanaAnswerTypeRun}?script=${script}&tab=weak&mode=typing`);
+    navigate(`${appShellRoutes.practiceKanaAnswerType}?script=${script}`);
   };
 
   return (
