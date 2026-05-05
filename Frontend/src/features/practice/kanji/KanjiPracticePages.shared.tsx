@@ -184,12 +184,18 @@ const DM_CHAR_HALO =
   'pointer-events-none absolute left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 blur-3xl bg-[#d06070]/8 [.theme-dark_&]:opacity-100';
 
 /* ── Corner breadcrumb ─────────────────────────────────────────────── */
-const Corner: React.FC<{ label: string }> = ({ label }) => (
-  <div className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
-    <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/60" />
-    {label}
-  </div>
-);
+const Corner: React.FC<{ label: string; onClick?: () => void }> = ({ label, onClick }) =>
+  onClick ? (
+    <button type="button" onClick={onClick} className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 transition-colors duration-150 hover:text-[#2b2422]/55 [.theme-dark_&]:text-white/35 [.theme-dark_&]:hover:text-white/55">
+      <span className="text-[13px] leading-none">←</span>
+      {label}
+    </button>
+  ) : (
+    <div className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
+      <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/60" />
+      {label}
+    </div>
+  );
 
 /* ── The shared practice engine ────────────────────────────────────── */
 const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> = ({
@@ -214,6 +220,8 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
 
   const current = round[index] ?? null;
   const complete = round.length > 0 && index >= round.length;
+
+  const goBack = () => { setRound([]); setIndex(0); setInput(''); setSelected(null); setChecked(null); setCorrectCount(0); setWrongCount(0); setCombo(0); };
   const knownCount = Object.values(progress).filter((v) => v === 'known').length;
   const reviewCount = Object.values(progress).filter((v) => v === 'review').length;
 
@@ -293,7 +301,7 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
         <div className={OVERLAY} />
         <div className={FOCUS_HALO} />
         <div className={DM_CHAR_HALO} />
-        <Corner label={`Kanji · ${mc.label}`} />
+        <Corner label={`Kanji · ${mc.label}`} onClick={goBack} />
 
         <div className="relative z-10 flex flex-col items-center gap-4 px-4 text-center">
           <div
@@ -395,7 +403,7 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
       <div className={DM_CHAR_HALO} />
 
       {/* Corner: progress */}
-      <Corner label={`${mc.label} · ${index + 1} / ${round.length}`} />
+      <Corner label={`${mc.label} · ${index + 1} / ${round.length}`} onClick={goBack} />
 
       {/* Score — top right */}
       <div className="absolute right-5 top-6 z-10 flex items-center gap-3 text-[9px] uppercase tracking-[0.24em] text-[#2b2422]/25 [.theme-dark_&]:text-white/30">

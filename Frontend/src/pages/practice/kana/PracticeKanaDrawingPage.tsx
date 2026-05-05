@@ -71,6 +71,19 @@ const LM_HALO =
 const DM_CHAR_HALO =
   'pointer-events-none absolute left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 blur-3xl bg-[#d06070]/8 [.theme-dark_&]:opacity-100';
 
+const Corner: React.FC<{ label: string; onClick?: () => void }> = ({ label, onClick }) =>
+  onClick ? (
+    <button type="button" onClick={onClick} className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 transition-colors duration-150 hover:text-[#2b2422]/55 [.theme-dark_&]:text-white/35 [.theme-dark_&]:hover:text-white/55">
+      <span className="text-[13px] leading-none">←</span>
+      {label}
+    </button>
+  ) : (
+    <div className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
+      <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/60" />
+      {label}
+    </div>
+  );
+
 const Atmosphere: React.FC = () => (
   <>
     <div className={LM_VIGNETTE} />
@@ -124,6 +137,8 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
   const current = round[index] ?? null;
   const complete = round.length > 0 && index >= round.length;
 
+  const goBack = () => { setRound([]); setSessionType(null); };
+
   const setScript = (next: KanaScript) => {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set('script', next);
@@ -167,6 +182,7 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
     return (
       <div className={SCENE}>
         <Atmosphere />
+        <Corner label="Kana · Drawing" onClick={goBack} />
         <div className="relative z-10 flex flex-col items-center gap-4 px-4 text-center">
           <div
             className="select-none font-serif text-[9rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
@@ -197,10 +213,7 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
       <div className={SCENE}>
         <Atmosphere />
 
-        <div className="absolute left-5 top-6 z-10 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
-          <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/70" />
-          Drawing · {index + 1} / {round.length}
-        </div>
+        <Corner label={`Drawing · ${index + 1} / ${round.length}`} onClick={goBack} />
 
         <main className="relative z-10 flex w-full max-w-xs flex-col items-center gap-5 px-4 text-center sm:max-w-sm">
 
@@ -263,10 +276,7 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
     <div className={SCENE}>
       <Atmosphere />
 
-      <div className="absolute left-5 top-6 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-[#2b2422]/28 [.theme-dark_&]:text-white/35">
-        <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#d06070]/70" />
-        Kana · Drawing
-      </div>
+      <Corner label="Kana · Drawing" />
 
       {/* Script toggle */}
       <div className="absolute right-5 top-5 inline-flex rounded-full border border-[#2b2422]/8 bg-white/14 p-0.5 backdrop-blur-[1px]">
