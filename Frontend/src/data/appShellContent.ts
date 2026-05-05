@@ -88,7 +88,9 @@ export const appShellRoutes = {
   kanjiOverview: '/kana/kanji/overview',
   search: '/search',
   account: '/account',
-  settings: '/account/settings'
+  profile: '/profile',
+  settings: '/settings',
+  legacyAccountSettings: '/account/settings'
 } as const;
 
 export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnitBase}/${unitId}`;
@@ -596,9 +598,9 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
           links: [
             {
               id: 'footer-account',
-              label: 'Dashboard',
-              description: 'Hesap ve ileride dashboard icin giris noktasi.',
-              href: appShellRoutes.account
+              label: 'Profil',
+              description: 'Dojo profiline ve ogrenme yolculuguna git.',
+              href: appShellRoutes.profile
             },
             {
               id: 'footer-settings',
@@ -991,9 +993,9 @@ export const appShellContent: Record<AppLanguage, AppShellContent> = {
           links: [
             {
               id: 'footer-account',
-              label: 'Dashboard',
-              description: 'Reserved account and dashboard entry.',
-              href: appShellRoutes.account
+              label: 'Profile',
+              description: 'Open your dojo profile and learning journey.',
+              href: appShellRoutes.profile
             },
             {
               id: 'footer-settings',

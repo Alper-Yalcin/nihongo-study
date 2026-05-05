@@ -380,8 +380,6 @@ export default function App() {
       <Route path="/katakana" element={<Navigate to={`${appShellRoutes.letters}?script=katakana`} replace />} />
       <Route path="/kanji" element={<Navigate to={appShellRoutes.kanjiOverview} replace />} />
       <Route path="/kanji/overview" element={<Navigate to={appShellRoutes.kanjiOverview} replace />} />
-      <Route path="/settings" element={<Navigate to={appShellRoutes.settings} replace />} />
-
       <Route path="/kana/hiragana" element={<Navigate to={`${appShellRoutes.letters}?script=hiragana`} replace />} />
       <Route path={appShellRoutes.hiraganaOverview} element={<Navigate to={`${appShellRoutes.letters}?script=hiragana`} replace />} />
       <Route path={appShellRoutes.hiraganaLearn} element={<Navigate to={`${appShellRoutes.letters}?script=hiragana`} replace />} />
@@ -446,6 +444,7 @@ export default function App() {
           />
         }
       />
+      <Route path={appShellRoutes.profile} element={<ProfilePage language={language} />} />
       <Route path={appShellRoutes.account} element={<ProfilePage language={language} />} />
       <Route
         path={appShellRoutes.settings}
@@ -460,6 +459,7 @@ export default function App() {
           />
         }
       />
+      <Route path={appShellRoutes.legacyAccountSettings} element={<Navigate to={appShellRoutes.settings} replace />} />
       <Route path="*" element={<Navigate to={appShellRoutes.learn} replace />} />
     </Routes>
   );

@@ -28,6 +28,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   const isDark = themeMode === 'dark';
   const isLandingRoute = location.pathname === '/';
   const isLearnMap = location.pathname === '/learn' || location.pathname === '/learn/japanese';
+  const isProfileScene = location.pathname === '/profile' || location.pathname === '/account';
+  const isSettingsScene = location.pathname === '/settings';
   const isImmersivePractice =
     location.pathname.startsWith('/practice/kana') ||
     location.pathname.startsWith('/practice/kanji/') ||
@@ -60,6 +62,8 @@ export const AppShell: React.FC<AppShellProps> = ({
               className={
                 isLearnMap
                   ? 'w-full max-w-none px-0 pb-0 pt-0'
+                  : isProfileScene || isSettingsScene
+                    ? 'w-full max-w-none px-0 pb-0 pt-0'
                   : isImmersivePractice
                     ? 'w-full max-w-none px-0 py-0'
                     : 'mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-10 xl:pb-12 xl:pt-7'

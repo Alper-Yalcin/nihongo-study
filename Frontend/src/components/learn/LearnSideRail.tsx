@@ -3,7 +3,6 @@ import { BarChart3, BookOpenText, LucideIcon, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { appShellRoutes } from '../../data/appShellContent';
-import { MascotFigure } from '../mascot/MascotFigure';
 
 export type LearnSideItemId = 'journey' | 'review' | 'stats';
 
@@ -18,14 +17,12 @@ const copy = {
   tr: {
     journey: 'Yolculuk',
     review: 'Tekrar',
-    stats: 'Istatistik',
-    profile: 'Profil'
+    stats: 'Istatistik'
   },
   en: {
     journey: 'Journey',
     review: 'Review',
-    stats: 'Stats',
-    profile: 'Profile'
+    stats: 'Stats'
   }
 } as const;
 
@@ -80,14 +77,6 @@ export const LearnSideRail: React.FC<LearnSideRailProps> = ({
           );
         })}
       </nav>
-      <div className={`mb-4 flex flex-col items-center gap-2 text-xs font-semibold xl:mb-8 ${isDark ? 'text-[#d6deef]' : 'text-[#4f5965]'}`}>
-        <div className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 shadow-[0_8px_18px_rgba(220,90,110,0.16)] ${
-          isDark ? 'border-[#ffb7c7] bg-[rgba(255,255,255,0.12)]' : 'border-[#ffd6de] bg-[#fff1f4]'
-        }`}>
-          <MascotFigure pose="cheer" tone="brand" size={48} />
-        </div>
-        <span>{labels.profile}</span>
-      </div>
     </aside>
   );
 };

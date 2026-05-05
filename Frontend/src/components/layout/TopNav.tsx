@@ -20,6 +20,7 @@ import {
   Timer,
   Trophy,
   Type,
+  UserRound,
   Users,
   Zap,
   type LucideIcon
@@ -91,7 +92,8 @@ const labels = {
     japaneseQuiz: 'Japanese Quiz',
     customPractice: 'Custom Practice',
     trainingRecord: 'Antrenman Raporu',
-    flashcards: 'Flashcards'
+    flashcards: 'Flashcards',
+    profile: 'Profil'
   },
   en: {
     learn: 'Learn',
@@ -143,7 +145,8 @@ const labels = {
     japaneseQuiz: 'Japanese Quiz',
     customPractice: 'Custom Practice',
     trainingRecord: 'Training Record',
-    flashcards: 'Flashcards'
+    flashcards: 'Flashcards',
+    profile: 'Profile'
   }
 } as const;
 
@@ -306,7 +309,8 @@ export const TopNav: React.FC<TopNavProps> = ({
       ]
     },
     { id: 'quests', label: copy.quests, href: appShellRoutes.quests, icon: Trophy },
-    { id: 'settings', label: copy.settings, href: appShellRoutes.settings, icon: Settings2 }
+    { id: 'settings', label: copy.settings, href: appShellRoutes.settings, icon: Settings2 },
+    { id: 'profile', label: copy.profile, href: appShellRoutes.profile, icon: UserRound }
   ], [activeScript, copy]);
 
   const isItemActive = (id: string) => {
@@ -332,6 +336,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     if (id === 'quiz') return location.pathname.startsWith(appShellRoutes.quiz);
     if (id === 'quests') return location.pathname.startsWith(appShellRoutes.quests);
     if (id === 'settings') return location.pathname.startsWith(appShellRoutes.settings);
+    if (id === 'profile') return location.pathname.startsWith(appShellRoutes.profile) || location.pathname === appShellRoutes.account;
     return false;
   };
 
@@ -623,6 +628,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           >
             {kyu}°
           </div>
+
         </div>
       </div>
     </header>

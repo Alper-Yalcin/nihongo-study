@@ -1,13 +1,10 @@
 import React from 'react';
 import {
   Bell,
-  Brush,
   Check,
-  Globe2,
-  GraduationCap,
   Headphones,
-  Languages,
   Moon,
+  Music2,
   Palette,
   Sparkles,
   Sun,
@@ -15,9 +12,8 @@ import {
   Wand2
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
-import { kanaFontStyles, KanaFontStyleId } from '../../data/kanaFontStyles';
+import { kanaFontStyles, KanaFontStyle, KanaFontStyleId } from '../../data/kanaFontStyles';
 import { usePersistentState } from '../../hooks/usePersistentState';
-import { GamePageShell, PageHero } from '../../components/layout';
 
 interface SettingsProps {
   language: AppLanguage;
@@ -29,96 +25,76 @@ interface SettingsProps {
 }
 
 const SOUND_KEY = 'kototsuna.pref.sound-effects';
+const MOTIVATION_SOUND_KEY = 'kototsuna.pref.motivation-sounds';
 const ANIMATION_KEY = 'kototsuna.pref.animations';
+const TRANSITION_KEY = 'kototsuna.pref.transition-effects';
 const MOTIVATION_KEY = 'kototsuna.pref.motivation';
 const LISTENING_KEY = 'kototsuna.pref.listening-drills';
 
-interface Copy {
-  eyebrow: string;
-  title: string;
-  description: string;
-  appearance: string;
-  appearanceHint: string;
-  theme: string;
-  themeLight: string;
-  themeDark: string;
-  kanaFont: string;
-  kanaFontHint: string;
-  lesson: string;
-  lessonHint: string;
-  soundLabel: string;
-  soundDesc: string;
-  animationsLabel: string;
-  animationsDesc: string;
-  motivationLabel: string;
-  motivationDesc: string;
-  listeningLabel: string;
-  listeningDesc: string;
-  language: string;
-  languageHint: string;
-  livePreview: string;
-  current: string;
-  on: string;
-  off: string;
-}
+const kanaPreview = 'あ き さ';
 
-const copyEn: Copy = {
-  eyebrow: 'Dojo preferences',
-  title: 'Settings',
-  description: 'Tune how Kototsuna looks, sounds, and feels. Changes apply instantly across the app.',
-  appearance: 'Appearance',
-  appearanceHint: 'Theme and the typeface used for kana characters.',
-  theme: 'Theme',
-  themeLight: 'Light',
-  themeDark: 'Dark',
-  kanaFont: 'Kana font',
-  kanaFontHint: 'Pick a typeface for hiragana and katakana display.',
-  lesson: 'Lesson experience',
-  lessonHint: 'Sound, motion, encouragement, and listening drills.',
-  soundLabel: 'Sound effects',
-  soundDesc: 'Answer and reward sounds during practice.',
-  animationsLabel: 'Animations',
-  animationsDesc: 'Motion for transitions and feedback.',
-  motivationLabel: 'Motivation messages',
-  motivationDesc: 'Short encouraging notes during study.',
-  listeningLabel: 'Listening drills',
-  listeningDesc: 'Audio-focused question flows.',
-  language: 'Language',
-  languageHint: 'Interface language for menus and instructions.',
-  livePreview: 'Live preview',
-  current: 'Current',
-  on: 'On',
-  off: 'Off'
-};
+const copy = {
+  tr: {
+    eyebrow: 'DOJO AYARLARI',
+    title: 'Öğrenme ortamını ayarla',
+    description: 'Görünümü, sesi ve çalışma ritmini kendine göre düzenle.',
+    themeTitle: 'Görsel atmosfer',
+    light: 'Açık',
+    dark: 'Koyu',
+    lightDesc: 'Sıcak krem, sakin metin ve gündüz çalışma hissi.',
+    darkDesc: 'Koyu sahne, yumuşak ışık ve gece odağı.',
+    fontTitle: 'Kana yazı stili',
+    fontHint: 'Kana karakterlerini hangi ritimle görmek istediğini seç.',
+    experienceTitle: 'Ders deneyimi',
+    soundGroup: 'Ses',
+    motionGroup: 'Hareket',
+    supportGroup: 'Destek',
+    soundEffects: 'Ses efektleri',
+    motivationSounds: 'Motivasyon sesleri',
+    animations: 'Animasyonlar',
+    transitions: 'Geçiş efektleri',
+    motivationMessages: 'Motivasyon mesajları',
+    listeningDrills: 'Dinleme egzersizleri',
+    languageTitle: 'Arayüz dili',
+    previewTitle: 'Canlı ders önizlemesi',
+    previewTask: 'Kana çalışması',
+    previewQuestion: 'Bu karakterin okunuşu nedir?',
+    answer: 'Cevapla',
+    on: 'açık',
+    off: 'kapalı'
+  },
+  en: {
+    eyebrow: 'DOJO SETTINGS',
+    title: 'Shape your learning environment',
+    description: 'Adjust the look, sound, and rhythm of your study space.',
+    themeTitle: 'Visual atmosphere',
+    light: 'Light',
+    dark: 'Dark',
+    lightDesc: 'Warm cream, calm text, and a daytime study feel.',
+    darkDesc: 'Deep scene, soft light, and night focus.',
+    fontTitle: 'Kana writing style',
+    fontHint: 'Choose the visual rhythm you want for kana characters.',
+    experienceTitle: 'Lesson experience',
+    soundGroup: 'Sound',
+    motionGroup: 'Motion',
+    supportGroup: 'Support',
+    soundEffects: 'Sound effects',
+    motivationSounds: 'Motivation sounds',
+    animations: 'Animations',
+    transitions: 'Transition effects',
+    motivationMessages: 'Motivation messages',
+    listeningDrills: 'Listening drills',
+    languageTitle: 'Interface language',
+    previewTitle: 'Live lesson preview',
+    previewTask: 'Kana practice',
+    previewQuestion: 'What is the reading of this character?',
+    answer: 'Answer',
+    on: 'on',
+    off: 'off'
+  }
+} as const;
 
-const copyTr: Copy = {
-  eyebrow: 'Dojo tercihleri',
-  title: 'Ayarlar',
-  description: 'Kototsuna’nin gorunusunu, sesini ve hissini ayarla. Degisiklikler aninda uygulanir.',
-  appearance: 'Gorunum',
-  appearanceHint: 'Tema ve kana karakterlerinin yazi tipi.',
-  theme: 'Tema',
-  themeLight: 'Acik',
-  themeDark: 'Koyu',
-  kanaFont: 'Kana fontu',
-  kanaFontHint: 'Hiragana ve katakana icin bir yazi tipi sec.',
-  lesson: 'Ders deneyimi',
-  lessonHint: 'Ses, hareket, motivasyon ve dinleme egzersizleri.',
-  soundLabel: 'Ses efektleri',
-  soundDesc: 'Calisma sirasindaki cevap ve odul sesleri.',
-  animationsLabel: 'Animasyonlar',
-  animationsDesc: 'Gecis ve geri bildirim hareketleri.',
-  motivationLabel: 'Motivasyon mesajlari',
-  motivationDesc: 'Calisma sirasinda kisa destek metinleri.',
-  listeningLabel: 'Dinleme egzersizleri',
-  listeningDesc: 'Ses odakli soru akislari.',
-  language: 'Dil',
-  languageHint: 'Menuler ve talimatlar icin arayuz dili.',
-  livePreview: 'Canli onizleme',
-  current: 'Aktif',
-  on: 'Acik',
-  off: 'Kapali'
-};
+type SettingCopy = (typeof copy)['tr'] | (typeof copy)['en'];
 
 export const Settings: React.FC<SettingsProps> = ({
   language,
@@ -128,328 +104,389 @@ export const Settings: React.FC<SettingsProps> = ({
   onThemeModeChange,
   onLanguageChange
 }) => {
-  const c = language === 'tr' ? copyTr : copyEn;
+  const c = copy[language];
+  const isDark = themeMode === 'dark';
   const [soundEffects, setSoundEffects] = usePersistentState<boolean>(SOUND_KEY, true);
+  const [motivationSounds, setMotivationSounds] = usePersistentState<boolean>(MOTIVATION_SOUND_KEY, true);
   const [animations, setAnimations] = usePersistentState<boolean>(ANIMATION_KEY, true);
+  const [transitionEffects, setTransitionEffects] = usePersistentState<boolean>(TRANSITION_KEY, true);
   const [motivationMessages, setMotivationMessages] = usePersistentState<boolean>(MOTIVATION_KEY, true);
   const [listeningDrills, setListeningDrills] = usePersistentState<boolean>(LISTENING_KEY, true);
   const selectedFont = kanaFontStyles.find((option) => option.id === kanaFontStyle) ?? kanaFontStyles[0];
 
   return (
-    <GamePageShell className="space-y-7 px-3 sm:px-5">
-      <PageHero
-        className="bg-[linear-gradient(135deg,var(--kt-surface-raised),var(--kt-brand-soft))]"
-        backgroundGlyph="設定"
-        eyebrow={
-          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--kt-surface-muted)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--kt-ink-muted)]">
-            <Palette size={13} />
-            {c.eyebrow}
-          </div>
-        }
-        title={c.title}
-        description={c.description}
-      />
+    <main className="relative min-h-[calc(100vh-92px)] overflow-x-hidden px-5 pb-24 pt-12 text-[var(--kt-ink-strong)] sm:px-8 lg:px-12">
+      <SettingsBackdrop isDark={isDark} />
 
-      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-        {/* ============== LEFT: settings sections ============== */}
-        <div className="space-y-5">
-          {/* APPEARANCE */}
-          <SettingsCard
-            icon={<Brush size={18} />}
-            title={c.appearance}
-            description={c.appearanceHint}
-          >
-            <Field label={c.theme}>
-              <Segmented
-                value={themeMode}
-                onChange={onThemeModeChange}
-                options={[
-                  { id: 'light' as ThemeMode, label: c.themeLight, icon: Sun },
-                  { id: 'dark' as ThemeMode, label: c.themeDark, icon: Moon }
-                ]}
-              />
-            </Field>
+      <div className="relative mx-auto w-full max-w-[1520px]">
+        <SettingsHeader copy={c} />
 
-            <Field label={c.kanaFont} hint={c.kanaFontHint}>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {kanaFontStyles.map((option) => {
-                  const isSelected = option.id === kanaFontStyle;
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => onKanaFontStyleChange(option.id)}
-                      className={`group relative flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                        isSelected
-                          ? 'border-[color:var(--kt-brand)]/55 bg-[var(--kt-brand-soft)] shadow-[0_4px_14px_rgba(196,93,79,0.12)]'
-                          : 'border-[var(--kt-border-subtle)] bg-[var(--kt-surface)] hover:bg-[var(--kt-surface-muted)]'
-                      }`}
-                    >
-                      <div
-                        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_srgb,var(--kt-surface-muted)_60%,transparent)] text-2xl font-black text-[var(--kt-ink-strong)]"
-                        style={{ fontFamily: option.fontFamily }}
-                      >
-                        あ
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-sm font-black ${isSelected ? 'text-[var(--kt-brand)]' : 'text-[var(--kt-ink-strong)]'}`}
-                          >
-                            {option.name}
-                          </span>
-                          {isSelected ? (
-                            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[var(--kt-brand)] text-[var(--kt-brand-on)]">
-                              <Check size={10} />
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-0.5 line-clamp-2 text-[12px] leading-5 text-[var(--kt-ink-muted)]">
-                          {option.description[language]}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </Field>
-          </SettingsCard>
+        <div className="mt-14 flex flex-col gap-14 xl:flex-row xl:items-start xl:gap-20">
+          <div className="min-w-0 flex-1 space-y-16">
+            <ThemeAtmosphereSelector copy={c} value={themeMode} onChange={onThemeModeChange} />
 
-          {/* LESSON EXPERIENCE */}
-          <SettingsCard
-            icon={<GraduationCap size={18} />}
-            title={c.lesson}
-            description={c.lessonHint}
-          >
-            <ul className="divide-y divide-[var(--kt-border-subtle)]">
-              <ToggleRow
-                icon={<Volume2 size={16} />}
-                label={c.soundLabel}
-                description={c.soundDesc}
-                checked={soundEffects}
-                onChange={setSoundEffects}
-              />
-              <ToggleRow
-                icon={<Wand2 size={16} />}
-                label={c.animationsLabel}
-                description={c.animationsDesc}
-                checked={animations}
-                onChange={setAnimations}
-              />
-              <ToggleRow
-                icon={<Bell size={16} />}
-                label={c.motivationLabel}
-                description={c.motivationDesc}
-                checked={motivationMessages}
-                onChange={setMotivationMessages}
-              />
-              <ToggleRow
-                icon={<Headphones size={16} />}
-                label={c.listeningLabel}
-                description={c.listeningDesc}
-                checked={listeningDrills}
-                onChange={setListeningDrills}
-              />
-            </ul>
-          </SettingsCard>
+            <KanaFontSelector
+              copy={c}
+              language={language}
+              value={kanaFontStyle}
+              onChange={onKanaFontStyleChange}
+            />
 
-          {/* LANGUAGE */}
-          <SettingsCard
-            icon={<Languages size={18} />}
-            title={c.language}
-            description={c.languageHint}
-          >
-            <Segmented
-              value={language}
-              onChange={onLanguageChange}
-              options={[
-                { id: 'tr' as AppLanguage, label: 'Türkçe', icon: Globe2 },
-                { id: 'en' as AppLanguage, label: 'English', icon: Globe2 }
+            <ExperienceToggles
+              copy={c}
+              groups={[
+                {
+                  title: c.soundGroup,
+                  items: [
+                    { icon: Volume2, label: c.soundEffects, checked: soundEffects, onChange: setSoundEffects },
+                    { icon: Music2, label: c.motivationSounds, checked: motivationSounds, onChange: setMotivationSounds },
+                    { icon: Headphones, label: c.listeningDrills, checked: listeningDrills, onChange: setListeningDrills }
+                  ]
+                },
+                {
+                  title: c.motionGroup,
+                  items: [
+                    { icon: Wand2, label: c.animations, checked: animations, onChange: setAnimations },
+                    { icon: Sparkles, label: c.transitions, checked: transitionEffects, onChange: setTransitionEffects }
+                  ]
+                },
+                {
+                  title: c.supportGroup,
+                  items: [
+                    { icon: Bell, label: c.motivationMessages, checked: motivationMessages, onChange: setMotivationMessages }
+                  ]
+                }
               ]}
             />
-          </SettingsCard>
-        </div>
 
-        {/* ============== RIGHT: live preview (sticky) ============== */}
-        <aside className="lg:sticky lg:top-4">
-          <div
-            className="overflow-hidden rounded-[1.25rem] border border-[var(--kt-border-subtle)] p-5"
-            style={{
-              background:
-                'linear-gradient(160deg, color-mix(in srgb, var(--kt-surface) 80%, transparent), color-mix(in srgb, var(--kt-brand-soft) 50%, transparent))'
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--kt-ink-subtle)]">
-                {c.livePreview}
-              </div>
-              <span className="rounded-full bg-[var(--kt-accent-info-soft)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--kt-accent-info)]">
-                {c.current}
-              </span>
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_75%,transparent)] p-5 text-center">
-              <div
-                className="font-jp text-[3.6rem] font-black leading-none text-[var(--kt-ink-strong)]"
-                style={{ fontFamily: selectedFont.fontFamily }}
-              >
-                {selectedFont.preview}
-              </div>
-              <div className="mt-3 text-base font-black text-[var(--kt-ink-strong)]">{selectedFont.name}</div>
-              <p className="mt-1 text-[12px] leading-5 text-[var(--kt-ink-muted)]">
-                {selectedFont.description[language]}
-              </p>
-            </div>
-
-            <dl className="mt-4 divide-y divide-[var(--kt-border-subtle)] text-sm">
-              <PreviewRow icon={<Palette size={14} />} label={c.theme} value={themeMode === 'dark' ? c.themeDark : c.themeLight} />
-              <PreviewRow icon={<Languages size={14} />} label={c.language} value={language === 'tr' ? 'Türkçe' : 'English'} />
-              <PreviewRow icon={<Volume2 size={14} />} label={c.soundLabel} value={soundEffects ? c.on : c.off} tone={soundEffects ? 'on' : 'off'} />
-              <PreviewRow icon={<Wand2 size={14} />} label={c.animationsLabel} value={animations ? c.on : c.off} tone={animations ? 'on' : 'off'} />
-              <PreviewRow icon={<Bell size={14} />} label={c.motivationLabel} value={motivationMessages ? c.on : c.off} tone={motivationMessages ? 'on' : 'off'} />
-              <PreviewRow icon={<Headphones size={14} />} label={c.listeningLabel} value={listeningDrills ? c.on : c.off} tone={listeningDrills ? 'on' : 'off'} />
-            </dl>
+            <LanguageSelector copy={c} value={language} onChange={onLanguageChange} />
           </div>
-        </aside>
+
+          <LiveLessonPreview
+            copy={c}
+            language={language}
+            themeMode={themeMode}
+            selectedFont={selectedFont}
+            soundEffects={soundEffects}
+            animations={animations}
+            motivationMessages={motivationMessages}
+            listeningDrills={listeningDrills}
+          />
+        </div>
       </div>
-    </GamePageShell>
+    </main>
   );
 };
 
-/* ============== local components ============== */
-
-const SettingsCard: React.FC<{
-  icon: React.ReactNode;
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}> = ({ icon, title, description, children }) => (
-  <section className="rounded-[1.25rem] border border-[var(--kt-border-subtle)] bg-[color-mix(in_srgb,var(--kt-surface)_88%,transparent)] p-5 md:p-6">
-    <header className="flex items-start gap-3">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--kt-brand-soft)] text-[var(--kt-brand)]">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <h2 className="text-lg font-black tracking-[-0.01em] text-[var(--kt-ink-strong)] md:text-xl">{title}</h2>
-        {description ? <p className="mt-0.5 text-sm leading-5 text-[var(--kt-ink-muted)]">{description}</p> : null}
-      </div>
-    </header>
-    <div className="mt-5 space-y-5">{children}</div>
-  </section>
-);
-
-const Field: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
-  <div>
-    <div className="flex items-center justify-between">
-      <label className="text-[11px] font-black uppercase tracking-[0.16em] text-[var(--kt-ink-subtle)]">
-        {label}
-      </label>
+const SettingsBackdrop: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+  <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <div className={`absolute inset-0 ${isDark ? 'bg-slate-950/55' : 'bg-rose-50/25'}`} />
+    <div className="absolute inset-0 bg-white/20 [.theme-dark_&]:bg-transparent" />
+    <div className="absolute left-[12%] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-[#f04d72]/14 blur-3xl" />
+    <div className="absolute right-[4%] top-[9rem] h-[28rem] w-[28rem] rounded-full bg-[#f09a20]/12 blur-3xl" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_srgb,var(--kt-ink-strong)_10%,transparent)_1px,transparent_0)] bg-[length:28px_28px] opacity-[0.10]" />
+    <div className="absolute right-[-5rem] top-4 font-jp text-[18rem] font-black leading-none text-[var(--kt-brand)] opacity-[0.045] blur-[1px]">
+      設定
     </div>
-    {hint ? <p className="mb-2 mt-0.5 text-[12px] text-[var(--kt-ink-muted)]">{hint}</p> : <div className="mb-2" />}
-    {children}
   </div>
 );
 
-interface SegmentedOption<T extends string> {
-  id: T;
-  label: React.ReactNode;
-  icon?: React.ElementType;
-}
+const SettingsHeader: React.FC<{ copy: SettingCopy }> = ({ copy }) => (
+  <header className="relative max-w-4xl pt-6">
+    <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-[var(--kt-brand)]">
+      <Palette size={15} />
+      {copy.eyebrow}
+    </div>
+    <h1 className="mt-5 text-5xl font-black leading-[0.96] tracking-tight text-[var(--kt-ink-strong)] sm:text-7xl">
+      {copy.title}
+    </h1>
+    <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--kt-ink-muted)] sm:text-xl">
+      {copy.description}
+    </p>
+  </header>
+);
 
-function Segmented<T extends string>({
-  value,
-  onChange,
-  options
-}: {
-  value: T;
-  onChange: (next: T) => void;
-  options: SegmentedOption<T>[];
-}) {
-  return (
-    <div
-      role="tablist"
-      className="inline-flex w-full max-w-md items-center rounded-full border border-[var(--kt-border-subtle)] bg-[var(--kt-surface-muted)] p-1"
-    >
-      {options.map((option) => {
+const SectionTitle: React.FC<{ title: string; hint?: string }> = ({ title, hint }) => (
+  <div className="mb-6">
+    <h2 className="text-3xl font-black tracking-tight text-[var(--kt-ink-strong)]">{title}</h2>
+    {hint ? <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--kt-ink-muted)]">{hint}</p> : null}
+  </div>
+);
+
+const ThemeAtmosphereSelector: React.FC<{
+  copy: SettingCopy;
+  value: ThemeMode;
+  onChange: (value: ThemeMode) => void;
+}> = ({ copy, value, onChange }) => (
+  <section>
+    <SectionTitle title={copy.themeTitle} />
+    <div className="flex flex-col gap-5 lg:flex-row">
+      {[
+        { id: 'light' as ThemeMode, label: copy.light, description: copy.lightDesc, icon: Sun },
+        { id: 'dark' as ThemeMode, label: copy.dark, description: copy.darkDesc, icon: Moon }
+      ].map((option) => {
+        const selected = value === option.id;
+        const previewDark = option.id === 'dark';
         const Icon = option.icon;
-        const active = option.id === value;
+
         return (
           <button
             key={option.id}
             type="button"
-            role="tab"
-            aria-selected={active}
             onClick={() => onChange(option.id)}
-            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-black transition ${
-              active
-                ? 'bg-[var(--kt-surface)] text-[var(--kt-brand)] shadow-[0_2px_10px_rgba(0,0,0,0.06)]'
-                : 'text-[var(--kt-ink-muted)] hover:text-[var(--kt-ink-strong)]'
+            className={`group relative min-h-56 flex-1 overflow-hidden rounded-[2rem] px-5 py-5 text-left transition duration-300 hover:-translate-y-1 ${
+              selected
+                ? 'shadow-[0_26px_80px_rgba(240,77,114,0.20)]'
+                : 'opacity-78 hover:opacity-100'
             }`}
           >
-            {Icon ? <Icon size={15} /> : null}
+            <span
+              className={`absolute inset-x-6 top-0 h-1 rounded-full transition ${
+                selected ? 'bg-[linear-gradient(90deg,#f04d72,#f09a20)] opacity-100' : 'bg-[var(--kt-border-subtle)] opacity-40'
+              }`}
+            />
+            <span
+              className={`absolute inset-0 -z-10 rounded-[2rem] backdrop-blur-xl ${
+                previewDark
+                  ? 'bg-[linear-gradient(145deg,rgba(20,15,25,0.92),rgba(42,31,47,0.76))]'
+                  : 'bg-[linear-gradient(145deg,rgba(255,251,247,0.82),rgba(255,244,238,0.54))]'
+              }`}
+            />
+
+            <div className={previewDark ? 'text-white' : 'text-[#233244]'}>
+              <div className="flex items-center justify-between">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f04d72]/14 text-[#f04d72]">
+                  <Icon size={20} />
+                </span>
+                {selected ? (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f04d72] text-white">
+                    <Check size={15} />
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-9 max-w-sm">
+                <div className="h-3 w-36 rounded-full bg-current opacity-18" />
+                <div className="mt-3 h-2 w-56 max-w-full rounded-full bg-current opacity-10" />
+                <div className="mt-8 flex items-center gap-3">
+                  <span className="h-11 w-28 rounded-full bg-[#f04d72] shadow-[0_14px_34px_rgba(240,77,114,0.22)]" />
+                  <span className="h-2 w-24 rounded-full bg-current opacity-14" />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <h3 className="text-2xl font-black text-[var(--kt-ink-strong)]">{option.label}</h3>
+              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--kt-ink-muted)]">{option.description}</p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </section>
+);
+
+const KanaFontSelector: React.FC<{
+  copy: SettingCopy;
+  language: AppLanguage;
+  value: KanaFontStyleId;
+  onChange: (value: KanaFontStyleId) => void;
+}> = ({ copy, language, value, onChange }) => (
+  <section>
+    <SectionTitle title={copy.fontTitle} hint={copy.fontHint} />
+    <div className="-mx-5 flex gap-5 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {kanaFontStyles.map((option) => {
+        const selected = value === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            className={`group min-w-[17rem] rounded-[1.8rem] px-5 py-5 text-left transition duration-300 hover:-translate-y-1 ${
+              selected
+                ? 'bg-[rgba(240,77,114,0.10)] shadow-[0_22px_60px_rgba(240,77,114,0.16)]'
+                : 'bg-[rgba(255,255,255,0.28)] opacity-70 backdrop-blur-md hover:opacity-100 [.theme-dark_&]:bg-white/5'
+            }`}
+          >
+            <div
+              className={`text-5xl font-black leading-none transition duration-300 ${
+                selected ? 'text-[var(--kt-brand)]' : 'text-[var(--kt-ink-strong)]'
+              }`}
+              style={{ fontFamily: option.fontFamily }}
+            >
+              {kanaPreview}
+            </div>
+            <div className="mt-5 flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base font-black text-[var(--kt-ink-strong)]">{option.name}</h3>
+                <p className="mt-1 line-clamp-1 text-sm text-[var(--kt-ink-muted)]">{option.description[language]}</p>
+              </div>
+              {selected ? <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--kt-brand)] shadow-[0_0_16px_rgba(240,77,114,0.55)]" /> : null}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </section>
+);
+
+interface ExperienceGroup {
+  title: string;
+  items: {
+    icon: React.ElementType;
+    label: string;
+    checked: boolean;
+    onChange: (next: boolean) => void;
+  }[];
+}
+
+const ExperienceToggles: React.FC<{ copy: SettingCopy; groups: ExperienceGroup[] }> = ({ copy, groups }) => (
+  <section>
+    <SectionTitle title={copy.experienceTitle} />
+    <div className="flex flex-col gap-10 lg:flex-row">
+      {groups.map((group) => (
+        <div key={group.title} className="flex-1">
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[var(--kt-brand)]">{group.title}</h3>
+          <div className="mt-5 space-y-5">
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.label} className="flex items-center justify-between gap-5 border-t border-[var(--kt-border-subtle)] pt-5">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Icon size={19} className="shrink-0 text-[var(--kt-ink-subtle)]" />
+                    <span className="text-base font-bold text-[var(--kt-ink-strong)]">{item.label}</span>
+                  </div>
+                  <SoftToggle checked={item.checked} onChange={item.onChange} label={item.label} onLabel={copy.on} offLabel={copy.off} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const SoftToggle: React.FC<{
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  label: string;
+  onLabel: string;
+  offLabel: string;
+}> = ({ checked, onChange, label, onLabel, offLabel }) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    aria-label={label}
+    onClick={() => onChange(!checked)}
+    className="group inline-flex min-w-[6.25rem] items-center justify-end gap-3 text-sm font-black text-[var(--kt-ink-muted)]"
+  >
+    <span className={checked ? 'text-[var(--kt-brand)]' : 'text-[var(--kt-ink-subtle)]'}>{checked ? onLabel : offLabel}</span>
+    <span
+      className={`relative h-7 w-12 rounded-full p-1 transition duration-200 ${
+        checked ? 'bg-[#f04d72] shadow-[0_0_20px_rgba(240,77,114,0.22)]' : 'bg-[var(--kt-progress-track)]'
+      }`}
+    >
+      <span className={`block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+    </span>
+  </button>
+);
+
+const LanguageSelector: React.FC<{
+  copy: SettingCopy;
+  value: AppLanguage;
+  onChange: (value: AppLanguage) => void;
+}> = ({ copy, value, onChange }) => (
+  <section>
+    <SectionTitle title={copy.languageTitle} />
+    <div className="flex flex-wrap gap-3">
+      {[
+        { id: 'tr' as AppLanguage, label: 'TR' },
+        { id: 'en' as AppLanguage, label: 'EN' }
+      ].map((option) => {
+        const selected = value === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            className={`min-h-12 rounded-full px-7 text-sm font-black transition duration-200 ${
+              selected
+                ? 'bg-[#f04d72] text-white shadow-[0_16px_36px_rgba(240,77,114,0.22)]'
+                : 'bg-[rgba(255,255,255,0.36)] text-[var(--kt-ink-muted)] backdrop-blur-md hover:text-[var(--kt-ink-strong)] [.theme-dark_&]:bg-white/6'
+            }`}
+          >
             {option.label}
           </button>
         );
       })}
     </div>
-  );
-}
-
-const ToggleRow: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-  checked: boolean;
-  onChange: (next: boolean) => void;
-}> = ({ icon, label, description, checked, onChange }) => (
-  <li className="flex items-center justify-between gap-4 py-3.5 first:pt-1 last:pb-1">
-    <div className="flex min-w-0 items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--kt-surface-muted)] text-[var(--kt-ink-muted)]">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <div className="text-[15px] font-black text-[var(--kt-ink-strong)]">{label}</div>
-        <div className="mt-0.5 text-[12px] leading-5 text-[var(--kt-ink-muted)]">{description}</div>
-      </div>
-    </div>
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={() => onChange(!checked)}
-      className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-        checked ? 'bg-[var(--kt-brand)]' : 'bg-[var(--kt-surface-sunken)]'
-      }`}
-    >
-      <span
-        className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-all ${
-          checked ? 'left-6' : 'left-1'
-        }`}
-      />
-    </button>
-  </li>
+  </section>
 );
 
-const PreviewRow: React.FC<{ icon: React.ReactNode; label: string; value: string; tone?: 'on' | 'off' }> = ({
-  icon,
-  label,
-  value,
-  tone
-}) => {
-  const valueClass =
-    tone === 'on'
-      ? 'text-[var(--kt-accent-success)]'
-      : tone === 'off'
-        ? 'text-[var(--kt-ink-subtle)]'
-        : 'text-[var(--kt-ink-strong)]';
+const LiveLessonPreview: React.FC<{
+  copy: SettingCopy;
+  language: AppLanguage;
+  themeMode: ThemeMode;
+  selectedFont: KanaFontStyle;
+  soundEffects: boolean;
+  animations: boolean;
+  motivationMessages: boolean;
+  listeningDrills: boolean;
+}> = ({ copy, language, themeMode, selectedFont, soundEffects, animations, motivationMessages, listeningDrills }) => {
+  const previewDark = themeMode === 'dark';
+  const activePills = [
+    soundEffects ? copy.soundEffects : null,
+    listeningDrills ? copy.listeningDrills : null,
+    motivationMessages ? '+12 XP' : null,
+    language.toUpperCase()
+  ].filter(Boolean);
+
   return (
-    <div className="flex items-center justify-between py-2.5">
-      <dt className="flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.12em] text-[var(--kt-ink-muted)]">
-        <span className="text-[var(--kt-ink-subtle)]">{icon}</span>
-        {label}
-      </dt>
-      <dd className={`text-sm font-black tabular-nums ${valueClass}`}>{value}</dd>
-    </div>
+    <aside className="w-full shrink-0 xl:sticky xl:top-28 xl:w-[26rem]">
+      <div className="text-xs font-black uppercase tracking-[0.22em] text-[var(--kt-brand)]">{copy.previewTitle}</div>
+      <div
+        className={`relative mt-6 overflow-hidden rounded-[2.4rem] px-7 py-8 shadow-[0_28px_100px_rgba(208,96,112,0.16)] backdrop-blur-2xl ${
+          previewDark
+            ? 'bg-[linear-gradient(145deg,rgba(18,13,24,0.88),rgba(42,31,48,0.72))] text-white'
+            : 'bg-[linear-gradient(145deg,rgba(255,252,248,0.72),rgba(255,241,232,0.46))] text-[#1f2b3b]'
+        }`}
+      >
+        <div className="pointer-events-none absolute -right-10 -top-10 font-jp text-[9rem] font-black text-[#f04d72]/10" aria-hidden="true">
+          問
+        </div>
+        <div className="relative">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-[11px] font-black uppercase tracking-[0.18em] opacity-50">{copy.previewTask}</span>
+            {motivationMessages ? <span className="rounded-full bg-[#f04d72]/14 px-3 py-1 text-xs font-black text-[#f04d72]">+12 XP</span> : null}
+          </div>
+
+          <div
+            className={`mx-auto mt-10 flex h-36 w-36 items-center justify-center rounded-full text-7xl font-black ${
+              previewDark ? 'bg-white/8 text-white' : 'bg-white/48 text-[#1f2b3b]'
+            } ${animations ? 'transition duration-300 hover:scale-105' : ''}`}
+            style={{ fontFamily: selectedFont.fontFamily }}
+          >
+            あ
+          </div>
+
+          <p className="mx-auto mt-7 max-w-xs text-center text-base font-semibold leading-7 opacity-72">{copy.previewQuestion}</p>
+          <button
+            type="button"
+            className="mt-7 flex min-h-12 w-full items-center justify-center rounded-full bg-[#f04d72] text-sm font-black text-white shadow-[0_18px_42px_rgba(240,77,114,0.28)] transition hover:scale-[1.02]"
+          >
+            {copy.answer}
+          </button>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            {activePills.map((pill) => (
+              <span key={pill} className="rounded-full bg-current/8 px-3 py-1 text-[11px] font-black opacity-70">
+                {pill}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </aside>
   );
 };
