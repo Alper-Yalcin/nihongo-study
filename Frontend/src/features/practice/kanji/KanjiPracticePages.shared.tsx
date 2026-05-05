@@ -217,6 +217,7 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const [combo, setCombo] = useState(0);
+  const [selectedChip, setSelectedChip] = useState(0);
 
   const current = round[index] ?? null;
   const complete = round.length > 0 && index >= round.length;
@@ -378,16 +379,18 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
           {/* Preview chips */}
           <div className="mt-5 flex flex-wrap justify-center gap-2">
             {items.slice(0, 5).map((item, i) => (
-              <div
+              <button
                 key={item.char}
+                type="button"
+                onClick={() => setSelectedChip(i)}
                 className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
-                  i === 0
+                  i === selectedChip
                     ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 hover:bg-[#d06070]/10 hover:text-[#d06070] [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc]'
                     : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 hover:bg-white/24 hover:text-[#2b2422]/60 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55'
                 }`}
               >
                 {item.char}
-              </div>
+              </button>
             ))}
           </div>
         </main>
