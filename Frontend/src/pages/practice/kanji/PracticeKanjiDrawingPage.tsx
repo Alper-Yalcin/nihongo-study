@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   recordCorrect,
-  recordWrong,
   getFeedbackState,
   subscribeFeedback
 } from '../../../hooks/useFeedback';
@@ -14,6 +13,31 @@ import {
   writeKanjiProgress,
   shuffle
 } from '../../../features/practice/kanji/KanjiPracticePages.shared';
+import { DrawingPracticePad, DrawingPracticePadRef } from '../../../components/DrawingPracticePad';
+import { Stroke } from '../../../utils/DrawingEvaluator';
+
+const getStrokeLength = (stroke: Stroke) => {
+  let total = 0;
+  for (let index = 1; index < stroke.length; index += 1) {
+    const left = stroke[index - 1];
+    const right = stroke[index];
+    total += Math.hypot(left.x - right.x, left.y - right.y);
+  }
+  return total;
+};
+
+const hasMeaningfulDrawing = (strokes: Stroke[]) => {
+  const points = strokes.flat();
+  if (points.length < 4) return false;
+
+  const length = strokes.reduce((sum, stroke) => sum + getStrokeLength(stroke), 0);
+  const xs = points.map((point) => point.x);
+  const ys = points.map((point) => point.y);
+  const width = Math.max(...xs) - Math.min(...xs);
+  const height = Math.max(...ys) - Math.min(...ys);
+
+  return length >= 80 && width >= 28 && height >= 28;
+};
 
 const computeStreak = (): number => {
   const grid = getHeatGrid(60);
@@ -72,6 +96,7 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [hanabira, setHanabira] = useState(() => getFeedbackState().hanabira);
+  const drawingPadRef = useRef<DrawingPracticePadRef>(null);
   const streak = useMemo(() => computeStreak(), []);
 
   const current = round[index] ?? null;
@@ -113,17 +138,23 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
     setRevealed(false);
   };
 
-  const handleResult = (correct: boolean) => {
+  const advanceAfterReveal = () => {
+    window.setTimeout(() => {
+      setIndex((v) => v + 1);
+      setRevealed(false);
+    }, 900);
+  };
+
+  const handleReveal = () => {
     if (!current) return;
+    const correct = hasMeaningfulDrawing(drawingPadRef.current?.getStrokes() ?? []);
+    setRevealed(true);
     setProgress((prev) => ({ ...prev, [current.char]: correct ? 'known' : 'review' }));
     if (correct) {
       recordCorrect();
       markPracticedToday();
-    } else {
-      recordWrong();
     }
-    setIndex((v) => v + 1);
-    setRevealed(false);
+    advanceAfterReveal();
   };
 
   /* ── Completion ── */
@@ -248,9 +279,7 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
         {/* Canvas placeholder — dark mode: no white bg, just a thin border */}
         <div className="relative flex h-56 w-56 items-center justify-center rounded-2xl border border-[#2b2422]/8 bg-white/16 transition-colors duration-200 [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-transparent">
           {!revealed ? (
-            <span className="select-none text-[9px] uppercase tracking-[0.35em] text-[#2b2422]/18 [.theme-dark_&]:text-white/22">
-              Draw here
-            </span>
+            <DrawingPracticePad ref={drawingPadRef} resetKey={`kanji-${current?.char ?? 'empty'}-${index}`} />
           ) : (
             <div
               className="select-none font-serif text-[7rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
@@ -265,26 +294,13 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
         <div className="flex h-12 items-center justify-center">
           {!revealed ? (
             <button
-              onClick={() => setRevealed(true)}
+              onClick={handleReveal}
               className="rounded-full border border-[#2b2422]/12 bg-white/15 px-10 py-3 text-sm font-medium uppercase tracking-[0.22em] text-[#2b2422]/40 transition-all duration-150 ease-out hover:bg-white/28 hover:text-[#2b2422]/60 active:scale-[0.98] [.theme-dark_&]:border-white/14 [.theme-dark_&]:bg-white/6 [.theme-dark_&]:text-white/45 [.theme-dark_&]:hover:bg-white/10 [.theme-dark_&]:hover:text-white/65"
             >
               Reveal
             </button>
           ) : (
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleResult(false)}
-                className="rounded-full border border-[#2b2422]/8 bg-white/12 px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-[#2b2422]/36 transition-all duration-150 ease-out hover:bg-white/24 hover:text-[#2b2422]/55 active:scale-[0.98] [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/6 [.theme-dark_&]:text-white/42 [.theme-dark_&]:hover:bg-white/10 [.theme-dark_&]:hover:text-white/60"
-              >
-                Missed
-              </button>
-              <button
-                onClick={() => handleResult(true)}
-                className="rounded-full bg-[#d06070] px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white transition-all duration-200 ease-out hover:opacity-90 hover:scale-[1.025] active:scale-[0.98]"
-              >
-                Nailed it
-              </button>
-            </div>
+            null
           )}
         </div>
       </main>

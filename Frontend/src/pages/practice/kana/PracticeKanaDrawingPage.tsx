@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
 import { getNhkKanaGuideImageSrc } from '../../../data/nhkKanaGuideImages';
@@ -11,8 +11,11 @@ import {
   getWeakKanaProgressEntries
 } from '../../../features/kana/review/reviewSelectors';
 import { getKanaItemById } from '../../../features/kana/data/kanaInventory';
-import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
+import { recordCorrect } from '../../../hooks/useFeedback';
 import { markPracticedToday } from '../../../features/streak/tomoshibi';
+import { DrawingPracticePad, DrawingPracticePadRef } from '../../../components/DrawingPracticePad';
+import { evaluateDrawing } from '../../../utils/DrawingEvaluator';
+import { Character } from '../../../types';
 
 interface PracticeKanaDrawingPageProps {
   language: AppLanguage;
@@ -106,6 +109,7 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [selectedChip, setSelectedChip] = useState(0);
+  const drawingPadRef = useRef<DrawingPracticePadRef>(null);
 
   const { listByScript, summaries } = useKanaProgressStore();
   const progressEntries = listByScript(script);
@@ -140,6 +144,14 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
 
   const goBack = () => { setRound([]); setSessionType(null); };
 
+  const toCharacter = (item: KanaItem): Character => ({
+    id: item.id,
+    symbol: item.char,
+    label: item.romaji[0] ?? '',
+    type: item.type,
+    drawingData: item.drawingMetadata
+  });
+
   const setScript = (next: KanaScript) => {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set('script', next);
@@ -167,16 +179,24 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
     setSessionType(type);
   };
 
-  const handleResult = (correct: boolean) => {
+  const advanceAfterReveal = () => {
+    window.setTimeout(() => {
+      setIndex((v) => v + 1);
+      setRevealed(false);
+    }, 900);
+  };
+
+  const handleReveal = () => {
     if (!current) return;
+    const strokes = drawingPadRef.current?.getStrokes() ?? [];
+    const correct = evaluateDrawing(strokes, toCharacter(current), { tolerance: 'practice' });
+    setRevealed(true);
+
     if (correct) {
       recordCorrect();
       markPracticedToday();
-    } else {
-      recordWrong();
     }
-    setIndex((v) => v + 1);
-    setRevealed(false);
+    advanceAfterReveal();
   };
 
   /* ── Completion ── */
@@ -230,9 +250,7 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
 
           <div className="relative flex h-56 w-56 items-center justify-center rounded-2xl border border-[#2b2422]/8 bg-white/16 transition-colors duration-200 [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-transparent">
             {!revealed ? (
-              <span className="select-none text-[9px] uppercase tracking-[0.35em] text-[#2b2422]/18 [.theme-dark_&]:text-white/22">
-                Draw here
-              </span>
+              <DrawingPracticePad ref={drawingPadRef} resetKey={`kana-${current?.id ?? 'empty'}-${index}`} />
             ) : (
               <div
                 className="select-none font-serif text-[7rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
@@ -246,26 +264,13 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
           <div className="flex h-12 items-center justify-center">
             {!revealed ? (
               <button
-                onClick={() => setRevealed(true)}
+                onClick={handleReveal}
                 className="rounded-full border border-[#2b2422]/12 bg-white/15 px-10 py-3 text-sm font-medium uppercase tracking-[0.22em] text-[#2b2422]/40 transition-all duration-150 ease-out hover:bg-white/28 hover:text-[#2b2422]/60 active:scale-[0.98] [.theme-dark_&]:border-white/14 [.theme-dark_&]:bg-white/6 [.theme-dark_&]:text-white/45 [.theme-dark_&]:hover:bg-white/10 [.theme-dark_&]:hover:text-white/65"
               >
                 Reveal
               </button>
             ) : (
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleResult(false)}
-                  className="rounded-full border border-[#2b2422]/8 bg-white/12 px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-[#2b2422]/36 transition-all duration-150 ease-out hover:bg-white/24 hover:text-[#2b2422]/55 active:scale-[0.98] [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/6 [.theme-dark_&]:text-white/42 [.theme-dark_&]:hover:bg-white/10 [.theme-dark_&]:hover:text-white/60"
-                >
-                  Missed
-                </button>
-                <button
-                  onClick={() => handleResult(true)}
-                  className="rounded-full bg-[#d06070] px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white transition-all duration-200 ease-out hover:opacity-90 hover:scale-[1.025] active:scale-[0.98]"
-                >
-                  Nailed it
-                </button>
-              </div>
+              null
             )}
           </div>
         </main>
