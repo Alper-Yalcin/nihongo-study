@@ -25,6 +25,7 @@ import { buildKanaRoadmapTrack, getTrackLessonOrder } from '../../features/study
 import { useStudyRoadmapStore } from '../../features/study-roadmap/progress/useStudyRoadmapStore';
 import { getHeatGrid, tomoshibiVisual } from '../../features/streak/tomoshibi';
 import { getJLearnUserState, subscribeJLearnUserState } from '../../features/jlearn/debug/debugStore';
+import { BackgroundScene } from '../../components/layout';
 
 interface ProfilePageProps {
   language: AppLanguage;
@@ -257,55 +258,46 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ language }) => {
   ];
 
   return (
-    <main className="relative min-h-[calc(100vh-92px)] overflow-x-clip px-5 pb-24 pt-12 text-[var(--kt-ink-strong)] sm:px-8 lg:px-12">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <div className="absolute inset-0 bg-rose-50/25 [.theme-dark_&]:bg-slate-950/55" />
-        <div className="absolute inset-0 bg-white/20 [.theme-dark_&]:bg-transparent" />
-        <div className="absolute left-1/2 top-8 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-[var(--kt-brand-soft)] opacity-30 blur-3xl" />
-        <div className="absolute right-[8%] top-[18rem] h-[26rem] w-[26rem] rounded-full bg-[var(--kt-dan-gold-soft)] opacity-30 blur-3xl" />
-        <div className="absolute -right-16 top-12 font-jp text-[18rem] font-black leading-none text-[var(--kt-brand)] opacity-[0.035] blur-[1px]">
-          道
+    <main className="relative min-h-[calc(100vh-92px)] overflow-x-hidden text-[var(--kt-ink-strong)]">
+      <BackgroundScene />
+
+      <div className="relative z-10 px-4 pb-24 pt-10 sm:px-6 lg:px-10">
+        <div className="mx-auto w-full max-w-[1180px]">
+          <IdentitySection
+            text={text}
+            name={profileName}
+            title={profileTitle}
+            photo={profilePhoto}
+            onNameChange={setProfileName}
+            onTitleChange={setProfileTitle}
+            onPhotoChange={setProfilePhoto}
+            danLabel={cleanDisplayLabel(dan.label)}
+            danRank={cleanDisplayLabel(dan.rank)}
+            xp={feedbackState.hanabira}
+            xpPercent={danProgress.percent}
+            nextLabel={cleanDisplayLabel(danProgress.nextLabel)}
+            initials={initialsFromName(profileName)}
+            streakDays={streakDays}
+            tomoshibiGlow={tomoshibi.glow}
+            tomoshibiHaloColor={tomoshibi.haloColor}
+          />
+
+          <ProgressLine title={text.progressTitle} stats={stats} />
+
+          <ActivityFlow title={text.heatmapTitle} description={text.heatmapText} />
+
+          <LearningJourney title={text.journeyTitle} tracks={tracks} />
+
+          <Achievements title={text.achievementsTitle} emptyTitle={text.noBadgesTitle} emptyText={text.noBadgesText} badges={badges} />
+
+          <ActivityTimeline
+            title={text.recentTitle}
+            emptyTitle={text.noActivityTitle}
+            emptyText={text.noActivityText}
+            runs={playStore.runs.slice(0, 6)}
+            text={text}
+          />
         </div>
-        <div className="absolute bottom-12 left-[-5rem] font-jp text-[16rem] font-black leading-none text-[var(--kt-dan-gold)] opacity-[0.045] blur-[1px]">
-          学
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-[1520px]">
-        <IdentitySection
-          text={text}
-          name={profileName}
-          title={profileTitle}
-          photo={profilePhoto}
-          onNameChange={setProfileName}
-          onTitleChange={setProfileTitle}
-          onPhotoChange={setProfilePhoto}
-          danLabel={cleanDisplayLabel(dan.label)}
-          danRank={cleanDisplayLabel(dan.rank)}
-          xp={feedbackState.hanabira}
-          xpPercent={danProgress.percent}
-          nextLabel={cleanDisplayLabel(danProgress.nextLabel)}
-          initials={initialsFromName(profileName)}
-          streakDays={streakDays}
-          tomoshibiGlow={tomoshibi.glow}
-          tomoshibiHaloColor={tomoshibi.haloColor}
-        />
-
-        <ProgressLine title={text.progressTitle} stats={stats} />
-
-        <ActivityFlow title={text.heatmapTitle} description={text.heatmapText} />
-
-        <LearningJourney title={text.journeyTitle} tracks={tracks} />
-
-        <Achievements title={text.achievementsTitle} emptyTitle={text.noBadgesTitle} emptyText={text.noBadgesText} badges={badges} />
-
-        <ActivityTimeline
-          title={text.recentTitle}
-          emptyTitle={text.noActivityTitle}
-          emptyText={text.noActivityText}
-          runs={playStore.runs.slice(0, 6)}
-          text={text}
-        />
       </div>
     </main>
   );

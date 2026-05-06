@@ -1,4 +1,5 @@
 export { AppShell } from './AppShell';
+export { BackgroundScene } from './BackgroundScene';
 export { DailyQuestsCard } from './DailyQuestsCard';
 export { GamePageShell } from './GamePageShell';
 export { SceneHeader } from './SceneHeader';

@@ -14,6 +14,7 @@ import {
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
 import { kanaFontStyles, KanaFontStyle, KanaFontStyleId } from '../../data/kanaFontStyles';
 import { usePersistentState } from '../../hooks/usePersistentState';
+import { BackgroundScene } from '../../components/layout';
 
 interface SettingsProps {
   language: AppLanguage;
@@ -105,7 +106,6 @@ export const Settings: React.FC<SettingsProps> = ({
   onLanguageChange
 }) => {
   const c = copy[language];
-  const isDark = themeMode === 'dark';
   const [soundEffects, setSoundEffects] = usePersistentState<boolean>(SOUND_KEY, true);
   const [motivationSounds, setMotivationSounds] = usePersistentState<boolean>(MOTIVATION_SOUND_KEY, true);
   const [animations, setAnimations] = usePersistentState<boolean>(ANIMATION_KEY, true);
@@ -115,81 +115,70 @@ export const Settings: React.FC<SettingsProps> = ({
   const selectedFont = kanaFontStyles.find((option) => option.id === kanaFontStyle) ?? kanaFontStyles[0];
 
   return (
-    <main className="relative min-h-[calc(100vh-92px)] overflow-x-hidden px-5 pb-24 pt-12 text-[var(--kt-ink-strong)] sm:px-8 lg:px-12">
-      <SettingsBackdrop isDark={isDark} />
+    <main className="relative min-h-[calc(100vh-92px)] overflow-x-hidden text-[var(--kt-ink-strong)]">
+      <BackgroundScene />
 
-      <div className="relative mx-auto w-full max-w-[1520px]">
-        <SettingsHeader copy={c} />
+      <div className="relative z-10 px-4 pb-24 pt-10 sm:px-6 lg:px-10">
+        <div className="mx-auto w-full max-w-[1280px]">
+          <SettingsHeader copy={c} />
 
-        <div className="mt-14 flex flex-col gap-14 xl:flex-row xl:items-start xl:gap-20">
-          <div className="min-w-0 flex-1 space-y-16">
-            <ThemeAtmosphereSelector copy={c} value={themeMode} onChange={onThemeModeChange} />
+          <div className="mt-14 flex flex-col gap-14 xl:flex-row xl:items-start xl:gap-20">
+            <div className="min-w-0 flex-1 space-y-16">
+              <ThemeAtmosphereSelector copy={c} value={themeMode} onChange={onThemeModeChange} />
 
-            <KanaFontSelector
+              <KanaFontSelector
+                copy={c}
+                language={language}
+                value={kanaFontStyle}
+                onChange={onKanaFontStyleChange}
+              />
+
+              <ExperienceToggles
+                copy={c}
+                groups={[
+                  {
+                    title: c.soundGroup,
+                    items: [
+                      { icon: Volume2, label: c.soundEffects, checked: soundEffects, onChange: setSoundEffects },
+                      { icon: Music2, label: c.motivationSounds, checked: motivationSounds, onChange: setMotivationSounds },
+                      { icon: Headphones, label: c.listeningDrills, checked: listeningDrills, onChange: setListeningDrills }
+                    ]
+                  },
+                  {
+                    title: c.motionGroup,
+                    items: [
+                      { icon: Wand2, label: c.animations, checked: animations, onChange: setAnimations },
+                      { icon: Sparkles, label: c.transitions, checked: transitionEffects, onChange: setTransitionEffects }
+                    ]
+                  },
+                  {
+                    title: c.supportGroup,
+                    items: [
+                      { icon: Bell, label: c.motivationMessages, checked: motivationMessages, onChange: setMotivationMessages }
+                    ]
+                  }
+                ]}
+              />
+
+              <LanguageSelector copy={c} value={language} onChange={onLanguageChange} />
+            </div>
+
+            <LiveLessonPreview
               copy={c}
               language={language}
-              value={kanaFontStyle}
-              onChange={onKanaFontStyleChange}
+              themeMode={themeMode}
+              selectedFont={selectedFont}
+              soundEffects={soundEffects}
+              animations={animations}
+              motivationMessages={motivationMessages}
+              listeningDrills={listeningDrills}
             />
-
-            <ExperienceToggles
-              copy={c}
-              groups={[
-                {
-                  title: c.soundGroup,
-                  items: [
-                    { icon: Volume2, label: c.soundEffects, checked: soundEffects, onChange: setSoundEffects },
-                    { icon: Music2, label: c.motivationSounds, checked: motivationSounds, onChange: setMotivationSounds },
-                    { icon: Headphones, label: c.listeningDrills, checked: listeningDrills, onChange: setListeningDrills }
-                  ]
-                },
-                {
-                  title: c.motionGroup,
-                  items: [
-                    { icon: Wand2, label: c.animations, checked: animations, onChange: setAnimations },
-                    { icon: Sparkles, label: c.transitions, checked: transitionEffects, onChange: setTransitionEffects }
-                  ]
-                },
-                {
-                  title: c.supportGroup,
-                  items: [
-                    { icon: Bell, label: c.motivationMessages, checked: motivationMessages, onChange: setMotivationMessages }
-                  ]
-                }
-              ]}
-            />
-
-            <LanguageSelector copy={c} value={language} onChange={onLanguageChange} />
           </div>
-
-          <LiveLessonPreview
-            copy={c}
-            language={language}
-            themeMode={themeMode}
-            selectedFont={selectedFont}
-            soundEffects={soundEffects}
-            animations={animations}
-            motivationMessages={motivationMessages}
-            listeningDrills={listeningDrills}
-          />
         </div>
       </div>
     </main>
   );
 };
-
-const SettingsBackdrop: React.FC<{ isDark: boolean }> = ({ isDark }) => (
-  <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-    <div className={`absolute inset-0 ${isDark ? 'bg-slate-950/55' : 'bg-rose-50/25'}`} />
-    <div className="absolute inset-0 bg-white/20 [.theme-dark_&]:bg-transparent" />
-    <div className="absolute left-[12%] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-[#f04d72]/14 blur-3xl" />
-    <div className="absolute right-[4%] top-[9rem] h-[28rem] w-[28rem] rounded-full bg-[#f09a20]/12 blur-3xl" />
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_srgb,var(--kt-ink-strong)_10%,transparent)_1px,transparent_0)] bg-[length:28px_28px] opacity-[0.10]" />
-    <div className="absolute right-[-5rem] top-4 font-jp text-[18rem] font-black leading-none text-[var(--kt-brand)] opacity-[0.045] blur-[1px]">
-      設定
-    </div>
-  </div>
-);
 
 const SettingsHeader: React.FC<{ copy: SettingCopy }> = ({ copy }) => (
   <header className="relative max-w-4xl pt-6">
