@@ -320,7 +320,7 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
   /* ── Active round ── */
   if (rounds.length > 0) {
     return (
-      <div className={SCENE_SCROLL}>
+      <div className={SCENE_CENTER}>
         <div className={OVERLAY} />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_50%_46%,rgba(253,250,248,0.5)_0%,transparent_100%)] [.theme-dark_&]:opacity-0" />
         <div className={DM_CHAR_HALO} />
@@ -335,7 +335,7 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
           <span className={remainingSeconds <= 10 ? 'text-[#c24f69]/70' : ''}>{remainingSeconds}s</span>
         </div>
 
-        <main className="relative z-10 flex w-full max-w-sm flex-col items-center gap-8 px-4 pt-20 pb-16 text-center">
+        <main className="relative z-10 flex w-full max-w-sm flex-col items-center gap-8 px-4 text-center">
 
           {/* Prompt */}
           {current?.type === 'romaji' && (
