@@ -217,7 +217,18 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const [combo, setCombo] = useState(0);
-  const [selectedChip, setSelectedChip] = useState(0);
+  const [subMode, setSubMode] = useState<0 | 1>(0);
+
+  const subModeLabels: Record<KanjiMode, [string, string]> = {
+    drawing:   ['なぞる', '書く'],
+    reading:   ['文字', '音声'],
+    listening: ['文字', '意味'],
+    writing:   ['黙', '音声'],
+    usage:     ['文字', '意味'],
+    challenge: ['混合', '視覚'],
+    match:     ['文字', '意味'],
+    pop:       ['意味', '読み'],
+  };
 
   const current = round[index] ?? null;
   const complete = round.length > 0 && index >= round.length;
@@ -227,6 +238,13 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
   const reviewCount = Object.values(progress).filter((v) => v === 'review').length;
 
   useEffect(() => { writeKanjiProgress(progress); }, [progress]);
+
+  useEffect(() => {
+    if (round.length === 0 || subMode !== 1) return;
+    if (mode !== 'reading' && mode !== 'writing') return;
+    const item = round[index];
+    if (item) speakJapanese(item.readings[0] ?? item.char);
+  }, [index, round.length, subMode]);
 
   const startRound = () => {
     const reviewChars = new Set(
@@ -376,20 +394,20 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
             <span>{c.review} {reviewCount}</span>
           </div>
 
-          {/* Preview chips */}
+          {/* Mode buttons */}
           <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {items.slice(0, 5).map((item, i) => (
+            {([0, 1] as const).map((sm) => (
               <button
-                key={item.char}
+                key={sm}
                 type="button"
-                onClick={() => setSelectedChip(i)}
+                onClick={() => setSubMode(sm)}
                 className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
-                  i === selectedChip
+                  subMode === sm
                     ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 hover:bg-[#d06070]/10 hover:text-[#d06070] [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc]'
                     : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 hover:bg-white/24 hover:text-[#2b2422]/60 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55'
                 }`}
               >
-                {item.char}
+                {subModeLabels[mode][sm]}
               </button>
             ))}
           </div>
@@ -439,13 +457,15 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
 
         {(mode === 'usage' || mode === 'challenge' || mode === 'match') && current && (
           <div>
-            <div
-              className="select-none font-serif text-[6rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
-              style={{ textShadow: '0 2px 20px rgba(43,36,34,0.09)' }}
-            >
-              {current.char}
-            </div>
-            <div className="mt-3 text-lg font-light tracking-widest text-[#2b2422]/60 [.theme-dark_&]:text-white/60">
+            {!(mode === 'challenge' && subMode === 1) && (
+              <div
+                className="select-none font-serif text-[6rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
+                style={{ textShadow: '0 2px 20px rgba(43,36,34,0.09)' }}
+              >
+                {current.char}
+              </div>
+            )}
+            <div className={`text-lg font-light tracking-widest text-[#2b2422]/60 [.theme-dark_&]:text-white/60 ${!(mode === 'challenge' && subMode === 1) ? 'mt-3' : ''}`}>
               {current.meanings[0] ?? '—'}
             </div>
           </div>
@@ -454,10 +474,10 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
         {showMeaningCue && current && (
           <div>
             <div className="mb-2.5 text-[9px] font-medium uppercase tracking-[0.42em] text-[#d06070]/70">
-              {c.meaning}
+              {mode === 'pop' && subMode === 1 ? 'Reading' : c.meaning}
             </div>
             <div className="text-2xl font-light tracking-widest text-[#2b2422]/85 [.theme-dark_&]:text-white/80">
-              {current.meanings[0] ?? '—'}
+              {mode === 'pop' && subMode === 1 ? (current.readings[0] ?? '—') : (current.meanings[0] ?? '—')}
             </div>
           </div>
         )}
@@ -475,7 +495,11 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
                   type="button"
                   disabled={checked !== null}
                   onClick={() => choose(choice)}
-                  className={`min-h-[4.5rem] rounded-2xl border font-serif text-3xl transition-all duration-150 ease-out ${
+                  className={`min-h-[4.5rem] rounded-2xl border transition-all duration-150 ease-out ${
+                    subMode === 1 && (mode === 'listening' || mode === 'usage' || mode === 'match')
+                      ? 'px-2 text-sm font-light tracking-wide'
+                      : 'font-serif text-3xl'
+                  } ${
                     showOk
                       ? 'border-[#8d5965]/30 bg-[#8d5965]/8 text-[#8d5965]'
                       : showBad
@@ -483,7 +507,9 @@ const PracticeKanjiPage: React.FC<PracticeKanjiPageProps & { mode: KanjiMode }> 
                         : 'border-[#2b2422]/8 bg-white/14 text-[#2b2422]/80 hover:bg-white/24 hover:scale-[1.03] active:scale-[0.98] [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/75 [.theme-dark_&]:hover:bg-white/14'
                   }`}
                 >
-                  {choice.char}
+                  {subMode === 1 && (mode === 'listening' || mode === 'usage' || mode === 'match')
+                    ? (choice.meanings[0] ?? choice.char)
+                    : choice.char}
                 </button>
               );
             })}

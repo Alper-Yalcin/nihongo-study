@@ -21,6 +21,7 @@ interface PracticeKanaPopPageProps {
 }
 
 type PopPromptType = 'romaji' | 'audio';
+type PopMode = 'timed' | 'free';
 
 interface PopRound {
   id: string;
@@ -50,6 +51,8 @@ const strings = {
     subtitle: 'İpucundan doğru kanayi bul',
     timeUp: 'Süre bitti',
     bestCombo: 'En iyi kombo',
+    modeTimed: '速',
+    modeFree: '自由',
   },
   en: {
     hiragana: 'Hiragana',
@@ -68,6 +71,8 @@ const strings = {
     subtitle: 'Find the correct kana fast',
     timeUp: 'Time up',
     bestCombo: 'Best combo',
+    modeTimed: '速',
+    modeFree: '自由',
   }
 } as const;
 
@@ -176,7 +181,7 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
   const [remainingSeconds, setRemainingSeconds] = useState(TIME_LIMIT_SECONDS);
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [selectedChip, setSelectedChip] = useState(0);
+  const [popMode, setPopMode] = useState<PopMode>('timed');
 
   const current = rounds[index] ?? null;
 
@@ -210,7 +215,6 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
     setBestCombo(0);
     setRemainingSeconds(TIME_LIMIT_SECONDS);
     setIsComplete(false);
-    setSelectedChip(0);
   };
 
   const setScript = (next: KanaScript) => {
@@ -231,7 +235,7 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
       choices: buildChoices(item, inventory)
     })));
     resetState();
-    setIsRunning(true);
+    setIsRunning(popMode === 'timed');
   };
 
   const answer = (choice: KanaItem) => {
@@ -331,8 +335,12 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
           <span>{correctCount} {c.correct.toLowerCase()}</span>
           <span>·</span>
           <span>×{combo}</span>
-          <span>·</span>
-          <span className={remainingSeconds <= 10 ? 'text-[#c24f69]/70' : ''}>{remainingSeconds}s</span>
+          {popMode === 'timed' && (
+            <>
+              <span>·</span>
+              <span className={remainingSeconds <= 10 ? 'text-[#c24f69]/70' : ''}>{remainingSeconds}s</span>
+            </>
+          )}
         </div>
 
         <main className="relative z-10 flex w-full max-w-sm flex-col items-center gap-8 px-4 text-center">
@@ -471,18 +479,18 @@ export const PracticeKanaPopPage: React.FC<PracticeKanaPopPageProps> = ({
         </div>
 
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {samples.map((kana, i) => (
+          {(['timed', 'free'] as PopMode[]).map((mode) => (
             <button
-              key={kana}
+              key={mode}
               type="button"
-              onClick={() => setSelectedChip(i)}
+              onClick={() => setPopMode(mode)}
               className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
-                i === selectedChip
+                popMode === mode
                   ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc] hover:bg-[#d06070]/10 hover:text-[#d06070]'
                   : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55 hover:bg-white/24 hover:text-[#2b2422]/60'
               }`}
             >
-              {kana}
+              {mode === 'timed' ? c.modeTimed : c.modeFree}
             </button>
           ))}
         </div>

@@ -23,6 +23,7 @@ interface PracticeKanaFlashcardsPageProps {
 }
 
 type DeckFilter = 'due' | 'weak' | 'all';
+type CardMode = 'kana-front' | 'romaji-front';
 
 const copy = {
   tr: {
@@ -38,7 +39,9 @@ const copy = {
     again: 'Tekrar',
     known: 'Bildim',
     noCards: 'Bu deste şu an boş.',
-    tapToFlip: 'Karta dokun'
+    tapToFlip: 'Karta dokun',
+    modeKanaFront: 'あ→a',
+    modeRomajiFront: 'a→あ'
   },
   en: {
     hiragana: 'Hiragana',
@@ -53,7 +56,9 @@ const copy = {
     again: 'Again',
     known: 'Known',
     noCards: 'This deck is empty right now.',
-    tapToFlip: 'Tap to flip'
+    tapToFlip: 'Tap to flip',
+    modeKanaFront: 'あ→a',
+    modeRomajiFront: 'a→あ'
   }
 } as const;
 
@@ -85,6 +90,7 @@ export const PracticeKanaFlashcardsPage: React.FC<PracticeKanaFlashcardsPageProp
     requestedDeck === 'weak' || requestedDeck === 'all' || requestedDeck === 'due' ? requestedDeck : 'due';
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [cardMode, setCardMode] = useState<CardMode>('kana-front');
 
   const sections = useMemo(
     () => (script === 'hiragana' ? getLocalizedHiraganaSections(language) : getLocalizedKatakanaSections(language)),
@@ -256,26 +262,51 @@ export const PracticeKanaFlashcardsPage: React.FC<PracticeKanaFlashcardsPageProp
             className="flex h-52 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-[#2b2422]/8 bg-white/18 backdrop-blur-[2px] transition-all duration-200 hover:bg-white/26 active:scale-[0.99]"
           >
             {isFlipped ? (
-              <>
-                <div className="font-mono text-6xl font-black lowercase leading-none text-[#2b2422]">
-                  {currentCard?.romaji.join(' / ')}
-                </div>
-                <div className="text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/28">
-                  {currentCard?.groupLabel}
-                </div>
-              </>
+              cardMode === 'kana-front' ? (
+                <>
+                  <div className="font-mono text-6xl font-black lowercase leading-none text-[#2b2422]">
+                    {currentCard?.romaji.join(' / ')}
+                  </div>
+                  <div className="text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/28">
+                    {currentCard?.groupLabel}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className="select-none font-serif text-[7rem] leading-none text-[#2b2422]"
+                    style={{ textShadow: '0 2px 20px rgba(43,36,34,0.08)' }}
+                  >
+                    {currentCard?.char}
+                  </div>
+                  <div className="text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/28">
+                    {currentCard?.groupLabel}
+                  </div>
+                </>
+              )
             ) : (
-              <>
-                <div
-                  className="select-none font-serif text-[7rem] leading-none text-[#2b2422]"
-                  style={{ textShadow: '0 2px 20px rgba(43,36,34,0.08)' }}
-                >
-                  {currentCard?.char}
-                </div>
-                <div className="text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/22">
-                  {c.tapToFlip}
-                </div>
-              </>
+              cardMode === 'kana-front' ? (
+                <>
+                  <div
+                    className="select-none font-serif text-[7rem] leading-none text-[#2b2422]"
+                    style={{ textShadow: '0 2px 20px rgba(43,36,34,0.08)' }}
+                  >
+                    {currentCard?.char}
+                  </div>
+                  <div className="text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/22">
+                    {c.tapToFlip}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="font-mono text-6xl font-black lowercase leading-none text-[#2b2422]">
+                    {currentCard?.romaji.join(' / ')}
+                  </div>
+                  <div className="text-[9px] uppercase tracking-[0.3em] text-[#2b2422]/22">
+                    {c.tapToFlip}
+                  </div>
+                </>
+              )
             )}
           </button>
         )}
@@ -332,6 +363,23 @@ export const PracticeKanaFlashcardsPage: React.FC<PracticeKanaFlashcardsPageProp
           <span>{c.weak} {summary.weakCount}</span>
           <span>·</span>
           <span>{c.mastered} {summary.masteredCount}</span>
+        </div>
+
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          {(['kana-front', 'romaji-front'] as CardMode[]).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setCardMode(mode)}
+              className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
+                cardMode === mode
+                  ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc] hover:bg-[#d06070]/10 hover:text-[#d06070]'
+                  : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55 hover:bg-white/24 hover:text-[#2b2422]/60'
+              }`}
+            >
+              {mode === 'kana-front' ? c.modeKanaFront : c.modeRomajiFront}
+            </button>
+          ))}
         </div>
       </main>
     </div>

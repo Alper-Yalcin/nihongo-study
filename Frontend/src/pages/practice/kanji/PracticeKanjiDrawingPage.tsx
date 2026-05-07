@@ -87,6 +87,8 @@ const Atmosphere: React.FC = () => (
   </>
 );
 
+type DrawingMode = 'trace' | 'free';
+
 export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ language }) => {
   const items = useMemo(() => buildCuratedKanjiItems(language), [language]);
   const [progress, setProgress] = useState<Record<string, 'known' | 'review'>>(() =>
@@ -96,6 +98,7 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [hanabira, setHanabira] = useState(() => getFeedbackState().hanabira);
+  const [drawingMode, setDrawingMode] = useState<DrawingMode>('trace');
   const drawingPadRef = useRef<DrawingPracticePadRef>(null);
   const streak = useMemo(() => computeStreak(), []);
 
@@ -233,19 +236,21 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
             <span>{items.length} kanji</span>
           </div>
 
-          {/* 5 · Chips */}
+          {/* 5 · Mode buttons */}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {nextSet.map((item, i) => (
-              <div
-                key={item.char}
-                className={`group select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
-                  i === 0
+            {(['trace', 'free'] as DrawingMode[]).map((dm) => (
+              <button
+                key={dm}
+                type="button"
+                onClick={() => setDrawingMode(dm)}
+                className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
+                  drawingMode === dm
                     ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 hover:bg-[#d06070]/10 hover:text-[#d06070] [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc]'
-                    : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 hover:bg-white/24 hover:text-[#2b2422]/60 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55 [.theme-dark_&]:hover:bg-white/12 [.theme-dark_&]:hover:text-white/70'
+                    : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 hover:bg-white/24 hover:text-[#2b2422]/60 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55'
                 }`}
               >
-                {item.char}
-              </div>
+                {dm === 'trace' ? 'なぞる' : '書く'}
+              </button>
             ))}
           </div>
         </main>
@@ -279,7 +284,14 @@ export const PracticeKanjiDrawingPage: React.FC<PracticeKanjiPageProps> = ({ lan
         {/* Canvas placeholder — dark mode: no white bg, just a thin border */}
         <div className="relative flex h-56 w-56 items-center justify-center rounded-2xl border border-[#2b2422]/8 bg-white/16 transition-colors duration-200 [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-transparent">
           {!revealed ? (
-            <DrawingPracticePad ref={drawingPadRef} resetKey={`kanji-${current?.char ?? 'empty'}-${index}`} />
+            <>
+              {drawingMode === 'trace' && (
+                <span className="pointer-events-none select-none font-serif text-[7rem] leading-none text-[#2b2422]/12 [.theme-dark_&]:text-white/16">
+                  {current?.char}
+                </span>
+              )}
+              <DrawingPracticePad ref={drawingPadRef} resetKey={`kanji-${current?.char ?? 'empty'}-${index}-${drawingMode}`} />
+            </>
           ) : (
             <div
               className="select-none font-serif text-[7rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"

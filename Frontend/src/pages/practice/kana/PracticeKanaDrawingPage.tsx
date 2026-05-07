@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
-import { getNhkKanaGuideImageSrc } from '../../../data/nhkKanaGuideImages';
 import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
 import { isKanaScript } from '../../../hooks/useActiveScript';
 import { KanaItem, KanaScript } from '../../../features/kana/domain/kanaItem';
@@ -23,6 +22,7 @@ interface PracticeKanaDrawingPageProps {
 }
 
 type SessionType = 'review' | 'weak' | 'free';
+type DrawingMode = 'trace' | 'free';
 
 const copy = {
   tr: {
@@ -35,7 +35,9 @@ const copy = {
     weak: 'Zayıf',
     mastered: 'Tamam',
     subtitle: 'Stroke sirasini hafizadan uret',
-    back: 'Geri'
+    back: 'Geri',
+    modeTrace: 'なぞる',
+    modeFree: '書く'
   },
   en: {
     hiragana: 'Hiragana',
@@ -47,14 +49,11 @@ const copy = {
     weak: 'Weak',
     mastered: 'Done',
     subtitle: 'Reproduce the stroke order from memory',
-    back: 'Back'
+    back: 'Back',
+    modeTrace: 'なぞる',
+    modeFree: '書く'
   }
 } as const;
-
-const sampleIdsByScript: Record<KanaScript, string[]> = {
-  hiragana: ['h-a', 'h-ki', 'h-so', 'h-me', 'h-tsu'],
-  katakana: ['k-a', 'k-ki', 'k-so', 'k-me', 'k-tsu']
-};
 
 const sampleCharsByScript: Record<KanaScript, string[]> = {
   hiragana: ['あ', 'き', 'そ', 'め', 'つ'],
@@ -108,7 +107,7 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
   const [round, setRound] = useState<KanaItem[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [selectedChip, setSelectedChip] = useState(0);
+  const [drawingMode, setDrawingMode] = useState<DrawingMode>('free');
   const drawingPadRef = useRef<DrawingPracticePadRef>(null);
 
   const { listByScript, summaries } = useKanaProgressStore();
@@ -136,7 +135,6 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
     [sections]
   );
 
-  const ids = sampleIdsByScript[script];
   const chars = sampleCharsByScript[script];
 
   const current = round[index] ?? null;
@@ -158,7 +156,6 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
     setSearchParams(nextParams);
     setSessionType(null);
     setRound([]);
-    setSelectedChip(0);
   };
 
   const startSession = (type: SessionType) => {
@@ -250,7 +247,17 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
 
           <div className="relative flex h-56 w-56 items-center justify-center rounded-2xl border border-[#2b2422]/8 bg-white/16 transition-colors duration-200 [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-transparent">
             {!revealed ? (
-              <DrawingPracticePad ref={drawingPadRef} resetKey={`kana-${current?.id ?? 'empty'}-${index}`} />
+              <>
+                {drawingMode === 'trace' && (
+                  <span
+                    className="pointer-events-none select-none font-serif text-[7rem] leading-none text-[#2b2422]/12 [.theme-dark_&]:text-white/16"
+                    aria-hidden="true"
+                  >
+                    {current?.char}
+                  </span>
+                )}
+                <DrawingPracticePad ref={drawingPadRef} resetKey={`kana-${current?.id ?? 'empty'}-${index}-${drawingMode}`} />
+              </>
             ) : (
               <div
                 className="select-none font-serif text-[7rem] leading-none text-[#2b2422] [.theme-dark_&]:text-[#f2d8d6]/85"
@@ -340,33 +347,20 @@ export const PracticeKanaDrawingPage: React.FC<PracticeKanaDrawingPageProps> = (
         </div>
 
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {ids.map((id, i) => {
-            const guideSrc = getNhkKanaGuideImageSrc(id);
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setSelectedChip(i)}
-                className={`flex select-none items-center justify-center rounded-xl border transition-all duration-150 ease-out hover:scale-105 ${
-                  i === selectedChip
-                    ? 'border-[#d06070]/20 bg-[#d06070]/6 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 hover:bg-[#d06070]/10'
-                    : 'border-[#2b2422]/7 bg-white/12 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 hover:bg-white/24'
-                } ${guideSrc ? 'h-12 w-12 p-1' : 'px-5 py-2.5'}`}
-              >
-                {guideSrc ? (
-                  <img
-                    src={guideSrc}
-                    alt={chars[i]}
-                    className={`max-h-full max-w-full object-contain ${i === selectedChip ? 'opacity-75' : 'opacity-40'}`}
-                  />
-                ) : (
-                  <span className={`font-serif text-lg leading-none ${i === selectedChip ? 'text-[#d06070]/80 [.theme-dark_&]:text-[#ffd6dc]' : 'text-[#2b2422]/38 [.theme-dark_&]:text-white/55'}`}>
-                    {chars[i]}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+          {(['trace', 'free'] as DrawingMode[]).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setDrawingMode(mode)}
+              className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
+                drawingMode === mode
+                  ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc] hover:bg-[#d06070]/10 hover:text-[#d06070]'
+                  : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55 hover:bg-white/24 hover:text-[#2b2422]/60'
+              }`}
+            >
+              {mode === 'trace' ? c.modeTrace : c.modeFree}
+            </button>
+          ))}
         </div>
       </main>
     </div>

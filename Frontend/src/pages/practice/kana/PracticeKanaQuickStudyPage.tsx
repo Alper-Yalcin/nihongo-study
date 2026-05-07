@@ -21,6 +21,7 @@ interface PracticeKanaQuickStudyPageProps {
 }
 
 type QuickQuestionType = 'kana-to-romaji' | 'romaji-to-kana' | 'audio-to-kana';
+type MixMode = 'all' | 'visual';
 
 interface QuickQuestion {
   id: string;
@@ -46,6 +47,8 @@ const strings = {
     romajiToKana: 'Kanayi seç',
     audioToKana: 'Sesi dinle, kanayi seç',
     subtitle: 'Kana, romaji ve sesi karışık çöz',
+    modeAll: '混合',
+    modeVisual: '視覚',
   },
   en: {
     hiragana: 'Hiragana',
@@ -63,6 +66,8 @@ const strings = {
     romajiToKana: 'Choose the kana',
     audioToKana: 'Listen and choose',
     subtitle: 'Mixed kana, romaji and audio prompts',
+    modeAll: '混合',
+    modeVisual: '視覚',
   }
 } as const;
 
@@ -179,7 +184,7 @@ export const PracticeKanaQuickStudyPage: React.FC<PracticeKanaQuickStudyPageProp
   const [wrongCount, setWrongCount] = useState(0);
   const [combo, setCombo] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [selectedChip, setSelectedChip] = useState(0);
+  const [mixMode, setMixMode] = useState<MixMode>('all');
 
   const current = questions[index] ?? null;
 
@@ -200,14 +205,14 @@ export const PracticeKanaQuickStudyPage: React.FC<PracticeKanaQuickStudyPageProp
     setWrongCount(0);
     setCombo(0);
     setIsComplete(false);
-    setSelectedChip(0);
   };
 
   const startRound = () => {
     const roundItems = shuffle(prioritizedPool).slice(0, 12);
     const built = roundItems.map((item, i) => {
-      const type: QuickQuestionType =
-        i % 3 === 0 ? 'kana-to-romaji' : i % 3 === 1 ? 'romaji-to-kana' : 'audio-to-kana';
+      const type: QuickQuestionType = mixMode === 'visual'
+        ? (i % 2 === 0 ? 'kana-to-romaji' : 'romaji-to-kana')
+        : (i % 3 === 0 ? 'kana-to-romaji' : i % 3 === 1 ? 'romaji-to-kana' : 'audio-to-kana');
       return { id: `${item.id}-${type}-${i}`, type, item, choices: buildChoices(item, type, inventory, 6) };
     });
     setQuestions(built);
@@ -465,18 +470,18 @@ export const PracticeKanaQuickStudyPage: React.FC<PracticeKanaQuickStudyPageProp
         </div>
 
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {samples.map((kana, i) => (
+          {(['all', 'visual'] as MixMode[]).map((mode) => (
             <button
-              key={kana}
+              key={mode}
               type="button"
-              onClick={() => setSelectedChip(i)}
+              onClick={() => setMixMode(mode)}
               className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
-                i === selectedChip
+                mixMode === mode
                   ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc] hover:bg-[#d06070]/10 hover:text-[#d06070]'
                   : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55 hover:bg-white/24 hover:text-[#2b2422]/60'
               }`}
             >
-              {kana}
+              {mode === 'all' ? c.modeAll : c.modeVisual}
             </button>
           ))}
         </div>

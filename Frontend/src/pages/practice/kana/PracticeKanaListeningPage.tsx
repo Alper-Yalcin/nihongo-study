@@ -20,6 +20,8 @@ interface PracticeKanaListeningPageProps {
   activeScript: KanaScript;
 }
 
+type AnswerFormat = 'kana' | 'romaji';
+
 const strings = {
   tr: {
     hiragana: 'Hiragana',
@@ -35,6 +37,8 @@ const strings = {
     due: 'Bkl',
     weak: 'Zayıf',
     mastered: 'Tamam',
+    modeKana: '文字',
+    modeRomaji: '読み',
   },
   en: {
     hiragana: 'Hiragana',
@@ -50,6 +54,8 @@ const strings = {
     due: 'Due',
     weak: 'Weak',
     mastered: 'Done',
+    modeKana: '文字',
+    modeRomaji: '読み',
   }
 } as const;
 
@@ -149,7 +155,7 @@ export const PracticeKanaListeningPage: React.FC<PracticeKanaListeningPageProps>
   const [wrongCount, setWrongCount] = useState(0);
   const [combo, setCombo] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [selectedChip, setSelectedChip] = useState(0);
+  const [answerFormat, setAnswerFormat] = useState<AnswerFormat>('kana');
 
   const current = round[index] ?? null;
 
@@ -181,7 +187,6 @@ export const PracticeKanaListeningPage: React.FC<PracticeKanaListeningPageProps>
     setWrongCount(0);
     setCombo(0);
     setIsComplete(false);
-    setSelectedChip(0);
   };
 
   const startRound = (type: 'review' | 'weak' | 'free') => {
@@ -322,7 +327,9 @@ export const PracticeKanaListeningPage: React.FC<PracticeKanaListeningPageProps>
                   type="button"
                   disabled={checked !== null}
                   onClick={() => choose(choice)}
-                  className={`min-h-[4.5rem] rounded-2xl border font-serif text-3xl transition-all duration-150 ease-out ${
+                  className={`min-h-[4.5rem] rounded-2xl border transition-all duration-150 ease-out ${
+                    answerFormat === 'kana' ? 'font-serif text-3xl' : 'font-mono text-xl lowercase'
+                  } ${
                     showOk
                       ? 'border-[#8d5965]/30 bg-[#8d5965]/8 text-[#8d5965]'
                       : showBad
@@ -330,7 +337,7 @@ export const PracticeKanaListeningPage: React.FC<PracticeKanaListeningPageProps>
                         : 'border-[#2b2422]/8 bg-white/14 text-[#2b2422]/80 hover:bg-white/24 hover:scale-[1.03] active:scale-[0.98] [.theme-dark_&]:border-white/12 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/75 [.theme-dark_&]:hover:bg-white/14'
                   }`}
                 >
-                  {choice.char}
+                  {answerFormat === 'kana' ? choice.char : (choice.romaji[0] ?? choice.char)}
                 </button>
               );
             })}
@@ -432,18 +439,18 @@ export const PracticeKanaListeningPage: React.FC<PracticeKanaListeningPageProps>
         </div>
 
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {samples.map((kana, i) => (
+          {(['kana', 'romaji'] as AnswerFormat[]).map((fmt) => (
             <button
-              key={kana}
+              key={fmt}
               type="button"
-              onClick={() => setSelectedChip(i)}
+              onClick={() => setAnswerFormat(fmt)}
               className={`select-none rounded-full border px-5 py-2.5 font-serif text-lg transition-all duration-150 ease-out hover:scale-105 ${
-                i === selectedChip
+                answerFormat === fmt
                   ? 'border-[#d06070]/20 bg-[#d06070]/6 text-[#d06070]/80 [.theme-dark_&]:border-[#d06070]/40 [.theme-dark_&]:bg-[#d06070]/22 [.theme-dark_&]:text-[#ffd6dc] hover:bg-[#d06070]/10 hover:text-[#d06070]'
                   : 'border-[#2b2422]/7 bg-white/12 text-[#2b2422]/38 [.theme-dark_&]:border-white/10 [.theme-dark_&]:bg-white/8 [.theme-dark_&]:text-white/55 hover:bg-white/24 hover:text-[#2b2422]/60'
               }`}
             >
-              {kana}
+              {fmt === 'kana' ? c.modeKana : c.modeRomaji}
             </button>
           ))}
         </div>
