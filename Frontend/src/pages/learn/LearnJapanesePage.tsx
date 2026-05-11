@@ -16,7 +16,9 @@ import {
   Utensils
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
-import { appShellRoutes, getLearnGuideRoute, getLearnUnitRoute, getPracticeHomeRoute } from '../../data/appShellContent';
+import { appShellRoutes, getLearnGuideRoute, getLessonRoute, getPracticeHomeRoute } from '../../data/appShellContent';
+import { getCompletedLessonIds } from '../../features/lesson/lessonStorage';
+import { hasLessonData } from '../../features/lesson/data/greetingsUnit';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
@@ -91,6 +93,7 @@ interface FallingFlower {
 interface LessonNodeRuntime {
   node: LessonNode;
   unitId: string | null;
+  lessonId: string | null;
   state: LessonNodeState;
   progress: number;
 }
@@ -681,7 +684,7 @@ const MobileLearnRoadmap: React.FC<{
   allLevelUnitsComplete: boolean;
   hasNextLevel: boolean;
   currentLevel: string;
-  onOpenUnit: (unitId: string) => void;
+  onOpenUnit: (unitId: string, lessonId: string) => void;
   onExam: () => void;
 }> = ({ language, themeMode, copy, sections, levelInfo, allLevelUnitsComplete, hasNextLevel, onOpenUnit, onExam }) => {
   const isDark = themeMode === 'dark';
@@ -771,7 +774,7 @@ const MobileLearnRoadmap: React.FC<{
                     key={item.node.id}
                     item={item}
                     isDark={isDark}
-                    onSelect={item.unitId && item.state !== 'locked' ? () => onOpenUnit(item.unitId as string) : undefined}
+                    onSelect={item.unitId && item.lessonId && item.state !== 'locked' ? () => onOpenUnit(item.unitId as string, item.lessonId as string) : undefined}
                   />
                 ))}
               </div>
@@ -860,7 +863,8 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const sections = useMemo(() => getLearnCourseSections(language, currentLevel), [language, currentLevel]);
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
-  const { completedCount, completedSet, getUnitProgress, getUnitState, resetProgress } = useLearnCourseProgress(orderedUnitIds);
+  const { completedCount, completedSet, resetProgress } = useLearnCourseProgress(orderedUnitIds);
+  const [completedLessons] = useState(() => new Set(getCompletedLessonIds()));
 
   const allLevelUnitsComplete = units.length > 0 && completedCount === units.length;
 
@@ -916,47 +920,65 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
     [chapterStart, chapterUnits, language]
   );
 
-  const nodeRuntime = useMemo<LessonNodeRuntime[]>(
-    () =>
-      lessonNodes.map((node, index) => {
-        const unitIndex = Math.floor(index / NODES_PER_GROUP);
-        const lessonIndex = index % NODES_PER_GROUP;
-        const unit = chapterUnits[unitIndex];
-        const isCheckpoint = lessonIndex === NODES_PER_GROUP - 1;
+  const nodeRuntime = useMemo<LessonNodeRuntime[]>(() => {
+    // First pass: build the flat lessonId array for all 20 nodes
+    const lessonIds: (string | null)[] = lessonNodes.map((_, index) => {
+      const unitIndex = Math.floor(index / NODES_PER_GROUP);
+      const lessonIndex = index % NODES_PER_GROUP;
+      const unit = chapterUnits[unitIndex];
+      if (!unit) return null;
+      const isCheckpoint = lessonIndex === NODES_PER_GROUP - 1;
+      return isCheckpoint ? `${unit.id}-checkpoint` : `${unit.id}-l${lessonIndex + 1}`;
+    });
 
-        if (!unit) {
-          return {
-            node,
-            unitId: null,
-            state: 'locked' as LessonNodeState,
-            progress: 0
-          };
-        }
+    // Second pass: compute per-node runtime state
+    let foundFirstAvailable = false;
 
-        const unitState = getUnitState(unit.id);
-        const lessonTitle =
-          isCheckpoint
-            ? language === 'tr' ? 'Kontrol' : 'Checkpoint'
-            : language === 'tr' ? `Ders ${lessonIndex + 1}` : `Lesson ${lessonIndex + 1}`;
-        const lessonSubtitle =
-          isCheckpoint
-            ? language === 'tr' ? 'Ünite sonu' : 'Unit checkpoint'
-            : unit.lessonHighlights[lessonIndex] ?? node.subtitle;
+    return lessonNodes.map((node, index) => {
+      const unitIndex = Math.floor(index / NODES_PER_GROUP);
+      const lessonIndex = index % NODES_PER_GROUP;
+      const unit = chapterUnits[unitIndex];
+      const isCheckpoint = lessonIndex === NODES_PER_GROUP - 1;
+      const lessonId = lessonIds[index];
 
-        return {
-          node: {
-            ...node,
-            number: lessonIndex + 1,
-            title: lessonTitle,
-            subtitle: lessonSubtitle
-          },
-          unitId: unit.id,
-          state: unitState,
-          progress: getUnitProgress(unit.id)
-        };
-      }),
-    [chapterUnits, getUnitProgress, getUnitState, language]
-  );
+      const lessonTitle = isCheckpoint
+        ? (language === 'tr' ? 'Kontrol' : 'Checkpoint')
+        : (language === 'tr' ? `Ders ${lessonIndex + 1}` : `Lesson ${lessonIndex + 1}`);
+      const lessonSubtitle = isCheckpoint
+        ? (language === 'tr' ? 'Ünite sonu' : 'Unit checkpoint')
+        : (unit?.lessonHighlights?.[lessonIndex] ?? node.subtitle);
+
+      const updatedNode = { ...node, number: lessonIndex + 1, title: lessonTitle, subtitle: lessonSubtitle };
+
+      // No unit or no lesson data → locked
+      if (!unit || !lessonId || !hasLessonData(lessonId)) {
+        return { node: updatedNode, unitId: unit?.id ?? null, lessonId: null, state: 'locked' as LessonNodeState, progress: 0 };
+      }
+
+      const isCompleted = completedLessons.has(lessonId);
+
+      // Previous node's lessonId (null means this is the very first node)
+      const prevLessonId = index > 0 ? lessonIds[index - 1] : null;
+      // Previous unlocked = no prev OR prev has data and is completed
+      const prevDone = prevLessonId === null
+        ? true
+        : (hasLessonData(prevLessonId) ? completedLessons.has(prevLessonId) : false);
+
+      let state: LessonNodeState;
+      if (isCompleted) {
+        state = 'completed';
+      } else if (!prevDone) {
+        state = 'locked';
+      } else if (!foundFirstAvailable) {
+        foundFirstAvailable = true;
+        state = 'active';
+      } else {
+        state = 'locked'; // Only one lesson available at a time
+      }
+
+      return { node: updatedNode, unitId: unit.id, lessonId, state, progress: isCompleted ? 100 : 0 };
+    });
+  }, [chapterUnits, completedLessons, language]);
 
   const mobileSections = useMemo<MobileUnitSection[]>(
     () =>
@@ -1055,7 +1077,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         allLevelUnitsComplete={allLevelUnitsComplete}
         hasNextLevel={hasNextLevel}
         currentLevel={currentLevel}
-        onOpenUnit={(unitId) => navigate(getLearnUnitRoute(unitId))}
+        onOpenUnit={(unitId, lessonId) => navigate(getLessonRoute(unitId, lessonId))}
         onExam={() => navigate(getLearnExamRoute(currentLevel))}
       />
 
@@ -1148,14 +1170,14 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             />
           ))}
 
-          {nodeRuntime.map(({ node, unitId, state, progress }) => (
+          {nodeRuntime.map(({ node, unitId, lessonId, state, progress }) => (
             <LessonNodeButton
               key={node.id}
               node={node}
               isDark={isDark}
               state={state}
               progress={progress}
-              onSelect={unitId && state !== 'locked' ? () => navigate(getLearnUnitRoute(unitId)) : undefined}
+              onSelect={unitId && lessonId && state !== 'locked' ? () => navigate(getLessonRoute(unitId, lessonId)) : undefined}
               xOffset={DESKTOP_MAP_X_OFFSET}
             />
           ))}
