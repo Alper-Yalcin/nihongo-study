@@ -7,6 +7,9 @@ const lesson1: Lesson = {
   unitId: 'p1-u1',
   title: { tr: 'İlk Selamlar', en: 'First Greetings' },
   estimatedMinutes: 5,
+  npc: { name: 'Hana', emoji: '🦊' },
+  location: '🌸 Bahar parkı',
+  sceneTitle: { tr: 'Hana ile Park Günü', en: 'A Day at the Park with Hana' },
   learnedWords: [
     { japanese: 'こんにちは', romaji: 'konnichiwa', meaning: 'Merhaba' },
     { japanese: 'おはよう', romaji: 'ohayou', meaning: 'Günaydın' },
@@ -16,7 +19,6 @@ const lesson1: Lesson = {
   exercises: [
     // ── BLOK 1: こんにちは ────────────────────────────────────────────────────
 
-    // 1. TeachCard — önce öğret
     {
       id: 'gr1-tc-1',
       type: 'teach_card',
@@ -30,8 +32,10 @@ const lesson1: Lesson = {
       exampleJapanese: 'こんにちは！',
       exampleMeaning: 'Merhaba!',
       usageNote: 'Öğleden sonraya kadar kullanılır.',
+      npcLine: 'こんにちは！',
+      sceneContext: 'Hana parkta birine merhaba diyor',
+      sceneBg: '🌸',
     },
-    // 2. AudioReinforcement — dinleme
     {
       id: 'gr1-ar-1',
       type: 'audio_reinforcement',
@@ -43,7 +47,6 @@ const lesson1: Lesson = {
       meaning: 'Merhaba',
       audioText: 'こんにちは',
     },
-    // 3. InstantRecognition — ilk test
     {
       id: 'gr1-ir-1',
       type: 'instant_recognition',
@@ -63,7 +66,6 @@ const lesson1: Lesson = {
 
     // ── BLOK 2: おはよう ──────────────────────────────────────────────────────
 
-    // 4. TeachCard — önce öğret
     {
       id: 'gr1-tc-2',
       type: 'teach_card',
@@ -77,8 +79,10 @@ const lesson1: Lesson = {
       exampleJapanese: 'おはよう！',
       exampleMeaning: 'Günaydın!',
       usageNote: 'Sabah saatlerinde, arkadaş ve aileyle kullanılır.',
+      npcLine: 'おはよう！',
+      sceneContext: 'Sabah — Hana komşusuyla karşılaşıyor',
+      sceneBg: '🌅',
     },
-    // 5. AudioToKana — sesi duy, kana seç
     {
       id: 'gr1-atk-1',
       type: 'audio_to_kana',
@@ -94,7 +98,6 @@ const lesson1: Lesson = {
         { japanese: 'はじめまして', correct: false },
       ],
     },
-    // 6. VisualContext — sabah sahnesi
     {
       id: 'gr1-vc-1',
       type: 'visual_context',
@@ -108,7 +111,6 @@ const lesson1: Lesson = {
 
     // ── BLOK 3: こんばんは ────────────────────────────────────────────────────
 
-    // 7. TeachCard — önce öğret
     {
       id: 'gr1-tc-3',
       type: 'teach_card',
@@ -122,8 +124,10 @@ const lesson1: Lesson = {
       exampleJapanese: 'こんばんは！',
       exampleMeaning: 'İyi akşamlar!',
       usageNote: 'Akşam saatlerinde kullanılır.',
+      npcLine: 'こんばんは！',
+      sceneContext: 'Akşam — Hana eve dönüyor',
+      sceneBg: '🌙',
     },
-    // 8. AudioToMeaning — sesi duy, anlamı seç
     {
       id: 'gr1-atm-1',
       type: 'audio_to_meaning',
@@ -140,7 +144,6 @@ const lesson1: Lesson = {
         { label: 'Görüşürüz', correct: false },
       ],
     },
-    // 9. GuidedResponse — NPC selar, kullanıcı yanıt verir
     {
       id: 'gr1-gr-1',
       type: 'guided_response',
@@ -160,7 +163,6 @@ const lesson1: Lesson = {
 
     // ── BLOK 4: はじめまして ──────────────────────────────────────────────────
 
-    // 10. TeachCard — önce öğret
     {
       id: 'gr1-tc-4',
       type: 'teach_card',
@@ -174,8 +176,10 @@ const lesson1: Lesson = {
       exampleJapanese: 'はじめまして、アリです。',
       exampleMeaning: 'Memnun oldum, ben Ali.',
       usageNote: 'İlk tanışmada söylenir.',
+      npcLine: 'はじめまして！',
+      sceneContext: 'Hana yeni birini tanıyor',
+      sceneBg: '🤝',
     },
-    // 11. VisualContext — tanışma sahnesi
     {
       id: 'gr1-vc-2',
       type: 'visual_context',
@@ -186,7 +190,6 @@ const lesson1: Lesson = {
       npcJapanese: 'はじめまして！',
       npcMeaning: 'Memnun oldum!',
     },
-    // 12. ConversationChain — kısa selamlaşma
     {
       id: 'gr1-cc-1',
       type: 'conversation_chain',
@@ -226,9 +229,8 @@ const lesson1: Lesson = {
       ],
     },
 
-    // ── BLOK 5: Hafif recall ──────────────────────────────────────────────────
+    // ── BLOK 5: Hatırlama ──────────────────────────────────────────────────────
 
-    // 13. FastRecall — こんばんは
     {
       id: 'gr1-fr-1',
       type: 'fast_recall',
@@ -246,7 +248,6 @@ const lesson1: Lesson = {
         { japanese: 'はじめまして', correct: false },
       ],
     },
-    // 14. FastRecall — はじめまして
     {
       id: 'gr1-fr-2',
       type: 'fast_recall',
@@ -273,7 +274,10 @@ const lesson2: Lesson = {
   id: 'p1-u1-l2',
   unitId: 'p1-u1',
   title: { tr: 'Vedalaşma & Teşekkürler', en: 'Farewells & Thanks' },
-  estimatedMinutes: 4,
+  estimatedMinutes: 5,
+  npc: { name: 'Hana', emoji: '🦊' },
+  location: '🏫 Okul koridoru',
+  sceneTitle: { tr: 'Vedalaşma Vakti', en: 'Time to Say Goodbye' },
   learnedWords: [
     { japanese: 'さようなら', romaji: 'sayounara', meaning: 'Hoşça kal (resmi)' },
     { japanese: 'じゃあね', romaji: 'jaa ne', meaning: 'Görüşürüz' },
@@ -282,7 +286,25 @@ const lesson2: Lesson = {
     { japanese: 'ありがとうございます', romaji: 'arigatou gozaimasu', meaning: 'Çok teşekkürler' },
   ],
   exercises: [
-    // 1. Instant Recognition — さようなら
+    // ── BLOK 1: さようなら ────────────────────────────────────────────────────
+
+    {
+      id: 'gr2-tc-1',
+      type: 'teach_card',
+      difficulty: 'easy',
+      skillTags: ['kana', 'listening', 'recognition'],
+      progressGain: 3,
+      japanese: 'さようなら',
+      romaji: 'sayounara',
+      meaning: 'Hoşça kal (resmi)',
+      audioText: 'さようなら',
+      exampleJapanese: 'さようなら、先生！',
+      exampleMeaning: 'Hoşça kalın, hocam!',
+      usageNote: 'Resmi ya da uzun süre ayrılıklarda kullanılır.',
+      npcLine: 'さようなら！',
+      sceneContext: 'Hana okul çıkışında öğretmenine veda ediyor',
+      sceneBg: '🚪',
+    },
     {
       id: 'gr2-ir-1',
       type: 'instant_recognition',
@@ -298,7 +320,26 @@ const lesson2: Lesson = {
         { label: 'Günaydın', correct: false },
       ],
     },
-    // 2. Audio Reinforcement
+
+    // ── BLOK 2: じゃあね ──────────────────────────────────────────────────────
+
+    {
+      id: 'gr2-tc-2',
+      type: 'teach_card',
+      difficulty: 'easy',
+      skillTags: ['kana', 'listening', 'recognition'],
+      progressGain: 3,
+      japanese: 'じゃあね',
+      romaji: 'jaa ne',
+      meaning: 'Görüşürüz',
+      audioText: 'じゃあね',
+      exampleJapanese: 'じゃあね、また明日！',
+      exampleMeaning: 'Görüşürüz, yarına kadar!',
+      usageNote: 'Arkadaşlarla samimi vedalaşmada kullanılır.',
+      npcLine: 'じゃあね！',
+      sceneContext: 'Hana arkadaşlarına el sallıyor',
+      sceneBg: '👋',
+    },
     {
       id: 'gr2-ar-1',
       type: 'audio_reinforcement',
@@ -310,7 +351,26 @@ const lesson2: Lesson = {
       meaning: 'Görüşürüz (arkadaşça)',
       audioText: 'じゃあね',
     },
-    // 3. Instant Recognition — ありがとう
+
+    // ── BLOK 3: ありがとう ────────────────────────────────────────────────────
+
+    {
+      id: 'gr2-tc-3',
+      type: 'teach_card',
+      difficulty: 'easy',
+      skillTags: ['kana', 'listening', 'recognition'],
+      progressGain: 3,
+      japanese: 'ありがとう',
+      romaji: 'arigatou',
+      meaning: 'Teşekkürler',
+      audioText: 'ありがとう',
+      exampleJapanese: 'ありがとう、助かったよ！',
+      exampleMeaning: 'Teşekkürler, çok yardımcı oldun!',
+      usageNote: 'Samimi, arkadaşça ortamlarda kullanılır.',
+      npcLine: 'ありがとう！',
+      sceneContext: 'Hana düşen kitaplarını toplayan arkadaşına teşekkür ediyor',
+      sceneBg: '🙏',
+    },
     {
       id: 'gr2-ir-2',
       type: 'instant_recognition',
@@ -326,7 +386,6 @@ const lesson2: Lesson = {
         { label: 'Memnun oldum', correct: false },
       ],
     },
-    // 4. Kana Recognition — ありがとう
     {
       id: 'gr2-kr-1',
       type: 'kana_recognition',
@@ -341,7 +400,6 @@ const lesson2: Lesson = {
         { label: 'douitashimashite', correct: false },
       ],
     },
-    // 5. Audio → Kana
     {
       id: 'gr2-atk-1',
       type: 'audio_to_kana',
@@ -356,16 +414,34 @@ const lesson2: Lesson = {
         { japanese: 'じゃあね', correct: false },
       ],
     },
-    // 6. NPC Reaction
     {
       id: 'gr2-nr-1',
       type: 'npc_reaction',
       difficulty: 'easy',
       skillTags: ['listening'],
       progressGain: 0,
-      message: 'You got it!',
+      message: 'すごい！ Çok iyi gidiyorsun!',
     },
-    // 7. Instant Recognition — どういたしまして
+
+    // ── BLOK 4: どういたしまして ──────────────────────────────────────────────
+
+    {
+      id: 'gr2-tc-4',
+      type: 'teach_card',
+      difficulty: 'medium',
+      skillTags: ['kana', 'listening', 'recognition'],
+      progressGain: 3,
+      japanese: 'どういたしまして',
+      romaji: 'douitashimashite',
+      meaning: 'Rica ederim',
+      audioText: 'どういたしまして',
+      exampleJapanese: 'どういたしまして！',
+      exampleMeaning: 'Rica ederim!',
+      usageNote: 'ありがとう aldıktan sonra söylenir.',
+      npcLine: 'どういたしまして！',
+      sceneContext: 'Hana kibarca yanıt veriyor',
+      sceneBg: '😊',
+    },
     {
       id: 'gr2-ir-3',
       type: 'instant_recognition',
@@ -381,7 +457,6 @@ const lesson2: Lesson = {
         { label: 'Hoşça kal', correct: false },
       ],
     },
-    // 8. Audio → Meaning
     {
       id: 'gr2-atm-1',
       type: 'audio_to_meaning',
@@ -397,7 +472,9 @@ const lesson2: Lesson = {
         { label: 'Memnun oldum', correct: false },
       ],
     },
-    // 9. Fill Blank — particle
+
+    // ── BLOK 5: Pratik + Üretim ───────────────────────────────────────────────
+
     {
       id: 'gr2-fb-1',
       type: 'fill_blank',
@@ -416,7 +493,6 @@ const lesson2: Lesson = {
         { label: 'が', correct: false },
       ],
     },
-    // 10. Guided Response
     {
       id: 'gr2-gr-1',
       type: 'guided_response',
@@ -432,7 +508,6 @@ const lesson2: Lesson = {
         { japanese: 'はじめまして！', correct: false },
       ],
     },
-    // 11. Token Build
     {
       id: 'gr2-tb-1',
       type: 'token_build',
@@ -445,16 +520,17 @@ const lesson2: Lesson = {
       explanation: 'ありがとう(teşekkürler) + ございます(kibarlık eki) = resmi teşekkür',
       smartFeedback: 'ございます eklenince daha kibar olur.',
     },
-    // 12. NPC Reaction
     {
       id: 'gr2-nr-2',
       type: 'npc_reaction',
       difficulty: 'easy',
       skillTags: ['production'],
       progressGain: 0,
-      message: 'Keep going!',
+      message: 'いいね！ Mükemmel gidiyorsun!',
     },
-    // 13-14. Fast Recall
+
+    // ── BLOK 6: Hatırlama ─────────────────────────────────────────────────────
+
     {
       id: 'gr2-fr-1',
       type: 'fast_recall',
@@ -497,6 +573,9 @@ const lesson3: Lesson = {
   unitId: 'p1-u1',
   title: { tr: 'Konuşma Pratiği', en: 'Conversation Practice' },
   estimatedMinutes: 5,
+  npc: { name: 'Hana', emoji: '🦊' },
+  location: '🌙 Akşam, kafe',
+  sceneTitle: { tr: 'Hana ile Tanışma', en: 'Meeting Hana' },
   learnedWords: [
     { japanese: 'おはようございます', romaji: 'ohayou gozaimasu', meaning: 'Günaydın (resmi)' },
     { japanese: 'よろしくおねがいします', romaji: 'yoroshiku onegaishimasu', meaning: 'Çok memnun oldum' },
@@ -506,7 +585,6 @@ const lesson3: Lesson = {
     { japanese: 'は', romaji: 'wa', meaning: 'Konu particle\'ı' },
   ],
   exercises: [
-    // 1. Warm-up recall
     {
       id: 'gr3-ir-1',
       type: 'instant_recognition',
@@ -522,7 +600,6 @@ const lesson3: Lesson = {
         { label: 'Hoşça kal', correct: false },
       ],
     },
-    // 2. Audio → Kana (harder)
     {
       id: 'gr3-atk-1',
       type: 'audio_to_kana',
@@ -537,7 +614,6 @@ const lesson3: Lesson = {
         { japanese: 'おはようございます', correct: false },
       ],
     },
-    // 3. Fill Blank — particle practice
     {
       id: 'gr3-fb-1',
       type: 'fill_blank',
@@ -556,7 +632,6 @@ const lesson3: Lesson = {
         { label: 'に', correct: false },
       ],
     },
-    // 4. Visual Context — evening scene
     {
       id: 'gr3-vc-1',
       type: 'visual_context',
@@ -567,7 +642,6 @@ const lesson3: Lesson = {
       npcJapanese: 'こんばんは！はじめまして。',
       npcMeaning: 'İyi akşamlar! Memnun oldum.',
     },
-    // 5. Conversation Chain — multi-turn, memory
     {
       id: 'gr3-cc-1',
       type: 'conversation_chain',
@@ -621,16 +695,14 @@ const lesson3: Lesson = {
         },
       ],
     },
-    // 6. NPC Reaction
     {
       id: 'gr3-nr-1',
       type: 'npc_reaction',
       difficulty: 'easy',
       skillTags: ['conversation'],
       progressGain: 0,
-      message: 'Great conversation!',
+      message: 'やった！ Harika konuştun!',
     },
-    // 7. Listening Build
     {
       id: 'gr3-lb-1',
       type: 'listening_build',
@@ -644,7 +716,6 @@ const lesson3: Lesson = {
       explanation: 'わたしはがくせいです = Ben öğrenciyim',
       smartFeedback: 'は particle\'ı konuyu belirtir.',
     },
-    // 8. Listening Conversation
     {
       id: 'gr3-lc-1',
       type: 'listening_conversation',
@@ -661,7 +732,6 @@ const lesson3: Lesson = {
         { japanese: 'ありがとう', correct: false },
       ],
     },
-    // 9. Token Build — harder
     {
       id: 'gr3-tb-1',
       type: 'token_build',
@@ -674,16 +744,14 @@ const lesson3: Lesson = {
       explanation: 'みず=su, を=nesne particle\'ı, のみます=içerim',
       smartFeedback: 'を particle\'ı nesne (doğrudan etkilenen şey) için kullanılır.',
     },
-    // 10. NPC Reaction
     {
       id: 'gr3-nr-2',
       type: 'npc_reaction',
       difficulty: 'easy',
       skillTags: ['production'],
       progressGain: 0,
-      message: 'Amazing progress!',
+      message: '完璧！ Mükemmel ilerliyorsun!',
     },
-    // 11-13. Fast Recall (hard, longer timers)
     {
       id: 'gr3-fr-1',
       type: 'fast_recall',

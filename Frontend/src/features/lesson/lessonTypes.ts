@@ -1,5 +1,12 @@
 import type { AppLanguage } from '../../data/appPreferences';
 
+// ── NPC Character ──────────────────────────────────────────────────────────
+
+export interface NpcCharacter {
+  name: string;
+  emoji: string;
+}
+
 // ── Exercise Types ─────────────────────────────────────────────────────────
 
 export type ExerciseType =
@@ -84,6 +91,10 @@ export interface TeachCardExercise extends BaseExercise {
   exampleJapanese?: string;
   exampleMeaning?: string;
   usageNote?: string;
+  // Scene/discovery fields
+  npcLine?: string;      // What the NPC says (shown before reveal)
+  sceneContext?: string; // Short description: "Hana birini selamlıyor"
+  sceneBg?: string;      // Emoji representing the scene: "🌅"
 }
 
 export interface InstantRecognitionExercise extends BaseExercise {
@@ -266,6 +277,10 @@ export interface Lesson {
   estimatedMinutes: number;
   learnedWords: LearnedWord[];
   exercises: LessonExercise[];
+  // Scene / story metadata (optional)
+  npc?: NpcCharacter;
+  sceneTitle?: Record<AppLanguage, string>;
+  location?: string; // e.g. "🌸 Bahar parkı"
 }
 
 export interface LessonUnit {

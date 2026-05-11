@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { Lesson, LearnedWord } from '../lessonTypes';
+import type { Lesson, LearnedWord, NpcCharacter } from '../lessonTypes';
 import { useLessonFlow } from '../useLessonFlow';
 import { stopAudio } from '../lessonAudio';
 import { LessonComplete } from './LessonComplete';
@@ -45,14 +45,41 @@ const AUTO_ADVANCE_TYPES = new Set([
   'npc_reaction',
 ]);
 
+// Phase label derived from exercise type
+const EXERCISE_PHASE: Record<string, string> = {
+  teach_card: '🔍 Keşif',
+  audio_reinforcement: '👂 Dinleme',
+  audio_to_kana: '👂 Dinleme',
+  audio_to_meaning: '👂 Dinleme',
+  instant_recognition: '🧠 Tanıma',
+  kana_recognition: '🧠 Tanıma',
+  guided_response: '✏️ Pratik',
+  fill_blank: '✏️ Pratik',
+  token_build: '✏️ Pratik',
+  listening_build: '✏️ Pratik',
+  conversation_chain: '💬 Konuşma',
+  listening_conversation: '💬 Konuşma',
+  fast_recall: '⚡ Hatırlama',
+};
+
+// NPC feedback pools
+const NPC_CORRECT = ['すごい！ Harika!', 'やった！ Başardın!', 'いいね！ Güzel!', '完璧！ Mükemmel!', 'よし！ Evet!'];
+const NPC_WRONG = ['惜しい！ Neredeyse.', 'もう一度！ Bir daha.', 'ゆっくり。 Sabırlı ol.'];
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const DEFAULT_NPC: NpcCharacter = { name: 'Hana', emoji: '🦊' };
+const MAX_LIVES = 5;
+
 type FeedbackState = {
   tone: 'correct' | 'wrong';
+  npcMessage: string;
   smartFeedback?: string;
   explanation?: string;
   echoWord?: LearnedWord;
 } | null;
-
-const MAX_LIVES = 5;
 
 export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
   const navigate = useNavigate();
@@ -63,9 +90,9 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
   const [lives, setLives] = React.useState(MAX_LIVES);
   const [streak, setStreak] = React.useState(0);
 
+  const npc = lesson.npc ?? DEFAULT_NPC;
   const { currentExercise, progressPct, isComplete, result } = flow;
 
-  // Reset interaction state on each new exercise
   useEffect(() => {
     setPendingCorrect(null);
     setChecked(false);
@@ -79,12 +106,14 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
         result={result}
         themeMode={themeMode}
         learnedWords={lesson.learnedWords}
+        npc={npc}
       />
     );
   }
 
   const isAutoAdvance = currentExercise ? AUTO_ADVANCE_TYPES.has(currentExercise.type) : false;
   const isKontrolEt = currentExercise ? KONTROL_ET_TYPES.has(currentExercise.type) : false;
+  const phaseLabel = currentExercise ? (EXERCISE_PHASE[currentExercise.type] ?? '') : '';
 
   const handleCorrect = () => {
     flow.onCorrect();
@@ -103,7 +132,13 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
       ? lesson.learnedWords.find((w) => exJapanese.includes(w.japanese))
       : undefined;
 
-    setFeedback({ tone: 'correct', smartFeedback: ex.smartFeedback, explanation: ex.explanation, echoWord });
+    setFeedback({
+      tone: 'correct',
+      npcMessage: pickRandom(NPC_CORRECT),
+      smartFeedback: ex.smartFeedback,
+      explanation: ex.explanation,
+      echoWord,
+    });
   };
 
   const handleWrong = () => {
@@ -113,7 +148,12 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
 
     setStreak(0);
     setLives((l) => Math.max(0, l - 1));
-    setFeedback({ tone: 'wrong', smartFeedback: ex.smartFeedback, explanation: ex.explanation });
+    setFeedback({
+      tone: 'wrong',
+      npcMessage: pickRandom(NPC_WRONG),
+      smartFeedback: ex.smartFeedback,
+      explanation: ex.explanation,
+    });
   };
 
   const handleContinue = () => {
@@ -172,7 +212,7 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
       case 'fast_recall':
         return <FastRecall key={currentExercise.id} exercise={currentExercise} {...directProps} />;
       case 'npc_reaction':
-        return <NpcReaction key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} />;
+        return <NpcReaction key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} npc={npc} />;
       default:
         return null;
     }
@@ -180,7 +220,7 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden px-5 py-5 text-[var(--kt-ink)]">
-      {/* Header */}
+      {/* Header row */}
       <header className="relative z-10 mx-auto flex max-w-3xl items-center gap-3">
         <button
           type="button"
@@ -211,6 +251,21 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
         </div>
       </header>
 
+      {/* Scene / phase info row */}
+      <div className="mx-auto mt-2.5 max-w-3xl flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <span className="text-base leading-none">{npc.emoji}</span>
+          {lesson.location && (
+            <span className="text-xs font-bold text-[var(--kt-ink-subtle)]">{lesson.location}</span>
+          )}
+        </div>
+        {phaseLabel && (
+          <span className="rounded-full bg-[var(--kt-surface-muted)] px-2.5 py-0.5 text-xs font-black text-[var(--kt-ink-muted)]">
+            {phaseLabel}
+          </span>
+        )}
+      </div>
+
       {/* Streak badge */}
       {streak >= 3 && !feedback && (
         <div className="mx-auto mt-3 max-w-3xl">
@@ -226,11 +281,11 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
         </div>
       )}
 
-      <main className="relative z-10 mx-auto mt-10 max-w-3xl pb-36">
+      <main className="relative z-10 mx-auto mt-8 max-w-3xl pb-36">
         {renderExercise()}
       </main>
 
-      {/* Sticky footer — not shown for auto-advance types */}
+      {/* Sticky footer */}
       {!isAutoAdvance && (
         <div className="fixed bottom-0 left-0 right-0 z-50">
           {feedback ? (
@@ -243,27 +298,15 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
               }`}
             >
               <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
-                {/* Icon + message */}
                 <div className="flex min-w-0 items-start gap-3">
-                  <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-base font-black text-white ${
-                      feedback.tone === 'correct'
-                        ? 'bg-[var(--kt-accent-success)]'
-                        : 'bg-[var(--kt-accent-danger)]'
-                    }`}
-                  >
-                    {feedback.tone === 'correct' ? '✓' : '✗'}
-                  </div>
+                  {/* NPC avatar */}
+                  <div className="shrink-0 text-2xl leading-none">{npc.emoji}</div>
                   <div className="min-w-0">
-                    <p
-                      className={`font-black ${
-                        feedback.tone === 'correct'
-                          ? 'text-[var(--kt-accent-success)]'
-                          : 'text-[var(--kt-accent-danger)]'
-                      }`}
-                    >
-                      {feedback.tone === 'correct' ? 'Aferin!' : 'Doğru cevap:'}
-                    </p>
+                    {/* NPC message — Japanese part styled separately */}
+                    <NpcFeedbackMessage
+                      message={feedback.npcMessage}
+                      tone={feedback.tone}
+                    />
                     {feedback.tone === 'correct' && feedback.echoWord && (
                       <p className="mt-0.5 text-sm font-bold text-[var(--kt-accent-success)]">
                         <span className="font-jp">{feedback.echoWord.japanese}</span>
@@ -272,7 +315,7 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
                       </p>
                     )}
                     {feedback.tone === 'wrong' && feedback.smartFeedback && (
-                      <p className="mt-0.5 text-sm font-bold text-[var(--kt-accent-danger)]">
+                      <p className="mt-0.5 text-sm font-bold text-[var(--kt-accent-danger)] opacity-90">
                         {feedback.smartFeedback}
                       </p>
                     )}
@@ -315,4 +358,32 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
       )}
     </div>
   );
+};
+
+// ── NPC feedback message renderer ──────────────────────────────────────────
+
+interface NpcFeedbackMessageProps {
+  message: string;
+  tone: 'correct' | 'wrong';
+}
+
+const NpcFeedbackMessage: React.FC<NpcFeedbackMessageProps> = ({ message, tone }) => {
+  // Messages like "すごい！ Harika!" — split on first space
+  const spaceIdx = message.indexOf(' ');
+  const hasJapanese = spaceIdx > 0 && /[぀-ヿ一-鿿！。、]/.test(message.slice(0, spaceIdx));
+
+  const color = tone === 'correct' ? 'text-[var(--kt-accent-success)]' : 'text-[var(--kt-accent-danger)]';
+
+  if (hasJapanese) {
+    const jpPart = message.slice(0, spaceIdx);
+    const trPart = message.slice(spaceIdx + 1);
+    return (
+      <div>
+        <span className={`font-jp text-lg font-black ${color}`}>{jpPart}</span>
+        {' '}
+        <span className={`text-sm font-bold ${color} opacity-80`}>{trPart}</span>
+      </div>
+    );
+  }
+  return <p className={`font-black ${color}`}>{message}</p>;
 };

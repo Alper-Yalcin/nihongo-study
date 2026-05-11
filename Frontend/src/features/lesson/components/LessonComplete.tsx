@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flame, Star } from 'lucide-react';
-import type { LearnedWord, LessonResult } from '../lessonTypes';
+import type { LearnedWord, LessonResult, NpcCharacter } from '../lessonTypes';
 import { LearnFallingFlowers } from '../../../components/learn/LearnFallingFlowers';
 import type { ThemeMode } from '../../../data/appPreferences';
 import { markPracticedToday } from '../../streak/tomoshibi';
@@ -11,6 +11,7 @@ interface Props {
   result: LessonResult;
   themeMode: ThemeMode;
   learnedWords: LearnedWord[];
+  npc?: NpcCharacter;
 }
 
 type Tier = 'Mükemmel' | 'İyi' | 'Gelişiyor';
@@ -69,6 +70,7 @@ export const LessonComplete: React.FC<Props> = ({
   result,
   themeMode,
   learnedWords,
+  npc,
 }) => {
   const navigate = useNavigate();
   const xp = useCountUp(result.xpEarned, 1200);
@@ -96,6 +98,23 @@ export const LessonComplete: React.FC<Props> = ({
       <LearnFallingFlowers themeMode={themeMode} />
 
       <div className="relative z-10 mx-auto flex min-h-[80vh] max-w-lg flex-col items-center justify-center gap-6 text-center">
+
+        {/* NPC closing message */}
+        {npc && (
+          <div className="flex items-center gap-3 rounded-[1.3rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 py-4 shadow-[var(--kt-shadow-sm)] text-left">
+            <span className="shrink-0 text-4xl leading-none">{npc.emoji}</span>
+            <div>
+              <p className="font-jp text-base font-black text-[var(--kt-brand)]">
+                {accuracy >= 75 ? 'すごい！' : 'いいね！'}
+              </p>
+              <p className="text-sm font-bold text-[var(--kt-ink-muted)]">
+                {accuracy >= 75
+                  ? `${npc.name} bugünkü dersten çok memnun!`
+                  : `${npc.name}: Devam et, her seferinde daha iyi olacaksın!`}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* XP badge */}
         <div className="flex h-28 w-28 flex-col items-center justify-center rounded-full bg-[var(--kt-brand)] shadow-[0_0_48px_color-mix(in_srgb,var(--kt-brand)_45%,transparent)]">
