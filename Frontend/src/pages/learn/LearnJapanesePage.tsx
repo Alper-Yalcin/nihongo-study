@@ -16,9 +16,7 @@ import {
   Utensils
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
-import { appShellRoutes, getLearnGuideRoute, getLessonRoute, getPracticeHomeRoute } from '../../data/appShellContent';
-import { getCompletedLessonIds } from '../../features/lesson/lessonStorage';
-import { hasLessonData } from '../../features/lesson/data/greetingsUnit';
+import { appShellRoutes, getLearnGuideRoute, getPracticeHomeRoute } from '../../data/appShellContent';
 import {
   flattenLearnCourseUnits,
   getLearnCourseSections
@@ -864,7 +862,6 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
   const units = useMemo(() => flattenLearnCourseUnits(sections), [sections]);
   const orderedUnitIds = useMemo(() => units.map((unit) => unit.id), [units]);
   const { completedCount, completedSet, resetProgress } = useLearnCourseProgress(orderedUnitIds);
-  const [completedLessons] = useState(() => new Set(getCompletedLessonIds()));
 
   const allLevelUnitsComplete = units.length > 0 && completedCount === units.length;
 
@@ -950,19 +947,15 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
 
       const updatedNode = { ...node, number: lessonIndex + 1, title: lessonTitle, subtitle: lessonSubtitle };
 
-      // No unit or no lesson data → locked
-      if (!unit || !lessonId || !hasLessonData(lessonId)) {
+      // No lesson content available yet → always locked
+      if (!unit || !lessonId) {
         return { node: updatedNode, unitId: unit?.id ?? null, lessonId: null, state: 'locked' as LessonNodeState, progress: 0 };
       }
 
-      const isCompleted = completedLessons.has(lessonId);
+      const isCompleted = false;
 
-      // Previous node's lessonId (null means this is the very first node)
       const prevLessonId = index > 0 ? lessonIds[index - 1] : null;
-      // Previous unlocked = no prev OR prev has data and is completed
-      const prevDone = prevLessonId === null
-        ? true
-        : (hasLessonData(prevLessonId) ? completedLessons.has(prevLessonId) : false);
+      const prevDone = prevLessonId === null ? false : false;
 
       let state: LessonNodeState;
       if (isCompleted) {
@@ -978,7 +971,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
 
       return { node: updatedNode, unitId: unit.id, lessonId, state, progress: isCompleted ? 100 : 0 };
     });
-  }, [chapterUnits, completedLessons, language]);
+  }, [chapterUnits, language]);
 
   const mobileSections = useMemo<MobileUnitSection[]>(
     () =>
@@ -1077,7 +1070,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
         allLevelUnitsComplete={allLevelUnitsComplete}
         hasNextLevel={hasNextLevel}
         currentLevel={currentLevel}
-        onOpenUnit={(unitId, lessonId) => navigate(getLessonRoute(unitId, lessonId))}
+        onOpenUnit={() => undefined}
         onExam={() => navigate(getLearnExamRoute(currentLevel))}
       />
 
@@ -1177,7 +1170,7 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
               isDark={isDark}
               state={state}
               progress={progress}
-              onSelect={unitId && lessonId && state !== 'locked' ? () => navigate(getLessonRoute(unitId, lessonId)) : undefined}
+              onSelect={undefined}
               xOffset={DESKTOP_MAP_X_OFFSET}
             />
           ))}

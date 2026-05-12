@@ -21,8 +21,6 @@ export const appShellRoutes = {
   learnUnitBase: '/learn/unit',
   learnGuideBase: '/learn/guide',
   learnExamBase: '/learn/exam',
-  learnUnits: '/learn/units',
-  learnLessonBase: '/learn/lesson',
   letters: '/letters',
   practice: '/practice',
   practiceReview: '/practice/review',
@@ -98,8 +96,6 @@ export const appShellRoutes = {
 export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnitBase}/${unitId}`;
 export const getLearnGuideRoute = (unitId: string) => `${appShellRoutes.learnGuideBase}/${unitId}`;
 export const getLearnExamRoute = (level: string) => `${appShellRoutes.learnExamBase}/${level}`;
-export const getLessonRoute = (unitId: string, lessonId: string) =>
-  `${appShellRoutes.learnLessonBase}/${unitId}/${lessonId}`;
 
 export const getPracticeHomeRoute = (script: KanaRouteScript = 'hiragana') => {
   const searchParams = new URLSearchParams();

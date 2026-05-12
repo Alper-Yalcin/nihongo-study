@@ -64,8 +64,6 @@ import { AppShell } from './components/layout';
 import { ReEntrySplash } from './features/jlearn/reentry/ReEntrySplash';
 import { ChallengeReadyPrompt } from './features/jlearn/challenge/ChallengeReadyPrompt';
 import { ChallengeMissionPage } from './pages/learn/ChallengeMissionPage';
-import { LessonRunnerPage } from './pages/learn/LessonRunnerPage';
-import { LessonUnitsPage } from './pages/learn/LessonUnitsPage';
 import { SpeakingSuggestToast } from './features/jlearn/speaking/SpeakingSuggestToast';
 import { FeedbackLayer } from './components/feedback/FeedbackLayer';
 import { ensureWeeklyFreezeGrant } from './features/streak/tomoshibi';
@@ -194,7 +192,6 @@ export default function App() {
         element={<LandingPage language={language} activeScript={activeScript} themeMode={themeMode} />}
       />
       <Route path={appShellRoutes.learn} element={<LearnJapanesePage language={language} themeMode={themeMode} />} />
-      <Route path={appShellRoutes.learnUnits} element={<LessonUnitsPage language={language} />} />
       <Route path={appShellRoutes.learnReview} element={<LearnReviewPage language={language} themeMode={themeMode} />} />
       <Route path={appShellRoutes.learnStatistic} element={<LearnStatisticPage language={language} themeMode={themeMode} />} />
       <Route path={appShellRoutes.learnStatisticAlias} element={<LearnStatisticPage language={language} themeMode={themeMode} />} />
@@ -516,7 +513,6 @@ export default function App() {
           <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
           <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} themeMode={themeMode} activeScript={activeScript} />} />
           <Route path={`${appShellRoutes.learnExamBase}/:level`} element={<LearnLevelExamPage language={language} themeMode={themeMode} />} />
-          <Route path={`${appShellRoutes.learnLessonBase}/:unitId/:lessonId`} element={<LessonRunnerPage language={language} themeMode={themeMode} />} />
           <Route path="*" element={shell} />
         </Routes>
         <ReEntrySplash />
