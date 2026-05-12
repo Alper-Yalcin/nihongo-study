@@ -16,17 +16,15 @@ import { saveLessonResult, updateAdaptiveData } from './lessonStorage';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const MAX_REVIEW_PER_EXERCISE = 1; // each exercise can enter review at most once
-const MAX_TOTAL_REVIEWS = 3;       // at most 3 review exercises per lesson
+const MAX_TOTAL_REVIEWS = 4;    // max wrong-answer re-insertions per lesson
+const REINSERT_AHEAD = 3;       // insert wrong exercise N positions ahead
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-// Strip __review suffix to get the original exercise ID
 function originalId(id: string): string {
   return id.replace(/__review$/, '');
 }
 
-// Non-interactive types advance automatically — no feedback bar shown, no scoring
 const NON_INTERACTIVE_TYPES = new Set([
   'teach_card',
   'audio_reinforcement',
@@ -56,8 +54,8 @@ const CONFIDENCE_WEIGHT = 8;
 
 // ── Phase determination ────────────────────────────────────────────────────
 
-function resolvePhase(pct: number, inReview: boolean): LessonPhase {
-  if (inReview) return 'review';
+function resolvePhase(pct: number, isReview: boolean): LessonPhase {
+  if (isReview) return 'review';
   if (pct < 20) return 'easy';
   if (pct < 40) return 'listening';
   if (pct < 60) return 'guided';
@@ -107,40 +105,31 @@ export function useLessonFlow(
   lessonId: string,
   baseExercises: LessonExercise[]
 ): UseLessonFlowReturn {
-  // ── Phase 1 tracking ─────────────────────────────────────────────────────
-  const [baseIdx, setBaseIdx] = useState(0);
+  // Single mutable exercise list — review exercises are injected inline
+  const [exercises, setExercises] = useState<LessonExercise[]>(() => [...baseExercises]);
+  const [currentIdx, setCurrentIdx] = useState(0);
 
-  // ── Phase 2 tracking ─────────────────────────────────────────────────────
-  const [reviewQueue, setReviewQueue] = useState<LessonExercise[]>([]);
-  const [reviewIdx, setReviewIdx] = useState(0);
-  const [inReview, setInReview] = useState(false);
-
-  // ── Completion ───────────────────────────────────────────────────────────
   const [isComplete, setIsComplete] = useState(false);
   const [result, setResult] = useState<LessonResult | null>(null);
-
-  // ── Progress ─────────────────────────────────────────────────────────────
   const [earnedPoints, setEarnedPoints] = useState(0);
-
-  // ── Conversation memory ───────────────────────────────────────────────────
   const [memory, setMemory] = useState<ConversationMemory>({});
 
-  // ── Persistent refs (don't trigger re-render) ─────────────────────────────
-  // Which original exercise IDs have been added to review (prevents duplicates)
+  // Refs — mutations don't trigger re-render
   const reviewedOriginalIds = useRef(new Set<string>());
-  // Wrong counts per original exercise ID
+  const totalReviewsAdded = useRef(0);
   const wrongCounts = useRef<Record<string, number>>({});
-  // Stats for result
   const correctFirstTry = useRef(0);
   const interactiveAnswered = useRef(0);
   const skillBreakdown = useRef<SkillBreakdown>({});
-  const confidenceRef = useRef<ConfidenceScores>({ listening: 50, kana: 50, particles: 50, production: 50 });
+  const confidenceRef = useRef<ConfidenceScores>({
+    listening: 50,
+    kana: 50,
+    particles: 50,
+    production: 50,
+  });
 
   // ── Derived values ────────────────────────────────────────────────────────
 
-  const totalBase = baseExercises.length;
-
-  // Max progress points = sum of base exercise gains only (fixed denominator)
   const maxPoints = useMemo(
     () => baseExercises.reduce((sum, ex) => sum + PROGRESS_GAIN_BY_TYPE[ex.type], 0),
     [baseExercises]
@@ -148,20 +137,19 @@ export function useLessonFlow(
 
   const currentExercise: LessonExercise | null = isComplete
     ? null
-    : inReview
-      ? (reviewQueue[reviewIdx] ?? null)
-      : (baseExercises[baseIdx] ?? null);
+    : (exercises[currentIdx] ?? null);
 
-  // Progress capped at 99 until lesson is explicitly complete, then 100
+  const isReviewExercise = currentExercise?.id.endsWith('__review') ?? false;
+
   const progressPct = isComplete
     ? 100
     : maxPoints > 0
       ? Math.min(99, Math.round((earnedPoints / maxPoints) * 100))
       : 0;
 
-  const phase = resolvePhase(progressPct, inReview);
+  const phase = resolvePhase(progressPct, isReviewExercise);
 
-  // ── Memory helpers ────────────────────────────────────────────────────────
+  // ── Memory ────────────────────────────────────────────────────────────────
 
   const updateMemory = useCallback((key: string, value: string) => {
     setMemory((prev) => ({ ...prev, [key]: value }));
@@ -190,7 +178,7 @@ export function useLessonFlow(
     setIsComplete(true);
   }, [lessonId]);
 
-  // ── Confidence update ─────────────────────────────────────────────────────
+  // ── Confidence ────────────────────────────────────────────────────────────
 
   const applyConfidence = useCallback((tags: SkillTag[], correct: boolean) => {
     const delta = (correct ? 1 : -1) * CONFIDENCE_WEIGHT;
@@ -217,7 +205,11 @@ export function useLessonFlow(
     if (!isNonInteractive(currentExercise.type)) {
       if (!hadWrong) correctFirstTry.current += 1;
       interactiveAnswered.current += 1;
-      skillBreakdown.current = updateSkillBreakdown(skillBreakdown.current, currentExercise.skillTags, true);
+      skillBreakdown.current = updateSkillBreakdown(
+        skillBreakdown.current,
+        currentExercise.skillTags,
+        true
+      );
       applyConfidence(currentExercise.skillTags, true);
     }
 
@@ -231,74 +223,63 @@ export function useLessonFlow(
 
     const oid = originalId(currentExercise.id);
 
-    // Partial progress gain
     const gain = PROGRESS_GAIN_BY_TYPE[currentExercise.type] * WRONG_GAIN_MULTIPLIER;
     setEarnedPoints((prev) => Math.min(maxPoints, prev + gain));
 
     if (!isNonInteractive(currentExercise.type)) {
       interactiveAnswered.current += 1;
-      skillBreakdown.current = updateSkillBreakdown(skillBreakdown.current, currentExercise.skillTags, false);
+      skillBreakdown.current = updateSkillBreakdown(
+        skillBreakdown.current,
+        currentExercise.skillTags,
+        false
+      );
       applyConfidence(currentExercise.skillTags, false);
     }
 
     updateAdaptiveData(oid, false);
-
-    // Track wrong count by original ID
     wrongCounts.current[oid] = (wrongCounts.current[oid] ?? 0) + 1;
 
-    // Add to review queue if:
-    //   - not already in review pool
-    //   - review pool not full
-    //   - this is not already a review exercise (prevent re-review)
-    const alreadyReviewed = reviewedOriginalIds.current.has(oid);
-    const poolFull = reviewQueue.length >= MAX_TOTAL_REVIEWS;
+    // Inject the wrong exercise back into the live list REINSERT_AHEAD positions ahead.
+    // This means the user will face the same question again before the lesson ends.
+    const alreadyQueued = reviewedOriginalIds.current.has(oid);
+    const atLimit = totalReviewsAdded.current >= MAX_TOTAL_REVIEWS;
 
-    if (!alreadyReviewed && !poolFull && MAX_REVIEW_PER_EXERCISE > 0) {
+    if (!alreadyQueued && !atLimit) {
       reviewedOriginalIds.current.add(oid);
-      const reviewExercise: LessonExercise = { ...currentExercise, id: `${oid}__review` };
-      setReviewQueue((prev) => [...prev, reviewExercise]);
+      totalReviewsAdded.current += 1;
+      const reviewEx: LessonExercise = {
+        ...currentExercise,
+        id: `${oid}__review`,
+      };
+      setExercises((prev) => {
+        const insertPos = Math.min(currentIdx + REINSERT_AHEAD, prev.length);
+        const next = [...prev];
+        next.splice(insertPos, 0, reviewEx);
+        return next;
+      });
     }
-  }, [currentExercise, maxPoints, reviewQueue.length, applyConfidence]);
+  }, [currentExercise, maxPoints, currentIdx, applyConfidence]);
 
   // ── onNext ────────────────────────────────────────────────────────────────
 
   const onNext = useCallback(() => {
     if (isComplete) return;
-
-    if (!inReview) {
-      // Still in base phase
-      const nextBase = baseIdx + 1;
-      setBaseIdx(nextBase);
-
-      if (nextBase >= totalBase) {
-        // Base exercises exhausted — check if review needed
-        if (reviewQueue.length === 0) {
-          completeLesson();
-        } else {
-          setInReview(true);
-          setReviewIdx(0);
-        }
-      }
-    } else {
-      // In review phase
-      const nextReview = reviewIdx + 1;
-      setReviewIdx(nextReview);
-
-      if (nextReview >= reviewQueue.length) {
-        completeLesson();
-      }
+    const nextIdx = currentIdx + 1;
+    setCurrentIdx(nextIdx);
+    if (nextIdx >= exercises.length) {
+      completeLesson();
     }
-  }, [isComplete, inReview, baseIdx, totalBase, reviewQueue.length, reviewIdx, completeLesson]);
+  }, [isComplete, currentIdx, exercises.length, completeLesson]);
 
   // ── Return ────────────────────────────────────────────────────────────────
 
   return {
     currentExercise,
-    exerciseIndex: inReview ? totalBase + reviewIdx : baseIdx,
-    totalBaseExercises: totalBase,
+    exerciseIndex: currentIdx,
+    totalBaseExercises: baseExercises.length,
     progressPct,
     phase,
-    isReviewPhase: inReview,
+    isReviewPhase: isReviewExercise,
     isComplete,
     conversationMemory: memory,
     updateMemory,

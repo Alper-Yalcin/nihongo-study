@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Volume2 } from 'lucide-react';
 import { createAudioPlayer } from '../../lessonAudio';
 import type { GuidedResponseExercise } from '../../lessonTypes';
+import { DialogueBubble } from '../ui/DialogueBubble';
+import { deriveChoiceState } from '../ui/ChoicePill';
 
 interface Props {
   exercise: GuidedResponseExercise;
@@ -9,25 +10,26 @@ interface Props {
   checked: boolean;
 }
 
-function optionCls(i: number, correct: boolean, selected: number | null, checked: boolean): string {
-  const base = 'rounded-[0.9rem] border-2 px-5 py-4 text-left font-jp text-lg font-black transition';
+function replyBubbleCls(
+  i: number,
+  correct: boolean,
+  selected: number | null,
+  checked: boolean,
+): string {
+  const base =
+    'rounded-[1rem] rounded-tr-sm px-4 py-3 font-jp text-base font-black text-right transition-all duration-150';
+  const state = deriveChoiceState(i, correct, selected, checked);
 
-  if (selected === null) {
-    return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] shadow-[inset_0_-4px_0_var(--kt-border-subtle)] hover:-translate-y-0.5 cursor-pointer`;
-  }
-  if (!checked) {
-    if (i === selected) {
-      return `${base} border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-brand)_25%,transparent)]`;
-    }
-    return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-40`;
-  }
-  if (correct) {
-    return `${base} border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-success)_30%,transparent)]`;
-  }
-  if (i === selected) {
-    return `${base} border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-danger)_30%,transparent)]`;
-  }
-  return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-40`;
+  const stateMap: Record<string, string> = {
+    idle: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:-translate-y-0.5 hover:border-[var(--kt-brand)] cursor-pointer',
+    selected:
+      'border-2 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] pointer-events-none',
+    correct:
+      'border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] pointer-events-none',
+    wrong: 'border-2 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] pointer-events-none',
+    dimmed: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-30 pointer-events-none',
+  };
+  return `${base} ${stateMap[state]}`;
 }
 
 export const GuidedResponse: React.FC<Props> = ({ exercise, onAnswerSelect, checked }) => {
@@ -35,8 +37,8 @@ export const GuidedResponse: React.FC<Props> = ({ exercise, onAnswerSelect, chec
   const [selected, setSelected] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => audio.play(), 500);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => audio.play(), 500);
+    return () => clearTimeout(t);
   }, [exercise.id]);
 
   const handleSelect = (index: number, correct: boolean) => {
@@ -46,42 +48,32 @@ export const GuidedResponse: React.FC<Props> = ({ exercise, onAnswerSelect, chec
   };
 
   return (
-    <section className="mx-auto max-w-2xl">
-      <div className="rounded-[1.4rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 shadow-[var(--kt-shadow-md)]">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => audio.play()}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[0.85rem] bg-[var(--kt-accent-info)] text-white shadow-[inset_0_-3px_0_color-mix(in_srgb,var(--kt-accent-info)_70%,black)]"
-          >
-            <Volume2 size={24} strokeWidth={2.5} />
-          </button>
-          <div>
-            <div className="font-jp text-2xl font-black text-[var(--kt-ink-strong)]">
-              {exercise.npcJapanese}
-            </div>
-            <div className="mt-0.5 text-sm font-bold text-[var(--kt-ink-muted)]">
-              {exercise.npcMeaning}
-            </div>
-          </div>
+    <section className="mx-auto max-w-lg space-y-5">
+      {/* NPC dialogue bubble */}
+      <DialogueBubble
+        speaker="npc"
+        japanese={exercise.npcJapanese}
+        meaning={exercise.npcMeaning}
+        onAudio={() => audio.play()}
+      />
+
+      {/* Reply options — right-aligned chat bubble style */}
+      <div className="mt-4">
+        <p className="mb-3 text-xs font-black uppercase tracking-wider text-[var(--kt-ink-subtle)]">
+          Nasıl cevap verirsin?
+        </p>
+        <div className="flex flex-col items-end gap-2.5">
+          {exercise.options.map((option, i) => (
+            <button
+              key={i}
+              type="button"
+              className={replyBubbleCls(i, option.correct, selected, checked)}
+              onClick={() => handleSelect(i, option.correct)}
+            >
+              {option.japanese}
+            </button>
+          ))}
         </div>
-      </div>
-
-      <p className="mt-5 mb-3 text-sm font-black uppercase tracking-wider text-[var(--kt-ink-muted)]">
-        Nasıl cevap verirsin?
-      </p>
-
-      <div className="flex flex-col gap-3">
-        {exercise.options.map((option, i) => (
-          <button
-            key={i}
-            type="button"
-            className={optionCls(i, option.correct, selected, checked)}
-            onClick={() => handleSelect(i, option.correct)}
-          >
-            {option.japanese}
-          </button>
-        ))}
       </div>
     </section>
   );

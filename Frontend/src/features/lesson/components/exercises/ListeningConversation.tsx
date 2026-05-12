@@ -1,12 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { Volume2 } from 'lucide-react';
 import { createAudioPlayer } from '../../lessonAudio';
 import type { ListeningConversationExercise } from '../../lessonTypes';
+import { AudioOrb } from '../ui/AudioOrb';
+import { DialogueBubble } from '../ui/DialogueBubble';
+import { deriveChoiceState } from '../ui/ChoicePill';
 
 interface Props {
   exercise: ListeningConversationExercise;
   onCorrect: () => void;
   onWrong: () => void;
+}
+
+function replyBubbleCls(
+  i: number,
+  correct: boolean,
+  selected: number | null,
+): string {
+  const base =
+    'rounded-[1rem] rounded-tr-sm px-4 py-3 font-jp text-lg font-black text-right transition-all duration-150';
+  const state = deriveChoiceState(i, correct, selected, selected !== null);
+
+  const stateMap: Record<string, string> = {
+    idle: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:-translate-y-0.5 hover:border-[var(--kt-brand)] cursor-pointer',
+    selected: 'border-2 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] pointer-events-none',
+    correct: 'border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] pointer-events-none',
+    wrong: 'border-2 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] pointer-events-none',
+    dimmed: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-30 pointer-events-none',
+  };
+  return `${base} ${stateMap[state] ?? stateMap.dimmed}`;
 }
 
 export const ListeningConversation: React.FC<Props> = ({ exercise, onCorrect, onWrong }) => {
@@ -15,8 +36,8 @@ export const ListeningConversation: React.FC<Props> = ({ exercise, onCorrect, on
   const [selected, setSelected] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => audio.play(), 400);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => audio.play(), 400);
+    return () => clearTimeout(t);
   }, [exercise.id]);
 
   const handleSelect = (index: number, correct: boolean) => {
@@ -27,85 +48,52 @@ export const ListeningConversation: React.FC<Props> = ({ exercise, onCorrect, on
   };
 
   return (
-    <section className="mx-auto max-w-2xl text-center">
-      <p className="mb-6 text-sm font-black uppercase tracking-wider text-[var(--kt-ink-muted)]">
+    <section className="mx-auto max-w-lg">
+      <p className="mb-6 text-center text-xs font-black uppercase tracking-widest text-[var(--kt-ink-subtle)]">
         Önce dinle, sonra cevapla
       </p>
 
-      <div className="rounded-[1.4rem] border-2 border-[var(--kt-accent-info)] bg-[var(--kt-accent-info-soft)] p-8 shadow-[var(--kt-shadow-md)]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => audio.play()}
-              className="flex h-18 w-18 h-16 w-16 items-center justify-center rounded-[1.1rem] bg-[var(--kt-accent-info)] text-white shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-info)_70%,black)] transition hover:scale-105"
-            >
-              <Volume2 size={32} strokeWidth={2.5} />
-            </button>
-            <button
-              type="button"
-              onClick={() => audio.playSlower()}
-              className="flex h-10 w-10 items-center justify-center rounded-[0.75rem] bg-[var(--kt-accent-info)] text-white opacity-70"
-            >
-              <Volume2 size={20} strokeWidth={2.5} />
-            </button>
-          </div>
-
-          {revealed ? (
-            <div>
-              <div className="font-jp text-2xl font-black text-[var(--kt-ink-strong)]">
-                {exercise.hiddenJapanese}
-              </div>
-              <div className="mt-1 text-sm font-bold text-[var(--kt-ink-muted)]">
-                {exercise.hiddenMeaning}
-              </div>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setRevealed(true)}
-              className="text-sm font-bold text-[var(--kt-ink-subtle)] underline"
-            >
-              Japonca'yı göster (ipucu)
-            </button>
-          )}
-        </div>
+      {/* AudioOrb as hero */}
+      <div className="mb-7 flex justify-center">
+        <AudioOrb onPlay={() => audio.play()} onPlaySlow={() => audio.playSlower()} />
       </div>
 
-      <p className="mt-6 mb-3 text-sm font-black uppercase tracking-wider text-[var(--kt-ink-muted)]">
+      {/* Hidden text / reveal */}
+      {!revealed ? (
+        <div className="mb-6 text-center">
+          <button
+            type="button"
+            onClick={() => setRevealed(true)}
+            className="text-xs font-bold text-[var(--kt-ink-subtle)] underline"
+          >
+            Japonca'yı göster (ipucu)
+          </button>
+        </div>
+      ) : (
+        <div className="mb-6">
+          <DialogueBubble
+            speaker="npc"
+            japanese={exercise.hiddenJapanese}
+            meaning={exercise.hiddenMeaning}
+          />
+        </div>
+      )}
+
+      {/* Reply options */}
+      <p className="mb-3 text-right text-xs font-black uppercase tracking-wider text-[var(--kt-ink-subtle)]">
         Ne dedi?
       </p>
-
-      <div className="grid grid-cols-2 gap-3">
-        {exercise.options.map((option, i) => {
-          let cls =
-            'rounded-[0.9rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 py-4 font-jp text-lg font-black text-[var(--kt-ink-strong)] shadow-[inset_0_-4px_0_var(--kt-border-subtle)] transition';
-
-          if (selected !== null) {
-            if (option.correct) {
-              cls =
-                'rounded-[0.9rem] border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] px-5 py-4 font-jp text-lg font-black text-[var(--kt-accent-success)] shadow-none';
-            } else if (i === selected) {
-              cls =
-                'rounded-[0.9rem] border-2 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] px-5 py-4 font-jp text-lg font-black text-[var(--kt-accent-danger)] shadow-none';
-            } else {
-              cls += ' opacity-40';
-            }
-          } else {
-            cls += ' hover:-translate-y-0.5 cursor-pointer';
-          }
-
-          return (
-            <button
-              key={i}
-              type="button"
-              className={cls}
-              onClick={() => handleSelect(i, option.correct)}
-            >
-              {option.japanese}
-            </button>
-          );
-        })}
+      <div className="flex flex-col items-end gap-2.5">
+        {exercise.options.map((option, i) => (
+          <button
+            key={i}
+            type="button"
+            className={replyBubbleCls(i, option.correct, selected)}
+            onClick={() => handleSelect(i, option.correct)}
+          >
+            {option.japanese}
+          </button>
+        ))}
       </div>
     </section>
   );

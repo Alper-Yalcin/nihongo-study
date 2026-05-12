@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Volume2 } from 'lucide-react';
 import { createAudioPlayer } from '../../lessonAudio';
 import type { AudioToKanaExercise } from '../../lessonTypes';
+import { AudioOrb } from '../ui/AudioOrb';
+import { deriveChoiceState } from '../ui/ChoicePill';
 
 interface Props {
   exercise: AudioToKanaExercise;
@@ -9,25 +10,23 @@ interface Props {
   checked: boolean;
 }
 
-function optionCls(i: number, correct: boolean, selected: number | null, checked: boolean): string {
-  const base = 'rounded-[0.9rem] border-2 px-5 py-5 font-jp text-2xl font-black transition';
+function kanaOptionCls(
+  i: number,
+  correct: boolean,
+  selected: number | null,
+  checked: boolean,
+): string {
+  const base = 'rounded-[0.95rem] py-5 font-jp text-3xl font-black text-center transition-all duration-150';
+  const state = deriveChoiceState(i, correct, selected, checked);
 
-  if (selected === null) {
-    return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] shadow-[inset_0_-4px_0_var(--kt-border-subtle)] hover:-translate-y-0.5 cursor-pointer`;
-  }
-  if (!checked) {
-    if (i === selected) {
-      return `${base} border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-brand)_25%,transparent)]`;
-    }
-    return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-40`;
-  }
-  if (correct) {
-    return `${base} border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-success)_30%,transparent)]`;
-  }
-  if (i === selected) {
-    return `${base} border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-danger)_30%,transparent)]`;
-  }
-  return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-40`;
+  const stateMap: Record<string, string> = {
+    idle: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] shadow-[0_2px_0_var(--kt-border)] hover:-translate-y-0.5 hover:border-[var(--kt-brand)] cursor-pointer',
+    selected: 'border-2 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] pointer-events-none',
+    correct: 'border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] pointer-events-none',
+    wrong: 'border-2 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] pointer-events-none',
+    dimmed: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-30 pointer-events-none',
+  };
+  return `${base} ${stateMap[state]}`;
 }
 
 export const AudioToKana: React.FC<Props> = ({ exercise, onAnswerSelect, checked }) => {
@@ -35,8 +34,8 @@ export const AudioToKana: React.FC<Props> = ({ exercise, onAnswerSelect, checked
   const [selected, setSelected] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => audio.play(), 400);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => audio.play(), 400);
+    return () => clearTimeout(t);
   }, [exercise.id]);
 
   const handleSelect = (index: number, correct: boolean) => {
@@ -46,36 +45,21 @@ export const AudioToKana: React.FC<Props> = ({ exercise, onAnswerSelect, checked
   };
 
   return (
-    <section className="mx-auto max-w-2xl text-center">
-      <p className="mb-6 text-sm font-black uppercase tracking-wider text-[var(--kt-ink-muted)]">
+    <section className="mx-auto max-w-lg text-center">
+      <p className="mb-7 text-xs font-black uppercase tracking-widest text-[var(--kt-ink-subtle)]">
         Duyduğun kana'yı seç
       </p>
 
-      <div className="flex items-center justify-center gap-4">
-        <button
-          type="button"
-          onClick={() => audio.play()}
-          className="flex h-20 w-20 items-center justify-center rounded-[1.3rem] bg-[var(--kt-accent-info)] text-white shadow-[inset_0_-5px_0_color-mix(in_srgb,var(--kt-accent-info)_70%,black)] transition hover:scale-105"
-          aria-label="Sesi çal"
-        >
-          <Volume2 size={38} strokeWidth={2.5} />
-        </button>
-        <button
-          type="button"
-          onClick={() => audio.playSlower()}
-          className="flex h-12 w-12 items-center justify-center rounded-[0.85rem] bg-[var(--kt-accent-info)] text-white opacity-70 shadow-[inset_0_-3px_0_color-mix(in_srgb,var(--kt-accent-info)_70%,black)]"
-          aria-label="Yavaş çal"
-        >
-          <Volume2 size={22} strokeWidth={2.5} />
-        </button>
-      </div>
+      {/* AudioOrb as hero */}
+      <AudioOrb onPlay={() => audio.play()} onPlaySlow={() => audio.playSlower()} />
 
-      <div className="mt-10 grid grid-cols-2 gap-4">
+      {/* 2×2 large kana tiles */}
+      <div className="mt-10 grid grid-cols-2 gap-3">
         {exercise.options.map((option, i) => (
           <button
             key={i}
             type="button"
-            className={optionCls(i, option.correct, selected, checked)}
+            className={kanaOptionCls(i, option.correct, selected, checked)}
             onClick={() => handleSelect(i, option.correct)}
           >
             {option.japanese}

@@ -11,71 +11,69 @@ interface Props {
 export const TeachCard: React.FC<Props> = ({ exercise, onContinue }) => {
   const [revealed, setRevealed] = useState(false);
 
-  // Auto-play audio when meaning is revealed
   useEffect(() => {
     if (revealed) {
-      const timer = setTimeout(() => playJapaneseAudio(exercise.audioText), 250);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => playJapaneseAudio(exercise.audioText), 280);
+      return () => clearTimeout(t);
     }
   }, [revealed, exercise.audioText]);
 
-  const handleReveal = () => setRevealed(true);
-
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-5 px-2 pt-2">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-6 px-2 pt-4">
 
-      {/* Scene background + NPC speech bubble */}
-      {(exercise.sceneBg || exercise.npcLine || exercise.sceneContext) && (
-        <div className="rounded-[1.4rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 py-4 shadow-[var(--kt-shadow-sm)]">
+      {/* Scene ambient row — no card */}
+      {(exercise.sceneBg || exercise.sceneContext) && (
+        <div className="flex w-full items-center gap-3">
           {exercise.sceneBg && (
-            <div className="mb-3 text-5xl leading-none">{exercise.sceneBg}</div>
-          )}
-          {exercise.npcLine && (
-            <div className="mb-2 inline-block rounded-[1rem] rounded-tl-sm bg-[var(--kt-surface-muted)] px-4 py-2.5">
-              <span className="font-jp text-xl font-black text-[var(--kt-ink-strong)]">
-                「{exercise.npcLine}」
-              </span>
-            </div>
+            <span className="text-4xl leading-none">{exercise.sceneBg}</span>
           )}
           {exercise.sceneContext && (
-            <p className="text-sm font-bold text-[var(--kt-ink-subtle)] italic">
+            <span className="text-sm font-bold italic text-[var(--kt-ink-subtle)]">
               {exercise.sceneContext}
-            </p>
+            </span>
           )}
         </div>
       )}
 
-      {/* Main word card */}
-      <div className={`rounded-[1.6rem] border-2 p-8 text-center shadow-[var(--kt-shadow-md)] transition-colors duration-300 ${
-        revealed
-          ? 'border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))]'
-          : 'border-[var(--kt-border)] bg-[var(--kt-surface)]'
-      }`}>
-        {/* New word badge */}
-        <span className="mb-4 inline-block rounded-full bg-[var(--kt-brand)] px-3 py-1 text-xs font-black uppercase tracking-widest text-[var(--kt-brand-on)]">
+      {/* NPC line as dialogue bubble — no wrapper card */}
+      {exercise.npcLine && (
+        <div className="w-full">
+          <div className="inline-block rounded-[1.1rem] rounded-tl-sm bg-[var(--kt-surface)] px-4 py-3 shadow-[0_2px_14px_rgba(0,0,0,0.07)]">
+            <span className="font-jp text-xl font-black text-[var(--kt-ink-strong)]">
+              「{exercise.npcLine}」
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Main focus: Japanese word floating, no heavy card */}
+      <div className="w-full text-center">
+        <span className="mb-3 inline-block rounded-full bg-[var(--kt-brand)] px-3 py-0.5 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[var(--kt-brand-on)]">
           Yeni Kelime
         </span>
 
-        {/* Japanese — always visible, large and primary */}
-        <div className="font-jp text-7xl font-black text-[var(--kt-ink-strong)] leading-none">
+        <div
+          className={`font-jp text-7xl font-black leading-none tracking-tight transition-colors duration-300 ${
+            revealed ? 'text-[var(--kt-brand)]' : 'text-[var(--kt-ink-strong)]'
+          }`}
+        >
           {exercise.japanese}
         </div>
 
-        {/* Romaji — always visible but secondary */}
-        <div className="mt-3 text-sm font-bold tracking-widest text-[var(--kt-ink-subtle)]">
+        <div className="mt-2.5 text-xs font-bold tracking-[0.18em] text-[var(--kt-ink-subtle)]">
           {exercise.romaji}
         </div>
 
-        {/* Meaning + details — only after reveal */}
+        {/* Revealed content — fades in below the word, no extra card border */}
         {revealed && (
-          <div className="mt-5 border-t border-[var(--kt-border)] pt-5">
+          <div className="mt-5 space-y-3">
             <p className="text-2xl font-black text-[var(--kt-ink-strong)]">
               {exercise.meaning}
             </p>
 
             {exercise.exampleJapanese && (
-              <div className="mt-4 rounded-[0.8rem] bg-[var(--kt-surface)] px-4 py-3 text-left">
-                <p className="text-xs font-black uppercase tracking-wider text-[var(--kt-ink-subtle)] mb-1">
+              <div className="mx-auto max-w-xs rounded-[0.9rem] bg-[var(--kt-surface-muted)] px-4 py-3 text-left">
+                <p className="mb-1 text-[0.65rem] font-black uppercase tracking-wider text-[var(--kt-ink-subtle)]">
                   Örnek
                 </p>
                 <p className="font-jp text-lg font-black text-[var(--kt-ink-strong)]">
@@ -90,7 +88,7 @@ export const TeachCard: React.FC<Props> = ({ exercise, onContinue }) => {
             )}
 
             {exercise.usageNote && (
-              <p className="mt-3 text-xs font-bold text-[var(--kt-ink-subtle)] italic">
+              <p className="text-xs font-bold italic text-[var(--kt-ink-subtle)]">
                 💡 {exercise.usageNote}
               </p>
             )}
@@ -98,23 +96,23 @@ export const TeachCard: React.FC<Props> = ({ exercise, onContinue }) => {
         )}
       </div>
 
-      {/* Action buttons */}
+      {/* Action row */}
       {!revealed ? (
         <button
           type="button"
-          onClick={handleReveal}
+          onClick={() => setRevealed(true)}
           className="w-full rounded-[0.95rem] bg-[var(--kt-brand)] px-5 py-4 text-sm font-black uppercase tracking-[0.08em] text-[var(--kt-brand-on)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-brand)_76%,black)] transition hover:opacity-90"
         >
           Anlamını Gör →
         </button>
       ) : (
-        <div className="flex gap-3">
+        <div className="flex w-full gap-3">
           <button
             type="button"
             onClick={() => playJapaneseAudio(exercise.audioText)}
-            className="flex items-center gap-2 rounded-[0.95rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 py-4 text-sm font-black text-[var(--kt-ink-strong)] shadow-[var(--kt-shadow-sm)] transition hover:bg-[var(--kt-surface-muted)]"
+            className="flex items-center gap-2 rounded-[0.95rem] border border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 py-4 text-sm font-black text-[var(--kt-ink-strong)] shadow-sm transition hover:bg-[var(--kt-surface-muted)]"
           >
-            <Volume2 size={18} className="text-[var(--kt-brand)]" />
+            <Volume2 size={17} className="text-[var(--kt-brand)]" />
             Dinle
           </button>
           <button

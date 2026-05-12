@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Volume2 } from 'lucide-react';
 import { createAudioPlayer } from '../../lessonAudio';
 import type { ConversationChainExercise, ConversationMemory } from '../../lessonTypes';
+import { DialogueBubble } from '../ui/DialogueBubble';
+import { deriveChoiceState } from '../ui/ChoicePill';
 
 interface Props {
   exercise: ConversationChainExercise;
@@ -13,6 +14,27 @@ interface Props {
 
 function resolveTemplate(template: string, memory: ConversationMemory): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => memory[key] ?? _);
+}
+
+function replyBubbleCls(
+  i: number,
+  correct: boolean,
+  selected: number | null,
+): string {
+  const base =
+    'rounded-[1rem] rounded-tr-sm px-4 py-3 font-jp text-base font-black text-right transition-all duration-150';
+  const state = deriveChoiceState(i, correct, selected, true);
+
+  if (selected === null) {
+    return `${base} border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] hover:-translate-y-0.5 hover:border-[var(--kt-brand)] cursor-pointer`;
+  }
+  const stateMap: Record<string, string> = {
+    selected: 'border-2 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] pointer-events-none',
+    correct: 'border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] pointer-events-none',
+    wrong: 'border-2 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] pointer-events-none',
+    dimmed: 'border border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-30 pointer-events-none',
+  };
+  return `${base} ${stateMap[state] ?? stateMap.dimmed}`;
 }
 
 export const ConversationChain: React.FC<Props> = ({
@@ -41,7 +63,6 @@ export const ConversationChain: React.FC<Props> = ({
     }
   }, [isDone]);
 
-  // Auto-play NPC audio when NPC turn advances
   useEffect(() => {
     if (!currentTurn || currentTurn.speaker !== 'npc' || !currentTurn.audioText) return;
     const audio = createAudioPlayer(currentTurn.audioText);
@@ -57,12 +78,9 @@ export const ConversationChain: React.FC<Props> = ({
   const handleUserSelect = (index: number, correct: boolean, japanese: string) => {
     if (selectedOption !== null) return;
     setSelectedOption(index);
-
     if (!correct) setWrongOnce(true);
 
-    // Memory capture
     if (currentTurn?.memoryKey && onMemoryUpdate) {
-      // Extract the name from "アリです" → "アリ"
       const cleaned = japanese.replace(/です$/, '').trim();
       onMemoryUpdate(currentTurn.memoryKey, cleaned);
     }
@@ -74,124 +92,85 @@ export const ConversationChain: React.FC<Props> = ({
   };
 
   return (
-    <section className="mx-auto max-w-2xl">
+    <section className="mx-auto max-w-lg">
       <div className="space-y-3">
-        {/* Render past turns as static bubbles */}
+        {/* Past turns — dimmed */}
         {exercise.turns.slice(0, turnIdx).map((turn, i) => {
           if (turn.speaker === 'npc') {
-            const resolved = resolveTemplate(turn.npcJapanese ?? '', memory);
             return (
-              <div key={i} className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--kt-accent-info)] text-sm font-black text-white">
-                  NPC
-                </div>
-                <div className="rounded-[1rem] rounded-tl-sm border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3">
-                  <div className="font-jp text-lg font-black text-[var(--kt-ink-strong)]">{resolved}</div>
-                  {turn.npcMeaning && (
-                    <div className="mt-0.5 text-xs font-bold text-[var(--kt-ink-muted)]">{resolveTemplate(turn.npcMeaning, memory)}</div>
-                  )}
-                </div>
-              </div>
-            );
-          } else {
-            return (
-              <div key={i} className="flex items-start justify-end gap-3">
-                <div className="rounded-[1rem] rounded-tr-sm border-2 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-accent-success-soft))] px-4 py-3">
-                  <div className="font-jp text-lg font-black text-[var(--kt-ink-strong)]">
-                    {turn.userOptions?.find((o) => o.correct)?.japanese ?? '...'}
-                  </div>
-                </div>
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--kt-brand)] text-sm font-black text-[var(--kt-brand-on)]">
-                  Sen
-                </div>
-              </div>
+              <DialogueBubble
+                key={i}
+                speaker="npc"
+                japanese={resolveTemplate(turn.npcJapanese ?? '', memory)}
+                meaning={turn.npcMeaning ? resolveTemplate(turn.npcMeaning, memory) : undefined}
+                dimmed
+              />
             );
           }
+          return (
+            <DialogueBubble
+              key={i}
+              speaker="user"
+              japanese={turn.userOptions?.find((o) => o.correct)?.japanese ?? '...'}
+              dimmed
+            />
+          );
         })}
 
         {/* Current NPC turn */}
         {currentTurn?.speaker === 'npc' && (
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--kt-accent-info)] text-sm font-black text-white">
-              NPC
-            </div>
-            <div className="rounded-[1rem] rounded-tl-sm border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 shadow-[var(--kt-shadow-sm)]">
-              <div className="font-jp text-lg font-black text-[var(--kt-ink-strong)]">
-                {resolveTemplate(currentTurn.npcJapanese ?? '', memory)}
-              </div>
-              {currentTurn.npcMeaning && (
-                <div className="mt-0.5 text-xs font-bold text-[var(--kt-ink-muted)]">
-                  {resolveTemplate(currentTurn.npcMeaning, memory)}
-                </div>
-              )}
-              <div className="mt-2 flex gap-2">
-                {currentTurn.audioText && (
-                  <button
-                    type="button"
-                    onClick={() => createAudioPlayer(currentTurn.audioText!).play()}
-                    className="flex h-7 w-7 items-center justify-center rounded-[0.5rem] bg-[var(--kt-accent-info)] text-white"
-                  >
-                    <Volume2 size={14} />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          <DialogueBubble
+            speaker="npc"
+            japanese={resolveTemplate(currentTurn.npcJapanese ?? '', memory)}
+            meaning={
+              currentTurn.npcMeaning
+                ? resolveTemplate(currentTurn.npcMeaning, memory)
+                : undefined
+            }
+            onAudio={
+              currentTurn.audioText
+                ? () => createAudioPlayer(currentTurn.audioText!).play()
+                : undefined
+            }
+          />
         )}
 
-        {/* Current user turn */}
-        {currentTurn?.speaker === 'user' && currentTurn.userOptions && (
-          <div className="mt-2 flex flex-col gap-2 pl-0 pr-0">
-            <p className="text-xs font-black uppercase tracking-wider text-[var(--kt-ink-muted)]">
-              Cevabını seç:
-            </p>
-            {currentTurn.userOptions.map((opt, i) => {
-              let cls =
-                'rounded-[0.85rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-4 py-3 text-right font-jp text-base font-black text-[var(--kt-ink-strong)] shadow-[inset_0_-3px_0_var(--kt-border-subtle)] transition';
-
-              if (selectedOption !== null) {
-                if (opt.correct) {
-                  cls =
-                    'rounded-[0.85rem] border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] px-4 py-3 text-right font-jp text-base font-black text-[var(--kt-accent-success)] shadow-none';
-                } else if (i === selectedOption) {
-                  cls =
-                    'rounded-[0.85rem] border-2 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] px-4 py-3 text-right font-jp text-base font-black text-[var(--kt-accent-danger)] shadow-none';
-                } else {
-                  cls += ' opacity-40';
-                }
-              } else {
-                cls += ' hover:-translate-y-0.5 cursor-pointer';
-              }
-
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  className={cls}
-                  onClick={() => handleUserSelect(i, opt.correct, opt.japanese)}
-                >
-                  {opt.japanese}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* NPC turn — continue button */}
+        {/* Current NPC — advance button */}
         {currentTurn?.speaker === 'npc' && (
           <div className="flex justify-end">
             <button
               type="button"
               onClick={handleAdvance}
-              className="rounded-[0.85rem] bg-[var(--kt-brand)] px-5 py-2.5 text-sm font-black text-[var(--kt-brand-on)] shadow-[inset_0_-3px_0_color-mix(in_srgb,var(--kt-brand)_76%,black)]"
+              className="rounded-[0.85rem] bg-[var(--kt-brand)] px-5 py-2.5 text-sm font-black text-[var(--kt-brand-on)] shadow-[inset_0_-3px_0_color-mix(in_srgb,var(--kt-brand)_76%,black)] transition hover:opacity-90"
             >
               Devam →
             </button>
           </div>
         )}
 
+        {/* Current user turn — right-aligned reply bubbles */}
+        {currentTurn?.speaker === 'user' && currentTurn.userOptions && (
+          <div className="mt-2">
+            <p className="mb-2 text-right text-xs font-black uppercase tracking-wider text-[var(--kt-ink-subtle)]">
+              Cevabını seç:
+            </p>
+            <div className="flex flex-col items-end gap-2">
+              {currentTurn.userOptions.map((opt, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={replyBubbleCls(i, opt.correct, selectedOption)}
+                  onClick={() => handleUserSelect(i, opt.correct, opt.japanese)}
+                >
+                  {opt.japanese}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {isDone && (
-          <div className="rounded-[1rem] border-2 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] p-4 text-center">
+          <div className="rounded-[0.9rem] bg-[var(--kt-accent-success-soft)] px-4 py-3 text-center">
             <span className="font-black text-[var(--kt-accent-success)]">
               ✓ Konuşma tamamlandı!
             </span>

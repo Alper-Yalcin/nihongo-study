@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { FillBlankExercise } from '../../lessonTypes';
+import { ChoicePill, deriveChoiceState } from '../ui/ChoicePill';
 
 interface Props {
   exercise: FillBlankExercise;
@@ -7,26 +8,11 @@ interface Props {
   checked: boolean;
 }
 
-function optionCls(i: number, correct: boolean, selected: number | null, checked: boolean): string {
-  const base = 'rounded-[0.9rem] border-2 px-5 py-4 font-jp text-xl font-black transition';
-
-  if (selected === null) {
-    return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-strong)] shadow-[inset_0_-4px_0_var(--kt-border-subtle)] hover:-translate-y-0.5 cursor-pointer`;
-  }
-  if (!checked) {
-    if (i === selected) {
-      return `${base} border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] text-[var(--kt-brand)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-brand)_25%,transparent)]`;
-    }
-    return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-40`;
-  }
-  if (correct) {
-    return `${base} border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] text-[var(--kt-accent-success)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-success)_30%,transparent)]`;
-  }
-  if (i === selected) {
-    return `${base} border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] text-[var(--kt-accent-danger)] shadow-[inset_0_-4px_0_color-mix(in_srgb,var(--kt-accent-danger)_30%,transparent)]`;
-  }
-  return `${base} border-[var(--kt-border)] bg-[var(--kt-surface)] text-[var(--kt-ink-muted)] opacity-40`;
-}
+const BLANK_TYPE_LABEL: Record<FillBlankExercise['blankType'], string> = {
+  particle: 'Parçacık',
+  word: 'Kelime',
+  verb: 'Fiil',
+};
 
 export const FillBlank: React.FC<Props> = ({ exercise, onAnswerSelect, checked }) => {
   const [selected, setSelected] = useState<number | null>(null);
@@ -38,42 +24,53 @@ export const FillBlank: React.FC<Props> = ({ exercise, onAnswerSelect, checked }
   };
 
   const selectedLabel = selected !== null ? exercise.options[selected]?.label : null;
-  const blankLabel = checked && selected !== null
-    ? exercise.options[selected]?.label
-    : selectedLabel ?? '＿＿';
 
-  const blankCls = checked
-    ? selected !== null && exercise.options[selected]?.correct
-      ? 'inline-block min-w-[3rem] rounded-[0.6rem] border-b-4 border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] px-3 py-1 text-[var(--kt-accent-success)]'
-      : 'inline-block min-w-[3rem] rounded-[0.6rem] border-b-4 border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] px-3 py-1 text-[var(--kt-accent-danger)]'
-    : selected !== null
-      ? 'inline-block min-w-[3rem] rounded-[0.6rem] border-b-4 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] px-3 py-1 text-[var(--kt-brand)]'
-      : 'inline-block min-w-[3rem] rounded-[0.6rem] border-b-4 border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] px-3 py-1 text-[var(--kt-brand)]';
+  const blankState =
+    !checked
+      ? selected !== null
+        ? 'pending'
+        : 'empty'
+      : selected !== null && exercise.options[selected]?.correct
+        ? 'correct'
+        : 'wrong';
+
+  const blankCls =
+    blankState === 'empty'
+      ? 'inline-block min-w-[2.5rem] rounded-[0.5rem] border-b-[3px] border-[var(--kt-brand)] px-2 py-0.5 text-[var(--kt-brand)] opacity-40'
+      : blankState === 'pending'
+        ? 'inline-block min-w-[2.5rem] rounded-[0.5rem] border-b-[3px] border-[var(--kt-brand)] bg-[var(--kt-brand-soft,var(--kt-surface-muted))] px-2 py-0.5 text-[var(--kt-brand)]'
+        : blankState === 'correct'
+          ? 'inline-block min-w-[2.5rem] rounded-[0.5rem] border-b-[3px] border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)] px-2 py-0.5 text-[var(--kt-accent-success)]'
+          : 'inline-block min-w-[2.5rem] rounded-[0.5rem] border-b-[3px] border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)] px-2 py-0.5 text-[var(--kt-accent-danger)]';
 
   return (
-    <section className="mx-auto max-w-2xl">
-      <p className="mb-5 text-sm font-black uppercase tracking-wider text-[var(--kt-ink-muted)]">
-        Boşluğu doldur
-      </p>
-
-      <div className="rounded-[1.4rem] border-2 border-[var(--kt-border)] bg-[var(--kt-surface)] p-6 text-center shadow-[var(--kt-shadow-md)]">
-        <div className="flex flex-wrap items-center justify-center gap-2 font-jp text-3xl font-black text-[var(--kt-ink-strong)]">
-          {exercise.sentenceBefore && <span>{exercise.sentenceBefore}</span>}
-          <span className={blankCls}>{blankLabel}</span>
-          {exercise.sentenceAfter && <span>{exercise.sentenceAfter}</span>}
-        </div>
+    <section className="mx-auto max-w-lg">
+      {/* Type badge + label */}
+      <div className="mb-5 flex items-center gap-2">
+        <span className="rounded-full bg-[var(--kt-surface-muted)] px-2.5 py-0.5 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[var(--kt-ink-subtle)]">
+          {BLANK_TYPE_LABEL[exercise.blankType]}
+        </span>
+        <span className="text-xs font-bold text-[var(--kt-ink-subtle)]">Boşluğu doldur</span>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      {/* Sentence as one large inline line */}
+      <div className="mb-8 font-jp text-3xl font-black leading-relaxed text-[var(--kt-ink-strong)]">
+        {exercise.sentenceBefore && <span>{exercise.sentenceBefore}</span>}
+        <span className={blankCls}>{selectedLabel ?? '＿'}</span>
+        {exercise.sentenceAfter && <span>{exercise.sentenceAfter}</span>}
+      </div>
+
+      {/* Grammar chips */}
+      <div className="grid grid-cols-2 gap-2.5">
         {exercise.options.map((option, i) => (
-          <button
+          <ChoicePill
             key={i}
-            type="button"
-            className={optionCls(i, option.correct, selected, checked)}
+            state={deriveChoiceState(i, option.correct, selected, checked)}
             onClick={() => handleSelect(i, option.correct)}
+            className="font-jp text-xl text-center"
           >
             {option.label}
-          </button>
+          </ChoicePill>
         ))}
       </div>
     </section>

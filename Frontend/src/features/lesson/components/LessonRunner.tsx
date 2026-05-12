@@ -20,6 +20,8 @@ import { ConversationChain } from './exercises/ConversationChain';
 import { ListeningConversation } from './exercises/ListeningConversation';
 import { FastRecall } from './exercises/FastRecall';
 import { NpcReaction } from './exercises/NpcReaction';
+import { LessonCorrectBurst } from './LessonCorrectBurst';
+import { FloatingFeedback } from './ui/FloatingFeedback';
 import type { ThemeMode } from '../../../data/appPreferences';
 
 interface Props {
@@ -37,7 +39,7 @@ const KONTROL_ET_TYPES = new Set([
   'fill_blank',
 ]);
 
-// No footer — these handle their own continue
+// No sticky footer — these handle their own flow
 const AUTO_ADVANCE_TYPES = new Set([
   'teach_card',
   'audio_reinforcement',
@@ -45,7 +47,6 @@ const AUTO_ADVANCE_TYPES = new Set([
   'npc_reaction',
 ]);
 
-// Phase label derived from exercise type
 const EXERCISE_PHASE: Record<string, string> = {
   teach_card: '🔍 Keşif',
   audio_reinforcement: '👂 Dinleme',
@@ -62,8 +63,13 @@ const EXERCISE_PHASE: Record<string, string> = {
   fast_recall: '⚡ Hatırlama',
 };
 
-// NPC feedback pools
-const NPC_CORRECT = ['すごい！ Harika!', 'やった！ Başardın!', 'いいね！ Güzel!', '完璧！ Mükemmel!', 'よし！ Evet!'];
+const NPC_CORRECT = [
+  'すごい！ Harika!',
+  'やった！ Başardın!',
+  'いいね！ Güzel!',
+  '完璧！ Mükemmel!',
+  'よし！ Evet!',
+];
 const NPC_WRONG = ['惜しい！ Neredeyse.', 'もう一度！ Bir daha.', 'ゆっくり。 Sabırlı ol.'];
 
 function pickRandom<T>(arr: T[]): T {
@@ -89,6 +95,8 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
   const [checked, setChecked] = React.useState(false);
   const [lives, setLives] = React.useState(MAX_LIVES);
   const [streak, setStreak] = React.useState(0);
+  const [showBurst, setShowBurst] = React.useState(false);
+  const burstTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const npc = lesson.npc ?? DEFAULT_NPC;
   const { currentExercise, progressPct, isComplete, result } = flow;
@@ -99,6 +107,13 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
   }, [currentExercise?.id]);
 
   useEffect(() => () => stopAudio(), []);
+
+  useEffect(
+    () => () => {
+      if (burstTimerRef.current) clearTimeout(burstTimerRef.current);
+    },
+    [],
+  );
 
   if (isComplete && result) {
     return (
@@ -131,6 +146,10 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
     const echoWord = exJapanese
       ? lesson.learnedWords.find((w) => exJapanese.includes(w.japanese))
       : undefined;
+
+    if (burstTimerRef.current) clearTimeout(burstTimerRef.current);
+    setShowBurst(true);
+    burstTimerRef.current = setTimeout(() => setShowBurst(false), 1400);
 
     setFeedback({
       tone: 'correct',
@@ -175,27 +194,49 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
 
     switch (currentExercise.type) {
       case 'teach_card':
-        return <TeachCard key={currentExercise.id} exercise={currentExercise} onContinue={handleCorrect} />;
+        return (
+          <TeachCard key={currentExercise.id} exercise={currentExercise} onContinue={handleCorrect} />
+        );
       case 'instant_recognition':
-        return <InstantRecognition key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />;
+        return (
+          <InstantRecognition key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />
+        );
       case 'audio_reinforcement':
-        return <AudioReinforcement key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} />;
+        return (
+          <AudioReinforcement key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} />
+        );
       case 'kana_recognition':
-        return <KanaRecognition key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />;
+        return (
+          <KanaRecognition key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />
+        );
       case 'audio_to_kana':
-        return <AudioToKana key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />;
+        return (
+          <AudioToKana key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />
+        );
       case 'audio_to_meaning':
-        return <AudioToMeaning key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />;
+        return (
+          <AudioToMeaning key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />
+        );
       case 'visual_context':
-        return <VisualContext key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} />;
+        return (
+          <VisualContext key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} />
+        );
       case 'guided_response':
-        return <GuidedResponse key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />;
+        return (
+          <GuidedResponse key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />
+        );
       case 'token_build':
-        return <TokenBuild key={currentExercise.id} exercise={currentExercise} {...directProps} />;
+        return (
+          <TokenBuild key={currentExercise.id} exercise={currentExercise} {...directProps} />
+        );
       case 'listening_build':
-        return <ListeningBuild key={currentExercise.id} exercise={currentExercise} {...directProps} />;
+        return (
+          <ListeningBuild key={currentExercise.id} exercise={currentExercise} {...directProps} />
+        );
       case 'fill_blank':
-        return <FillBlank key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />;
+        return (
+          <FillBlank key={currentExercise.id} exercise={currentExercise} {...kontrolEtProps} />
+        );
       case 'conversation_chain':
         return (
           <ConversationChain
@@ -208,11 +249,22 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
           />
         );
       case 'listening_conversation':
-        return <ListeningConversation key={currentExercise.id} exercise={currentExercise} {...directProps} />;
+        return (
+          <ListeningConversation key={currentExercise.id} exercise={currentExercise} {...directProps} />
+        );
       case 'fast_recall':
-        return <FastRecall key={currentExercise.id} exercise={currentExercise} {...directProps} />;
+        return (
+          <FastRecall key={currentExercise.id} exercise={currentExercise} {...directProps} />
+        );
       case 'npc_reaction':
-        return <NpcReaction key={currentExercise.id} exercise={currentExercise} onCorrect={handleCorrect} npc={npc} />;
+        return (
+          <NpcReaction
+            key={currentExercise.id}
+            exercise={currentExercise}
+            onCorrect={handleCorrect}
+            npc={npc}
+          />
+        );
       default:
         return null;
     }
@@ -220,18 +272,24 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden px-5 py-5 text-[var(--kt-ink)]">
-      {/* Header row */}
-      <header className="relative z-10 mx-auto flex max-w-3xl items-center gap-3">
+      {showBurst && <LessonCorrectBurst themeMode={themeMode} />}
+
+      {/* Top bar */}
+      <header className="relative z-10 mx-auto flex max-w-2xl items-center gap-3">
         <button
           type="button"
-          onClick={() => { stopAudio(); navigate('/learn'); }}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--kt-ink-subtle)] transition hover:bg-[var(--kt-surface-muted)]"
+          onClick={() => {
+            stopAudio();
+            navigate('/learn');
+          }}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--kt-ink-subtle)] transition hover:bg-[var(--kt-surface-muted)]"
           aria-label="Dersi kapat"
         >
-          <X size={22} />
+          <X size={20} />
         </button>
 
-        <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-[var(--kt-surface-muted)]">
+        {/* Progress bar — slightly thicker, softer */}
+        <div className="relative h-3.5 flex-1 overflow-hidden rounded-full bg-[var(--kt-surface-muted)]">
           <div
             className="h-full rounded-full bg-[var(--kt-brand)] transition-all duration-500"
             style={{ width: `${Math.max(2, progressPct)}%` }}
@@ -243,7 +301,9 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
           {Array.from({ length: MAX_LIVES }, (_, i) => (
             <span
               key={i}
-              className={`text-lg leading-none transition ${i < lives ? 'text-[var(--kt-accent-danger)]' : 'text-[var(--kt-border)]'}`}
+              className={`text-base leading-none transition ${
+                i < lives ? 'text-[var(--kt-accent-danger)]' : 'text-[var(--kt-border)]'
+              }`}
             >
               ♥
             </span>
@@ -251,8 +311,8 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
         </div>
       </header>
 
-      {/* Scene / phase info row */}
-      <div className="mx-auto mt-2.5 max-w-3xl flex items-center justify-between gap-2">
+      {/* Scene / phase row */}
+      <div className="mx-auto mt-2 max-w-2xl flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <span className="text-base leading-none">{npc.emoji}</span>
           {lesson.location && (
@@ -260,7 +320,7 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
           )}
         </div>
         {phaseLabel && (
-          <span className="rounded-full bg-[var(--kt-surface-muted)] px-2.5 py-0.5 text-xs font-black text-[var(--kt-ink-muted)]">
+          <span className="rounded-full bg-[var(--kt-surface-muted)] px-2.5 py-0.5 text-[0.65rem] font-black uppercase tracking-widest text-[var(--kt-ink-subtle)]">
             {phaseLabel}
           </span>
         )}
@@ -268,77 +328,39 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
 
       {/* Streak badge */}
       {streak >= 3 && !feedback && (
-        <div className="mx-auto mt-3 max-w-3xl">
-          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--kt-accent-success-soft)] px-3 py-1 text-xs font-black uppercase tracking-wider text-[var(--kt-accent-success)]">
-            🔥 {streak} üst üste doğru
+        <div className="mx-auto mt-2 max-w-2xl">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--kt-accent-success-soft)] px-3 py-0.5 text-xs font-black uppercase tracking-wider text-[var(--kt-accent-success)]">
+            🔥 {streak} üst üste
           </span>
         </div>
       )}
 
       {flow.isReviewPhase && (
-        <div className="mx-auto mt-3 max-w-3xl rounded-[0.8rem] bg-[var(--kt-accent-warning-soft,var(--kt-surface-muted))] px-4 py-2 text-center text-xs font-black uppercase tracking-wider text-[var(--kt-accent-warning,var(--kt-ink-muted))]">
+        <div className="mx-auto mt-2 max-w-2xl rounded-[0.7rem] bg-[var(--kt-surface-muted)] px-4 py-1.5 text-center text-[0.65rem] font-black uppercase tracking-widest text-[var(--kt-ink-subtle)]">
           Tekrar turu — zorlandıkların geliyor
         </div>
       )}
 
-      <main className="relative z-10 mx-auto mt-8 max-w-3xl pb-36">
+      {/* Exercise content */}
+      <main className="relative z-10 mx-auto mt-8 max-w-2xl pb-36">
         {renderExercise()}
       </main>
 
-      {/* Sticky footer */}
+      {/* Bottom dock */}
       {!isAutoAdvance && (
         <div className="fixed bottom-0 left-0 right-0 z-50">
           {feedback ? (
-            /* Feedback state */
-            <div
-              className={`border-t-4 px-5 pb-8 pt-5 ${
-                feedback.tone === 'correct'
-                  ? 'border-[var(--kt-accent-success)] bg-[var(--kt-accent-success-soft)]'
-                  : 'border-[var(--kt-accent-danger)] bg-[var(--kt-accent-danger-soft)]'
-              }`}
-            >
-              <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
-                <div className="flex min-w-0 items-start gap-3">
-                  {/* NPC avatar */}
-                  <div className="shrink-0 text-2xl leading-none">{npc.emoji}</div>
-                  <div className="min-w-0">
-                    {/* NPC message — Japanese part styled separately */}
-                    <NpcFeedbackMessage
-                      message={feedback.npcMessage}
-                      tone={feedback.tone}
-                    />
-                    {feedback.tone === 'correct' && feedback.echoWord && (
-                      <p className="mt-0.5 text-sm font-bold text-[var(--kt-accent-success)]">
-                        <span className="font-jp">{feedback.echoWord.japanese}</span>
-                        {' — '}
-                        {feedback.echoWord.meaning}
-                      </p>
-                    )}
-                    {feedback.tone === 'wrong' && feedback.smartFeedback && (
-                      <p className="mt-0.5 text-sm font-bold text-[var(--kt-accent-danger)] opacity-90">
-                        {feedback.smartFeedback}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                {/* DEVAM ET */}
-                <button
-                  type="button"
-                  onClick={handleContinue}
-                  className={`shrink-0 rounded-[0.95rem] px-6 py-3 text-sm font-black uppercase tracking-[0.08em] text-white shadow-[inset_0_-3px_0_rgba(0,0,0,0.20)] transition hover:opacity-90 ${
-                    feedback.tone === 'correct'
-                      ? 'bg-[var(--kt-accent-success)]'
-                      : 'bg-[var(--kt-accent-danger)]'
-                  }`}
-                >
-                  Devam et
-                </button>
-              </div>
-            </div>
+            <FloatingFeedback
+              tone={feedback.tone}
+              npcMessage={feedback.npcMessage}
+              npcEmoji={npc.emoji}
+              smartFeedback={feedback.smartFeedback}
+              echoWord={feedback.echoWord}
+              onContinue={handleContinue}
+            />
           ) : isKontrolEt ? (
-            /* KONTROL ET state */
-            <div className="border-t-2 border-[var(--kt-border)] bg-[var(--kt-surface)] px-5 pb-8 pt-4">
-              <div className="mx-auto max-w-3xl">
+            <div className="bg-[var(--kt-surface)] px-5 pb-8 pt-3 shadow-[0_-1px_0_var(--kt-border)]">
+              <div className="mx-auto max-w-2xl">
                 <button
                   type="button"
                   onClick={handleKontrolEt}
@@ -358,32 +380,4 @@ export const LessonRunner: React.FC<Props> = ({ lesson, themeMode }) => {
       )}
     </div>
   );
-};
-
-// ── NPC feedback message renderer ──────────────────────────────────────────
-
-interface NpcFeedbackMessageProps {
-  message: string;
-  tone: 'correct' | 'wrong';
-}
-
-const NpcFeedbackMessage: React.FC<NpcFeedbackMessageProps> = ({ message, tone }) => {
-  // Messages like "すごい！ Harika!" — split on first space
-  const spaceIdx = message.indexOf(' ');
-  const hasJapanese = spaceIdx > 0 && /[぀-ヿ一-鿿！。、]/.test(message.slice(0, spaceIdx));
-
-  const color = tone === 'correct' ? 'text-[var(--kt-accent-success)]' : 'text-[var(--kt-accent-danger)]';
-
-  if (hasJapanese) {
-    const jpPart = message.slice(0, spaceIdx);
-    const trPart = message.slice(spaceIdx + 1);
-    return (
-      <div>
-        <span className={`font-jp text-lg font-black ${color}`}>{jpPart}</span>
-        {' '}
-        <span className={`text-sm font-bold ${color} opacity-80`}>{trPart}</span>
-      </div>
-    );
-  }
-  return <p className={`font-black ${color}`}>{message}</p>;
 };
