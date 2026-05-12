@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { WordItem } from '../types';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
+import { studyContent } from '../learn/data/studyContent';
 import { getLocalizedWordMeaning, MeaningTranslations } from '../utils/wordMeaning';
 
 interface Props {

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ArrowRight, CheckCircle2, LucideIcon } from 'lucide-react';
 import {
   ScriptAccentTone,
   ScriptOverviewDetailSection
-} from '../../content/scriptLandingContent';
+} from '../../letters/data/scriptLandingContent';
 import { AppLanguage } from '../../data/appPreferences';
 import { OverviewDemoFrame } from '../overview/OverviewDemoFrame';
 import { ScriptStudyDetailModal } from '../ScriptStudyDetailModal';

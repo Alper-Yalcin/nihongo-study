@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
+﻿import React, { useRef, useState } from 'react';
+import { PracticeQuestion } from '../../../learn/data/jlearn/jlearnTypes';
 import { isAnswerCorrect } from './answerNormalizer';
 
 interface FillInBlankProps {

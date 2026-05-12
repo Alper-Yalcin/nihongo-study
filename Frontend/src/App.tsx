@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,13 +7,13 @@ import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LandingPage } from './pages/home/LandingPage';
-import { Kanji } from './pages/letters/Kanji';
-import { KanaItemPage } from './pages/letters/KanaItemPage';
-import { KanaPlayPage } from './pages/play/KanaPlayPage';
-import { KanaSessionPage } from './pages/letters/KanaSessionPage';
+import { Kanji } from './letters/pages/Kanji';
+import { KanaItemPage } from './letters/pages/KanaItemPage';
+import { KanaPlayPage } from './play/pages/KanaPlayPage';
+import { KanaSessionPage } from './letters/pages/KanaSessionPage';
 import { Settings } from './pages/account/Settings';
 import { PlaceholderPage } from './pages/misc/PlaceholderPage';
-import { LettersPage } from './pages/letters/LettersPage';
+import { LettersPage } from './letters/pages/LettersPage';
 import { PracticeKanaDrawingPage } from './pages/practice/kana/PracticeKanaDrawingPage';
 import { PracticeKanaAnswerTypePage } from './pages/practice/kana/PracticeKanaAnswerTypePage';
 import { PracticeKanaListeningPage } from './pages/practice/kana/PracticeKanaListeningPage';
@@ -43,17 +43,17 @@ import {
 } from './pages/practice/kanji';
 import { QuizJapanesePage, QuizKanaPage, QuizKanjiPage } from './pages/quiz';
 import { PracticeStatsPage } from './pages/practice/shared/PracticeStatsPage';
-import { MissionPage } from './pages/learn/MissionPage';
-import { QuestsPage } from './pages/quests/QuestsPage';
+import { MissionPage } from './learn/pages/MissionPage';
+import { QuestsPage } from './quests/pages/QuestsPage';
 import { ProfilePage } from './pages/account/ProfilePage';
-import { LearnUnitPage } from './pages/learn/LearnUnitPage';
-import { LearnLevelExamPage } from './pages/learn/LearnLevelExamPage';
-import { LearnGuidePage } from './pages/learn/LearnGuidePage';
-import { LearnJapanesePage } from './pages/learn/LearnJapanesePage';
-import { LearnReviewPage } from './pages/learn/LearnReviewPage';
-import { LearnStatisticPage } from './pages/learn/LearnStatisticPage';
+import { LearnUnitPage } from './learn/pages/LearnUnitPage';
+import { LearnLevelExamPage } from './learn/pages/LearnLevelExamPage';
+import { LearnGuidePage } from './learn/pages/LearnGuidePage';
+import { LearnJapanesePage } from './learn/pages/LearnJapanesePage';
+import { LearnReviewPage } from './learn/pages/LearnReviewPage';
+import { LearnStatisticPage } from './learn/pages/LearnStatisticPage';
 import { ForgePage } from './pages/practice/shared/ForgePage';
-import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './data/kanaFontStyles';
+import { defaultKanaFontStyleId, kanaFontStyles, KanaFontStyleId } from './letters/data/kanaFontStyles';
 import { AppLanguage, ThemeMode } from './data/appPreferences';
 import { usePersistentState } from './hooks/usePersistentState';
 import { ACTIVE_SCRIPT_STORAGE_KEY, isKanaScript, resolveActiveScript } from './hooks/useActiveScript';
@@ -63,7 +63,7 @@ import { KanaScript } from './features/kana/domain/kanaItem';
 import { AppShell } from './components/layout';
 import { ReEntrySplash } from './features/jlearn/reentry/ReEntrySplash';
 import { ChallengeReadyPrompt } from './features/jlearn/challenge/ChallengeReadyPrompt';
-import { ChallengeMissionPage } from './pages/learn/ChallengeMissionPage';
+import { ChallengeMissionPage } from './learn/pages/ChallengeMissionPage';
 import { SpeakingSuggestToast } from './features/jlearn/speaking/SpeakingSuggestToast';
 import { FeedbackLayer } from './components/feedback/FeedbackLayer';
 import { ensureWeeklyFreezeGrant } from './features/streak/tomoshibi';

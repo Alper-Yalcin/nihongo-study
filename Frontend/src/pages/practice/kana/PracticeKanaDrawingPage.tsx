@@ -1,7 +1,7 @@
-import React, { useMemo, useRef, useState } from 'react';
+﻿import React, { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
+import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../learn/data/studyContent';
 import { isKanaScript } from '../../../hooks/useActiveScript';
 import { KanaItem, KanaScript } from '../../../features/kana/domain/kanaItem';
 import { useKanaProgressStore } from '../../../features/kana/progress/progressStore';

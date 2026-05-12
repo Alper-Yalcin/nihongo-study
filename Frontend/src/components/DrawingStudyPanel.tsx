@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { KanaSection, Character, RunStats, DrawingMode } from '../types';
 import { ArrowLeft, RotateCcw, Eraser, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { DrawingCanvas, DrawingCanvasRef } from './DrawingCanvas';
 import { evaluateDrawing } from '../utils/DrawingEvaluator';
 import { AppLanguage } from '../data/appPreferences';
-import { getNhkKanaGuideImageSrc } from '../data/nhkKanaGuideImages';
-import { studyContent } from '../data/studyContent';
+import { getNhkKanaGuideImageSrc } from '../letters/data/nhkKanaGuideImages';
+import { studyContent } from '../learn/data/studyContent';
 import { calculateAccuracy, calculateSpeed } from '../utils/typing';
 import { formatDuration } from '../utils/formatDuration';
 import { useKanaProgressStore } from '../features/kana/progress/progressStore';

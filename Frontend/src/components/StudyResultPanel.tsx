@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { KanaSection, RunStats } from '../types';
 import { Trophy, Clock, Target, RotateCcw, ArrowLeft, Zap, Flame } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
+import { studyContent } from '../learn/data/studyContent';
 import { getTypingModeStorageKey, isBetterTypingRun } from '../utils/typing';
 import { isBetterListeningRun } from '../utils/listening';
 import { useBestScore } from '../hooks/useBestScore';

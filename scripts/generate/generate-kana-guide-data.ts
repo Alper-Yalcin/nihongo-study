@@ -4,14 +4,14 @@ import {
   hiraganaSingleMatrix,
   katakanaExtendedMatrix,
   katakanaSingleMatrix,
-} from '../../Frontend/src/data/kana';
+} from '../../Frontend/src/letters/data/kana';
 
 type CharacterSeed = {
   id: string;
   symbol: string;
 };
 
-const OUTPUT_FILE = new URL('../../Frontend/src/data/generatedKanaDrawingGuides.ts', import.meta.url);
+const OUTPUT_FILE = new URL('../../Frontend/src/letters/data/generatedKanaDrawingGuides.ts', import.meta.url);
 const SOURCE_BASE_URL = 'https://raw.githubusercontent.com/zhengkyl/strokesvg/main/dist';
 const GUIDE_COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 

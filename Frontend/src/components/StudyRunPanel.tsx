@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { KanaSection, Character, RunStats, TypingMode } from '../types';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
+import { studyContent } from '../learn/data/studyContent';
 import {
   calculateAccuracy,
   calculateSpeed,

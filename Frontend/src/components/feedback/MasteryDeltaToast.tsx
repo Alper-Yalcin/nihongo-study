@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import {
   MasteryDeltaEventDetail,
   subscribeMasteryDelta
 } from './masterySession';
-import { masteryBucket } from '../../data/masterySystem';
+import { masteryBucket } from '../../learn/data/masterySystem';
 import { getKanaItemById } from '../../features/kana/data/kanaInventory';
 
 const TOAST_VISIBLE_MS = 9000;

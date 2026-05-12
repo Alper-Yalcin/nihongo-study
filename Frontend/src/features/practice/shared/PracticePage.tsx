@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   BarChart3,
@@ -15,7 +15,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/ui';
 import { AppLanguage } from '../../../data/appPreferences';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
+import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../learn/data/studyContent';
 import { appShellRoutes } from '../../../data/appShellContent';
 import { useKanaProgressStore } from '../../../features/kana/progress/progressStore';
 import { KanaScript } from '../../../features/kana/domain/kanaItem';

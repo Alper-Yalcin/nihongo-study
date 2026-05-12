@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { wordStudyContent } from '../data/wordStudyContent';
-import { studyContent } from '../data/studyContent';
+import { wordStudyContent } from '../learn/data/wordStudyContent';
+import { studyContent } from '../learn/data/studyContent';
 import { WordItem, RunStats, WordQuizMode } from '../types';
 import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
 import { calculateAccuracy, isAcceptedRomajiAnswer } from '../utils/typing';

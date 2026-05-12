@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ForgePage — zayıf kana otomatik drill (Sprint 2 D5).
  *
  * Plan: "12 zayıf kana — 4 dakikada güçlendir". Kullanıcı Forge'a
@@ -17,7 +17,7 @@ import { KanaScript } from '../../../features/kana/domain/kanaItem';
 import { useKanaProgressStore } from '../../../features/kana/progress/progressStore';
 import { getWeakKanaProgressEntries } from '../../../features/kana/review/reviewSelectors';
 import { getKanaItemById } from '../../../features/kana/data/kanaInventory';
-import { computeMastery, masteryBucket } from '../../../data/masterySystem';
+import { computeMastery, masteryBucket } from '../../../learn/data/masterySystem';
 
 interface ForgePageProps {
   language: AppLanguage;

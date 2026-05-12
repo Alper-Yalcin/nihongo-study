@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { WordItem, RunStats, WordStudyMode } from '../types';
 import { SectionCard } from './SectionCard';
 import { WordDictionaryPanel } from './WordDictionaryPanel';
@@ -6,7 +6,7 @@ import { WordStudyTyping } from './WordStudyTyping';
 import { WordStudyTest } from './WordStudyTest';
 import { WordResultPanel } from './WordResultPanel';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
+import { studyContent } from '../learn/data/studyContent';
 
 interface WordStudyContainerProps {
   title: string;

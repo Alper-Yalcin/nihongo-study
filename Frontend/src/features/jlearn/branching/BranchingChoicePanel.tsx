@@ -1,5 +1,5 @@
-import React from 'react';
-import { BranchingChoice } from '../../../data/jlearn/jlearnTypes';
+﻿import React from 'react';
+import { BranchingChoice } from '../../../learn/data/jlearn/jlearnTypes';
 import { BranchingPickResult, useBranchingChoice } from './useBranchingChoice';
 
 interface BranchingChoicePanelProps {

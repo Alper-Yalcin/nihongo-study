@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+﻿import { useCallback } from 'react';
 import { usePersistentState } from './usePersistentState';
-import { JLPTLevel, JLPT_LEVEL_ORDER, getNextLevel } from '../data/learnLevels';
+import { JLPTLevel, JLPT_LEVEL_ORDER, getNextLevel } from '../learn/data/learnLevels';
 
 interface LearnLevelProgressState {
   currentLevel: JLPTLevel;

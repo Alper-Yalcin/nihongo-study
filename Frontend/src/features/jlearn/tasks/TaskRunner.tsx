@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { LearningEvent, PracticeQuestion, SrsSkill } from '../../../data/jlearn/jlearnTypes';
-import { appendLearningEvents, readVocab, updateVocabProgress, writeVocab } from '../../../data/jlearn/jlearnStorage';
+﻿import React, { useEffect, useRef, useState } from 'react';
+import { LearningEvent, PracticeQuestion, SrsSkill } from '../../../learn/data/jlearn/jlearnTypes';
+import { appendLearningEvents, readVocab, updateVocabProgress, writeVocab } from '../../../learn/data/jlearn/jlearnStorage';
 import { ConfidenceLevel } from '../debug/debugStore';
 import { MultipleChoice } from './MultipleChoice';
 import { FillInBlank } from './FillInBlank';

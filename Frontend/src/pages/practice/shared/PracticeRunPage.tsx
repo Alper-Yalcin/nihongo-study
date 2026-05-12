@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
 import { appShellRoutes } from '../../../data/appShellContent';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
-import { useDictionaryWordSearch } from '../../../data/words';
+import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../learn/data/studyContent';
+import { useDictionaryWordSearch } from '../../../learn/data/words';
 import { StudyContainer } from '../../../components/StudyContainer';
-import { ListeningStudyContainer } from '../../../components/listening/ListeningStudyContainer';
+import { ListeningStudyContainer } from '../../../learn/components/listening/ListeningStudyContainer';
 import { WordStudyContainer } from '../../../components/WordStudyContainer';
 import { KanaScript } from '../../../features/kana/domain/kanaItem';
 import { useKanaProgressStore } from '../../../features/kana/progress/progressStore';

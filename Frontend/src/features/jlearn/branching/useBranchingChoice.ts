@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { BranchingChoice, BranchingOption, BranchingOutcomeKind } from '../../../data/jlearn/jlearnTypes';
+﻿import { useCallback, useState } from 'react';
+import { BranchingChoice, BranchingOption, BranchingOutcomeKind } from '../../../learn/data/jlearn/jlearnTypes';
 
 export interface BranchingPickResult {
   result: BranchingOutcomeKind;

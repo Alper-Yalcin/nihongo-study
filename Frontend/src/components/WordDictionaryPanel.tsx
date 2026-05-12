@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { WordItem, WordStudyMode } from '../types';
 import { WordTable } from './WordTable';
 import { Search, ChevronLeft, ChevronRight, Keyboard, ListChecks } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
-import { wordStudyContent } from '../data/wordStudyContent';
+import { studyContent } from '../learn/data/studyContent';
+import { wordStudyContent } from '../learn/data/wordStudyContent';
 import { getLocalizedWordMeaning, useMeaningTranslations } from '../utils/wordMeaning';
 import {
   DictionaryWordDetail,
@@ -12,7 +12,7 @@ import {
   searchDictionaryWords,
   useDictionaryWordPacks,
   useDictionaryWordSearch
-} from '../data/words';
+} from '../learn/data/words';
 
 const studyModes: WordStudyMode[] = ['wordToRomaji', 'wordToMeaning', 'meaningToWord', 'test'];
 

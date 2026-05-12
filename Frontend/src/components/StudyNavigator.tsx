@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
+import { studyContent } from '../learn/data/studyContent';
 
 interface StudyNavigatorProps {
   title: string;

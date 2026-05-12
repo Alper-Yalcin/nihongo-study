@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { CheckCircle2, X } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
 import {
   ScriptAccentTone,
   ScriptOverviewDetailSection,
   scriptLandingContent
-} from '../content/scriptLandingContent';
+} from '../letters/data/scriptLandingContent';
 import { OverviewDemoFrame } from './overview/OverviewDemoFrame';
 
 interface Props {

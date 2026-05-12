@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import { PracticeQuestion, VocabItem } from '../../../data/jlearn/jlearnTypes';
-import { readUserState, readVocab, readWeakTopics, VocabProgressMap, WeakTopicMap } from '../../../data/jlearn/jlearnStorage';
-import { getAllJLearnVocabItems } from '../../../data/jlearn/jlearnContent';
+﻿import React, { useMemo, useState } from 'react';
+import { PracticeQuestion, VocabItem } from '../../../learn/data/jlearn/jlearnTypes';
+import { readUserState, readVocab, readWeakTopics, VocabProgressMap, WeakTopicMap } from '../../../learn/data/jlearn/jlearnStorage';
+import { getAllJLearnVocabItems } from '../../../learn/data/jlearn/jlearnContent';
 import { TaskRunner, TaskSummary } from '../tasks/TaskRunner';
 import { ConfidenceLevel, JLearnUserState } from '../debug/debugStore';
 

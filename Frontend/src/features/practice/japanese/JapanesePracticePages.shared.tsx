@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -23,9 +23,9 @@ import {
   getAllJLearnGrammarPoints,
   getAllJLearnSteps,
   getAllJLearnVocabItems
-} from '../../../data/jlearn/jlearnContent';
-import { PracticeQuestion, QuestionType, VocabItem } from '../../../data/jlearn/jlearnTypes';
-import { readVocab, updateVocabProgress, writeVocab } from '../../../data/jlearn/jlearnStorage';
+} from '../../../learn/data/jlearn/jlearnContent';
+import { PracticeQuestion, QuestionType, VocabItem } from '../../../learn/data/jlearn/jlearnTypes';
+import { readVocab, updateVocabProgress, writeVocab } from '../../../learn/data/jlearn/jlearnStorage';
 import { isAnswerCorrect } from '../../../features/jlearn/tasks/answerNormalizer';
 import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
 import { markPracticedToday } from '../../../features/streak/tomoshibi';

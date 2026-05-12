@@ -1,5 +1,5 @@
-import { JLearnLevel, JLearnStep, JLearnTrack } from '../../../data/jlearn/jlearnTypes';
-import { MissionProgress } from '../../../data/jlearn/jlearnStorage';
+﻿import { JLearnLevel, JLearnStep, JLearnTrack } from '../../../learn/data/jlearn/jlearnTypes';
+import { MissionProgress } from '../../../learn/data/jlearn/jlearnStorage';
 import {
   JLearnFeatureFlags,
   JLearnUserState,

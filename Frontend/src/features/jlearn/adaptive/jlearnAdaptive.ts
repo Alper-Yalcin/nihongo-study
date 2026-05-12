@@ -1,4 +1,4 @@
-import { JLearnStep } from '../../../data/jlearn/jlearnTypes';
+﻿import { JLearnStep } from '../../../learn/data/jlearn/jlearnTypes';
 import {
   ConfidenceLevel,
   FormalityPreference,

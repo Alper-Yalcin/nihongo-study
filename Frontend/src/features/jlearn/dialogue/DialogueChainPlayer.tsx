@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { DialogueChain, DialogueLineVariant } from '../../../data/jlearn/jlearnTypes';
+﻿import React, { useEffect, useRef, useState } from 'react';
+import { DialogueChain, DialogueLineVariant } from '../../../learn/data/jlearn/jlearnTypes';
 import { useDialogueChain } from './useDialogueChain';
 import { isAnswerCorrect } from '../tasks/answerNormalizer';
 import { getJLearnUserState, RelationshipStage, subscribeJLearnUserState } from '../debug/debugStore';

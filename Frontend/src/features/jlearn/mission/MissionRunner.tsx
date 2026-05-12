@@ -1,14 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { JLearnLevel, JLearnStep, VocabItem } from '../../../data/jlearn/jlearnTypes';
+import { JLearnLevel, JLearnStep, VocabItem } from '../../../learn/data/jlearn/jlearnTypes';
 import { appShellRoutes } from '../../../data/appShellContent';
 import { TaskRunner, TaskSummary } from '../tasks/TaskRunner';
 import { DialogueChainPlayer } from '../dialogue/DialogueChainPlayer';
 import { BranchingChoicePanel } from '../branching/BranchingChoicePanel';
-import { readProgress, readUserState, writeProgress, writeUserState } from '../../../data/jlearn/jlearnStorage';
-import { completeStep } from '../../../data/jlearn/jlearnGating';
-import { jlearnTrack } from '../../../data/jlearn/jlearnContent';
-import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
+import { readProgress, readUserState, writeProgress, writeUserState } from '../../../learn/data/jlearn/jlearnStorage';
+import { completeStep } from '../../../learn/data/jlearn/jlearnGating';
+import { jlearnTrack } from '../../../learn/data/jlearn/jlearnContent';
+import { PracticeQuestion } from '../../../learn/data/jlearn/jlearnTypes';
 import { AdaptiveBranchPick, updateUserStateForMission } from '../adaptive/jlearnAdaptive';
 import { deriveEmotionalFeedbackTier, EmotionalFeedbackTier } from './emotionalFeedback';
 import {

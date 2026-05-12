@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
-import { getGoogleTranslateKanaAudioSrc } from '../../../data/kanaAudio';
+import { getGoogleTranslateKanaAudioSrc } from '../../../letters/data/kanaAudio';
 import { isKanaScript } from '../../../hooks/useActiveScript';
 import { KanaItem, KanaScript } from '../../../features/kana/domain/kanaItem';
 import { kanaInventoryByScript } from '../../../features/kana/data/kanaInventory';

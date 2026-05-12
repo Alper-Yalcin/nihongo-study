@@ -1,11 +1,11 @@
-import {
+﻿import {
   BranchingOption,
   GrammarPoint,
   JLearnStep,
   PracticeQuestion,
   VocabItem,
-} from '../../../data/jlearn/jlearnTypes';
-import { getAllJLearnGrammarPoints, getAllJLearnVocabItems } from '../../../data/jlearn/jlearnContent';
+} from '../../../learn/data/jlearn/jlearnTypes';
+import { getAllJLearnGrammarPoints, getAllJLearnVocabItems } from '../../../learn/data/jlearn/jlearnContent';
 import { RecoveryFlag } from '../debug/debugStore';
 
 export interface FailForwardBranchPickLike {

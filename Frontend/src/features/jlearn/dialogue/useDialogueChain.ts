@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { DialogueChain, DialogueTurn } from '../../../data/jlearn/jlearnTypes';
+﻿import { useCallback, useState } from 'react';
+import { DialogueChain, DialogueTurn } from '../../../learn/data/jlearn/jlearnTypes';
 import { isAnswerCorrect } from '../tasks/answerNormalizer';
 
 export interface MissedTurn {

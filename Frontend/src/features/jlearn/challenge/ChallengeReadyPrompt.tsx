@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
 import { appShellRoutes } from '../../../data/appShellContent';
-import { jlearnTrack } from '../../../data/jlearn/jlearnContent';
-import { readProgress } from '../../../data/jlearn/jlearnStorage';
+import { jlearnTrack } from '../../../learn/data/jlearn/jlearnContent';
+import { readProgress } from '../../../learn/data/jlearn/jlearnStorage';
 import {
   getJLearnFeatureFlags,
   getJLearnUserState,

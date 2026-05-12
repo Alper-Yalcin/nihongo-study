@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AudioButton } from '../../../components/listening/AudioButton';
+import { AudioButton } from '../../../learn/components/listening/AudioButton';
 import { AppLanguage } from '../../../data/appPreferences';
-import { getGoogleTranslateKanaAudioSrc } from '../../../data/kanaAudio';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../data/studyContent';
+import { getGoogleTranslateKanaAudioSrc } from '../../../letters/data/kanaAudio';
+import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../../learn/data/studyContent';
 import { isKanaScript } from '../../../hooks/useActiveScript';
 import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
 import { markPracticedToday } from '../../../features/streak/tomoshibi';

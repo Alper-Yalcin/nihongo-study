@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Bell,
   Check,
@@ -12,7 +12,7 @@ import {
   Wand2
 } from 'lucide-react';
 import { AppLanguage, ThemeMode } from '../../data/appPreferences';
-import { kanaFontStyles, KanaFontStyle, KanaFontStyleId } from '../../data/kanaFontStyles';
+import { kanaFontStyles, KanaFontStyle, KanaFontStyleId } from '../../letters/data/kanaFontStyles';
 import { usePersistentState } from '../../hooks/usePersistentState';
 import { BackgroundScene } from '../../components/layout';
 

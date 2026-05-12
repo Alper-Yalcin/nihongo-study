@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { Trophy, Clock, Target, RotateCcw, ArrowLeft } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { wordStudyContent } from '../data/wordStudyContent';
-import { studyContent } from '../data/studyContent';
+import { wordStudyContent } from '../learn/data/wordStudyContent';
+import { studyContent } from '../learn/data/studyContent';
 import { RunStats, WordStudyMode } from '../types';
 import { useBestScore } from '../hooks/useBestScore';
 import { formatDuration } from '../utils/formatDuration';

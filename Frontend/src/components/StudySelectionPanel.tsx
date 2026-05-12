@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { KanaSection, TypingMode, DrawingMode } from '../types';
 import { StudyTable } from './StudyTable';
 import { CheckSquare, Square, Keyboard, PenTool } from 'lucide-react';
 import { AppLanguage } from '../data/appPreferences';
-import { studyContent } from '../data/studyContent';
+import { studyContent } from '../learn/data/studyContent';
 import { StudyModeSelector } from './StudyModeSelector';
 
 interface Props {

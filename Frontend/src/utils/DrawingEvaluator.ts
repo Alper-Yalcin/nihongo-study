@@ -1,4 +1,4 @@
-import { generatedKanaDrawingGuides } from '../data/generatedKanaDrawingGuides';
+﻿import { generatedKanaDrawingGuides } from '../letters/data/generatedKanaDrawingGuides';
 import { Character, DrawingData, GuidePath } from '../types';
 
 export type Point = { x: number; y: number };

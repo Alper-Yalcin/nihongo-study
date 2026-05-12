@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Award,
   BookOpenText,
@@ -15,8 +15,8 @@ import {
   Zap
 } from 'lucide-react';
 import { AppLanguage } from '../../data/appPreferences';
-import { getDanProgress, getKyuFromXp } from '../../data/danSystem';
-import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../data/studyContent';
+import { getDanProgress, getKyuFromXp } from '../../quests/data/danSystem';
+import { getLocalizedHiraganaSections, getLocalizedKatakanaSections } from '../../learn/data/studyContent';
 import { useFeedback } from '../../hooks/useFeedback';
 import { usePersistentState } from '../../hooks/usePersistentState';
 import { useKanaProgressSummary } from '../../features/kana/progress/progressStore';

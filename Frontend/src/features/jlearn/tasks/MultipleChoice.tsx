@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
+﻿import React, { useState } from 'react';
+import { PracticeQuestion } from '../../../learn/data/jlearn/jlearnTypes';
 import { isAnswerCorrect } from './answerNormalizer';
 
 interface MultipleChoiceProps {

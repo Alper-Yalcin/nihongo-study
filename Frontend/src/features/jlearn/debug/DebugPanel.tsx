@@ -1,19 +1,19 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   jlearnTrack,
   getAllJLearnGrammarPoints,
   getAllJLearnSteps,
   getAllJLearnVocabItems,
-} from '../../../data/jlearn/jlearnContent';
+} from '../../../learn/data/jlearn/jlearnContent';
 import {
   readProgress,
   writeProgress,
   readVocab,
   writeVocab,
   validateVocabProgress,
-} from '../../../data/jlearn/jlearnStorage';
-import { completeStep } from '../../../data/jlearn/jlearnGating';
+} from '../../../learn/data/jlearn/jlearnStorage';
+import { completeStep } from '../../../learn/data/jlearn/jlearnGating';
 import {
   getJLearnUserState,
   getJLearnFeatureFlags,

@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge, Button } from '../ui';
 import { EvaluatedChallenge } from '../../features/play/challenges/challengeEngine';
-import { QuestCard } from '../quests/QuestCard';
+import { QuestCard } from '../../quests/components/QuestCard';
 
 interface DailyQuestsCardProps {
   title: string;

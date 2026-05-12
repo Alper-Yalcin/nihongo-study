@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Volume2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLanguage } from '../../../data/appPreferences';
-import { getGoogleTranslateKanaAudioSrc } from '../../../data/kanaAudio';
+import { getGoogleTranslateKanaAudioSrc } from '../../../letters/data/kanaAudio';
 import { isKanaScript } from '../../../hooks/useActiveScript';
 import { recordCorrect, recordWrong } from '../../../hooks/useFeedback';
 import { markPracticedToday } from '../../../features/streak/tomoshibi';

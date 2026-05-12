@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { PracticeQuestion } from '../../../data/jlearn/jlearnTypes';
+﻿import React, { useMemo, useState } from 'react';
+import { PracticeQuestion } from '../../../learn/data/jlearn/jlearnTypes';
 
 interface SentenceBuildProps {
   question: PracticeQuestion;

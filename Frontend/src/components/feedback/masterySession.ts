@@ -1,4 +1,4 @@
-/**
+﻿/**
  * masterySession — oturum başına mastery delta snapshot store'u.
  *
  * sessionRunCoordinator iki uçtan çağırır:
@@ -14,7 +14,7 @@
  */
 
 import { KanaProgress } from '../../features/kana/domain/kanaProgress';
-import { computeMastery, MasteryDelta } from '../../data/masterySystem';
+import { computeMastery, MasteryDelta } from '../../learn/data/masterySystem';
 
 const EVENT_NAME = 'kototsuna:mastery-delta';
 
