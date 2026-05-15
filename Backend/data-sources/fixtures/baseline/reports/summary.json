@@ -1,0 +1,18 @@
+{
+  "total_jmdict_word_records": 3,
+  "total_kanji_character_records": 2,
+  "hiragana_word_count": 1,
+  "katakana_word_count": 1,
+  "kanji_word_count": 1,
+  "jlpt_matched_count": 3,
+  "jlpt_unmatched_count": 0,
+  "exact_pair_match_count": 3,
+  "fallback_match_count": 0,
+  "conflict_count": 0,
+  "normalized_pair_match_count": 0,
+  "kana_only_match_count": 0,
+  "parse_error_count": 0,
+  "validation_error_count": 0,
+  "jmdict_entries_seen": 3,
+  "kanjidic_characters_seen": 2
+}

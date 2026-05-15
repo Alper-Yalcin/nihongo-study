@@ -1,0 +1,12 @@
+{
+  "word_records_processed": 304544,
+  "jlpt_matched_count": 22131,
+  "jlpt_unmatched_count": 282413,
+  "exact_pair_match_count": 7239,
+  "normalized_pair_match_count": 225,
+  "kana_only_match_count": 14667,
+  "fallback_match_count": 14892,
+  "conflict_count": 1590,
+  "kanji_jlpt_matched_count": 0,
+  "kanji_records_processed": 10383
+}
