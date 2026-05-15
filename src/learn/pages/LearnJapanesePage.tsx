@@ -27,6 +27,16 @@ import { getLevelInfo } from '../data/learnLevels';
 import { LearnSideRail } from '../components/LearnSideRail';
 import { LearnFallingFlowers } from '../components/LearnFallingFlowers';
 import { getLearnExamRoute } from '../../data/appShellContent';
+import { LessonExerciseRunner } from '../../features/lessons/LessonExerciseRunner';
+import { lessonConcepts } from '../../features/lessons/data/lessonContent';
+import {
+  getNextAvailableSession,
+  markSessionComplete,
+} from '../../features/lessons/lessonStorage';
+import type {
+  LessonSessionNumber,
+  LessonSessionResult,
+} from '../../features/lessons/lessonTypes';
 
 interface LearnJapanesePageProps {
   language: AppLanguage;
@@ -431,7 +441,26 @@ const LessonNodeButton: React.FC<{
   progress: number;
   onSelect?: () => void;
   xOffset?: number;
-}> = ({ node, isDark, state, progress, onSelect, xOffset = 0 }) => {
+  isOpen?: boolean;
+  popupTitle?: string;
+  popupSessionLabel?: string;
+  popupCtaLabel?: string;
+  onStart?: () => void;
+  onClosePopup?: () => void;
+}> = ({
+  node,
+  isDark,
+  state,
+  progress,
+  onSelect,
+  xOffset = 0,
+  isOpen = false,
+  popupTitle,
+  popupSessionLabel,
+  popupCtaLabel,
+  onStart,
+  onClosePopup,
+}) => {
   const Icon = node.icon;
   const size = node.checkpoint ? 92 : 82;
   const iconSize = node.checkpoint ? 42 : 34;
@@ -542,6 +571,37 @@ const LessonNodeButton: React.FC<{
           }`}>{node.subtitle}</div>
         )}
       </div>
+
+      {isOpen && onStart && (
+        <>
+          <div
+            className="fixed inset-0 z-[40]"
+            onClick={onClosePopup}
+            aria-hidden="true"
+          />
+          <div className="absolute left-1/2 top-full z-[50] mt-4 w-[280px] -translate-x-1/2 rounded-[1.4rem] bg-[#58cc02] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div
+              className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 bg-[#58cc02]"
+              aria-hidden="true"
+            />
+            <p className="relative text-base font-black uppercase tracking-wide text-white">
+              {popupTitle ?? node.title}
+            </p>
+            {popupSessionLabel && (
+              <p className="relative mt-2 text-sm font-bold text-white/90">
+                {popupSessionLabel}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={onStart}
+              className="relative mt-4 w-full rounded-[1rem] bg-white py-3 text-sm font-black uppercase tracking-[0.12em] text-[#58a700] shadow-[0_4px_0_rgba(0,0,0,0.18)] transition active:translate-y-0.5 active:shadow-[0_2px_0_rgba(0,0,0,0.18)]"
+            >
+              {popupCtaLabel ?? 'Başlat +10 Puan'}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -851,9 +911,28 @@ const ChapterNavButton: React.FC<{
   );
 };
 
+interface ActiveLesson {
+  conceptId: string;
+  sessionNumber: LessonSessionNumber;
+}
+
+function getConceptForNode(globalNodeIndex: number) {
+  // Each unit (5 nodes: 4 lessons + 1 checkpoint) maps to one concept.
+  // Checkpoints are non-clickable so we ignore them for popup mapping.
+  const unitIndex = Math.floor(globalNodeIndex / NODES_PER_GROUP);
+  const lessonIndex = globalNodeIndex % NODES_PER_GROUP;
+  const isCheckpoint = lessonIndex === NODES_PER_GROUP - 1;
+  if (isCheckpoint || lessonConcepts.length === 0) return null;
+  const concept = lessonConcepts[unitIndex % lessonConcepts.length];
+  return { concept, sessionNumber: (lessonIndex + 1) as LessonSessionNumber };
+}
+
 export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, themeMode }) => {
   const navigate = useNavigate();
   const [desktopMapScale, setDesktopMapScale] = useState(getDesktopMapScale);
+  const [openNodeIndex, setOpenNodeIndex] = useState<number | null>(null);
+  const [activeLesson, setActiveLesson] = useState<ActiveLesson | null>(null);
+  const [, setLessonRefreshTick] = useState(0);
   const copy = pageCopy[language];
   const isDark = themeMode === 'dark';
   const { currentLevel, hasNextLevel } = useLearnLevelProgress();
@@ -1000,6 +1079,27 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
 
   const canGoPrev = viewChapter > 0;
   const canGoNext = viewChapter < totalChapters - 1;
+
+  if (activeLesson) {
+    const concept = lessonConcepts.find((c) => c.id === activeLesson.conceptId);
+    if (concept) {
+      const handleSessionComplete = (result: LessonSessionResult) => {
+        markSessionComplete(result.conceptId, result.sessionNumber);
+        setActiveLesson(null);
+        setLessonRefreshTick((t) => t + 1);
+      };
+      return (
+        <div className="fixed inset-0 z-[60]">
+          <LessonExerciseRunner
+            concept={concept}
+            sessionNumber={activeLesson.sessionNumber}
+            onSessionComplete={handleSessionComplete}
+            onExit={() => setActiveLesson(null)}
+          />
+        </div>
+      );
+    }
+  }
 
   return (
     <div
@@ -1163,17 +1263,50 @@ export const LearnJapanesePage: React.FC<LearnJapanesePageProps> = ({ language, 
             />
           ))}
 
-          {nodeRuntime.map(({ node, unitId, lessonId, state, progress }) => (
-            <LessonNodeButton
-              key={node.id}
-              node={node}
-              isDark={isDark}
-              state={state}
-              progress={progress}
-              onSelect={state !== 'locked' ? () => navigate(appShellRoutes.lessonMap) : undefined}
-              xOffset={DESKTOP_MAP_X_OFFSET}
-            />
-          ))}
+          {nodeRuntime.map(({ node, unitId, lessonId, state, progress }, index) => {
+            const mapping = getConceptForNode(index);
+            const isCheckpoint = node.checkpoint === true;
+            const concept = mapping?.concept;
+            const nextSession = concept ? getNextAvailableSession(concept.id) : null;
+            const popupTitle = concept?.title ?? node.title;
+            const popupSessionLabel = mapping
+              ? `Ders ${mapping.sessionNumber}/4`
+              : undefined;
+            const popupCtaLabel = nextSession === null
+              ? 'Tekrar Et'
+              : 'Başlat +10 Puan';
+            return (
+              <LessonNodeButton
+                key={node.id}
+                node={node}
+                isDark={isDark}
+                state={state}
+                progress={progress}
+                onSelect={
+                  state !== 'locked' && !isCheckpoint && mapping
+                    ? () => setOpenNodeIndex(index)
+                    : undefined
+                }
+                xOffset={DESKTOP_MAP_X_OFFSET}
+                isOpen={openNodeIndex === index}
+                popupTitle={popupTitle}
+                popupSessionLabel={popupSessionLabel}
+                popupCtaLabel={popupCtaLabel}
+                onClosePopup={() => setOpenNodeIndex(null)}
+                onStart={
+                  mapping
+                    ? () => {
+                        setActiveLesson({
+                          conceptId: mapping.concept.id,
+                          sessionNumber: mapping.sessionNumber,
+                        });
+                        setOpenNodeIndex(null);
+                      }
+                    : undefined
+                }
+              />
+            );
+          })}
 
           </div>
         </div>

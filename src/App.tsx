@@ -71,7 +71,6 @@ import { TomoshibiRelightModal } from './components/feedback/TomoshibiRelightMod
 import { OnboardingGate } from './page-views/home/OnboardingPage';
 import { installSmartNotifier } from './features/notifications/smartNotifications';
 import { LessonMapPage } from './features/lessons/pages/LessonMapPage';
-import { LessonSessionPage } from './features/lessons/pages/LessonSessionPage';
 
 const KANA_FONT_STORAGE_KEY = 'kototsuna.kana-font-style';
 const APP_LANGUAGE_STORAGE_KEY = 'kototsuna.app-language';
@@ -514,7 +513,6 @@ export default function App() {
         <Routes>
           <Route path={`${appShellRoutes.learnJapaneseMissionBase}/:stepId`} element={<MissionPage />} />
           <Route path={`${appShellRoutes.learnJapaneseChallengeBase}/:levelId`} element={<ChallengeMissionPage />} />
-          <Route path={`${appShellRoutes.lessonSessionBase}/:conceptId/:sessionNumber`} element={<LessonSessionPage />} />
           <Route path={`${appShellRoutes.learnUnitBase}/:unitId`} element={<LearnUnitPage language={language} themeMode={themeMode} activeScript={activeScript} />} />
           <Route path={`${appShellRoutes.learnExamBase}/:level`} element={<LearnLevelExamPage language={language} themeMode={themeMode} />} />
           <Route path="*" element={shell} />

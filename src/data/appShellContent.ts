@@ -92,14 +92,11 @@ export const appShellRoutes = {
   settings: '/settings',
   legacyAccountSettings: '/account/settings',
   lessonMap: '/lessons',
-  lessonSessionBase: '/lessons/session',
 } as const;
 
 export const getLearnUnitRoute = (unitId: string) => `${appShellRoutes.learnUnitBase}/${unitId}`;
 export const getLearnGuideRoute = (unitId: string) => `${appShellRoutes.learnGuideBase}/${unitId}`;
 export const getLearnExamRoute = (level: string) => `${appShellRoutes.learnExamBase}/${level}`;
-export const getLessonSessionRoute = (conceptId: string, sessionNumber: number) =>
-  `${appShellRoutes.lessonSessionBase}/${conceptId}/${sessionNumber}`;
 
 export const getPracticeHomeRoute = (script: KanaRouteScript = 'hiragana') => {
   const searchParams = new URLSearchParams();
